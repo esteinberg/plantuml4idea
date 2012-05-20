@@ -1,0 +1,23 @@
+<idea-plugin version="2">
+  <name>PlantUML integration</name>
+  <description>This plugin allows for smooth integration with PlantUML diagramming tool</description>
+  <version>1.0</version>
+  <vendor>org.esteinberg</vendor>
+  <idea-version since-build="8000"/>
+
+  <application-components>
+    <!-- Add your application components here -->
+  </application-components>
+
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>                              k
+
+  <actions>
+  </actions>
+
+  <extensions defaultExtensionNs="com.intellij">
+      <toolWindow id="PlantUML" icon="/org/plantuml/idea/uml.gif" anchor="right" factoryClass="org.plantuml.idea.PlantUmlToolWindowFactory"/>
+      <fileEditorProvider implementation="org.plantuml.idea.PlantUmlFileEditorProvider"/>
+  </extensions>
+</idea-plugin>
