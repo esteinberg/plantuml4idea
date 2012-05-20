@@ -8,15 +8,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * User: eugene
- * Date: 5/15/12
- * Time: 10:01 PM
+ * LazyApplicationPoolExecutor runs submitted Runnable asynchronously in separate thread if at least
+ * <strong>period</strong> milliseconds passed since last submission
+ *
+ * @author Eugene Steinberg
  */
 
-/**
- * LazyApplicationPoolExecutor runs submitted Runnable asynchronously in separate thread if at least
- * <strong>period</strong> milliseconds  passed since last submission
- */
 
 public class LazyApplicationPoolExecutor implements Executor {
     Future<?> commandFuture;

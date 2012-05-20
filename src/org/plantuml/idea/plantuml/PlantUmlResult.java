@@ -3,10 +3,10 @@ package org.plantuml.idea.plantuml;
 import java.awt.image.BufferedImage;
 
 /**
- * User: eugene
- * Date: 5/13/12
- * Time: 9:22 PM
+ *
+ * @author Eugene Steinberg
  */
+
 public class PlantUmlResult {
     private BufferedImage diagram;
     private String description;

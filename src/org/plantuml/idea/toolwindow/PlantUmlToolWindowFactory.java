@@ -15,10 +15,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * User: eugene
- * Date: 5/5/12
- * Time: 4:03 PM
+ *
+ * @author Eugene Steinberg
  */
+
 public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     private ToolWindow toolWindow;
     private JPanel mainPanel;

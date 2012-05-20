@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * User: eugene
- * Date: 5/13/12
- * Time: 9:19 PM
+ *
+ * @author Eugene Steinberg
  */
+
 public class PlantUml {
 
     public static final String STARTUML = "@startuml";
