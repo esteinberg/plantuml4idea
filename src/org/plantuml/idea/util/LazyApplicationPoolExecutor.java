@@ -1,69 +1,62 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.application.ApplicationManager;
-import org.apache.commons.lang.time.StopWatch;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * LazyApplicationPoolExecutor runs submitted Runnable asynchronously in separate thread if at least
- * <strong>period</strong> milliseconds passed since last submission
+ * This Executor executes Runnables sequentially and is so lazy that it executes only last Runnable submitted while
+ * previously scheduled Runnable is running. Useful when you want to submit a lot of cumulative Runnables without
+ * performance impact.
  *
  * @author Eugene Steinberg
  */
 
-
 public class LazyApplicationPoolExecutor implements Executor {
-    Future<?> commandFuture;
-    AtomicBoolean isExecutionRequested = new AtomicBoolean(false);
-    StopWatch commandWatch = new StopWatch();
-    int period;
+
+    private Runnable next;
+
+    Future<?> future;
 
     public LazyApplicationPoolExecutor() {
-        this.period = 1000;
-    }
-
-    public LazyApplicationPoolExecutor(int period) {
-        this.period = period;
     }
 
     /**
-     * Executes submitted command on Idea's Application thread pool lazily, e.g.
-     * no sooner than <strong>period</strong> milliseconds passed since previous execution finishes.
-     * If multiple requests for execution arrives during period, only last one will be executed
+     * Lazily executes the Runnable. Command will be queued for execution, but can be swallowed by another command
+     * if it will be submitted before this command will be scheduled for execution
      *
-     * @param command - comman
+     * @param command command to be executed.
      */
 
     public synchronized void execute(final Runnable command) {
-        isExecutionRequested.set(true);
-        if (commandFuture == null || commandFuture.isDone()) {
-            commandFuture = ApplicationManager.getApplication().executeOnPooledThread(
-                    new Runnable() {
 
-                        public void run() {
-                            do {
-                                commandWatch.reset();
-                                commandWatch.start();
-                                command.run();
-                                commandWatch.stop();
-                                try {
-                                    // sleep till the end of the period
-                                    if (commandWatch.getTime() < period) {
-                                        Thread.sleep(period - commandWatch.getTime());
-                                    }
-                                } catch (InterruptedException e) {
-                                    // do nothing
-                                    e.printStackTrace();
-                                }
-                            } while (isExecutionRequested.getAndSet(false));
-                        }
-                    }
-            );
-        } else {
-            // swallow execution request
+        next = new Runnable() {
+            public void run() {
+                try {
+                    command.run();
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } finally {
+                    scheduleNext();
+                }
+            }
+        };
+        if (future == null || future.isDone()) {
+            scheduleNext();
         }
     }
+
+    private synchronized Future<?> scheduleNext() {
+        final Runnable toSchedule = next;
+        next = null;
+        if (toSchedule != null) {
+            future = ApplicationManager.getApplication().executeOnPooledThread(toSchedule);
+            return future;
+        }
+        return null;
+    }
+
+
 }
