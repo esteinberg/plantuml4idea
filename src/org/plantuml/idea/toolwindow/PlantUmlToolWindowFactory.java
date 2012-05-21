@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
@@ -54,7 +55,17 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
 
         registerListeners();
 
+        renderSelectedDocument();
+
     }
+
+    private void renderSelectedDocument() {
+        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        if (selectedTextEditor != null) {
+            lazyRender(selectedTextEditor.getDocument().getText());
+        }
+    }
+
 
     private void registerListeners() {
         logger.debug("Registering listeners");
