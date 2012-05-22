@@ -1,8 +1,8 @@
 <idea-plugin version="2">
   <name>PlantUML integration</name>
   <description>This plugin allows for smooth integration with PlantUML diagramming tool</description>
-  <version>1.0</version>
-  <vendor>org.esteinberg</vendor>
+  <version>1.1</version>
+  <vendor>org.plantuml</vendor>
   <idea-version since-build="8000"/>
 
   <application-components>
