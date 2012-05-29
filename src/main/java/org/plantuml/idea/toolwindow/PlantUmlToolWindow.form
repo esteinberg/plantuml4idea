@@ -63,6 +63,9 @@
               <text value=""/>
             </properties>
           </component>
+          <hspacer id="7c82a">
+            <constraints/>
+          </hspacer>
         </children>
       </toolbar>
     </children>

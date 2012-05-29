@@ -17,8 +17,8 @@
     </scm>
 
     <properties>
-        <idea.home>${idea.sdk.path}</idea.home>
-        <idea.plug>${idea.plugins.path}</idea.plug>
+        <idea.home>C://Program Files/JetBrains/IntelliJ IDEA 11.1.1</idea.home>
+        <idea.plug>C://Users/mamontov/.IntelliJIdea11/config/plugins</idea.plug>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -50,10 +50,24 @@
         </dependency>
         <dependency>
             <groupId>com.intellij.openapi</groupId>
+            <artifactId>idea</artifactId>
+            <version>117.418</version>
+            <scope>system</scope>
+            <systemPath>${idea.home}/lib/idea.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.openapi</groupId>
             <artifactId>extensions</artifactId>
             <version>117.418</version>
             <scope>system</scope>
             <systemPath>${idea.home}/lib/extensions.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij.openapi</groupId>
+            <artifactId>annotations</artifactId>
+            <version>117.418</version>
+            <scope>system</scope>
+            <systemPath>${idea.home}/lib/annotations.jar</systemPath>
         </dependency>
     </dependencies>
 

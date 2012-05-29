@@ -1,22 +1,40 @@
 <idea-plugin version="2">
-  <name>PlantUML integration</name>
-  <description>This plugin allows for smooth integration with PlantUML diagramming tool</description>
-  <version>1.1</version>
-  <vendor>org.plantuml</vendor>
-  <idea-version since-build="8000"/>
+    <name>PlantUML integration</name>
+    <description>This plugin allows for smooth integration with PlantUML diagramming tool</description>
+    <version>1.1</version>
+    <vendor>org.plantuml</vendor>
+    <idea-version since-build="8000"/>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+    </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
 
-  <actions>
-  </actions>
+    <actions>
+        <group id="PlantUML.Parent" popup="true"
+               text="PlantUML Diagram" description="Create New PlantUML Diagram"
+               icon="/org/plantuml/idea/toolwindow/uml.gif">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
+        </group>
+        <group id="PlantUML.Group">
+            <action id="UseCase" class="org.plantuml.idea.action.CreateUseCaseDiagramAction"
+                    text="Use Case" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+            <action id="SequenceDiagram" class="org.plantuml.idea.action.CreateSequenceDiagramAction"
+                    text="Sequence Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+            <action id="ClassDiagram" class="org.plantuml.idea.action.CreateClassDiagramAction"
+                    text="Class Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+            <action id="ComponentDiagram" class="org.plantuml.idea.action.CreateComponentDiagramAction"
+                    text="Component Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+            <add-to-group group-id="PlantUML.Parent" anchor="first"/>
+        </group>
 
-  <extensions defaultExtensionNs="com.intellij">
-      <toolWindow id="PlantUML" icon="/org/plantuml/idea/toolwindow/uml.gif" anchor="right" factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
-  </extensions>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="PlantUML" icon="/org/plantuml/idea/toolwindow/uml.gif" anchor="right"
+                    factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
+    </extensions>
 </idea-plugin>
