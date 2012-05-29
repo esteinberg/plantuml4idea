@@ -26,6 +26,7 @@
             <constraints/>
             <properties>
               <enabled value="true"/>
+              <opaque value="true"/>
               <text value=""/>
               <verticalAlignment value="0"/>
             </properties>
@@ -53,6 +54,9 @@
             <constraints/>
             <properties>
               <icon value="actions/copy.png"/>
+              <margin top="3" left="3" bottom="3" right="3"/>
+              <maximumSize width="27" height="27"/>
+              <minimumSize width="27" height="27"/>
               <text value=""/>
             </properties>
           </component>
@@ -60,6 +64,7 @@
             <constraints/>
             <properties>
               <icon value="actions/menu-saveall.png"/>
+              <margin top="3" left="3" bottom="3" right="3"/>
               <text value=""/>
             </properties>
           </component>
