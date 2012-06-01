@@ -33,7 +33,7 @@ public class PlantumlFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return IconLoader.getIcon("/org/plantuml/idea/toolwindow/uml.gif");
+        return IconLoader.getIcon("/images/uml.gif");
     }
 
     @Override

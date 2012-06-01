@@ -16,25 +16,25 @@
     <actions>
         <group id="PlantUML.Parent" popup="true"
                text="PlantUML Diagram" description="Create New PlantUML Diagram"
-               icon="/org/plantuml/idea/toolwindow/uml.gif">
+               icon="/images/uml.gif">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
         </group>
         <group id="PlantUML.Group">
             <action id="UseCase" class="org.plantuml.idea.action.CreateUseCaseDiagramAction"
-                    text="Use Case" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+                    text="Use Case" icon="/images/uml.gif"/>
             <action id="SequenceDiagram" class="org.plantuml.idea.action.CreateSequenceDiagramAction"
-                    text="Sequence Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+                    text="Sequence Diagram" icon="/images/uml.gif"/>
             <action id="ClassDiagram" class="org.plantuml.idea.action.CreateClassDiagramAction"
-                    text="Class Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+                    text="Class Diagram" icon="/images/uml.gif"/>
             <action id="ComponentDiagram" class="org.plantuml.idea.action.CreateComponentDiagramAction"
-                    text="Component Diagram" icon="/org/plantuml/idea/toolwindow/uml.gif"/>
+                    text="Component Diagram" icon="/images/uml.gif"/>
             <add-to-group group-id="PlantUML.Parent" anchor="first"/>
         </group>
 
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="PlantUML" icon="/org/plantuml/idea/toolwindow/uml.gif" anchor="right"
+        <toolWindow id="PlantUML" icon="/images/uml.gif" anchor="right"
                     factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
     </extensions>
 </idea-plugin>
