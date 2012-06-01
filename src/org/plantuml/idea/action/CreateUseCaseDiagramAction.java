@@ -5,10 +5,7 @@ package org.plantuml.idea.action;
  */
 public class CreateUseCaseDiagramAction extends AbstractCreateDiagramAction {
 
-    public CreateUseCaseDiagramAction() {
-    }
-
-    public String getDiagramName() {
+    protected String getDiagramName() {
         return "Use Case";
     }
 }

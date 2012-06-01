@@ -16,7 +16,7 @@ public class PlantumlFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "SequenceDiagram";
+        return "diagram";
     }
 
     @NotNull
@@ -28,7 +28,7 @@ public class PlantumlFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return "plantuml";
+        return AbstractCreateDiagramAction.PLANTUML_EXT;
     }
 
     @Override

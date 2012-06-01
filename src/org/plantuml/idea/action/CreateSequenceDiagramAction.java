@@ -9,7 +9,7 @@ public class CreateSequenceDiagramAction extends AbstractCreateDiagramAction {
     }
 
     @Override
-    public String getDiagramName() {
+    protected String getDiagramName() {
         return "Sequence";
     }
 }

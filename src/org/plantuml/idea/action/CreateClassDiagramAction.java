@@ -6,7 +6,7 @@ package org.plantuml.idea.action;
 public class CreateClassDiagramAction extends AbstractCreateDiagramAction {
 
     @Override
-    public String getDiagramName() {
-        return "Class";
+    protected String getDiagramName() {
+            return "Class";
     }
 }

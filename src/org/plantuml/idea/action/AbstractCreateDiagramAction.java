@@ -19,8 +19,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractCreateDiagramAction extends CreateElementActionBase {
 
+    public static final String PLANTUML_EXT = ".puml";
+
     public AbstractCreateDiagramAction() {
-        super("Create New UML Diagram", "", null);
+        super("Create New Plant UML Diagram", "", null);
     }
 
     @NotNull
@@ -48,16 +50,16 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
         return new PsiElement[]{psiFile};
     }
 
-    public abstract String getDiagramName();
+    protected abstract String getDiagramName();
 
     @Override
     protected String getErrorTitle() {
-        return "Cannot Create Diagram File";
+        return "Error creating diagram";
     }
 
     @Override
     protected String getCommandName() {
-        return "Create Diagram File";
+        return "Create diagram file";
     }
 
     @Override
@@ -66,6 +68,6 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
     }
 
     private String getFileName(String name) {
-        return name + ".plantuml";
+        return name + PLANTUML_EXT;
     }
 }
