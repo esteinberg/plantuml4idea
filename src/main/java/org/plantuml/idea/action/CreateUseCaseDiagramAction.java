@@ -11,6 +11,4 @@ public class CreateUseCaseDiagramAction extends AbstractCreateDiagramAction {
     public String getDiagramName() {
         return "Use Case";
     }
-
-
 }

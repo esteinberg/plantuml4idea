@@ -1,6 +1,7 @@
 package org.plantuml.idea.action;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,11 +33,11 @@ public class PlantumlFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return IconLoader.getIcon("/org/plantuml/idea/toolwindow/uml.gif");
     }
 
     @Override
     public String getCharset(@NotNull VirtualFile virtualFile, byte[] bytes) {
-        return null;
+        return "UTF-8";
     }
 }
