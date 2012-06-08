@@ -1,4 +1,4 @@
-@startuml img/classes04.png
+@startuml
 
 abstract class AbstractList
 abstract AbstractCollection

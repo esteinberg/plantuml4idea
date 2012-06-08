@@ -19,8 +19,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractCreateDiagramAction extends CreateElementActionBase {
 
-    public static final String PLANTUML_EXT = ".puml";
-
     public AbstractCreateDiagramAction() {
         super("Create New Plant UML Diagram", "", null);
     }
@@ -41,7 +39,7 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
         Project project = psiDirectory.getProject();
         psiDirectory.checkCreateFile(fileName);
         PsiFile psiFile = PsiFileFactory.getInstance(project)
-                .createFileFromText(fileName, new PlantumlFileType(), template.getText());
+                .createFileFromText(fileName, PlantumlFileType.PLANTUML_FILE_TYPE, template.getText());
         psiFile = (PsiFile) psiDirectory.add(psiFile);
         final VirtualFile virtualFile = psiFile.getVirtualFile();
         if (virtualFile != null) {
@@ -68,6 +66,6 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
     }
 
     private String getFileName(String name) {
-        return name + PLANTUML_EXT;
+        return name + PlantumlFileType.PLANTUML_EXT;
     }
 }

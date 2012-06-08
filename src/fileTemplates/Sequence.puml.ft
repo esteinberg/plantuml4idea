@@ -1,4 +1,4 @@
-@startuml img/sequence_img001.png
+@startuml
 Alice -> Bob: Authentication Request
 Bob --> Alice: Authentication Response
 

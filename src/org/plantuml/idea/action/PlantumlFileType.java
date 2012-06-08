@@ -9,14 +9,18 @@ import javax.swing.*;
 
 public class PlantumlFileType extends LanguageFileType {
 
-    protected PlantumlFileType() {
+    public static final PlantumlFileType PLANTUML_FILE_TYPE = new PlantumlFileType();
+
+    public static final String PLANTUML_EXT = ".puml";
+
+    private PlantumlFileType() {
         super(new PlantumlLanguage());
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "diagram";
+        return "PLAIN_TEXT";
     }
 
     @NotNull
@@ -28,7 +32,7 @@ public class PlantumlFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return AbstractCreateDiagramAction.PLANTUML_EXT;
+        return PLANTUML_EXT;
     }
 
     @Override

@@ -7,5 +7,4 @@ public class PlantumlLanguage extends CompositeLanguage {
     PlantumlLanguage() {
         super("PlantUML", "text/uml");
     }
-
 }

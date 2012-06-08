@@ -1,4 +1,4 @@
-@startuml img/usecase_img04.png
+@startuml
 :Main Admin: as Admin
 (Use the application) as (Use)
 

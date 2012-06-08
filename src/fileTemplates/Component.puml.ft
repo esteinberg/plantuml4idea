@@ -1,4 +1,4 @@
-@startuml img/component_img04a.png
+@startuml
 
 package "Some Group" {
 HTTP - [First Component]
