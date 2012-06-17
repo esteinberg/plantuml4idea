@@ -35,12 +35,18 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
     @Override
     protected PsiElement[] create(String s, PsiDirectory psiDirectory) throws Exception {
         final FileTemplate template = FileTemplateManager.getInstance().getTemplate(getDiagramName());
+
+        if (template == null) {
+            throw new RuntimeException("Couldn't find template " + getDiagramName() );
+        }
+
         String fileName = getFileName(s);
         Project project = psiDirectory.getProject();
         psiDirectory.checkCreateFile(fileName);
         PsiFile psiFile = PsiFileFactory.getInstance(project)
                 .createFileFromText(fileName, PlantumlFileType.PLANTUML_FILE_TYPE, template.getText());
         psiFile = (PsiFile) psiDirectory.add(psiFile);
+
         final VirtualFile virtualFile = psiFile.getVirtualFile();
         if (virtualFile != null) {
             FileEditorManager.getInstance(project).openFile(virtualFile, true);
