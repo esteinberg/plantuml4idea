@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <description>This plugin allows for smooth integration with PlantUML diagramming tool</description>
-    <version>1.1</version>
+    <version>1.2.1</version>
     <vendor>org.plantuml</vendor>
     <idea-version since-build="8000"/>
 
@@ -15,7 +15,7 @@
 
     <actions>
         <group id="PlantUML.Parent" popup="true"
-               text="PlantUML Diagram" description="Create New PlantUML Diagram"
+               text="PlantUML Diagram" description="New PlantUML Diagram"
                icon="/images/uml.gif">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
         </group>
