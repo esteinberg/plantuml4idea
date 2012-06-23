@@ -1,28 +1,28 @@
 package org.plantuml.idea.plantuml;
 
-import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 /**
  *
  * @author Eugene Steinberg
  */
 public class PlantUmlResult {
-    private BufferedImage diagram;
+    private byte[] diagramBytes;
     private String description;
     private String error;
 
-    public PlantUmlResult(BufferedImage diagram, String description, String error) {
-        this.diagram = diagram;
+    public PlantUmlResult(byte[] diagramBytes, String description, String error) {
+        this.diagramBytes = diagramBytes;
         this.description = description;
         this.error = error;
     }
 
-    public BufferedImage getDiagram() {
-        return diagram;
+    public byte[] getDiagramBytes() {
+        return diagramBytes;
     }
 
-    public void setDiagram(BufferedImage diagram) {
-        this.diagram = diagram;
+    public void setDiagramBytes(byte[] diagramBytes) {
+        this.diagramBytes = diagramBytes;
     }
 
     public String getDescription() {
@@ -48,7 +48,7 @@ public class PlantUmlResult {
     @Override
     public String toString() {
         return "PlantUmlResult{" +
-                "diagram=" + diagram +
+                "diagramBytes=" + Arrays.toString(diagramBytes) +
                 ", description='" + description + '\'' +
                 ", error='" + error + '\'' +
                 '}';

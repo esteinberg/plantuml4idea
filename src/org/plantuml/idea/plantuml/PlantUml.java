@@ -1,5 +1,7 @@
 package org.plantuml.idea.plantuml;
 
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
 import javax.imageio.ImageIO;
@@ -10,15 +12,39 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
  * @author Eugene Steinberg
  */
 public class PlantUml {
 
+    public enum ImageFormat {
+        SVG {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.SVG;
+            }
+        },
+        PDF {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.PDF;
+            }
+        },
+        PNG {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.PNG;
+            }
+        };
+
+        abstract FileFormat getFormat();
+    }
+
     public static final String STARTUML = "@startuml";
 
-    public static PlantUmlResult render(String source) {
-        BufferedImage renderedImage = null;
+    public static PlantUmlResult render (String source) {
+        return render (source, ImageFormat.PNG);
+    }
+    public static PlantUmlResult render(String source, ImageFormat format) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         InputStream is = null;
         String desc = null;
@@ -27,14 +53,12 @@ public class PlantUml {
             // image generation.
             SourceStringReader reader = new SourceStringReader(source);
             // Write the image to "os"
-            desc = reader.generateImage(os);
+
+            desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
             // close all the flow.
             os.flush();
             os.close();
-            is = new ByteArrayInputStream(os.toByteArray());
-            renderedImage = ImageIO.read(new ByteArrayInputStream(os.toByteArray()));
-            // close the input stream
-            is.close();
+
         } catch (IOException e) {
             error = e.getMessage();
         } finally {
@@ -43,17 +67,13 @@ public class PlantUml {
             } catch (IOException e) {
                 // do nothing
             }
-            try {
-                if (is != null) is.close();
-            } catch (IOException e) {
-                // do nothing
-            }
         }
-        return new PlantUmlResult(renderedImage, desc, error);
+        return new PlantUmlResult(os.toByteArray(), desc, error);
     }
 
     /**
      * Checks wherever content contains PlantUML source code
+     *
      * @param content input content
      * @return true if content is a PlantUML source
      */

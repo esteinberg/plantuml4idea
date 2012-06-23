@@ -35,6 +35,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 /**
@@ -148,12 +149,30 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     }
 
     private void render(String source) {
-        final PlantUmlResult result = PlantUml.render(source);
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                setDiagram(result.getDiagram());
-            }
-        });
+        PlantUmlResult result = PlantUml.render(source);
+        try {
+            final BufferedImage image = getBufferedImage(result.getDiagramBytes());
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+                public void run() {
+                    setDiagram(image);
+                }
+            });
+        } catch (IOException e) {
+            System.out.println("Exception occured rendering source = " + source + ": " + e);
+        }
+
+    }
+
+    private static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
+        ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
+        BufferedImage bufferedImage;
+        try {
+            bufferedImage = ImageIO.read(input);
+        } finally {
+            if (input != null)
+                input.close();
+        }
+        return bufferedImage;
     }
 
     private class copyToClipboardActionListener implements ActionListener {
