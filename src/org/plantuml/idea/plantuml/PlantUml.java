@@ -4,9 +4,6 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,25 +14,24 @@ import java.io.InputStream;
 public class PlantUml {
 
     public enum ImageFormat {
+        PNG {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.PNG;
+            }
+        },
         SVG {
             @Override
             FileFormat getFormat() {
                 return FileFormat.SVG;
             }
         },
-        PDF {
+        EPS {
             @Override
             FileFormat getFormat() {
-                return FileFormat.PDF;
-            }
-        },
-        PNG {
-            @Override
-            FileFormat getFormat() {
-                return FileFormat.PNG;
+                return FileFormat.EPS;
             }
         };
-
         abstract FileFormat getFormat();
     }
 
@@ -57,7 +53,6 @@ public class PlantUml {
             desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
             // close all the flow.
             os.flush();
-            os.close();
 
         } catch (IOException e) {
             error = e.getMessage();

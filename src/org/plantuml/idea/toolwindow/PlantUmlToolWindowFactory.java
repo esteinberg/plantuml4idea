@@ -15,6 +15,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.openapi.wm.ToolWindow;
@@ -36,6 +37,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -49,6 +52,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     private JPanel mainPanel;
     private JLabel imageLabel;
     private BufferedImage diagram;
+    private Document currentDocument;
     private JButton copyToClipboard;
     private JButton saveToFile;
     private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
@@ -85,7 +89,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     private void renderSelectedDocument() {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
-            lazyRender(selectedTextEditor.getDocument().getText());
+            lazyRender(selectedTextEditor.getDocument());
         }
     }
 
@@ -122,7 +126,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
             if (newFile != null) {
                 Document document = FileDocumentManager.getInstance().getDocument(newFile);
                 if (document != null)
-                    lazyRender(document.getText());
+                    lazyRender(document);
             }
 
         }
@@ -136,14 +140,15 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
 
         public void documentChanged(DocumentEvent event) {
             logger.debug("document changed " + event);
-            lazyRender(event.getDocument().getText());
+            lazyRender(event.getDocument());
         }
     }
 
-    private void lazyRender(final String source) {
+    private void lazyRender(final Document document) {
+        currentDocument = document;
         lazyExecutor.execute(new Runnable() {
             public void run() {
-                render(source);
+                render(document.getText());
             }
         });
     }
@@ -158,7 +163,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
                 }
             });
         } catch (IOException e) {
-            System.out.println("Exception occured rendering source = " + source + ": " + e);
+            logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }
 
     }
@@ -169,8 +174,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
         try {
             bufferedImage = ImageIO.read(input);
         } finally {
-            if (input != null)
-                input.close();
+            input.close();
         }
         return bufferedImage;
     }
@@ -199,24 +203,58 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
         }
     }
 
+    public static final String[] extensions;
+
+    static {
+        PlantUml.ImageFormat[] values = PlantUml.ImageFormat.values();
+        extensions = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            extensions[i] = values[i].toString().toLowerCase();
+        }
+
+    }
+
     private class saveToFileActionListener implements ActionListener {
 
-        public static final String FILENAME = "diagram.png";
-        public static final String FORMAT_NAME = "png";
+        public static final String FILENAME = "diagram";
 
         public void actionPerformed(ActionEvent e) {
-
-            FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram");
+            FileOutputStream os = null;
+            FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
             final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
                     fsd, myProject).save(null, FILENAME);
             if (wrapper != null) {
                 try {
-                    ImageIO.write(diagram, FORMAT_NAME, wrapper.getFile());
-                } catch (IOException e1) {
-                    logger.error("Error writing diagram to file " + wrapper.getFile() + " got exception " + e1);
+                    File file = wrapper.getFile();
+                    String name = file.getName();
+                    String extension = name.substring(name.lastIndexOf('.') + 1);
+                    PlantUml.ImageFormat imageFormat;
+                    try {
+                        imageFormat = PlantUml.ImageFormat.valueOf(extension.toUpperCase());
+                    } catch (Exception e3) {
+                        throw new IOException("Extension '" + extension + "' is not supported");
+                    }
+                    PlantUmlResult result = PlantUml.render(currentDocument.getText(), imageFormat);
+                    os = new FileOutputStream(file);
+                    os.write(result.getDiagramBytes());
+                    os.flush();
+                } catch (Throwable e1) {
+                    String title = "Error writing diagram";
+                    String message = title + " to file:" + wrapper.getFile() + " : " + e1.toString();
+                    logger.warn(message);
+                    Messages.showErrorDialog(message, title);
+                } finally {
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e1) {
+                            // do nothing
+                        }
+                    }
                 }
             }
+
         }
+
     }
 }
-
