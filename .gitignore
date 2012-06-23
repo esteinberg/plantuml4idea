@@ -9,3 +9,5 @@
 .idea
 out
 .DS_Store
+target/
+plantuml4idea.zip
