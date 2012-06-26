@@ -146,9 +146,14 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
 
     private void lazyRender(final Document document) {
         currentDocument = document;
-        lazyExecutor.execute(new Runnable() {
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
+            @Override
             public void run() {
-                render(document.getText());
+                lazyExecutor.execute(new Runnable() {
+                    public void run() {
+                        render(document.getText());
+                    }
+                });
             }
         });
     }
