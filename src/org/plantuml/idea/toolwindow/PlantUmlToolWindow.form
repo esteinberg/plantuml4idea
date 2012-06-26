@@ -58,6 +58,7 @@
               <maximumSize width="27" height="27"/>
               <minimumSize width="27" height="27"/>
               <text value=""/>
+              <toolTipText value="Copy Diagram to Clipboard"/>
             </properties>
           </component>
           <component id="8157" class="javax.swing.JButton" binding="saveToFile">
@@ -66,6 +67,7 @@
               <icon value="actions/menu-saveall.png"/>
               <margin top="3" left="3" bottom="3" right="3"/>
               <text value=""/>
+              <toolTipText value="Save to File"/>
             </properties>
           </component>
           <hspacer id="7c82a">
