@@ -1,5 +1,6 @@
 package org.plantuml.idea.toolwindow;
 
+import com.google.common.io.Closeables;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -23,6 +24,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.messages.MessageBus;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
@@ -41,10 +43,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
+
 /**
  * @author Eugene Steinberg
  */
-
 public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     Logger logger = Logger.getInstance(PlantUmlToolWindowFactory.class);
     private Project myProject;
@@ -102,12 +105,10 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
         EditorFactory.getInstance().getEventMulticaster().addDocumentListener(plantUmlDocumentListener);
     }
 
-    private void setDiagram(BufferedImage image) {
-        if (image != null) {
-            diagram = image;
-            imageLabel.setIcon(new ImageIcon(diagram));
-            imageLabel.setPreferredSize(new Dimension(diagram.getWidth(), diagram.getHeight()));
-        }
+    private void setDiagram(@NotNull BufferedImage image) {
+        diagram = image;
+        imageLabel.setIcon(new ImageIcon(diagram));
+        imageLabel.setPreferredSize(new Dimension(diagram.getWidth(), diagram.getHeight()));
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {
@@ -133,14 +134,16 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     }
 
     private class PlantUmlDocumentListener implements DocumentListener {
-        public void beforeDocumentChange(DocumentEvent event) {
-            // nothing
 
+        public void beforeDocumentChange(DocumentEvent event) {
         }
 
         public void documentChanged(DocumentEvent event) {
             logger.debug("document changed " + event);
-            lazyRender(event.getDocument());
+            //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
+            if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
+                lazyRender(event.getDocument());
+            }
         }
     }
 
@@ -163,26 +166,21 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
         PlantUmlResult result = PlantUml.render(source);
         try {
             final BufferedImage image = getBufferedImage(result.getDiagramBytes());
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                public void run() {
-                    setDiagram(image);
-                }
-            });
+            if (image != null) {
+                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    public void run() {
+                        setDiagram(image);
+                    }
+                });
+            }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }
-
     }
 
     private static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
-        BufferedImage bufferedImage;
-        try {
-            bufferedImage = ImageIO.read(input);
-        } finally {
-            input.close();
-        }
-        return bufferedImage;
+        return ImageIO.read(input);
     }
 
     private class copyToClipboardActionListener implements ActionListener {
@@ -244,23 +242,15 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
                     os = new FileOutputStream(file);
                     os.write(result.getDiagramBytes());
                     os.flush();
-                } catch (Throwable e1) {
+                } catch (IOException e1) {
                     String title = "Error writing diagram";
                     String message = title + " to file:" + wrapper.getFile() + " : " + e1.toString();
                     logger.warn(message);
                     Messages.showErrorDialog(message, title);
                 } finally {
-                    if (os != null) {
-                        try {
-                            os.close();
-                        } catch (IOException e1) {
-                            // do nothing
-                        }
-                    }
+                    Closeables.closeQuietly(os);
                 }
             }
-
         }
-
     }
 }

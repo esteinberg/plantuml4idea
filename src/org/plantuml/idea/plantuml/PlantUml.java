@@ -35,8 +35,6 @@ public class PlantUml {
         abstract FileFormat getFormat();
     }
 
-    public static final String STARTUML = "@startuml";
-
     public static PlantUmlResult render(String source) {
         return render(source, ImageFormat.PNG);
     }
