@@ -1,6 +1,5 @@
 package org.plantuml.idea.toolwindow;
 
-import com.google.common.io.Closeables;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -248,7 +247,12 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
                     logger.warn(message);
                     Messages.showErrorDialog(message, title);
                 } finally {
-                    Closeables.closeQuietly(os);
+                    try {
+                        if (os != null)
+                            os.close();
+                    } catch (IOException e1) {
+                        // do nothing
+                    }
                 }
             }
         }
