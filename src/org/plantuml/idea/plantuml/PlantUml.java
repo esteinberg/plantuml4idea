@@ -11,6 +11,7 @@ import java.io.IOException;
  * @author Eugene Steinberg
  */
 public class PlantUml {
+    public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
 
     public enum ImageFormat {
         PNG {
@@ -52,5 +53,9 @@ public class PlantUml {
             error = e.getMessage();
         }
         return new PlantUmlResult(os.toByteArray(), desc, error);
+    }
+
+    public static PlantUmlResult testDot() {
+        return render(TESTDOT,ImageFormat.PNG);
     }
 }

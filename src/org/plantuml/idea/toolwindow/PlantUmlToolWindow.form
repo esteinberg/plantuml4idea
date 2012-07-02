@@ -36,10 +36,11 @@
       <toolbar id="9ad82">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="-1" height="20"/>
+            <preferred-size width="-1" height="32"/>
           </grid>
         </constraints>
         <properties>
+          <borderPainted value="true"/>
           <rollover value="false"/>
           <toolTipText value="PlantUML toolbar"/>
         </properties>
@@ -53,10 +54,11 @@
           <component id="82879" class="javax.swing.JButton" binding="copyToClipboard">
             <constraints/>
             <properties>
+              <borderPainted value="false"/>
               <icon value="actions/copy.png"/>
               <margin top="3" left="3" bottom="3" right="3"/>
-              <maximumSize width="27" height="27"/>
-              <minimumSize width="27" height="27"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
               <text value=""/>
               <toolTipText value="Copy Diagram to Clipboard"/>
             </properties>
@@ -64,8 +66,11 @@
           <component id="8157" class="javax.swing.JButton" binding="saveToFile">
             <constraints/>
             <properties>
+              <borderPainted value="false"/>
               <icon value="actions/menu-saveall.png"/>
               <margin top="3" left="3" bottom="3" right="3"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
               <text value=""/>
               <toolTipText value="Save to File"/>
             </properties>
@@ -73,6 +78,18 @@
           <hspacer id="7c82a">
             <constraints/>
           </hspacer>
+          <component id="3393d" class="javax.swing.JButton" binding="aboutButton" default-binding="true">
+            <constraints/>
+            <properties>
+              <borderPainted value="false"/>
+              <icon value="actions/help.png"/>
+              <margin top="3" left="3" bottom="3" right="3"/>
+              <maximumSize width="32" height="32"/>
+              <minimumSize width="32" height="32"/>
+              <text value=""/>
+              <toolTipText value="About"/>
+            </properties>
+          </component>
         </children>
       </toolbar>
     </children>

@@ -26,9 +26,9 @@ import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -37,7 +37,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,6 +56,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     private Document currentDocument;
     private JButton copyToClipboard;
     private JButton saveToFile;
+    private JButton aboutButton;
     private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
 
@@ -86,6 +86,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
 
         copyToClipboard.addActionListener(new copyToClipboardActionListener());
         saveToFile.addActionListener(new saveToFileActionListener());
+        aboutButton.addActionListener(new aboutActionListener());
     }
 
     private void renderSelectedDocument() {
@@ -164,11 +165,12 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
     private void render(String source) {
         PlantUmlResult result = PlantUml.render(source);
         try {
-            final BufferedImage image = getBufferedImage(result.getDiagramBytes());
+            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
             if (image != null) {
+                diagram = image;
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        setDiagram(image);
+                        UIUtils.setImage(image, imageLabel);
                     }
                 });
             }
@@ -177,10 +179,6 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
         }
     }
 
-    private static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
-        ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
-        return ImageIO.read(input);
-    }
 
     private class copyToClipboardActionListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -243,7 +241,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
                     os.flush();
                 } catch (IOException e1) {
                     String title = "Error writing diagram";
-                    String message = title + " to file:" + wrapper.getFile() + " : " + e1.toString();
+                    String message = title  + " to file:" + wrapper.getFile() + " : " + e1.toString();
                     logger.warn(message);
                     Messages.showErrorDialog(message, title);
                 } finally {
@@ -255,6 +253,19 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory {
                     }
                 }
             }
+        }
+    }
+
+    private class aboutActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            AboutDialog aboutDialog = new AboutDialog();
+            aboutDialog.pack();
+            Point centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+            Point topLeftPoint = new Point((centerPoint.x-aboutDialog.getWidth()/2),
+                    centerPoint.y-aboutDialog.getHeight()/2);
+            aboutDialog.setLocation(topLeftPoint);
+            aboutDialog.setVisible(true);
         }
     }
 }
