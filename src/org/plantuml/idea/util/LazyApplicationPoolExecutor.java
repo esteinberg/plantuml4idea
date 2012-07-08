@@ -35,9 +35,7 @@ public class LazyApplicationPoolExecutor implements Executor {
                     command.run();
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } finally {
-                    scheduleNext();
+                    Thread.currentThread().interrupt();
                 }
             }
         };
