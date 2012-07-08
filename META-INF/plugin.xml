@@ -19,7 +19,7 @@
                icon="/images/uml.gif">
             <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
         </group>
-        <group id="PlantUML.Group">
+        <group id="PlantUML.NewDiagram">
             <action id="UseCase" class="org.plantuml.idea.action.CreateUseCaseDiagramAction"
                     text="Use Case" icon="/images/uml.gif"/>
             <action id="SequenceDiagram" class="org.plantuml.idea.action.CreateSequenceDiagramAction"
@@ -29,6 +29,18 @@
             <action id="ComponentDiagram" class="org.plantuml.idea.action.CreateComponentDiagramAction"
                     text="Component Diagram" icon="/images/uml.gif"/>
             <add-to-group group-id="PlantUML.Parent" anchor="first"/>
+        </group>
+        <group id="PlantUML.Toolbar" description="PlantUML toolbar">
+            <action id="PlantUML.CopyToClipboard" description="Copy diagram to clipboard"
+                    class="org.plantuml.idea.action.CopyDiagramToClipboardAction"
+                    icon="/actions/copy.png"
+                    />
+            <action id="PlantUML.SaveToFile" description="Save diagram to file"
+                    class="org.plantuml.idea.action.SaveDiagramToFileAction"
+                    icon="/actions/menu-saveall.png"/>
+            <separator/>
+            <action id="PlantUML.About" description="About" icon="/actions/help.png"
+                    class="org.plantuml.idea.action.AboutAction"/>
         </group>
 
     </actions>

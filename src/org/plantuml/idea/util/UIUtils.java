@@ -1,5 +1,9 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -24,4 +28,13 @@ public class UIUtils {
         label.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
     }
 
+    public static String getSelectedSource(Project myProject) {
+        String source = "";
+        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        if (selectedTextEditor != null) {
+            final Document document = selectedTextEditor.getDocument();
+            source = document.getText();
+        }
+        return source;
+    }
 }
