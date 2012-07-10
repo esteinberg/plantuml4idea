@@ -5,6 +5,8 @@
     <vendor>org.plantuml</vendor>
     <idea-version since-build="8000"/>
 
+    <depends>com.intellij.modules.platform</depends>
+
     <application-components>
         <!-- Add your application components here -->
     </application-components>
@@ -17,7 +19,7 @@
         <group id="PlantUML.Parent" popup="true"
                text="PlantUML Diagram" description="New PlantUML Diagram"
                icon="/images/uml.gif">
-            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
         </group>
         <group id="PlantUML.NewDiagram">
             <action id="UseCase" class="org.plantuml.idea.action.CreateUseCaseDiagramAction"
