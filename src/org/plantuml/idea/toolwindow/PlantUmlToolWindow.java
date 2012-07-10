@@ -17,6 +17,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.messages.MessageBus;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
@@ -24,6 +25,8 @@ import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -35,6 +38,8 @@ import static com.intellij.codeInsight.completion.CompletionInitializationContex
  */
 public class PlantUmlToolWindow extends JPanel {
     private Project myProject;
+    private ToolWindow toolWindow;
+
     Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
     private JLabel imageLabel;
 
@@ -44,11 +49,11 @@ public class PlantUmlToolWindow extends JPanel {
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
 
 
-
-    public PlantUmlToolWindow(Project myProject) {
+    public PlantUmlToolWindow(Project myProject, ToolWindow toolWindow) {
         super(new BorderLayout());
 
         this.myProject = myProject;
+        this.toolWindow = toolWindow;
 
         setupUI();
 
@@ -59,8 +64,9 @@ public class PlantUmlToolWindow extends JPanel {
 
     private void setupUI() {
         ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("PlantUML.Toolbar");
-        final ActionToolbar actionToolbar= ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
-        add(actionToolbar.getComponent(), BorderLayout.PAGE_START );
+        final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
+        actionToolbar.setTargetComponent(this);
+        add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
         imageLabel = new JLabel();
 
@@ -74,7 +80,24 @@ public class PlantUmlToolWindow extends JPanel {
         messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, plantUmlVirtualFileListener);
 
         EditorFactory.getInstance().getEventMulticaster().addDocumentListener(plantUmlDocumentListener);
-        renderSelectedDocument();
+
+        toolWindow.getComponent().addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent ancestorEvent) {
+                renderSelectedDocument();
+            }
+
+            @Override
+            public void ancestorRemoved(AncestorEvent ancestorEvent) {
+                // do nothing
+            }
+
+            @Override
+            public void ancestorMoved(AncestorEvent ancestorEvent) {
+                // do nothing
+
+            }
+        });
     }
 
     private void renderSelectedDocument() {
@@ -86,17 +109,21 @@ public class PlantUmlToolWindow extends JPanel {
 
 
     private void lazyRender(final Document document) {
-        ApplicationManager.getApplication().runReadAction(new Runnable() {
-            @Override
-            public void run() {
-                final String source = document.getText();
-                lazyExecutor.execute(new Runnable() {
-                    public void run() {
-                        render(source);
-                    }
-                });
-            }
-        });
+        if (toolWindow.isVisible()) {
+            ApplicationManager.getApplication().runReadAction(new Runnable() {
+                @Override
+                public void run() {
+                    final String source = document.getText();
+
+                    Runnable command = new Runnable() {
+                        public void run() {
+                            render(source);
+                        }
+                    };
+                    lazyExecutor.execute(command);
+                }
+            });
+        }
     }
 
     private void render(String source) {
@@ -146,6 +173,7 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
+                logger.debug("lazyRender " + event);
                 lazyRender(event.getDocument());
             }
         }
