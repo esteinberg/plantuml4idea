@@ -5,7 +5,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
@@ -21,6 +24,9 @@ import java.io.IOException;
 public class SaveDiagramToFileAction extends AnAction {
     Logger logger = Logger.getInstance(SaveDiagramToFileAction.class);
     public static final String[] extensions;
+    public static VirtualFile homeDir = null;
+    private static VirtualFile lastFile = null;
+
 
     static {
         PlantUml.ImageFormat[] values = PlantUml.ImageFormat.values();
@@ -29,17 +35,26 @@ public class SaveDiagramToFileAction extends AnAction {
             extensions[i] = values[i].toString().toLowerCase();
         }
 
+        homeDir = LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home"));
     }
 
     public static final String FILENAME = "diagram";
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         FileOutputStream os = null;
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
+
+        final VirtualFile baseDir = lastFile == null? homeDir: lastFile;
+        String defaultFileName = getDefaultFileName(e.getProject());
+
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
-                fsd, e.getProject()).save(null, FILENAME);
+                fsd, e.getProject()).save(baseDir, defaultFileName);
+
         if (wrapper != null) {
             try {
+                if (wrapper.getVirtualFile() != null)
+                    lastFile = wrapper.getVirtualFile().getParent();
                 File file = wrapper.getFile();
                 String name = file.getName();
                 String extension = name.substring(name.lastIndexOf('.') + 1);
@@ -55,7 +70,7 @@ public class SaveDiagramToFileAction extends AnAction {
                 os.flush();
             } catch (IOException e1) {
                 String title = "Error writing diagram";
-                String message = title  + " to file:" + wrapper.getFile() + " : " + e1.toString();
+                String message = title + " to file:" + wrapper.getFile() + " : " + e1.toString();
                 logger.warn(message);
                 Messages.showErrorDialog(message, title);
             } finally {
@@ -67,6 +82,11 @@ public class SaveDiagramToFileAction extends AnAction {
                 }
             }
         }
+    }
+
+    private String getDefaultFileName(Project myProject) {
+        VirtualFile selectedFile = UIUtils.getSelectedFile(myProject);
+        return selectedFile == null? FILENAME: selectedFile.getNameWithoutExtension();
     }
 
 

@@ -2,8 +2,10 @@ package org.plantuml.idea.util;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -37,4 +39,16 @@ public class UIUtils {
         }
         return source;
     }
+
+    public static VirtualFile getSelectedFile(Project myProject) {
+        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        VirtualFile file = null;
+        if (selectedTextEditor != null) {
+            final Document document = selectedTextEditor.getDocument();
+            file = FileDocumentManager.getInstance().getFile(document);
+        }
+        return file;
+    }
+
+
 }
