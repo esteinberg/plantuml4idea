@@ -109,7 +109,6 @@ public class PlantUmlToolWindow extends JPanel {
 
 
     private void lazyRender(final Document document) {
-        if (toolWindow.isVisible()) {
             ApplicationManager.getApplication().runReadAction(new Runnable() {
                 @Override
                 public void run() {
@@ -123,7 +122,6 @@ public class PlantUmlToolWindow extends JPanel {
                     lazyExecutor.execute(command);
                 }
             });
-        }
     }
 
     private void render(String source) {
