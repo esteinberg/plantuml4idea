@@ -49,13 +49,10 @@ public class PlantUml {
             SourceStringReader reader = new SourceStringReader(source);
             // Write the image to "os"
             desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
-        } catch (IOException e) {
+        } catch (Exception e) {
             error = e.getMessage();
         }
         return new PlantUmlResult(os.toByteArray(), desc, error);
     }
 
-    public static PlantUmlResult testDot() {
-        return render(TESTDOT,ImageFormat.PNG);
-    }
 }
