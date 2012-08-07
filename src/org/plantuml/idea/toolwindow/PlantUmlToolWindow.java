@@ -9,6 +9,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -45,6 +47,7 @@ public class PlantUmlToolWindow extends JPanel {
 
     private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
+    private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
 
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
 
@@ -80,6 +83,7 @@ public class PlantUmlToolWindow extends JPanel {
         messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, plantUmlVirtualFileListener);
 
         EditorFactory.getInstance().getEventMulticaster().addDocumentListener(plantUmlDocumentListener);
+        EditorFactory.getInstance().getEventMulticaster().addCaretListener(plantUmlCaretListener);
 
         toolWindow.getComponent().addAncestorListener(new AncestorListener() {
             @Override
@@ -109,19 +113,19 @@ public class PlantUmlToolWindow extends JPanel {
 
 
     private void lazyRender(final Document document) {
-            ApplicationManager.getApplication().runReadAction(new Runnable() {
-                @Override
-                public void run() {
-                    final String source = document.getText();
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
+            @Override
+            public void run() {
+                final String source = document.getText();
 
-                    Runnable command = new Runnable() {
-                        public void run() {
-                            render(source);
-                        }
-                    };
-                    lazyExecutor.execute(command);
-                }
-            });
+                Runnable command = new Runnable() {
+                    public void run() {
+                        render(source);
+                    }
+                };
+                lazyExecutor.execute(command);
+            }
+        });
     }
 
     private void render(String source) {
@@ -177,4 +181,13 @@ public class PlantUmlToolWindow extends JPanel {
         }
     }
 
+    private class PlantUmlCaretListener implements CaretListener {
+        @Override
+        public void caretPositionChanged(CaretEvent e) {
+            String text = e.getEditor().getDocument().getText();
+            int offset = e.getEditor().logicalPositionToOffset(e.getNewPosition());
+            //System.out.println(PlantUml.extractSource(text,offset) + "\n====");
+        }
+    }
 }
+

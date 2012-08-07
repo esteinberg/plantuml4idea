@@ -5,13 +5,16 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Eugene Steinberg
  */
 public class PlantUml {
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
+    public static final String UMLSTART = "@startuml";
+    public static final String UMLEND = "@enduml";
 
     public enum ImageFormat {
         PNG {
@@ -53,6 +56,36 @@ public class PlantUml {
             error = e.getMessage();
         }
         return new PlantUmlResult(os.toByteArray(), desc, error);
+    }
+
+    private static final String separator = System.getProperty("line.separator");
+
+    /**
+     * Extracts plantUML diagram sourcePattern code from the given string starting from given offset
+     * <ul>
+     * <li>Relies on having @startuml and @enduml tags (puml tags) wrapping plantuml sourcePattern code</li>
+     * <li>If offset happens to be inside puml tags, returns corresponding sourcePattern code.</li>
+     * <li>If offset happens to be outside puml tags, returns empty string </li>
+     * </ul>
+     *
+     * @param text   sourcePattern code containing multiple plantuml sources
+     * @param offset offset in the text from which plantuml sourcePattern is extracted
+     * @return extracted plantUml code, including @startuml and @enduml tags or empty string if
+     *         no valid sourcePattern code was found
+     */
+    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?@enduml)(?s).*?)+");
+
+    public static String extractSource(String text, int offset) {
+        if (!text.contains("@startuml")) return "";
+
+        Matcher matcher = sourcePattern.matcher(text);
+
+        while (matcher.find()) {
+            String group = matcher.group();
+            if (matcher.start() <= offset && offset <= matcher.end())
+                return group;
+        }
+        return "";
     }
 
 }
