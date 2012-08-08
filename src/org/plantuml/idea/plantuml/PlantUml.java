@@ -61,14 +61,14 @@ public class PlantUml {
     private static final String separator = System.getProperty("line.separator");
 
     /**
-     * Extracts plantUML diagram sourcePattern code from the given string starting from given offset
+     * Extracts plantUML diagram source code from the given string starting from given offset
      * <ul>
      * <li>Relies on having @startuml and @enduml tags (puml tags) wrapping plantuml sourcePattern code</li>
      * <li>If offset happens to be inside puml tags, returns corresponding sourcePattern code.</li>
      * <li>If offset happens to be outside puml tags, returns empty string </li>
      * </ul>
      *
-     * @param text   sourcePattern code containing multiple plantuml sources
+     * @param text   source code containing multiple plantuml sources
      * @param offset offset in the text from which plantuml sourcePattern is extracted
      * @return extracted plantUml code, including @startuml and @enduml tags or empty string if
      *         no valid sourcePattern code was found

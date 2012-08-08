@@ -6,14 +6,12 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -107,25 +105,24 @@ public class PlantUmlToolWindow extends JPanel {
     private void renderSelectedDocument() {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
-            lazyRender(selectedTextEditor.getDocument());
+            extractAndRender(selectedTextEditor.getDocument().getText(),0);
         }
     }
 
-
-    private void lazyRender(final Document document) {
-        ApplicationManager.getApplication().runReadAction(new Runnable() {
-            @Override
+    private void lazyRender(final String source) {
+        Runnable command = new Runnable() {
             public void run() {
-                final String source = document.getText();
-
-                Runnable command = new Runnable() {
-                    public void run() {
-                        render(source);
-                    }
-                };
-                lazyExecutor.execute(command);
+                render(source);
             }
-        });
+        };
+        lazyExecutor.execute(command);
+    }
+
+    private void extractAndRender(final String fullSource, int offset) {
+        final String source = PlantUml.extractSource(fullSource, offset);
+        if (!source.isEmpty()) {
+            lazyRender(source);
+        }
     }
 
     private void render(String source) {
@@ -156,13 +153,10 @@ public class PlantUmlToolWindow extends JPanel {
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
 
-            VirtualFile newFile = event.getNewFile();
-            if (newFile != null) {
-                Document document = FileDocumentManager.getInstance().getDocument(newFile);
-                if (document != null)
-                    lazyRender(document);
+            Editor newEditor = (Editor) event.getNewEditor();
+            if (newEditor != null) {
+                extractAndRender(newEditor.getDocument().getText(),newEditor.getCaretModel().getOffset());
             }
-
         }
     }
 
@@ -175,18 +169,30 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                logger.debug("lazyRender " + event);
-                lazyRender(event.getDocument());
+                extractAndRender(event.getDocument().getText(),event.getOffset());
             }
         }
     }
 
     private class PlantUmlCaretListener implements CaretListener {
         @Override
-        public void caretPositionChanged(CaretEvent e) {
-            String text = e.getEditor().getDocument().getText();
-            int offset = e.getEditor().logicalPositionToOffset(e.getNewPosition());
-            //System.out.println(PlantUml.extractSource(text,offset) + "\n====");
+        public void caretPositionChanged(final CaretEvent e) {
+            ApplicationManager.getApplication().runReadAction(new Runnable() {
+                @Override
+                public void run() {
+                    String text = e.getEditor().getDocument().getText();
+                    int offset = e.getEditor().logicalPositionToOffset(e.getNewPosition());
+                    final String source = PlantUml.extractSource(text, offset);
+                    if (!source.isEmpty()) {
+                        Runnable command = new Runnable() {
+                            public void run() {
+                                render(source);
+                            }
+                        };
+                        lazyExecutor.execute(command);
+                    }
+                }
+            });
         }
     }
 }
