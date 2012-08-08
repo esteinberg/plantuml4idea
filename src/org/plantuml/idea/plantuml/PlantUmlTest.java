@@ -6,23 +6,33 @@ import junit.framework.TestCase;
  * @author Eugene Steinberg
  */
 public class PlantUmlTest extends TestCase {
-    String source1 = "@startuml some code @enduml";
-    String source2 = "@startuml\nsecond code\n@enduml";
-    String source3 = "@startuml\nthird code\n@enduml";
-    String compoundSource = source1 + "\n" + "some intermediate stuff " + "\n" + source2 + "some other intermediate"
-            + source3;
+    String validSource1 = "@startuml some code @enduml";
+    String validSource2 = "@startuml\nsecond code\n@enduml";
+    String validSource3 = "@startuml\nthird code\n@enduml";
+    String intermediateText1 = "\nsome intermediate\n paragraph text\n";
+    String intermediateText2 = "another \n intermediate \n text";
+    String sourceWithoutEndUml = "@startuml\ncode without enduml";
 
     public void testExtractSingleSource() throws Exception {
-        assertEquals(source1, PlantUml.extractSource(source1, 0));
-        assertEquals(source1, PlantUml.extractSource(source1, source1.length() / 2));
-        assertEquals(source1,PlantUml.extractSource(source1, source1.length()));
+        assertEquals(validSource1, PlantUml.extractSource(validSource1, 0));
+        assertEquals(validSource1, PlantUml.extractSource(validSource1, validSource1.length() / 2));
+        assertEquals(validSource1, PlantUml.extractSource(validSource1, validSource1.length()));
+        assertEquals(sourceWithoutEndUml, PlantUml.extractSource(sourceWithoutEndUml, sourceWithoutEndUml.length() / 2));
+        assertEquals(sourceWithoutEndUml, PlantUml.extractSource(sourceWithoutEndUml, sourceWithoutEndUml.length()));
     }
 
     public void testExtractCompoundSource() {
-        assertEquals(source1, PlantUml.extractSource(compoundSource, source1.length() / 2));
-        assertEquals(source2, PlantUml.extractSource(compoundSource, compoundSource.length() - source3.length() - 30));
-        assertEquals("",PlantUml.extractSource(compoundSource, source1.length() + 5));
+        String compoundSource1 = validSource1 + intermediateText1 + validSource2;
+        assertEquals(validSource1, PlantUml.extractSource(compoundSource1, validSource1.length() / 2));
+        assertEquals(validSource2, PlantUml.extractSource(compoundSource1, compoundSource1.length() - validSource2.length() / 2));
+        assertEquals("", PlantUml.extractSource(compoundSource1, validSource1.length() + intermediateText1.length() / 2));
 
+        String compoundSource2 = validSource1 + intermediateText1 + sourceWithoutEndUml;
+        assertEquals(sourceWithoutEndUml,
+                PlantUml.extractSource(compoundSource2,compoundSource2.length() - sourceWithoutEndUml.length() / 2));
+        String compoundSource3 = sourceWithoutEndUml+intermediateText1+validSource1;
+        assertEquals(compoundSource3,
+                PlantUml.extractSource(compoundSource3+intermediateText2,compoundSource3.length() - validSource1.length() / 2));
     }
 
 }

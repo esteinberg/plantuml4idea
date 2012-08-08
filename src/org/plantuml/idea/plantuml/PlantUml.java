@@ -73,10 +73,10 @@ public class PlantUml {
      * @return extracted plantUml code, including @startuml and @enduml tags or empty string if
      *         no valid sourcePattern code was found
      */
-    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?@enduml)(?s).*?)+");
+    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?(?:@enduml|$))(?s).*?)+");
 
     public static String extractSource(String text, int offset) {
-        if (!text.contains("@startuml")) return "";
+        if (!text.contains(UMLSTART)) return "";
 
         Matcher matcher = sourcePattern.matcher(text);
 
