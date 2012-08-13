@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.plantuml.PlantUml;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,7 +36,8 @@ public class UIUtils {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
-            source = document.getText();
+            int offset = selectedTextEditor.getCaretModel().getOffset();
+            source = PlantUml.extractSource(document.getText(), offset);
         }
         return source;
     }

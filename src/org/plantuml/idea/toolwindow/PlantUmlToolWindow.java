@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
@@ -103,13 +102,11 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     private void renderSelectedDocument() {
-        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
-        if (selectedTextEditor != null) {
-            extractAndRender(selectedTextEditor.getDocument().getText(), 0);
-        }
+        render(UIUtils.getSelectedSource(myProject));
     }
 
     private void lazyRender(final String source) {
+        if (source.isEmpty()) return;
         Runnable command = new Runnable() {
             public void run() {
                 render(source);
@@ -118,14 +115,9 @@ public class PlantUmlToolWindow extends JPanel {
         lazyExecutor.execute(command);
     }
 
-    private void extractAndRender(final String fullSource, int offset) {
-        final String source = PlantUml.extractSource(fullSource, offset);
-        if (!source.isEmpty()) {
-            lazyRender(source);
-        }
-    }
-
     private void render(String source) {
+        if (source.isEmpty())
+            return;
         PlantUmlResult result = PlantUml.render(source);
         try {
             final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
@@ -152,10 +144,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
-            if (selectedTextEditor != null) {
-                extractAndRender(selectedTextEditor.getDocument().getText(), selectedTextEditor.getCaretModel().getOffset());
-            }
+            lazyRender(UIUtils.getSelectedSource(myProject));
         }
     }
 
@@ -168,7 +157,7 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                extractAndRender(event.getDocument().getText(), event.getOffset());
+                lazyRender(UIUtils.getSelectedSource(myProject));
             }
         }
     }

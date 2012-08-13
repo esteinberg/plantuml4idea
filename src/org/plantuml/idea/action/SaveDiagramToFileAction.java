@@ -45,7 +45,7 @@ public class SaveDiagramToFileAction extends AnAction {
         FileOutputStream os = null;
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
 
-        final VirtualFile baseDir = lastFile == null? homeDir: lastFile;
+        final VirtualFile baseDir = lastFile == null ? homeDir : lastFile;
         String defaultFileName = getDefaultFileName(e.getProject());
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
@@ -86,7 +86,7 @@ public class SaveDiagramToFileAction extends AnAction {
 
     private String getDefaultFileName(Project myProject) {
         VirtualFile selectedFile = UIUtils.getSelectedFile(myProject);
-        return selectedFile == null? FILENAME: selectedFile.getNameWithoutExtension();
+        return selectedFile == null ? FILENAME : selectedFile.getNameWithoutExtension();
     }
 
 
