@@ -6,10 +6,10 @@ import org.plantuml.idea.util.UIUtils;
 /**
  * @author Eugene Steinberg
  */
-public class SaveDiagramToFileAction extends AbstractSaveDiagramAction {
+public class SaveAllDiagramToFileAction extends AbstractSaveDiagramAction {
 
     @Override
     protected String getSource(Project project) {
-        return UIUtils.getSelectedSourceWithCaret(project);
+        return UIUtils.getSelectedSource(project);
     }
 }

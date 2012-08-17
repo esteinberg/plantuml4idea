@@ -41,7 +41,7 @@
                     class="org.plantuml.idea.action.SaveDiagramToFileAction"
                     icon="/actions/checkOut.png"/>
             <action id="PlantUML.SaveAllToFile" description="Save all diagrams"
-                    class="org.plantuml.idea.action.SaveDiagramToFileAction"
+                    class="org.plantuml.idea.action.SaveAllDiagramToFileAction"
                     icon="/actions/menu-saveall.png"/>
             <separator/>
 

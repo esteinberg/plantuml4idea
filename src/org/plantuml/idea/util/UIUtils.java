@@ -31,8 +31,10 @@ public class UIUtils {
         label.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
     }
 
-    public static String getSelectedSource(Project myProject) {
+    public static String getSelectedSourceWithCaret(Project myProject) {
         String source = "";
+        source = getSelectedSource(myProject);
+
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
@@ -41,6 +43,16 @@ public class UIUtils {
         }
         return source;
     }
+    public static String getSelectedSource(Project myProject) {
+        String source = "";
+        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        if (selectedTextEditor != null) {
+            final Document document = selectedTextEditor.getDocument();
+            source = document.getText();
+        }
+        return source;
+    }
+
 
     public static VirtualFile getSelectedFile(Project myProject) {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();

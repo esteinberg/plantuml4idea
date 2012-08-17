@@ -102,7 +102,7 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     private void renderSelectedDocument() {
-        render(UIUtils.getSelectedSource(myProject));
+        render(UIUtils.getSelectedSourceWithCaret(myProject));
     }
 
     private void lazyRender(final String source) {
@@ -144,7 +144,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            lazyRender(UIUtils.getSelectedSource(myProject));
+            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
         }
     }
 
@@ -157,7 +157,7 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                lazyRender(UIUtils.getSelectedSource(myProject));
+                lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
             }
         }
     }

@@ -1,10 +1,14 @@
 package org.plantuml.idea.plantuml;
 
+import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +47,13 @@ public class PlantUml {
         return render(source, ImageFormat.PNG);
     }
 
+    /**
+     * Renders given source code into diagram
+     *
+     * @param source plantUml source code
+     * @param format desired image format
+     * @return rendering result
+     */
     public static PlantUmlResult render(String source, ImageFormat format) {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         String desc = null;
@@ -58,7 +69,29 @@ public class PlantUml {
         return new PlantUmlResult(os.toByteArray(), desc, error);
     }
 
-    private static final String separator = System.getProperty("line.separator");
+    /**
+     * Renders source code and saves diagram images to files according to provided naming scheme
+     * and image format.
+     *
+     * @param source         source code to be rendered
+     * @param format         image format
+     * @param fileName       fileName to use with first file
+     * @param fileNameFormat file naming scheme for further files
+     * @throws IOException in case of rendering or saving fails
+     */
+    public static void renderAndSave(String source, ImageFormat format, String fileName, String fileNameFormat)
+            throws IOException {
+        SourceStringReader reader = new SourceStringReader(source);
+        List<BlockUml> blocks = reader.getBlocks();
+        for (int i = 0; i < blocks.size(); i++) {
+            String fName = i == 0 ? fileName : String.format(fileNameFormat, i);
+            FileOutputStream outputStream = new FileOutputStream(fName);
+            reader.generateImage(outputStream, i, new FileFormatOption(format.getFormat()));
+            outputStream.close();
+        }
+    }
+
+    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?(?:@enduml|$))(?s).*?)+");
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset
@@ -73,8 +106,6 @@ public class PlantUml {
      * @return extracted plantUml code, including @startuml and @enduml tags or empty string if
      *         no valid sourcePattern code was found
      */
-    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?(?:@enduml|$))(?s).*?)+");
-
     public static String extractSource(String text, int offset) {
         if (!text.contains(UMLSTART)) return "";
 
