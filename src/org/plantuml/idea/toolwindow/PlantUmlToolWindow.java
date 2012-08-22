@@ -191,6 +191,7 @@ public class PlantUmlToolWindow extends JPanel {
 
     private class PlantUmlCaretListener implements CaretListener {
         @Override
+
         public void caretPositionChanged(final CaretEvent e) {
             ApplicationManager.getApplication().runReadAction(new Runnable() {
                 @Override

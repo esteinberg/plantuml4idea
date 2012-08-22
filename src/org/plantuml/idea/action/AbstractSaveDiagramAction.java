@@ -53,7 +53,7 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
                 if (virtualFile != null)
                     lastFile = virtualFile.getParent();
                 File file = wrapper.getFile();
-                String[] tokens = file.getName().split("\\.(?=[^\\.]+$)");
+                String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String base = tokens[0];
                 String extension = tokens.length < 2 ? "" : tokens[1];
                 PlantUml.ImageFormat imageFormat;
@@ -64,10 +64,9 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
                 }
                 String selectedSource = getSource(e.getProject());
 
-                String path = baseDir.getCanonicalPath() + "/";
-                String fileNameTemplate = path + base + "%03d." + extension;
+                String fileNameTemplate = base + "%03d." + extension;
 
-                PlantUml.renderAndSave(selectedSource, imageFormat, file.getName(), fileNameTemplate);
+                PlantUml.renderAndSave(selectedSource, imageFormat, file.getAbsolutePath(), fileNameTemplate);
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";
