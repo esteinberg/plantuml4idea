@@ -15,6 +15,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.messages.MessageBus;
@@ -99,6 +101,29 @@ public class PlantUmlToolWindow extends JPanel {
 
             }
         });
+
+        ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerListener() {
+            @Override
+            public void projectOpened(Project project) {
+                logger.debug("opened project "+ project);
+                myProject=project;
+            }
+
+            @Override
+            public boolean canCloseProject(Project project) {
+                return true;
+            }
+
+            @Override
+            public void projectClosed(Project project) {
+                logger.debug("closed project "+ project);
+                myProject = null;
+            }
+
+            @Override
+            public void projectClosing(Project project) {
+            }
+        });
     }
 
     private void renderSelectedDocument() {
@@ -144,7 +169,8 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+            if (!myProject.isDisposed())
+                lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
         }
     }
 
@@ -157,7 +183,8 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+                if (!myProject.isDisposed())
+                    lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
             }
         }
     }
