@@ -105,8 +105,8 @@ public class PlantUmlToolWindow extends JPanel {
         ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerListener() {
             @Override
             public void projectOpened(Project project) {
-                logger.debug("opened project "+ project);
-                myProject=project;
+                logger.debug("opened project " + project);
+                myProject = project;
             }
 
             @Override
@@ -116,7 +116,7 @@ public class PlantUmlToolWindow extends JPanel {
 
             @Override
             public void projectClosed(Project project) {
-                logger.debug("closed project "+ project);
+                logger.debug("closed project " + project);
                 myProject = null;
             }
 
@@ -169,7 +169,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            if (!myProject.isDisposed())
+            if (myProject != null && !myProject.isDisposed())
                 lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
         }
     }
@@ -183,7 +183,7 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                if (!myProject.isDisposed())
+                if (myProject != null && !myProject.isDisposed())
                     lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
             }
         }
