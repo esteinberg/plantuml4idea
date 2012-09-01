@@ -17,8 +17,7 @@ import java.util.regex.Pattern;
  */
 public class PlantUml {
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
-    public static final String UMLSTART = "@startuml";
-    public static final String UMLEND = "@enduml";
+    public static final String UMLSTART = "@start";
 
     public enum ImageFormat {
         PNG {
@@ -91,7 +90,8 @@ public class PlantUml {
         }
     }
 
-    private static Pattern sourcePattern = Pattern.compile("(?:(@startuml(?s).*?(?:@enduml|$))(?s).*?)+");
+    private static Pattern sourcePattern =
+            Pattern.compile("(?:(@start(?:uml|dot|jcckit|ditaa|salt)(?s).*?(?:@end(?:uml|dot|jcckit|ditaa|salt)|$))(?s).*?)+");
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset

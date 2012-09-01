@@ -35,4 +35,11 @@ public class PlantUmlTest extends TestCase {
                 PlantUml.extractSource(compoundSource3+intermediateText2,compoundSource3.length() - validSource1.length() / 2));
     }
 
+    public void testExtractDotSource() {
+
+        String dotSource = "@startdot\n dotcode\n @enddot";
+        assertEquals(dotSource, PlantUml.extractSource(intermediateText1+dotSource+intermediateText2,
+                intermediateText1.length()+dotSource.length() / 2));
+    }
+
 }
