@@ -33,7 +33,7 @@ public class LazyApplicationPoolExecutor implements Executor {
             public void run() {
                 try {
                     command.run();
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } finally {
