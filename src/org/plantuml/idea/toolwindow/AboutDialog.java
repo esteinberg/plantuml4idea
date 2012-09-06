@@ -67,7 +67,7 @@ public class AboutDialog extends JDialog {
         try {
             final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
             if (image != null) {
-                UIUtils.setImage(image, testDot);
+                UIUtils.setImage(image, testDot, 100);
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);

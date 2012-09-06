@@ -40,6 +40,7 @@ import static com.intellij.codeInsight.completion.CompletionInitializationContex
 public class PlantUmlToolWindow extends JPanel {
     private Project myProject;
     private ToolWindow toolWindow;
+    private int zoom = 100;
 
     Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
     private JLabel imageLabel;
@@ -50,12 +51,12 @@ public class PlantUmlToolWindow extends JPanel {
 
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
 
-
     public PlantUmlToolWindow(Project myProject, ToolWindow toolWindow) {
         super(new BorderLayout());
 
         this.myProject = myProject;
         this.toolWindow = toolWindow;
+        this.zoom = 100;
 
         setupUI();
 
@@ -149,13 +150,22 @@ public class PlantUmlToolWindow extends JPanel {
             if (image != null) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        UIUtils.setImage(image, imageLabel);
+                        UIUtils.setImage(image, imageLabel, zoom);
                     }
                 });
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }
+    }
+
+    public int getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(int zoom) {
+        this.zoom = zoom;
+        lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {

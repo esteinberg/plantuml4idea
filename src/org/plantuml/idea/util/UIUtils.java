@@ -26,9 +26,31 @@ public class UIUtils {
         return ImageIO.read(input);
     }
 
-    public static void setImage(@NotNull BufferedImage image, JLabel label) {
-        label.setIcon(new ImageIcon(image));
-        label.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+    /**
+     * Scales the image and sets it to label
+     *
+     * @param image source image
+     * @param label destination label
+     * @param zoom  zoom factor
+     */
+    public static void setImage(@NotNull BufferedImage image, JLabel label, int zoom) {
+        int newWidth;
+        int newHeight;
+        Image scaledImage;
+
+        if (zoom == 100) { // default zoom, no scaling
+            newWidth = image.getWidth();
+            newHeight = image.getHeight();
+            scaledImage = image;
+        } else {
+            newWidth = Math.round(image.getWidth() * zoom / 100.0f);
+            newHeight = Math.round(image.getHeight() * zoom / 100.0f);
+            scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
+        }
+
+        ImageIcon imageIcon = new ImageIcon(scaledImage);
+        label.setIcon(imageIcon);
+        label.setPreferredSize(new Dimension(newWidth, newHeight));
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
@@ -43,6 +65,7 @@ public class UIUtils {
         }
         return source;
     }
+
     public static String getSelectedSource(Project myProject) {
         String source = "";
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();

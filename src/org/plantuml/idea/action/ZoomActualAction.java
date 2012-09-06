@@ -1,15 +1,13 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 
 /**
  * @author Eugene Steinberg
  */
-public class ZoomActualAction extends AnAction {
+public class ZoomActualAction extends ZoomAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        // TODO: implement me
-
+        setZoom(e.getProject(), DEFAULT_ZOOM);
     }
 }
