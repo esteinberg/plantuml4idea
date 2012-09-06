@@ -45,6 +45,13 @@
                     icon="/actions/menu-saveall.png"/>
             <separator/>
 
+            <action id="PlantUML.ZoomIn" description="Zoom In" class="org.plantuml.idea.action.ZoomInAction"
+                    icon="/graph/zoomIn.png"/>
+            <action id="PlantUML.ZoomOut" description="Zoom In" class="org.plantuml.idea.action.ZoomOutAction"
+                    icon="/graph/zoomOut.png"/>
+            <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
+                    icon="/graph/actualZoom.png"/>
+
             <separator/>
 
             <action id="PlantUML.About" description="About" icon="/actions/help.png"
