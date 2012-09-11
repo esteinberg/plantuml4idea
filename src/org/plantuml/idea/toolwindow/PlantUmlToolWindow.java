@@ -128,7 +128,9 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     private void renderSelectedDocument() {
-        render(UIUtils.getSelectedSourceWithCaret(myProject));
+        if (isProjectValid()) {
+            render(UIUtils.getSelectedSourceWithCaret(myProject));
+        }
     }
 
     private void lazyRender(final String source) {
@@ -165,7 +167,9 @@ public class PlantUmlToolWindow extends JPanel {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+        if (isProjectValid()) {
+            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+        }
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {
@@ -179,7 +183,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            if (myProject != null && !myProject.isDisposed())
+            if (isProjectValid())
                 lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
         }
     }
@@ -193,10 +197,16 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                if (myProject != null && !myProject.isDisposed())
+                if (isProjectValid())
                     lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
             }
         }
+    }
+
+    private boolean isProjectValid() {
+        if (myProject != null && !myProject.isDisposed())
+            return true;
+        return false;
     }
 
     private class PlantUmlCaretListener implements CaretListener {
