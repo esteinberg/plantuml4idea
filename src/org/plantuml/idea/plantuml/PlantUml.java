@@ -62,7 +62,7 @@ public class PlantUml {
             SourceStringReader reader = new SourceStringReader(source);
             // Write the image to "os"
             desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             error = e.getMessage();
         }
         return new PlantUmlResult(os.toByteArray(), desc, error);
