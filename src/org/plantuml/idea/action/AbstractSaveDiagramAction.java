@@ -66,7 +66,8 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
 
                 String fileNameTemplate = base + "%03d." + extension;
 
-                PlantUml.renderAndSave(selectedSource, imageFormat, file.getAbsolutePath(), fileNameTemplate);
+                PlantUml.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
+                        imageFormat, file.getAbsolutePath(), fileNameTemplate);
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";

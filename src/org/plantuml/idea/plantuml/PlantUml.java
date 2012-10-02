@@ -74,26 +74,38 @@ public class PlantUml {
         return render;
     }
 
+
     /**
      * Renders source code and saves diagram images to files according to provided naming scheme
      * and image format.
      *
      * @param source         source code to be rendered
+     * @param baseDir        base dir to set for "include" functionality
      * @param format         image format
      * @param fileName       fileName to use with first file
      * @param fileNameFormat file naming scheme for further files
      * @throws IOException in case of rendering or saving fails
      */
-    public static void renderAndSave(String source, ImageFormat format, String fileName, String fileNameFormat)
+    public static void renderAndSave(String source, File baseDir, ImageFormat format, String fileName, String fileNameFormat)
             throws IOException {
-        SourceStringReader reader = new SourceStringReader(source);
-        List<BlockUml> blocks = reader.getBlocks();
-        for (int i = 0; i < blocks.size(); i++) {
-            String fName = i == 0 ? fileName : String.format(fileNameFormat, i);
-            FileOutputStream outputStream = new FileOutputStream(fName);
-            reader.generateImage(outputStream, i, new FileFormatOption(format.getFormat()));
-            outputStream.close();
+        File origDir = FileSystem.getInstance().getCurrentDir();
+        if (baseDir != null)
+            FileSystem.getInstance().setCurrentDir(baseDir);
+        try {
+            SourceStringReader reader = new SourceStringReader(source);
+
+            List<BlockUml> blocks = reader.getBlocks();
+            for (int i = 0; i < blocks.size(); i++) {
+                String fName = i == 0 ? fileName : String.format(fileNameFormat, i);
+                FileOutputStream outputStream = new FileOutputStream(fName);
+                reader.generateImage(outputStream, i, new FileFormatOption(format.getFormat()));
+                outputStream.close();
+            }
+        } finally {
+            if (origDir != null)
+                FileSystem.getInstance().setCurrentDir(origDir);
         }
+
     }
 
     /**
