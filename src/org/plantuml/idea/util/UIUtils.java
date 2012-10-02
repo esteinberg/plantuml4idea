@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -87,5 +88,21 @@ public class UIUtils {
         return file;
     }
 
+    public static File getSelectedDir(Project myProject) {
+        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        File baseDir = null;
+        if (selectedTextEditor != null) {
+
+            final Document document = selectedTextEditor.getDocument();
+            final VirtualFile file = FileDocumentManager.getInstance().getFile(document);
+            if (file != null) {
+                VirtualFile parent = file.getParent();
+                if (parent != null && parent.isDirectory()) {
+                    baseDir= new File(parent.getPath());
+                }
+            }
+        }
+        return baseDir;
+    }
 
 }

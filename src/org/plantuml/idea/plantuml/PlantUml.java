@@ -1,11 +1,9 @@
 package org.plantuml.idea.plantuml;
 
-import net.sourceforge.plantuml.BlockUml;
-import net.sourceforge.plantuml.FileFormat;
-import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
+import net.sourceforge.plantuml.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -46,26 +44,34 @@ public class PlantUml {
         return render(source, ImageFormat.PNG);
     }
 
+    public static PlantUmlResult render(String source, File baseDir) {
+        return render(source, baseDir, ImageFormat.PNG);
+    }
+
     /**
-     * Renders given source code into diagram
+     * Renders file with support of plantUML include feature, setting base dir for plantUML
+     * to provided value
      *
-     * @param source plantUml source code
-     * @param format desired image format
+     * @param source  plantUML source code
+     * @param baseDir base dir to set
+     * @param format  desired image format
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, ImageFormat format) {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        String desc = null;
-        String error = null;
+    public static PlantUmlResult render(String source, File baseDir, ImageFormat format) {
+        PlantUmlResult render;
+        File origDir = FileSystem.getInstance().getCurrentDir();
+
+        if (baseDir != null)
+            FileSystem.getInstance().setCurrentDir(baseDir);
+
         try {
-            // image generation.
-            SourceStringReader reader = new SourceStringReader(source);
-            // Write the image to "os"
-            desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
-        } catch (Throwable e) {
-            error = e.getMessage();
+            render = render(source, format);
+        } finally {
+            if (origDir != null)
+                FileSystem.getInstance().setCurrentDir(origDir);
         }
-        return new PlantUmlResult(os.toByteArray(), desc, error);
+
+        return render;
     }
 
     /**
@@ -88,6 +94,31 @@ public class PlantUml {
             reader.generateImage(outputStream, i, new FileFormatOption(format.getFormat()));
             outputStream.close();
         }
+    }
+
+    /**
+     * Renders given source code into diagram
+     *
+     * @param source plantUml source code
+     * @param format desired image format
+     * @return rendering result
+     */
+    public static PlantUmlResult render(String source, ImageFormat format) {
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        String desc = null;
+        String error = null;
+
+        try {
+            // image generation.
+            SourceStringReader reader = new SourceStringReader(source);
+
+            // Write the image to "os"
+            desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
+        } catch (Throwable e) {
+            error = e.getMessage();
+        }
+        return new PlantUmlResult(os.toByteArray(), desc, error);
     }
 
     private static Pattern sourcePattern =

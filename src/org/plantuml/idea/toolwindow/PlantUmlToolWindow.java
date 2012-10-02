@@ -20,6 +20,7 @@ import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.messages.MessageBus;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
@@ -30,6 +31,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
@@ -48,6 +50,8 @@ public class PlantUmlToolWindow extends JPanel {
     private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
     private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
+    private AncestorListener plantUmlAncestorListener = new PlantUmlAncestorListener();
+    private ProjectManagerListener plantUmlProjectManagerListener = new PlantUmlProjectManagerListener();
 
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
 
@@ -62,7 +66,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         registerListeners();
 
-        renderSelectedDocument();
+        lazyRender();
     }
 
     private void setupUI() {
@@ -85,62 +89,48 @@ public class PlantUmlToolWindow extends JPanel {
         EditorFactory.getInstance().getEventMulticaster().addDocumentListener(plantUmlDocumentListener);
         EditorFactory.getInstance().getEventMulticaster().addCaretListener(plantUmlCaretListener);
 
-        toolWindow.getComponent().addAncestorListener(new AncestorListener() {
-            @Override
-            public void ancestorAdded(AncestorEvent ancestorEvent) {
-                renderSelectedDocument();
-            }
+        toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
 
-            @Override
-            public void ancestorRemoved(AncestorEvent ancestorEvent) {
-                // do nothing
-            }
-
-            @Override
-            public void ancestorMoved(AncestorEvent ancestorEvent) {
-                // do nothing
-
-            }
-        });
-
-        ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerListener() {
-            @Override
-            public void projectOpened(Project project) {
-                logger.debug("opened project " + project);
-                myProject = project;
-            }
-
-            @Override
-            public boolean canCloseProject(Project project) {
-                return true;
-            }
-
-            @Override
-            public void projectClosed(Project project) {
-                logger.debug("closed project " + project);
-                myProject = null;
-            }
-
-            @Override
-            public void projectClosing(Project project) {
-            }
-        });
-    }
-
-    private void renderSelectedDocument() {
-        if (isProjectValid()) {
-            render(UIUtils.getSelectedSourceWithCaret(myProject));
-        }
+        ProjectManager.getInstance().addProjectManagerListener(plantUmlProjectManagerListener);
     }
 
     private void lazyRender(final String source) {
+        lazyRender(source, null);
+    }
+
+    private void lazyRender() {
+        if (isProjectValid()) {
+            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+        }
+    }
+
+    private void lazyRender(final String source, @Nullable final File baseDir) {
         if (source.isEmpty()) return;
+        final File selectedDir = UIUtils.getSelectedDir(myProject);
         Runnable command = new Runnable() {
             public void run() {
-                render(source);
+                renderWithBaseDir(source, baseDir == null ? selectedDir : baseDir);
             }
         };
         lazyExecutor.execute(command);
+    }
+
+    private void renderWithBaseDir(String source, File baseDir) {
+        if (source.isEmpty())
+            return;
+        PlantUmlResult result = PlantUml.render(source, baseDir);
+        try {
+            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
+            if (image != null) {
+                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    public void run() {
+                        UIUtils.setImage(image, imageLabel, zoom);
+                    }
+                });
+            }
+        } catch (IOException e) {
+            logger.warn("Exception occurred rendering source = " + source + ": " + e);
+        }
     }
 
     private void render(String source) {
@@ -167,9 +157,7 @@ public class PlantUmlToolWindow extends JPanel {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        if (isProjectValid()) {
-            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
-        }
+        lazyRender();
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {
@@ -197,38 +185,65 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                if (isProjectValid())
-                    lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+                    lazyRender();
             }
         }
     }
 
     private boolean isProjectValid() {
-        if (myProject != null && !myProject.isDisposed())
-            return true;
-        return false;
+        return myProject != null && !myProject.isDisposed();
     }
 
     private class PlantUmlCaretListener implements CaretListener {
         @Override
-
         public void caretPositionChanged(final CaretEvent e) {
             ApplicationManager.getApplication().runReadAction(new Runnable() {
                 @Override
                 public void run() {
-                    String text = e.getEditor().getDocument().getText();
-                    int offset = e.getEditor().logicalPositionToOffset(e.getNewPosition());
-                    final String source = PlantUml.extractSource(text, offset);
-                    if (!source.isEmpty()) {
-                        Runnable command = new Runnable() {
-                            public void run() {
-                                render(source);
-                            }
-                        };
-                        lazyExecutor.execute(command);
-                    }
+                    lazyRender();
                 }
             });
+        }
+    }
+
+    private class PlantUmlAncestorListener implements AncestorListener {
+        @Override
+        public void ancestorAdded(AncestorEvent ancestorEvent) {
+            lazyRender();
+        }
+
+        @Override
+        public void ancestorRemoved(AncestorEvent ancestorEvent) {
+            // do nothing
+        }
+
+        @Override
+        public void ancestorMoved(AncestorEvent ancestorEvent) {
+            // do nothing
+
+        }
+    }
+
+    private class PlantUmlProjectManagerListener implements ProjectManagerListener {
+        @Override
+        public void projectOpened(Project project) {
+            logger.debug("opened project " + project);
+            myProject = project;
+        }
+
+        @Override
+        public boolean canCloseProject(Project project) {
+            return true;
+        }
+
+        @Override
+        public void projectClosed(Project project) {
+            logger.debug("closed project " + project);
+            myProject = null;
+        }
+
+        @Override
+        public void projectClosing(Project project) {
         }
     }
 }
