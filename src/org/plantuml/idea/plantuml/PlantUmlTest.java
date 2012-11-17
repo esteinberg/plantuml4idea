@@ -29,17 +29,37 @@ public class PlantUmlTest extends TestCase {
 
         String compoundSource2 = validSource1 + intermediateText1 + sourceWithoutEndUml;
         assertEquals(sourceWithoutEndUml,
-                PlantUml.extractSource(compoundSource2,compoundSource2.length() - sourceWithoutEndUml.length() / 2));
-        String compoundSource3 = sourceWithoutEndUml+intermediateText1+validSource1;
+                PlantUml.extractSource(compoundSource2, compoundSource2.length() - sourceWithoutEndUml.length() / 2));
+        String compoundSource3 = sourceWithoutEndUml + intermediateText1 + validSource1;
         assertEquals(compoundSource3,
-                PlantUml.extractSource(compoundSource3+intermediateText2,compoundSource3.length() - validSource1.length() / 2));
+                PlantUml.extractSource(compoundSource3 + intermediateText2, compoundSource3.length() - validSource1.length() / 2));
     }
 
     public void testExtractDotSource() {
 
         String dotSource = "@startdot\n dotcode\n @enddot";
-        assertEquals(dotSource, PlantUml.extractSource(intermediateText1+dotSource+intermediateText2,
-                intermediateText1.length()+dotSource.length() / 2));
+        assertEquals(dotSource, PlantUml.extractSource(intermediateText1 + dotSource + intermediateText2,
+                intermediateText1.length() + dotSource.length() / 2));
     }
 
+    public void testExtractSourceWithComments() {
+        String source ="/**\n" +
+                "* @startuml\n" +
+                "* Bob -> Alice: hello\n" +
+                "*/";
+        String expected = "@startuml\n" +
+                "Bob -> Alice: hello\n" +
+                "*/";
+        assertEquals(expected,PlantUml.extractSource(source, source.length() / 2));
+
+        source ="/*\n" +
+                " * @startuml\n" +
+                " * (*) -> Init\n" +
+                " * @enduml\n" +
+                " */";
+        expected = "@startuml\n" +
+                "(*) -> Init\n" +
+                "@enduml";
+        assertEquals(expected,PlantUml.extractSource(source, source.length() / 2));
+    }
 }

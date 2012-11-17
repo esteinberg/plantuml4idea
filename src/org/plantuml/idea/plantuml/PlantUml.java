@@ -157,9 +157,17 @@ public class PlantUml {
         while (matcher.find()) {
             String group = matcher.group();
             if (matcher.start() <= offset && offset <= matcher.end())
-                return group;
+                return stripComments(group);
         }
         return "";
+    }
+
+    private static Pattern sourceCommentPattern =
+            Pattern.compile("^\\s*\\*\\s", Pattern.MULTILINE);
+
+    private static String stripComments(String source) {
+        Matcher matcher = sourceCommentPattern.matcher(source);
+        return matcher.replaceAll("");
     }
 
 }
