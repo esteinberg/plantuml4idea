@@ -18,50 +18,49 @@
     <actions>
         <group id="PlantUML.Parent" popup="true"
                text="PlantUML Diagram" description="New PlantUML Diagram"
-               icon="/images/uml.gif">
+               icon="/images/uml.png">
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewFile"/>
         </group>
         <group id="PlantUML.NewDiagram">
             <action id="UseCase" class="org.plantuml.idea.action.CreateUseCaseDiagramAction"
-                    text="Use Case" icon="/images/uml.gif"/>
+                    text="Use Case" icon="/images/uml.png"/>
             <action id="SequenceDiagram" class="org.plantuml.idea.action.CreateSequenceDiagramAction"
-                    text="Sequence Diagram" icon="/images/uml.gif"/>
+                    text="Sequence Diagram" icon="/images/uml.png"/>
             <action id="ClassDiagram" class="org.plantuml.idea.action.CreateClassDiagramAction"
-                    text="Class Diagram" icon="/images/uml.gif"/>
+                    text="Class Diagram" icon="/images/uml.png"/>
             <action id="ComponentDiagram" class="org.plantuml.idea.action.CreateComponentDiagramAction"
-                    text="Component Diagram" icon="/images/uml.gif"/>
+                    text="Component Diagram" icon="/images/uml.png"/>
             <add-to-group group-id="PlantUML.Parent" anchor="first"/>
         </group>
         <group id="PlantUML.Toolbar" description="PlantUML toolbar">
             <action id="PlantUML.CopyToClipboard" description="Copy current diagram to clipboard"
                     class="org.plantuml.idea.action.CopyDiagramToClipboardAction"
-                    icon="/actions/copy.png"
+                    icon="/actions/copy.png" text="Copy current diagram to clipboard"
                     />
             <action id="PlantUML.SaveToFile" description="Save current diagram only"
                     class="org.plantuml.idea.action.SaveDiagramToFileAction"
-                    icon="/actions/checkOut.png"/>
+                    icon="/actions/menu-saveall.png" text="Save current diagram only"/>
             <action id="PlantUML.SaveAllToFile" description="Save all diagrams"
                     class="org.plantuml.idea.action.SaveAllDiagramToFileAction"
-                    icon="/actions/menu-saveall.png"/>
+                    icon="/actions/export.png" text="Save all diagrams in current file"/>
             <separator/>
 
             <action id="PlantUML.ZoomIn" description="Zoom In" class="org.plantuml.idea.action.ZoomInAction"
-                    icon="/graph/zoomIn.png"/>
+                    icon="/graph/zoomIn.png" text="Zoom In"/>
             <action id="PlantUML.ZoomOut" description="Zoom In" class="org.plantuml.idea.action.ZoomOutAction"
-                    icon="/graph/zoomOut.png"/>
+                    icon="/graph/zoomOut.png" text="Zoom Out"/>
             <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
-                    icon="/graph/actualZoom.png"/>
-
+                    icon="/graph/actualZoom.png" text="Actual Zoom"/>
             <separator/>
 
             <action id="PlantUML.About" description="About" icon="/actions/help.png"
-                    class="org.plantuml.idea.action.AboutAction"/>
+                    class="org.plantuml.idea.action.AboutAction" text="About"/>
         </group>
 
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="PlantUML" icon="/images/uml.gif" anchor="right"
+        <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
                     factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
         <fileTypeFactory implementation="org.plantuml.idea.action.PlantumlTypeFactory"/>
     </extensions>
