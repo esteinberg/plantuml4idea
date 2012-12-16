@@ -1,6 +1,7 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.application.ApplicationManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -14,11 +15,20 @@ import java.util.concurrent.Future;
  */
 public class LazyApplicationPoolExecutor implements Executor {
 
+    public static final int DEFAULT_DELAY = 100;
+
     private Runnable next;
 
     private Future<?> future;
 
+    private int delay = DEFAULT_DELAY; // delay between command executions
+
+    public LazyApplicationPoolExecutor(int delay) {
+        this.delay = delay;
+    }
+
     public LazyApplicationPoolExecutor() {
+        this(DEFAULT_DELAY);
     }
 
     /**
@@ -27,13 +37,13 @@ public class LazyApplicationPoolExecutor implements Executor {
      *
      * @param command command to be executed.
      */
-    public synchronized void execute(final Runnable command) {
+    public synchronized void execute(@NotNull final Runnable command) {
 
         next = new Runnable() {
             public void run() {
                 try {
                     command.run();
-                    Thread.sleep(100);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } finally {

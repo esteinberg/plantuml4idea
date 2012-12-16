@@ -20,7 +20,6 @@ import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.util.messages.MessageBus;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
@@ -32,7 +31,6 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
 
@@ -66,7 +64,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         registerListeners();
 
-        lazyRender();
+        renderLater();
     }
 
     private void setupUI() {
@@ -94,25 +92,26 @@ public class PlantUmlToolWindow extends JPanel {
         ProjectManager.getInstance().addProjectManagerListener(plantUmlProjectManagerListener);
     }
 
-    private void lazyRender(final String source) {
-        lazyRender(source, null);
-    }
-
-    private void lazyRender() {
-        if (isProjectValid()) {
-            lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
-        }
-    }
-
-    private void lazyRender(final String source, @Nullable final File baseDir) {
-        if (source.isEmpty()) return;
-        final File selectedDir = UIUtils.getSelectedDir(myProject);
-        Runnable command = new Runnable() {
+    private void renderLater() {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+            @Override
             public void run() {
-                renderWithBaseDir(source, baseDir == null ? selectedDir : baseDir);
+                if (!isProjectValid())
+                    return;
+                final String source = UIUtils.getSelectedSourceWithCaret(myProject);
+                if (source.isEmpty())
+                    return;
+                final File selectedDir = UIUtils.getSelectedDir(myProject);
+                lazyExecutor.execute(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                renderWithBaseDir(source, selectedDir);
+                            }
+                        }
+                );
             }
-        };
-        lazyExecutor.execute(command);
+        });
     }
 
     private void renderWithBaseDir(String source, File baseDir) {
@@ -128,25 +127,7 @@ public class PlantUmlToolWindow extends JPanel {
                     }
                 });
             }
-        } catch (IOException e) {
-            logger.warn("Exception occurred rendering source = " + source + ": " + e);
-        }
-    }
-
-    private void render(String source) {
-        if (source.isEmpty())
-            return;
-        PlantUmlResult result = PlantUml.render(source);
-        try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-            if (image != null) {
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
-                    public void run() {
-                        UIUtils.setImage(image, imageLabel, zoom);
-                    }
-                });
-            }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }
     }
@@ -157,7 +138,7 @@ public class PlantUmlToolWindow extends JPanel {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        lazyRender();
+        renderLater();
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {
@@ -171,8 +152,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         public void selectionChanged(FileEditorManagerEvent event) {
             logger.debug("selection changed" + event);
-            if (isProjectValid())
-                lazyRender(UIUtils.getSelectedSourceWithCaret(myProject));
+            renderLater();
         }
     }
 
@@ -185,7 +165,7 @@ public class PlantUmlToolWindow extends JPanel {
             logger.debug("document changed " + event);
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                    lazyRender();
+                renderLater();
             }
         }
     }
@@ -197,19 +177,14 @@ public class PlantUmlToolWindow extends JPanel {
     private class PlantUmlCaretListener implements CaretListener {
         @Override
         public void caretPositionChanged(final CaretEvent e) {
-            ApplicationManager.getApplication().runReadAction(new Runnable() {
-                @Override
-                public void run() {
-                    lazyRender();
-                }
-            });
+            renderLater();
         }
     }
 
     private class PlantUmlAncestorListener implements AncestorListener {
         @Override
         public void ancestorAdded(AncestorEvent ancestorEvent) {
-            lazyRender();
+            renderLater();
         }
 
         @Override
