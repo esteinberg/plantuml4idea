@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.lang.PlantUmlFileType;
 
 /**
  * @author mamontov
@@ -37,7 +38,7 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
         final FileTemplate template = FileTemplateManager.getInstance().getTemplate(getDiagramName());
 
         if (template == null) {
-            throw new RuntimeException("Couldn't find template " + getDiagramName() );
+            throw new RuntimeException("Couldn't find template " + getDiagramName());
         }
 
         String fileName = getFileName(s);
@@ -72,6 +73,6 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
     }
 
     private String getFileName(String name) {
-        return name + PlantUmlFileType.PLANTUML_EXT;
+        return name + "." + PlantUmlFileType.PLANTUML_EXT;
     }
 }

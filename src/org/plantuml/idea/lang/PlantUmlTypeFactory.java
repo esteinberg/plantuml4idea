@@ -1,4 +1,4 @@
-package org.plantuml.idea.action;
+package org.plantuml.idea.lang;
 
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;

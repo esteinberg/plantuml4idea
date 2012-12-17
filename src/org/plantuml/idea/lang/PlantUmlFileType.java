@@ -1,4 +1,4 @@
-package org.plantuml.idea.action;
+package org.plantuml.idea.lang;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.IconLoader;
@@ -11,7 +11,9 @@ public class PlantUmlFileType extends LanguageFileType {
 
     public static final PlantUmlFileType PLANTUML_FILE_TYPE = new PlantUmlFileType();
 
-    public static final String PLANTUML_EXT = ".puml";
+    public static final String PLANTUML_EXT = "puml";
+
+    public static final Icon PLANTUML_ICON = IconLoader.getIcon("/images/uml.png");
 
     private PlantUmlFileType() {
         super(PlantUmlLanguage.INSTANCE);
@@ -20,7 +22,7 @@ public class PlantUmlFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "PLAIN_TEXT";
+        return "PlantUML file";
     }
 
     @NotNull
@@ -37,7 +39,7 @@ public class PlantUmlFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return IconLoader.getIcon("/images/uml.png");
+        return PLANTUML_ICON;
     }
 
     @Override
