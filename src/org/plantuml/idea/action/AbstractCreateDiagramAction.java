@@ -44,7 +44,7 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
         Project project = psiDirectory.getProject();
         psiDirectory.checkCreateFile(fileName);
         PsiFile psiFile = PsiFileFactory.getInstance(project)
-                .createFileFromText(fileName, PlantumlFileType.PLANTUML_FILE_TYPE, template.getText());
+                .createFileFromText(fileName, PlantUmlFileType.PLANTUML_FILE_TYPE, template.getText());
         psiFile = (PsiFile) psiDirectory.add(psiFile);
 
         final VirtualFile virtualFile = psiFile.getVirtualFile();
@@ -72,6 +72,6 @@ public abstract class AbstractCreateDiagramAction extends CreateElementActionBas
     }
 
     private String getFileName(String name) {
-        return name + PlantumlFileType.PLANTUML_EXT;
+        return name + PlantUmlFileType.PLANTUML_EXT;
     }
 }

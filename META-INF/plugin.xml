@@ -62,6 +62,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
                     factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
-        <fileTypeFactory implementation="org.plantuml.idea.action.PlantumlTypeFactory"/>
+        <fileTypeFactory implementation="org.plantuml.idea.action.PlantUmlTypeFactory"/>
     </extensions>
 </idea-plugin>
