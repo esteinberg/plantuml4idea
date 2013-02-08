@@ -114,7 +114,7 @@ public class PlantUmlToolWindow extends JPanel {
         });
     }
 
-    private void renderWithBaseDir(String source, File baseDir) {
+    public void renderWithBaseDir(String source, File baseDir) {
         if (source.isEmpty())
             return;
         PlantUmlResult result = PlantUml.render(source, baseDir);
