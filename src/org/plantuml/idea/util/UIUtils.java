@@ -6,8 +6,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -103,6 +106,11 @@ public class UIUtils {
             }
         }
         return baseDir;
+    }
+
+    public static PlantUmlToolWindow getToolWindow(Project project) {
+        ToolWindow plantUMLToolWindow = ToolWindowManager.getInstance(project).getToolWindow("PlantUML");
+        return (PlantUmlToolWindow) plantUMLToolWindow.getContentManager().getContent(0).getComponent();
     }
 
 }

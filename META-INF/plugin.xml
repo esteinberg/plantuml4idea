@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <description>PlantUML diagramming tool integration</description>
-    <version>1.4.4</version>
+    <version>1.4.5-SNAPSHOT</version>
     <vendor>org.plantuml</vendor>
     <idea-version since-build="8000"/>
 
@@ -36,7 +36,14 @@
             <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
                     icon="/graph/actualZoom.png" text="Actual Zoom"/>
             <separator/>
+            <action id="PlantUML.PrevPage" description="Prev Page" class="org.plantuml.idea.action.PrevPageAction"
+                    icon="/actions/back.png" text="Previous Page"/>
+            <action id="PlantUML.SelectPage" description="Select Page" class="org.plantuml.idea.action.SelectPageAction"
+                    text="Select Page"/>
 
+            <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
+                    icon="/actions/forward.png" text="Next Page"/>
+            <separator/>
             <action id="PlantUML.About" description="About" icon="/actions/help.png"
                     class="org.plantuml.idea.action.AboutAction" text="About"/>
         </group>

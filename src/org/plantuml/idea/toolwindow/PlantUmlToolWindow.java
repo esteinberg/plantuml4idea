@@ -17,8 +17,10 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.messages.MessageBus;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
@@ -31,6 +33,7 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Arrays;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
 
@@ -41,6 +44,8 @@ public class PlantUmlToolWindow extends JPanel {
     private Project myProject;
     private ToolWindow toolWindow;
     private int zoom = 100;
+    private int page = 1;
+    private int numPages = 5;
 
     Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
     private JLabel imageLabel;
@@ -58,7 +63,6 @@ public class PlantUmlToolWindow extends JPanel {
 
         this.myProject = myProject;
         this.toolWindow = toolWindow;
-        this.zoom = 100;
 
         setupUI();
 
@@ -75,7 +79,7 @@ public class PlantUmlToolWindow extends JPanel {
 
         imageLabel = new JLabel();
 
-        JScrollPane scrollPane = new JScrollPane(imageLabel);
+        JScrollPane scrollPane = new JBScrollPane(imageLabel);
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -106,7 +110,7 @@ public class PlantUmlToolWindow extends JPanel {
                         new Runnable() {
                             @Override
                             public void run() {
-                                renderWithBaseDir(source, selectedDir);
+                                renderWithBaseDir(source, selectedDir, page);
                             }
                         }
                 );
@@ -114,10 +118,10 @@ public class PlantUmlToolWindow extends JPanel {
         });
     }
 
-    public void renderWithBaseDir(String source, File baseDir) {
+    public void renderWithBaseDir(String source, File baseDir, int pageNum) {
         if (source.isEmpty())
             return;
-        PlantUmlResult result = PlantUml.render(source, baseDir);
+        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
         try {
             final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
             if (image != null) {
@@ -138,6 +142,16 @@ public class PlantUmlToolWindow extends JPanel {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
+        renderLater();
+    }
+
+    public void nextPage() {
+        this.page = this.page + 1 < numPages ? this.page + 1 : numPages;
+        renderLater();
+    }
+
+    public void prevPage() {
+        this.page = this.page - 1 > 0 ? this.page - 1 : 0;
         renderLater();
     }
 

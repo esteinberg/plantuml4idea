@@ -41,23 +41,24 @@ public class PlantUml {
     }
 
     public static PlantUmlResult render(String source) {
-        return render(source, ImageFormat.PNG);
+        return render(source, ImageFormat.PNG, 0);
     }
 
-    public static PlantUmlResult render(String source, File baseDir) {
-        return render(source, baseDir, ImageFormat.PNG);
+    public static PlantUmlResult render(String source, File baseDir, int page) {
+        return render(source, baseDir, ImageFormat.PNG, page);
     }
 
     /**
-     * Renders file with support of plantUML include feature, setting base dir for plantUML
-     * to provided value
+     * Renders file with support of plantUML include ange paging features, setting base dir and page for plantUML
+     * to provided values
      *
      * @param source  plantUML source code
      * @param baseDir base dir to set
      * @param format  desired image format
+     * @param page    page to render
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, File baseDir, ImageFormat format) {
+    public static PlantUmlResult render(String source, File baseDir, ImageFormat format, int page) {
         PlantUmlResult render;
         File origDir = FileSystem.getInstance().getCurrentDir();
 
@@ -65,7 +66,7 @@ public class PlantUml {
             FileSystem.getInstance().setCurrentDir(baseDir);
 
         try {
-            render = render(source, format);
+            render = render(source, format, page);
         } finally {
             if (origDir != null)
                 FileSystem.getInstance().setCurrentDir(origDir);
@@ -115,7 +116,7 @@ public class PlantUml {
      * @param format desired image format
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, ImageFormat format) {
+    public static PlantUmlResult render(String source, ImageFormat format, int page) {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         String desc = null;
@@ -124,9 +125,12 @@ public class PlantUml {
         try {
             // image generation.
             SourceStringReader reader = new SourceStringReader(source);
-
+            int nbImages = reader.getBlocks().get(0).getSystem().getNbImages();
+            System.out.println("source="+ source);
+            System.out.println("page = " + page);
+            System.out.println("nbImages = " + nbImages);
             // Write the image to "os"
-            desc = reader.generateImage(os, new FileFormatOption(format.getFormat()));
+            desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()));
         } catch (Throwable e) {
             error = e.getMessage();
         }

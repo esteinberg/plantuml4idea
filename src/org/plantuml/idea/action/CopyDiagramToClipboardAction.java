@@ -38,7 +38,7 @@ public class CopyDiagramToClipboardAction extends AnAction {
                     throw new UnsupportedFlavorException(flavor);
                 }
                 PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
-                        UIUtils.getSelectedDir(project));
+                        UIUtils.getSelectedDir(project),0);
                 final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
                 return image;
             }
