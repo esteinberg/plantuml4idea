@@ -1,9 +1,6 @@
 package org.plantuml.idea.toolwindow;
 
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
@@ -17,11 +14,11 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.messages.MessageBus;
+import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
@@ -33,7 +30,6 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
 
@@ -44,8 +40,10 @@ public class PlantUmlToolWindow extends JPanel {
     private Project myProject;
     private ToolWindow toolWindow;
     private int zoom = 100;
-    private int page = 1;
-    private int numPages = 5;
+    private int page = 0;
+    private int numPages = 1;
+    private String cachedSource = "";
+    private int cachedPage = page;
 
     Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
     private JLabel imageLabel;
@@ -57,6 +55,8 @@ public class PlantUmlToolWindow extends JPanel {
     private ProjectManagerListener plantUmlProjectManagerListener = new PlantUmlProjectManagerListener();
 
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
+
+    private SelectPageAction selectPageAction;
 
     public PlantUmlToolWindow(Project myProject, ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -81,6 +81,8 @@ public class PlantUmlToolWindow extends JPanel {
 
         JScrollPane scrollPane = new JBScrollPane(imageLabel);
         add(scrollPane, BorderLayout.CENTER);
+
+        selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
 
     private void registerListeners() {
@@ -96,6 +98,17 @@ public class PlantUmlToolWindow extends JPanel {
         ProjectManager.getInstance().addProjectManagerListener(plantUmlProjectManagerListener);
     }
 
+    private boolean renderRequired(String newSource) {
+        if (newSource.isEmpty())
+            return false;
+        if (!newSource.equals(cachedSource) || page != cachedPage) {
+            cachedSource = newSource;
+            cachedPage = page;
+            return true;
+        }
+        return false;
+    }
+
     private void renderLater() {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
@@ -103,7 +116,7 @@ public class PlantUmlToolWindow extends JPanel {
                 if (!isProjectValid())
                     return;
                 final String source = UIUtils.getSelectedSourceWithCaret(myProject);
-                if (source.isEmpty())
+                if (!renderRequired(source))
                     return;
                 final File selectedDir = UIUtils.getSelectedDir(myProject);
                 lazyExecutor.execute(
@@ -131,6 +144,7 @@ public class PlantUmlToolWindow extends JPanel {
                     }
                 });
             }
+            setNumPages(result.getPages());
         } catch (Exception e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }
@@ -145,14 +159,27 @@ public class PlantUmlToolWindow extends JPanel {
         renderLater();
     }
 
+    public void setPage(int page) {
+        if (page >= 0 && page < numPages) {
+            this.page = page;
+            selectPageAction.setPage(page);
+            renderLater();
+        }
+    }
+
     public void nextPage() {
-        this.page = this.page + 1 < numPages ? this.page + 1 : numPages;
-        renderLater();
+        setPage(this.page + 1);
     }
 
     public void prevPage() {
-        this.page = this.page - 1 > 0 ? this.page - 1 : 0;
-        renderLater();
+        setPage(this.page - 1);
+    }
+
+    public void setNumPages(int numPages) {
+        this.numPages = numPages;
+        if (page >= numPages)
+            setPage(numPages - 1);
+        selectPageAction.setNumPages(numPages);
     }
 
     private class PlantUmlFileManagerListener implements FileEditorManagerListener {

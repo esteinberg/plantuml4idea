@@ -3,18 +3,19 @@ package org.plantuml.idea.plantuml;
 import java.util.Arrays;
 
 /**
- *
  * @author Eugene Steinberg
  */
 public class PlantUmlResult {
     private byte[] diagramBytes;
     private String description;
     private String error;
+    private int pages;
 
-    public PlantUmlResult(byte[] diagramBytes, String description, String error) {
+    public PlantUmlResult(byte[] diagramBytes, String description, String error, int pages) {
         this.diagramBytes = diagramBytes;
         this.description = description;
         this.error = error;
+        this.pages = pages;
     }
 
     public byte[] getDiagramBytes() {
@@ -43,6 +44,14 @@ public class PlantUmlResult {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
     }
 
     @Override

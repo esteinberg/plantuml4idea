@@ -121,20 +121,21 @@ public class PlantUml {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         String desc = null;
         String error = null;
+        int pages = 1;
 
         try {
             // image generation.
             SourceStringReader reader = new SourceStringReader(source);
-            int nbImages = reader.getBlocks().get(0).getSystem().getNbImages();
-            System.out.println("source="+ source);
-            System.out.println("page = " + page);
-            System.out.println("nbImages = " + nbImages);
+
+            if (reader.getBlocks().size() > 0) {
+                pages = reader.getBlocks().get(0).getSystem().getNbImages();
+            }
             // Write the image to "os"
             desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()));
         } catch (Throwable e) {
             error = e.getMessage();
         }
-        return new PlantUmlResult(os.toByteArray(), desc, error);
+        return new PlantUmlResult(os.toByteArray(), desc, error, pages);
     }
 
     private static Pattern sourcePattern =
