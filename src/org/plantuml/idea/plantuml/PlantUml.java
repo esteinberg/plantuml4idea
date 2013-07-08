@@ -1,6 +1,7 @@
 package org.plantuml.idea.plantuml;
 
 import net.sourceforge.plantuml.*;
+import net.sourceforge.plantuml.core.Diagram;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -127,8 +128,12 @@ public class PlantUml {
             // image generation.
             SourceStringReader reader = new SourceStringReader(source);
 
-            if (reader.getBlocks().size() > 0) {
-                pages = reader.getBlocks().get(0).getSystem().getNbImages();
+            List<BlockUml> blocks = reader.getBlocks();
+            if (blocks.size() > 0) {
+                Diagram system = blocks.get(0).getSystem();
+                if (system != null) {
+                    pages = system.getNbImages();
+                }
             }
             // Write the image to "os"
             desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()));

@@ -44,6 +44,7 @@ public class PlantUmlToolWindow extends JPanel {
     private int numPages = 1;
     private String cachedSource = "";
     private int cachedPage = page;
+    private int cachedZoom = zoom;
 
     Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
     private JLabel imageLabel;
@@ -101,9 +102,10 @@ public class PlantUmlToolWindow extends JPanel {
     private boolean renderRequired(String newSource) {
         if (newSource.isEmpty())
             return false;
-        if (!newSource.equals(cachedSource) || page != cachedPage) {
+        if (!newSource.equals(cachedSource) || page != cachedPage || zoom != cachedZoom) {
             cachedSource = newSource;
             cachedPage = page;
+            cachedZoom = zoom;
             return true;
         }
         return false;
