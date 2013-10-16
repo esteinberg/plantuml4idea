@@ -130,7 +130,7 @@ public class PlantUml {
 
             List<BlockUml> blocks = reader.getBlocks();
             if (blocks.size() > 0) {
-                Diagram system = blocks.get(0).getSystem();
+                Diagram system = blocks.get(0).getDiagram();
                 if (system != null) {
                     pages = system.getNbImages();
                 }
