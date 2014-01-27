@@ -2,6 +2,7 @@ package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 import org.plantuml.idea.util.UIUtils;
 
 /**
@@ -11,6 +12,7 @@ import org.plantuml.idea.util.UIUtils;
 public class PrevPageAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-        UIUtils.getToolWindow(anActionEvent.getProject()).prevPage();
+        final Project project = anActionEvent.getProject();
+        UIUtils.getToolWindow(project).prevPage(project);
     }
 }

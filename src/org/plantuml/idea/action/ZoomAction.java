@@ -2,8 +2,6 @@ package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
@@ -23,7 +21,7 @@ public abstract class ZoomAction extends AnAction {
 
     protected void setZoom(Project project, int zoom) {
         PlantUmlToolWindow plantUML = UIUtils.getToolWindow(project);
-        plantUML.setZoom(zoom);
+        plantUML.setZoom(project, zoom);
     }
 
 }
