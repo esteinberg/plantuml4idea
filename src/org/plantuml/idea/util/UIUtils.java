@@ -6,8 +6,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
@@ -19,11 +17,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Eugene Steinberg
  */
 public class UIUtils {
+    private static Map<Project, PlantUmlToolWindow> windowMap = new ConcurrentHashMap<Project, PlantUmlToolWindow>();
 
     public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
@@ -58,8 +59,7 @@ public class UIUtils {
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
-        String source = "";
-        source = getSelectedSource(myProject);
+        String source = getSelectedSource(myProject);
 
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
@@ -109,8 +109,14 @@ public class UIUtils {
     }
 
     public static PlantUmlToolWindow getToolWindow(Project project) {
-        ToolWindow plantUMLToolWindow = ToolWindowManager.getInstance(project).getToolWindow("PlantUML");
-        return (PlantUmlToolWindow) plantUMLToolWindow.getContentManager().getContent(0).getComponent();
+        return windowMap.get(project);
     }
 
+    public static void addProject(Project project, PlantUmlToolWindow toolWindow) {
+        windowMap.put(project, toolWindow);
+    }
+
+    public static void removeProject(Project project) {
+        windowMap.remove(project);
+    }
 }

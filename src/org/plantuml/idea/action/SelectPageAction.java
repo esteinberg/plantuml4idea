@@ -1,9 +1,10 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
-import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
-import com.intellij.ui.components.JBComboBoxLabel;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.util.UIUtils;
 
@@ -54,9 +55,9 @@ public class SelectPageAction extends ComboBoxAction {
 
         @Override
         public void actionPerformed(AnActionEvent anActionEvent) {
-            UIUtils.getToolWindow(anActionEvent.getProject()).setPage(page);
+            final Project project = anActionEvent.getProject();
+            UIUtils.getToolWindow(project).setPage(project, page);
             setPage(page);
-
         }
     }
 }
