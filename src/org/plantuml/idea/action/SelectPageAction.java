@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -55,8 +56,11 @@ public class SelectPageAction extends ComboBoxAction {
 
         @Override
         public void actionPerformed(AnActionEvent anActionEvent) {
-            final Project project = anActionEvent.getProject();
-            UIUtils.getToolWindow(project).setPage(project, page);
+            Project project = anActionEvent.getProject();
+            PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
+            if (toolWindow != null) {
+                toolWindow.setPage(project, page);
+            }
             setPage(page);
         }
     }

@@ -3,10 +3,7 @@ package org.plantuml.idea.plantuml;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,25 +38,17 @@ public class PlantUml {
         abstract FileFormat getFormat();
     }
 
-    public static PlantUmlResult render(String source) {
-        return render(source, ImageFormat.PNG, 0);
-    }
-
-    public static PlantUmlResult render(String source, File baseDir, int page) {
-        return render(source, baseDir, ImageFormat.PNG, page);
-    }
-
     /**
      * Renders file with support of plantUML include ange paging features, setting base dir and page for plantUML
      * to provided values
      *
+     *
      * @param source  plantUML source code
      * @param baseDir base dir to set
-     * @param format  desired image format
      * @param page    page to render
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, File baseDir, ImageFormat format, int page) {
+    public static PlantUmlResult render(String source, File baseDir, int page) {
         PlantUmlResult render;
         File origDir = FileSystem.getInstance().getCurrentDir();
 
@@ -67,7 +56,7 @@ public class PlantUml {
             FileSystem.getInstance().setCurrentDir(baseDir);
 
         try {
-            render = render(source, format, page);
+            render = render(source, page);
         } finally {
             if (origDir != null)
                 FileSystem.getInstance().setCurrentDir(origDir);
@@ -114,18 +103,12 @@ public class PlantUml {
      * Renders given source code into diagram
      *
      * @param source plantUml source code
-     * @param format desired image format
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, ImageFormat format, int page) {
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        String desc = null;
-        String error = null;
-        int pages = 1;
-
+    private static PlantUmlResult render(String source, int page) {
         try {
-            // image generation.
+            int pages = 1; // image generation.
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
             SourceStringReader reader = new SourceStringReader(source);
 
             List<BlockUml> blocks = reader.getBlocks();
@@ -136,11 +119,11 @@ public class PlantUml {
                 }
             }
             // Write the image to "os"
-            desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()));
+            String desc = reader.generateImage(os, page, new FileFormatOption(FileFormat.SVG));
+            return new PlantUmlResult(os.toByteArray(), desc, null, pages);
         } catch (Throwable e) {
-            error = e.getMessage();
+            return new PlantUmlResult(new byte[]{}, null, e.getMessage(), 0);
         }
-        return new PlantUmlResult(os.toByteArray(), desc, error, pages);
     }
 
     private static Pattern sourcePattern =

@@ -63,11 +63,13 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT);
+        PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT, null, 0);
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
+            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes(), 75);
             if (image != null) {
-                UIUtils.setImage(image, testDot, 100);
+                ImageIcon imageIcon = new ImageIcon(image);
+                testDot.setIcon(imageIcon);
+                testDot.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);
