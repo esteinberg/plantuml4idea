@@ -22,6 +22,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.messages.MessageBus;
+import org.apache.batik.swing.JSVGCanvas;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -33,7 +34,10 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
@@ -45,7 +49,10 @@ public class PlantUmlToolWindow extends JPanel {
     private static Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
 
     private ToolWindow toolWindow;
-    private JLabel imageLabel;
+    private Container imageLabel;
+    private JSVGCanvas canvas;
+
+    private PlantUmlResult result;
 
     private int zoom = 100;
     private int page = 0;
@@ -54,6 +61,8 @@ public class PlantUmlToolWindow extends JPanel {
     private String cachedSource = "";
     private int cachedPage = page;
     private int cachedZoom = zoom;
+
+    private boolean zoomOnly;
 
     private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
@@ -72,21 +81,65 @@ public class PlantUmlToolWindow extends JPanel {
 
         UIUtils.addProject(myProject, this);
 
-        setupUI();
+        setupUI(myProject);
 
         registerListeners(myProject);
     }
 
-    private void setupUI() {
+    private void setupUI(final Project myProject) {
         ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("PlantUML.Toolbar");
         final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
-        imageLabel = new JLabel();
+        canvas = new JSVGCanvas();
+        canvas.setDisableInteractions(true);
 
-        JScrollPane scrollPane = new JBScrollPane(imageLabel);
+        imageLabel = new JLabel();
+        //imageLabel.setLayout(new BorderLayout());
+        imageLabel.add(canvas, BorderLayout.CENTER);
+
+        final JScrollPane scrollPane = new JBScrollPane(imageLabel);
         add(scrollPane, BorderLayout.CENTER);
+
+        canvas.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.isControlDown()) {
+                    setZoom(myProject, getZoom() - e.getWheelRotation() * 5);
+                } else {
+                    for (int i = 0; i < 10; i++) {
+                        imageLabel.dispatchEvent(e);
+                    }
+                }
+
+            }
+        });
+
+        canvas.addMouseMotionListener(new MouseMotionListener() {
+            private int x, y;
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                JScrollBar h = scrollPane.getHorizontalScrollBar();
+                JScrollBar v = scrollPane.getVerticalScrollBar();
+
+                int dx = x - e.getXOnScreen();
+                int dy = y - e.getYOnScreen();
+
+                h.setValue(h.getValue() + dx);
+                v.setValue(v.getValue() + dy);
+
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+        });
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
@@ -119,6 +172,7 @@ public class PlantUmlToolWindow extends JPanel {
         if (newSource.isEmpty())
             return false;
         if (!newSource.equals(cachedSource) || page != cachedPage || zoom != cachedZoom) {
+            zoomOnly = newSource.equals(cachedSource) && page == cachedPage;
             cachedSource = newSource;
             cachedPage = page;
             cachedZoom = zoom;
@@ -158,20 +212,33 @@ public class PlantUmlToolWindow extends JPanel {
         });
     }
 
-    private void renderWithBaseDir(Project myProject, String source, File baseDir, int pageNum) {
-        if (source.isEmpty())
-            return;
-        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
+    private void renderWithBaseDir(final Project myProject, final String source, final File selectedDir, final int page) {
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-            if (image != null) {
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
-                    public void run() {
-                        UIUtils.setImage(image, imageLabel, zoom);
-                    }
-                });
+            if (source.isEmpty())
+                return;
+
+            if (!zoomOnly) {
+                result = PlantUml.render(source, selectedDir, page);
+                canvas.setSVGDocument(result.getDocument());
             }
-            setNumPages(myProject, result.getPages());
+
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+                public void run() {
+                    if (!zoomOnly) {
+                        setNumPages(myProject, result.getPages());
+                    }
+
+                    Dimension dimension = new Dimension(result.getWidth() * zoom / 100, result.getHeight() * zoom / 100);
+                    if  (!dimension.equals(canvas.getSize())) {
+                        imageLabel.setPreferredSize(dimension);
+                        imageLabel.getParent().doLayout();
+
+                        canvas.setSize(dimension);
+                    }
+
+                }
+            });
+
         } catch (Exception e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e);
         }

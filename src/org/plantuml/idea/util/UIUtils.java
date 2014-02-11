@@ -6,17 +6,24 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.util.ui.UIUtil;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DocumentLoader;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgentAdapter;
+import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
+import org.apache.batik.gvt.GraphicsNode;
+import org.apache.batik.util.XMLResourceDescriptor;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.w3c.dom.svg.SVGDocument;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,36 +33,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UIUtils {
     private static Map<Project, PlantUmlToolWindow> windowMap = new ConcurrentHashMap<Project, PlantUmlToolWindow>();
 
-    public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
-        ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
+    public static BufferedImage getBufferedImage(byte[] imageBytes, int zoom) throws IOException {
+
+        String xmlParser = XMLResourceDescriptor.getXMLParserClassName();
+        SAXSVGDocumentFactory documentFactory = new SAXSVGDocumentFactory(xmlParser);
+        InputStream inputStream = new ByteArrayInputStream(imageBytes);
+
+        SVGDocument document = documentFactory.createSVGDocument("http://www.w3.org/2000/svg",
+                new InputStreamReader(inputStream, "utf8"));
+
+        UserAgentAdapter userAgent = new UserAgentAdapter();
+        DocumentLoader documentLoader = new DocumentLoader(userAgent);
+        BridgeContext bridgeContext = new BridgeContext(userAgent, documentLoader);
+        bridgeContext.setDynamicState(BridgeContext.DYNAMIC);
+        GVTBuilder builder = new GVTBuilder();
+        GraphicsNode graphicsNode = builder.build(bridgeContext, document);
+        Rectangle2D rect = graphicsNode.getGeometryBounds();
+        int width = (int) Math.round(rect.getWidth() * 1.1d * zoom / 100d);
+        int height = (int) Math.round(rect.getHeight() * 1.1d * zoom / 100d);
+        BufferedImage bi = UIUtil.createImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D graphics = bi.createGraphics();
+        graphics.scale(zoom / 100d, zoom / 100d);
+        graphicsNode.paint(graphics);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ImageIO.write(bi, "PNG", os);
+        ByteArrayInputStream input = new ByteArrayInputStream(os.toByteArray());
         return ImageIO.read(input);
-    }
-
-    /**
-     * Scales the image and sets it to label
-     *
-     * @param image source image
-     * @param label destination label
-     * @param zoom  zoom factor
-     */
-    public static void setImage(@NotNull BufferedImage image, JLabel label, int zoom) {
-        int newWidth;
-        int newHeight;
-        Image scaledImage;
-
-        if (zoom == 100) { // default zoom, no scaling
-            newWidth = image.getWidth();
-            newHeight = image.getHeight();
-            scaledImage = image;
-        } else {
-            newWidth = Math.round(image.getWidth() * zoom / 100.0f);
-            newHeight = Math.round(image.getHeight() * zoom / 100.0f);
-            scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
-        }
-
-        ImageIcon imageIcon = new ImageIcon(scaledImage);
-        label.setIcon(imageIcon);
-        label.setPreferredSize(new Dimension(newWidth, newHeight));
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
@@ -108,8 +112,9 @@ public class UIUtils {
         return baseDir;
     }
 
+    @Nullable
     public static PlantUmlToolWindow getToolWindow(Project project) {
-        return windowMap.get(project);
+        return project != null ? windowMap.get(project) : null;
     }
 
     public static void addProject(Project project, PlantUmlToolWindow toolWindow) {

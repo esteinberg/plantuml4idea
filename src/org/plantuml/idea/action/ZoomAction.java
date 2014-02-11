@@ -12,16 +12,21 @@ public abstract class ZoomAction extends AnAction {
     protected static int DEFAULT_ZOOM = 100;
     protected static int MAX_ZOOM = 500;
     protected static int MIN_ZOOM = 20;
-    protected static int ZOOM_STEP = 20;
+    protected static int ZOOM_STEP = 10;
 
     protected int getZoom(Project project) {
-        PlantUmlToolWindow plantUML = UIUtils.getToolWindow(project);
-        return plantUML.getZoom();
+        PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
+        if (toolWindow != null) {
+            return toolWindow.getZoom();
+        }
+        return 100;
     }
 
     protected void setZoom(Project project, int zoom) {
-        PlantUmlToolWindow plantUML = UIUtils.getToolWindow(project);
-        plantUML.setZoom(project, zoom);
+        PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
+        if (toolWindow != null) {
+            toolWindow.setZoom(project, zoom);
+        }
     }
 
 }

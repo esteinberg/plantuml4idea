@@ -37,10 +37,11 @@ public class CopyDiagramToClipboardAction extends AnAction {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);
                 }
-                PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
-                        UIUtils.getSelectedDir(project),0);
-                final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-                return image;
+                PlantUmlResult result = PlantUml.render(
+                        UIUtils.getSelectedSourceWithCaret(project),
+                        UIUtils.getSelectedDir(project), 0);
+
+                return UIUtils.getBufferedImage(result.getDiagramBytes(), 100);
             }
         });
     }
