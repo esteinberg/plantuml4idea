@@ -13,6 +13,7 @@ public class PrevPageAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
-        UIUtils.getToolWindow(project).prevPage(project);
+        if (project != null)
+            UIUtils.getToolWindow(project).prevPage(project);
     }
 }

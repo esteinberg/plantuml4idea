@@ -56,8 +56,10 @@ public class SelectPageAction extends ComboBoxAction {
         @Override
         public void actionPerformed(AnActionEvent anActionEvent) {
             final Project project = anActionEvent.getProject();
-            UIUtils.getToolWindow(project).setPage(project, page);
-            setPage(page);
+            if (project != null) {
+                UIUtils.getToolWindow(project).setPage(project, page);
+                setPage(page);
+            }
         }
     }
 }

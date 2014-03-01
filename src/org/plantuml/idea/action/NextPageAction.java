@@ -13,6 +13,7 @@ public class NextPageAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
-        UIUtils.getToolWindow(project).nextPage(project);
+        if (project != null)
+            UIUtils.getToolWindow(project).nextPage(project);
     }
 }

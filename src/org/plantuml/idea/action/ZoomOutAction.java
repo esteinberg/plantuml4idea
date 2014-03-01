@@ -1,6 +1,7 @@
 package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 
 /**
  * @author Eugene Steinberg
@@ -8,6 +9,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 public class ZoomOutAction extends ZoomAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        setZoom(e.getProject(), Math.max(MIN_ZOOM, getZoom(e.getProject()) - ZOOM_STEP));
+        Project project = e.getProject();
+        if (project != null) {
+            setZoom(project, Math.max(MIN_ZOOM, getZoom(project) - ZOOM_STEP));
+        }
     }
 }
