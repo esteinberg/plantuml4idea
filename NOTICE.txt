@@ -1,0 +1,5 @@
+PlantUml4Idea
+Copyright (c) 2012-2014 Eugene Steinberg
+
+This product includes software developed at
+PlantUml http://plantuml.sourceforge.net/
