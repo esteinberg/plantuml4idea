@@ -250,6 +250,16 @@ public class PlantUmlToolWindow extends JPanel {
         public void caretPositionChanged(final CaretEvent e) {
             renderLater(e.getEditor().getProject());
         }
+
+        @Override
+        public void caretAdded(CaretEvent e) {
+            renderLater(e.getEditor().getProject());
+        }
+
+        @Override
+        public void caretRemoved(CaretEvent e) {
+            // do nothing
+        }
     }
 
     private class PlantUmlAncestorListener implements AncestorListener {
