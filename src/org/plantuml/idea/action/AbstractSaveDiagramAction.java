@@ -64,7 +64,7 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
                 }
                 String selectedSource = getSource(e.getProject());
 
-                String fileNameTemplate = base + "%03d." + extension;
+                String fileNameTemplate = base + "-%03d." + extension;
 
                 PlantUml.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate);

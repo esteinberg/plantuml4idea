@@ -91,19 +91,27 @@ public class PlantUml {
     public static void renderAndSave(String source, File baseDir, ImageFormat format, String fileName, String fileNameFormat)
             throws IOException {
         File origDir = FileSystem.getInstance().getCurrentDir();
+        FileOutputStream outputStream = null;
         if (baseDir != null)
             FileSystem.getInstance().setCurrentDir(baseDir);
         try {
             SourceStringReader reader = new SourceStringReader(source);
 
             List<BlockUml> blocks = reader.getBlocks();
-            for (int i = 0; i < blocks.size(); i++) {
-                String fName = i == 0 ? fileName : String.format(fileNameFormat, i);
-                FileOutputStream outputStream = new FileOutputStream(fName);
-                reader.generateImage(outputStream, i, new FileFormatOption(format.getFormat()));
-                outputStream.close();
+            int imageСounter = 0;
+            for (BlockUml block : blocks) {
+                Diagram diagram = block.getDiagram();
+                int pages = diagram.getNbImages();
+                for (int page = 0; page < pages; ++page) {
+                    String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
+                    outputStream = new FileOutputStream(fName);
+                    reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
+                    outputStream.close();
+                }
             }
         } finally {
+            if (outputStream != null)
+                outputStream.close();
             if (origDir != null)
                 FileSystem.getInstance().setCurrentDir(origDir);
         }
@@ -117,6 +125,7 @@ public class PlantUml {
      * @param format desired image format
      * @return rendering result
      */
+
     public static PlantUmlResult render(String source, ImageFormat format, int page) {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -157,7 +166,7 @@ public class PlantUml {
      * @param text   source code containing multiple plantuml sources
      * @param offset offset in the text from which plantuml sourcePattern is extracted
      * @return extracted plantUml code, including @startuml and @enduml tags or empty string if
-     *         no valid sourcePattern code was found
+     * no valid sourcePattern code was found
      */
     public static String extractSource(String text, int offset) {
         if (!text.contains(UMLSTART)) return "";

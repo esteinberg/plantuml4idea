@@ -48,6 +48,7 @@ public class PlantUmlToolWindow extends JPanel {
     private JLabel imageLabel;
 
     private int zoom = 100;
+
     private int page = 0;
     private int numPages = 1;
 
@@ -305,6 +306,10 @@ public class PlantUmlToolWindow extends JPanel {
             UIUtils.removeProject(project);
             unregisterListeners();
         }
+    }
+
+    public int getPage() {
+        return page;
     }
 }
 
