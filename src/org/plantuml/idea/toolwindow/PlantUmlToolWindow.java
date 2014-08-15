@@ -129,6 +129,8 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     private void renderLater(final Project project) {
+        if (project == null) return;
+
         PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
 
         if (toolWindow != this) {
