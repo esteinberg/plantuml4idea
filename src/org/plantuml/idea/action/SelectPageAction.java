@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.util.UIUtils;
@@ -34,9 +35,14 @@ public class SelectPageAction extends ComboBoxAction {
         this.numPages = numPages;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         if (button != null) {
-            button.setText(getDisplayPage(page));
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    button.setText(getDisplayPage(page));
+                }
+            });
         }
     }
 
