@@ -56,5 +56,7 @@
         <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
+        <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
+        <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
     </extensions>
 </idea-plugin>

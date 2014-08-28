@@ -10,6 +10,7 @@ Author: [Eugene Steinberg](https://github.com/esteinberg)
 Contributors:
  * [Ivan Mamontov](https://github.com/IvanMamontov)
  * [Henady Zakalusky](https://github.com/hza)
+ * [Max Gorbunov](https://github.com/6zow)
 
 # Features
 
