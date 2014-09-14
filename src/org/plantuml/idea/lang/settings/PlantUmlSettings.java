@@ -7,10 +7,12 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Max Gorbunov
+ * @author Eugene Steinberg
  */
 @State(name = "PlantUmlSettings", storages = {@Storage(file = StoragePathMacros.APP_CONFIG + "/plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
     private String dotExecutable = null;
+    private boolean errorAnnotationEnabled = false;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -26,6 +28,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
             this.dotExecutable = null;
         }
         OptionFlags.getInstance().setDotExecutable(this.dotExecutable);
+    }
+
+    public boolean isErrorAnnotationEnabled() {
+        return errorAnnotationEnabled;
+    }
+
+    public void setErrorAnnotationEnabled(boolean errorAnnotationEnabled) {
+        this.errorAnnotationEnabled = errorAnnotationEnabled;
     }
 
     @Nullable
