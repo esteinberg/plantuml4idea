@@ -14,11 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Author: Eugene Steinberg
  * Date: 9/13/14
  */
-public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, AnnotationResult> {
+public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<Integer, AnnotationResult>> {
     @Nullable
     @Override
     public PsiFile collectInformation(@NotNull PsiFile file) {
@@ -27,32 +30,53 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Annota
 
     @Nullable
     @Override
-    public AnnotationResult doAnnotate(PsiFile collectedInfo) {
-        AnnotationResult result = null;
+    public Map<Integer, AnnotationResult> doAnnotate(PsiFile collectedInfo) {
+        Map<Integer, AnnotationResult> result = new LinkedHashMap<Integer, AnnotationResult>();
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
             String text = collectedInfo.getFirstChild().getText();
-            String source = PlantUml.extractSource(text, 0);
-            SyntaxResult syntaxResult = SyntaxChecker.checkSyntax(source);
-            if (syntaxResult.isError()) {
-                String error = Joiner.on(" \n").join(syntaxResult.getErrors());
-                String suggest = Joiner.on(" \n").join(syntaxResult.getSuggest());
-                result = new AnnotationResult(error, suggest, syntaxResult.getErrorLinePosition());
+            Map<Integer, String> sources = PlantUml.extractSources(text);
+            for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
+                AnnotationResult annotationResult = getAnnotationResult(sourceData.getValue());
+                if (annotationResult != null) {
+                    result.put(sourceData.getKey(), annotationResult);
+                }
             }
+
+
+        }
+        return result;
+    }
+
+    private AnnotationResult getAnnotationResult(String source) {
+        AnnotationResult result = null;
+        SyntaxResult syntaxResult = SyntaxChecker.checkSyntax(source);
+        if (syntaxResult.isError()) {
+            String error = Joiner.on(" \n").join(syntaxResult.getErrors());
+            String suggest = Joiner.on(" \n").join(syntaxResult.getSuggest());
+            result = new AnnotationResult(error, suggest, syntaxResult.getErrorLinePosition());
         }
         return result;
     }
 
     @Override
-    public void apply(@NotNull PsiFile file, AnnotationResult annotationResult, @NotNull AnnotationHolder holder) {
+    public void apply(@NotNull PsiFile file, Map<Integer, AnnotationResult> annotationResult, @NotNull AnnotationHolder holder) {
         if (null != annotationResult) {
             Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
             if (document != null) {
-                int startoffset = document.getLineStartOffset(annotationResult.getLineNumber());
-                int endoffset = document.getLineEndOffset(annotationResult.getLineNumber());
-                TextRange range = TextRange.create(startoffset, endoffset);
-                holder.createErrorAnnotation(range,
-                        annotationResult.getErrorMessage() + " " + annotationResult.getSuggestion());
+                for (Map.Entry<Integer, AnnotationResult> arEntry : annotationResult.entrySet()) {
+                    annotateSource(arEntry.getValue(), holder, document, arEntry.getKey());
+                }
+
             }
         }
+    }
+
+    private void annotateSource(AnnotationResult annotationResult, AnnotationHolder holder, Document document, int baseOffset) {
+        int sourceStartLineNumber = document.getLineNumber(baseOffset);
+        int startoffset = document.getLineStartOffset(annotationResult.getLineNumber() + sourceStartLineNumber);
+        int endoffset = document.getLineEndOffset(annotationResult.getLineNumber() + sourceStartLineNumber);
+        TextRange range = TextRange.create(startoffset, endoffset);
+        holder.createErrorAnnotation(range,
+                annotationResult.getErrorMessage() + " " + annotationResult.getSuggestion());
     }
 }

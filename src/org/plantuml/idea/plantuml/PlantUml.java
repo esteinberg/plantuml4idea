@@ -8,7 +8,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -158,8 +160,28 @@ public class PlantUml {
         return new PlantUmlResult(os.toByteArray(), desc, error, pages);
     }
 
+    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
     private static Pattern sourcePattern =
-            Pattern.compile("(?:(@start(?:uml|dot|jcckit|ditaa|salt)(?s).*?(?:@end(?:uml|dot|jcckit|ditaa|salt)|$))(?s).*?)+");
+            Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
+
+    /**
+     * Extracts all
+     * @param text
+     * @return
+     */
+    public static Map<Integer, String> extractSources(String text) {
+        LinkedHashMap<Integer, String> result = new LinkedHashMap<Integer, String>();
+
+        if (text.contains(UMLSTART)) {
+
+            Matcher matcher = sourcePattern.matcher(text);
+
+            while (matcher.find()) {
+                result.put(matcher.start(), matcher.group());
+            }
+        }
+        return result;
+    }
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset
@@ -175,16 +197,16 @@ public class PlantUml {
      * no valid sourcePattern code was found
      */
     public static String extractSource(String text, int offset) {
-        if (!text.contains(UMLSTART)) return "";
-
-        Matcher matcher = sourcePattern.matcher(text);
-
-        while (matcher.find()) {
-            String group = matcher.group();
-            if (matcher.start() <= offset && offset <= matcher.end())
-                return stripComments(group);
+        Map<Integer, String> sources = extractSources(text);
+        String source = "";
+        for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
+            Integer sourceOffset = sourceData.getKey();
+            if (sourceOffset <= offset && offset <= sourceOffset + sourceData.getValue().length()) {
+                source = stripComments(sourceData.getValue());
+                break;
+            }
         }
-        return "";
+        return source;
     }
 
     private static Pattern sourceCommentPattern =
