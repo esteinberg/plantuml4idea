@@ -2,9 +2,33 @@
     <name>PlantUML integration</name>
     <description>PlantUML diagramming tool integration</description>
     <version>1.4.12-SNAPSHOT</version>
-    <vendor>org.plantuml</vendor>
+    <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
+    <description>
+        <![CDATA[
+
+        PlantUML plugin renders PlantUML source code in a separate window
+
+        <ul>
+            <li> supports multiple sources per file</li>
+            <li> supports multi page diagrams</li>
+            <li> supports PlantUML includes</li>
+            <li> diagram zoom </li>
+            <li> PlantUML syntax error highlighting and intentions</li>
+            <li> Copy current diagram (or all diagrams in file) to clipboard or save as PNG, EPS or SVG</li>
+        </ul>
+        ]]>
+    </description>
+    <change-notes>
+        <![CDATA[
+                <p>1.4.12</p>
+                <ul>
+                    <li> support for syntax error highlighting in multi-source files</li>
+                    <li> PlantUML syntax error highlighting turned on by default</li>
+                </ul>
+       ]]>
+    </change-notes>
     <depends>com.intellij.modules.platform</depends>
 
     <application-components>
@@ -58,6 +82,7 @@
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
         <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
-        <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator" language="PUML"/>
+        <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
+                           language="PUML"/>
     </extensions>
 </idea-plugin>
