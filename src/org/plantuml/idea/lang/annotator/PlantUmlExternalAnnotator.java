@@ -5,6 +5,7 @@ import com.intellij.codeInsight.intention.IntentionAction;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -23,6 +24,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author: Eugene Steinberg
@@ -83,7 +86,27 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
             errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
         }
 
+        String source = document.getText();
+        for (String token : LanguageDescriptor.INSTANCE.keywords) {
+            highlightAllTokens(holder, source, token);
+        }
 
+
+    }
+
+    private void highlightAllTokens(AnnotationHolder holder, String source, String token) {
+        Pattern pattern = Pattern.compile("\\b" + token + "\\b");
+        Matcher matcher = pattern.matcher(source);
+        while (matcher.find()) {
+            highlightToken(holder, token, matcher.start());
+        }
+    }
+
+    private void highlightToken(AnnotationHolder holder, String token, int idx) {
+        TextRange range;
+        range = TextRange.create(idx, idx + token.length());
+        Annotation infoAnnotation = holder.createInfoAnnotation(range, "");
+        infoAnnotation.setTextAttributes(DefaultLanguageHighlighterColors.KEYWORD);
     }
 
     private List<String> cleanupSuggestions(List<String> suggest) {
