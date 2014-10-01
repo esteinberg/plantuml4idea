@@ -73,16 +73,18 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
 
     private void annotateSource(SyntaxResult annotationResult, AnnotationHolder holder, Document document, int baseOffset) {
         int sourceStartLineNumber = document.getLineNumber(baseOffset);
-        int startoffset = document.getLineStartOffset(annotationResult.getErrorLinePosition() + sourceStartLineNumber);
-        int endoffset = document.getLineEndOffset(annotationResult.getErrorLinePosition() + sourceStartLineNumber);
-        TextRange range = TextRange.create(startoffset, endoffset);
-        String errorMessage = Joiner.on("\n").join(annotationResult.getErrors());
-        Annotation errorAnnotation = holder.createErrorAnnotation(range,
-                errorMessage);
-        for (String s : cleanupSuggestions(annotationResult.getSuggest())) {
-            errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
+        int errorLine = annotationResult.getErrorLinePosition() + sourceStartLineNumber;
+        if (errorLine < document.getLineCount()) {
+            int startoffset = document.getLineStartOffset(errorLine);
+            int endoffset = document.getLineEndOffset(errorLine);
+            TextRange range = TextRange.create(startoffset, endoffset);
+            String errorMessage = Joiner.on("\n").join(annotationResult.getErrors());
+            Annotation errorAnnotation = holder.createErrorAnnotation(range,
+                    errorMessage);
+            for (String s : cleanupSuggestions(annotationResult.getSuggest())) {
+                errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
+            }
         }
-
 
     }
 
