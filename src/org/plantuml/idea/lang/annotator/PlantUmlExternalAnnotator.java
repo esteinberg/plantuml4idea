@@ -20,18 +20,17 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 
-import java.util.LinkedHashMap;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Author: Eugene Steinberg
  * Date: 9/13/14
  */
-public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<Integer, SyntaxResult>> {
+public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAnnotationResult> {
     @Nullable
     @Override
     public PsiFile collectInformation(@NotNull PsiFile file) {
@@ -40,16 +39,25 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
 
     @Nullable
     @Override
-    public Map<Integer, SyntaxResult> doAnnotate(PsiFile collectedInfo) {
-        Map<Integer, SyntaxResult> result = new LinkedHashMap<Integer, SyntaxResult>();
+    public FileAnnotationResult doAnnotate(PsiFile collectedInfo) {
+        FileAnnotationResult result = new FileAnnotationResult();
+
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
             String text = collectedInfo.getFirstChild().getText();
+
             Map<Integer, String> sources = PlantUml.extractSources(text);
+
             for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
-                SyntaxResult annotationResult = getAnnotationResult(sourceData.getValue());
-                if (annotationResult.isError()) {
-                    result.put(sourceData.getKey(), annotationResult);
-                }
+                SyntaxResult syntaxResult = checkSyntax(sourceData.getValue());
+
+//                if (syntaxResult.isError()) {
+                SourceAnnotationResult sourceAnnotationResult = new SourceAnnotationResult(
+                        syntaxResult.getErrors(),
+                        syntaxResult.getSuggest(),
+                        syntaxResult.getErrorLinePosition()
+                );
+                result.put(sourceData.getKey(), sourceAnnotationResult);
+//                }
             }
 
 
@@ -57,16 +65,16 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
         return result;
     }
 
-    private SyntaxResult getAnnotationResult(String source) {
+    private SyntaxResult checkSyntax(String source) {
         return SyntaxChecker.checkSyntax(source);
     }
 
     @Override
-    public void apply(@NotNull PsiFile file, Map<Integer, SyntaxResult> annotationResult, @NotNull AnnotationHolder holder) {
+    public void apply(@NotNull PsiFile file, FileAnnotationResult annotationResult, @NotNull AnnotationHolder holder) {
         if (null != annotationResult) {
             Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
             if (document != null) {
-                for (Map.Entry<Integer, SyntaxResult> arEntry : annotationResult.entrySet()) {
+                for (Map.Entry<Integer, SourceAnnotationResult> arEntry : annotationResult.getAnnotationResultMap().entrySet()) {
                     annotateSource(arEntry.getValue(), holder, document, arEntry.getKey());
                 }
 
@@ -74,32 +82,26 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
         }
     }
 
-    private void annotateSource(SyntaxResult annotationResult, AnnotationHolder holder, Document document, int baseOffset) {
+    private void annotateSource(SourceAnnotationResult annotationResult, AnnotationHolder holder, Document document, int baseOffset) {
         int sourceStartLineNumber = document.getLineNumber(baseOffset);
-        int startoffset = document.getLineStartOffset(annotationResult.getErrorLinePosition() + sourceStartLineNumber);
-        int endoffset = document.getLineEndOffset(annotationResult.getErrorLinePosition() + sourceStartLineNumber);
+        int startoffset = document.getLineStartOffset(annotationResult.getErrorLineNumber() + sourceStartLineNumber);
+        int endoffset = document.getLineEndOffset(annotationResult.getErrorLineNumber() + sourceStartLineNumber);
         TextRange range = TextRange.create(startoffset, endoffset);
-        String errorMessage = Joiner.on("\n").join(annotationResult.getErrors());
+        String errorMessage = Joiner.on("\n").join(annotationResult.getErrorMessage());
         Annotation errorAnnotation = holder.createErrorAnnotation(range,
                 errorMessage);
-        for (String s : cleanupSuggestions(annotationResult.getSuggest())) {
+        for (String s : cleanupSuggestions(annotationResult.getSuggestion())) {
             errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
         }
 
         String source = document.getText();
-        for (String token : LanguageDescriptor.INSTANCE.keywords) {
-            highlightAllTokens(holder, source, token);
-        }
 
-
-    }
-
-    private void highlightAllTokens(AnnotationHolder holder, String source, String token) {
-        Pattern pattern = Pattern.compile("\\b" + token + "\\b");
-        Matcher matcher = pattern.matcher(source);
+        Matcher matcher = LanguagePatternHolder.INSTANCE.keywordsPattern.matcher(source);
         while (matcher.find()) {
-            highlightToken(holder, token, matcher.start());
+            highlightToken(holder, matcher.group(), matcher.start());
         }
+
+
     }
 
     private void highlightToken(AnnotationHolder holder, String token, int idx) {
@@ -109,7 +111,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
         infoAnnotation.setTextAttributes(DefaultLanguageHighlighterColors.KEYWORD);
     }
 
-    private List<String> cleanupSuggestions(List<String> suggest) {
+    private List<String> cleanupSuggestions(Collection<String> suggest) {
+        if (suggest == null)
+            return new LinkedList<String>();
         LinkedList<String> suggestions = new LinkedList<String>(suggest);
         suggestions.remove("Did you mean:");
         return suggestions;
