@@ -1,17 +1,12 @@
 package org.plantuml.idea.lang.annotator;
 
-import com.google.common.base.Joiner;
-import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.util.IncorrectOperationException;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
 import org.jetbrains.annotations.NotNull;
@@ -19,16 +14,17 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author: Eugene Steinberg
  * Date: 9/13/14
  */
-public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<Integer, SyntaxResult>> {
+public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAnnotationResult> {
     @Nullable
     @Override
     public PsiFile collectInformation(@NotNull PsiFile file) {
@@ -37,16 +33,36 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
 
     @Nullable
     @Override
-    public Map<Integer, SyntaxResult> doAnnotate(PsiFile collectedInfo) {
-        Map<Integer, SyntaxResult> result = new LinkedHashMap<Integer, SyntaxResult>();
+    public FileAnnotationResult doAnnotate(PsiFile file) {
+        FileAnnotationResult result = new FileAnnotationResult();
+
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
-            String text = collectedInfo.getFirstChild().getText();
+            String text = file.getFirstChild().getText();
+
             Map<Integer, String> sources = PlantUml.extractSources(text);
+
             for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
-                SyntaxResult annotationResult = getAnnotationResult(sourceData.getValue());
-                if (annotationResult.isError()) {
-                    result.put(sourceData.getKey(), annotationResult);
-                }
+                Integer sourceOffset = sourceData.getKey();
+
+                SourceAnnotationResult sourceAnnotationResult = new SourceAnnotationResult(sourceOffset);
+
+                String source = sourceData.getValue();
+
+                sourceAnnotationResult.addAll(annotateSyntaxErrors(source));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.keywordsPattern,
+                        DefaultLanguageHighlighterColors.KEYWORD));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.typesPattern,
+                        DefaultLanguageHighlighterColors.LABEL));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.preprocPattern,
+                        DefaultLanguageHighlighterColors.METADATA));
+
+                result.add(sourceAnnotationResult);
             }
 
 
@@ -54,82 +70,43 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, Map<In
         return result;
     }
 
-    private SyntaxResult getAnnotationResult(String source) {
+    @Nullable
+    private Collection<SourceAnnotation> annotateSyntaxErrors(String source) {
+        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+        SyntaxResult syntaxResult = checkSyntax(source);
+        if (syntaxResult.isError()) {
+            ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
+                    syntaxResult.getErrors(),
+                    syntaxResult.getSuggest(),
+                    syntaxResult.getErrorLinePosition()
+            );
+            result.add(errorSourceAnnotation);
+        }
+        return result;
+    }
+
+    private SyntaxResult checkSyntax(String source) {
         return SyntaxChecker.checkSyntax(source);
     }
 
+    private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {
+        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+        Matcher matcher = pattern.matcher(source);
+        while (matcher.find()) {
+            result.add(new SyntaxHighlightAnnotation(matcher.start(), matcher.end(), textAttributesKey));
+        }
+        return result;
+    }
+
     @Override
-    public void apply(@NotNull PsiFile file, Map<Integer, SyntaxResult> annotationResult, @NotNull AnnotationHolder holder) {
-        if (null != annotationResult) {
+    public void apply(@NotNull PsiFile file, FileAnnotationResult fileAnnotationResult, @NotNull AnnotationHolder holder) {
+        if (null != fileAnnotationResult) {
             Document document = PsiDocumentManager.getInstance(file.getProject()).getDocument(file);
             if (document != null) {
-                for (Map.Entry<Integer, SyntaxResult> arEntry : annotationResult.entrySet()) {
-                    annotateSource(arEntry.getValue(), holder, document, arEntry.getKey());
-                }
-
+                fileAnnotationResult.annotate(holder, document);
             }
         }
     }
 
-    private void annotateSource(SyntaxResult annotationResult, AnnotationHolder holder, Document document, int baseOffset) {
-        int sourceStartLineNumber = document.getLineNumber(baseOffset);
-        int errorLine = annotationResult.getErrorLinePosition() + sourceStartLineNumber;
-        if (errorLine < document.getLineCount()) {
-            int startoffset = document.getLineStartOffset(errorLine);
-            int endoffset = document.getLineEndOffset(errorLine);
-            TextRange range = TextRange.create(startoffset, endoffset);
-            String errorMessage = Joiner.on("\n").join(annotationResult.getErrors());
-            Annotation errorAnnotation = holder.createErrorAnnotation(range,
-                    errorMessage);
-            for (String s : cleanupSuggestions(annotationResult.getSuggest())) {
-                errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
-            }
-        }
 
-    }
-
-    private List<String> cleanupSuggestions(List<String> suggest) {
-        LinkedList<String> suggestions = new LinkedList<String>(suggest);
-        suggestions.remove("Did you mean:");
-        return suggestions;
-    }
-
-    private class PlantUmlIntentionAction implements IntentionAction {
-        private int startOffset;
-        private int endOffset;
-        private String suggestion;
-
-        protected PlantUmlIntentionAction(int startOffset, int endOffset, String suggestion) {
-            this.startOffset = startOffset;
-            this.endOffset = endOffset;
-            this.suggestion = suggestion;
-        }
-
-        @NotNull
-        @Override
-        public String getText() {
-            return "change to '" + suggestion + "'";
-        }
-
-        @NotNull
-        @Override
-        public String getFamilyName() {
-            return "PLANTUML_INTENTIONS";
-        }
-
-        @Override
-        public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
-            return true;
-        }
-
-        @Override
-        public void invoke(@NotNull Project project, Editor editor, PsiFile file) throws IncorrectOperationException {
-            editor.getDocument().replaceString(startOffset, endOffset, suggestion);
-        }
-
-        @Override
-        public boolean startInWriteAction() {
-            return true;
-        }
-    }
 }
