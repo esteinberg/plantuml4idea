@@ -16,17 +16,17 @@ public enum LanguagePatternHolder {
 
     private final Joiner PipeJoiner = Joiner.on("|");
 
-    public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords);
-    public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types);
-    public final Pattern preprocPattern = createPattern(LanguageDescriptor.INSTANCE.preproc);
+    public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");
+    public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
+    public final Pattern preprocPattern = createPattern(LanguageDescriptor.INSTANCE.preproc, "[@|!]");
 
-    private Pattern createPattern(Collection<String> tokens) {
+    private Pattern createPattern(Collection<String> tokens, final String patternPrefix) {
         Collection<String> tokensAsWords = Collections2.transform(tokens, new Function<String, String>() {
             @Override
             public String apply(String s) {
                 return "\\b" + s + "\\b";
             }
         });
-        return Pattern.compile("(" + PipeJoiner.join(tokensAsWords) + ")");
+        return Pattern.compile("(" + patternPrefix + PipeJoiner.join(tokensAsWords) + ")");
     }
 }

@@ -2,7 +2,9 @@ package org.plantuml.idea.lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Author: Eugene Steinberg
@@ -47,7 +50,17 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
 
                 sourceAnnotationResult.addAll(annotateSyntaxErrors(source));
 
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source));
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.keywordsPattern,
+                        DefaultLanguageHighlighterColors.KEYWORD));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.typesPattern,
+                        DefaultLanguageHighlighterColors.LABEL));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.preprocPattern,
+                        DefaultLanguageHighlighterColors.METADATA));
 
                 result.add(sourceAnnotationResult);
             }
@@ -76,11 +89,11 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         return SyntaxChecker.checkSyntax(source);
     }
 
-    private Collection<SourceAnnotation> annotateSyntaxHighlight(String source) {
+    private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {
         Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
-        Matcher matcher = LanguagePatternHolder.INSTANCE.keywordsPattern.matcher(source);
+        Matcher matcher = pattern.matcher(source);
         while (matcher.find()) {
-            result.add(new SyntaxHighlightAnnotation(matcher.start(), matcher.end()));
+            result.add(new SyntaxHighlightAnnotation(matcher.start(), matcher.end(), textAttributesKey));
         }
         return result;
     }

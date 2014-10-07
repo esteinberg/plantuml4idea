@@ -38,8 +38,6 @@ public enum LanguageDescriptor {
     ));
 
     public final List<String> keywords = Collections.unmodifiableList(Arrays.asList(
-            "@startuml",
-            "@enduml",
             "as",
             "also",
             "autonumber",
@@ -102,12 +100,14 @@ public enum LanguageDescriptor {
     ));
 
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
-            "!include",
-            "!define",
-            "!undef",
-            "!ifdef",
-            "!endif",
-            "!ifndef"
+            "startuml",
+            "enduml",
+            "include",
+            "define",
+            "undef",
+            "ifdef",
+            "endif",
+            "ifndef"
     ));
 
 
