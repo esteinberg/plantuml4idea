@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <description>PlantUML diagramming tool integration</description>
-    <version>1.4.13-SNAPSHOT</version>
+    <version>1.4.13</version>
     <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
@@ -16,15 +16,17 @@
             <li> supports PlantUML includes</li>
             <li> diagram zoom </li>
             <li> PlantUML syntax error highlighting and intentions</li>
+            <li> Simple PlantUML syntax keywords highlighting</li>
             <li> Copy current diagram (or all diagrams in file) to clipboard or save as PNG, EPS or SVG</li>
         </ul>
         ]]>
     </description>
     <change-notes>
         <![CDATA[
-                <p>1.4.12</p>
+                <p>1.4.13</p>
                 <ul>
                     <li> support for syntax error highlighting in multi-source files</li>
+                    <li> support for basic keyword highlighting. Better than nothing in absence of well defined language grammar</li>
                     <li> PlantUML syntax error highlighting turned on by default</li>
                 </ul>
        ]]>
