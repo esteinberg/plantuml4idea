@@ -1,41 +1,32 @@
 package org.plantuml.idea.lang.annotator;
 
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.Document;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * Author: Eugene Steinberg
- * Date: 9/13/14
+ * Date: 10/5/14
  */
 public class SourceAnnotationResult {
-    private Collection<String> errorMessage;
-    private Collection<String> suggestion;
-    private int errorLineNumber;
+    private int sourceOffset;
 
-    public SourceAnnotationResult(Collection<String> errormsg, Collection<String> suggestion, int errorLineNumber) {
-        this.errorMessage = errormsg;
-        this.suggestion = suggestion;
-        this.errorLineNumber = errorLineNumber;
+    private Collection<SourceAnnotation> annotations = new ArrayList<SourceAnnotation>();
+
+    public SourceAnnotationResult(int sourceOffset) {
+        this.sourceOffset = sourceOffset;
     }
 
-
-    public Collection<String> getErrorMessage() {
-        return errorMessage;
+    public void addAll(Collection<SourceAnnotation> sourceAnnotations) {
+        annotations.addAll(sourceAnnotations);
     }
 
-    public Collection<String> getSuggestion() {
-        return suggestion;
+    public void annotate(AnnotationHolder holder, Document document) {
+        for (SourceAnnotation annotation : annotations) {
+            annotation.annotate(holder, document, sourceOffset);
+        }
     }
 
-    public int getErrorLineNumber() {
-        return errorLineNumber;
-    }
-
-    @Override
-    public String toString() {
-        return "SourceAnnotationResult{" +
-                "errorMessage=" + errorMessage +
-                ", suggestion=" + suggestion +
-                ", errorLineNumber=" + errorLineNumber +
-                '}';
-    }
 }

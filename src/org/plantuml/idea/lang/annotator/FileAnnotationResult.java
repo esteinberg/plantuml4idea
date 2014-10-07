@@ -1,23 +1,25 @@
 package org.plantuml.idea.lang.annotator;
 
-import java.util.Map;
-import java.util.TreeMap;
+import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.openapi.editor.Document;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Author: Eugene Steinberg
  * Date: 9/30/14
  */
 public class FileAnnotationResult {
-    private Map<Integer, SourceAnnotationResult> annotationResultMap = new TreeMap<Integer, SourceAnnotationResult>();
+    private Collection<SourceAnnotationResult> sourceAnnotationResults = new ArrayList<SourceAnnotationResult>();
 
-    public FileAnnotationResult() {
+    public boolean add(SourceAnnotationResult sourceAnnotationResult) {
+        return sourceAnnotationResults.add(sourceAnnotationResult);
     }
 
-    public void put(Integer key, SourceAnnotationResult sourceAnnotationResult) {
-        annotationResultMap.put(key, sourceAnnotationResult);
-    }
-
-    public Map<Integer, SourceAnnotationResult> getAnnotationResultMap() {
-        return annotationResultMap;
+    public void annotate(AnnotationHolder holder, Document document) {
+        for (SourceAnnotationResult sourceAnnotationResult : sourceAnnotationResults) {
+            sourceAnnotationResult.annotate(holder, document);
+        }
     }
 }
