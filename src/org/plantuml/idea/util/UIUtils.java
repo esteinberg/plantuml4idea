@@ -1,12 +1,16 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.PopupHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.CopyDiagramToClipboardAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
@@ -56,6 +60,21 @@ public class UIUtils {
         ImageIcon imageIcon = new ImageIcon(scaledImage);
         label.setIcon(imageIcon);
         label.setPreferredSize(new Dimension(newWidth, newHeight));
+        label.addMouseListener(new PopupHandler() {
+
+            @Override
+            public void invokePopup(Component comp, int x, int y) {
+                ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
+
+                    @NotNull
+                    @Override
+                    public AnAction[] getChildren(@Nullable AnActionEvent e) {
+                        return new AnAction[]{ActionManager.getInstance().getAction(CopyDiagramToClipboardAction.ACTION_ID)};
+                    }
+                }).getComponent().show(comp, x, y);
+
+            }
+        });
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
@@ -101,7 +120,7 @@ public class UIUtils {
             if (file != null) {
                 VirtualFile parent = file.getParent();
                 if (parent != null && parent.isDirectory()) {
-                    baseDir= new File(parent.getPath());
+                    baseDir = new File(parent.getPath());
                 }
             }
         }
