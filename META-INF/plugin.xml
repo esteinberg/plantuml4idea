@@ -39,6 +39,9 @@
 
     <project-components>
         <!-- Add your project components here -->
+        <component>
+            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlToolWindowAutoOpener</implementation-class>
+        </component>
     </project-components>
 
     <actions>
