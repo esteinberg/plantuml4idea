@@ -8,9 +8,11 @@ This plugin provides integration with popular [PlantUML](http://plantuml.sourcef
 Author: [Eugene Steinberg](https://github.com/esteinberg)
 
 Contributors:
+
  * [Ivan Mamontov](https://github.com/IvanMamontov)
  * [Henady Zakalusky](https://github.com/hza)
  * [Max Gorbunov](https://github.com/6zow)
+ * [Vojtěch Krása] (https://github.com/krasa)
 
 # Features
 

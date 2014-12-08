@@ -23,11 +23,10 @@
     </description>
     <change-notes>
         <![CDATA[
-                <p>1.4.13</p>
+                <p>1.4.14</p>
                 <ul>
-                    <li> support for syntax error highlighting in multi-source files</li>
-                    <li> support for basic keyword highlighting. Better than nothing in absence of well defined language grammar</li>
-                    <li> PlantUML syntax error highlighting turned on by default</li>
+                    <li> PlantUml tool window opens automatically if you navigate to PUML file</li>
+                    <li> Right Click on diagram copies to clipboard</li>
                 </ul>
        ]]>
     </change-notes>
