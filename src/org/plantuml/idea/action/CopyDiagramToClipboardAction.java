@@ -18,6 +18,9 @@ import java.io.IOException;
  * @author Eugene Steinberg
  */
 public class CopyDiagramToClipboardAction extends AnAction {
+    
+    public static final String ACTION_ID = "PlantUML.CopyToClipboard";
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
