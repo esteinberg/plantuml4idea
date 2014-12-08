@@ -11,6 +11,8 @@ import com.intellij.ui.content.ContentFactory;
  */
 public class PlantUmlToolWindowFactory implements ToolWindowFactory {
 
+    public static final String ID = "PlantUML";
+
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         PlantUmlToolWindow plantUmlToolWindow = new PlantUmlToolWindow(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
