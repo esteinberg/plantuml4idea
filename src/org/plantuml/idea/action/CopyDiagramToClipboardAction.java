@@ -6,6 +6,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import java.awt.datatransfer.DataFlavor;
@@ -19,7 +20,6 @@ import java.io.IOException;
  */
 public class CopyDiagramToClipboardAction extends AnAction {
     
-    public static final String ACTION_ID = "PlantUML.CopyToClipboard";
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -43,9 +43,21 @@ public class CopyDiagramToClipboardAction extends AnAction {
                 int page = UIUtils.getToolWindow(project).getPage();
                 PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
                         UIUtils.getSelectedDir(project), page);
-                final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
+                final BufferedImage image = UIUtils.getBufferedImage(result.getFirstDiagramBytes());
                 return image;
             }
         });
+    }
+
+    @Override
+    public void update(AnActionEvent e) {
+        super.update(e);
+        final Project project = e.getProject();
+        if (project != null) {
+            PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
+            if (toolWindow != null) {
+                e.getPresentation().setEnabled(toolWindow.getNumPages() == 1 || toolWindow.getPage() != -1);
+            }
+        }
     }
 }

@@ -6,24 +6,40 @@ import java.util.Arrays;
  * @author Eugene Steinberg
  */
 public class PlantUmlResult {
-    private byte[] diagramBytes;
+
+    private static final Diagram[] NO_DIAGRAMS = new Diagram[0];
+
+    private Diagram[] diagrams;
     private String description;
     private String error;
     private int pages;
 
-    public PlantUmlResult(byte[] diagramBytes, String description, String error, int pages) {
-        this.diagramBytes = diagramBytes;
+    public PlantUmlResult(Diagram[] diagrams, String description, int totalPages) {
+        this.diagrams = diagrams;
+        this.description = description;
+        this.pages = totalPages;
+    }
+
+    public PlantUmlResult(String description, String error, int pages) {
+        this.diagrams = NO_DIAGRAMS;
         this.description = description;
         this.error = error;
         this.pages = pages;
     }
 
-    public byte[] getDiagramBytes() {
-        return diagramBytes;
+    public byte[] getFirstDiagramBytes() {
+        if (diagrams.length == 0) {
+            return new byte[0];
+        }
+        return diagrams[0].getDiagramBytes();
     }
 
-    public void setDiagramBytes(byte[] diagramBytes) {
-        this.diagramBytes = diagramBytes;
+    public Diagram[] getDiagrams() {
+        return diagrams;
+    }
+
+    public void setDiagrams(Diagram[] diagrams) {
+        this.diagrams = diagrams;
     }
 
     public String getDescription() {
@@ -35,7 +51,7 @@ public class PlantUmlResult {
     }
 
     public boolean isError() {
-        return (description == null || description.isEmpty());
+        return (description == null || description.isEmpty() || "(Error)".equals(description));
     }
 
     public String getError() {
@@ -54,10 +70,28 @@ public class PlantUmlResult {
         this.pages = pages;
     }
 
+    public static class Diagram {
+
+        private byte[] diagramBytes;
+
+        public Diagram(byte[] diagramBytes) {
+            this.diagramBytes = diagramBytes;
+        }
+
+        public byte[] getDiagramBytes() {
+            return diagramBytes;
+        }
+
+        @Override
+        public String toString() {
+            return "Diagram{" + "diagramBytes=" + Arrays.toString(diagramBytes) + '}';
+        }
+    }
+
     @Override
     public String toString() {
         return "PlantUmlResult{" +
-                "diagramBytes=" + Arrays.toString(diagramBytes) +
+                "diagrams=" + Arrays.toString(diagrams) +
                 ", description='" + description + '\'' +
                 ", error='" + error + '\'' +
                 '}';

@@ -24,6 +24,7 @@ public class SelectPageAction extends ComboBoxAction {
         this.button = (ComboBoxButton) button;
         DefaultActionGroup group = new DefaultActionGroup();
 
+        group.add(new SetPageAction(-1));
         for (int i = 0; i < numPages; i++) {
             group.add(new SetPageAction(i));
         }
@@ -47,6 +48,9 @@ public class SelectPageAction extends ComboBoxAction {
     }
 
     private static String getDisplayPage(int page) {
+        if (page == - 1) {
+            return "All Pages";
+        }
         return Integer.toString(page + 1);
     }
 

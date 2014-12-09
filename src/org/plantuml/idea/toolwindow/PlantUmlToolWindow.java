@@ -35,6 +35,7 @@ import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
 
@@ -45,11 +46,11 @@ public class PlantUmlToolWindow extends JPanel {
     private static Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
 
     private ToolWindow toolWindow;
-    private JLabel imageLabel;
+    private JPanel imagesPanel;
 
     private int zoom = 100;
 
-    private int page = 0;
+    private int page = -1;
     private int numPages = 1;
 
     private String cachedSource = "";
@@ -84,9 +85,10 @@ public class PlantUmlToolWindow extends JPanel {
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
-        imageLabel = new JLabel();
-
-        JScrollPane scrollPane = new JBScrollPane(imageLabel);
+        imagesPanel = new JPanel();
+        imagesPanel.setLayout(new BoxLayout(imagesPanel, BoxLayout.Y_AXIS));
+        
+        JScrollPane scrollPane = new JBScrollPane(imagesPanel);
         add(scrollPane, BorderLayout.CENTER);
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
@@ -162,22 +164,76 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     private void renderWithBaseDir(Project myProject, String source, File baseDir, int pageNum) {
-        if (source.isEmpty())
+        if (source.isEmpty()) {
             return;
-        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
+        }
+
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-            if (image != null) {
+            PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
+            final BufferedImage[] images = toBufferedImages(result);
+
+            if (hasImages(images)) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
+
                     public void run() {
-                        UIUtils.setImage(image, imageLabel, zoom);
+                        imagesPanel.removeAll();
+                        for (int i = 0; i < images.length; i++) {
+                            BufferedImage image = images[i];
+                            JLabel label = new JLabel();
+                            if (image != null) {
+                                UIUtils.setImage(image, label, zoom);
+                            } else {
+                                label.setText("Failed to render page " + i);
+                            }
+                            if (i != 0) {
+                                imagesPanel.add(separator());
+                            }
+                            imagesPanel.add(label);
+                        }
+                        imagesPanel.revalidate();
+                        imagesPanel.repaint();
                     }
                 });
+
             }
-            setNumPages(myProject, result.getPages());
+            if (!result.isError()) {
+                setNumPages(myProject, result.getPages());
+            }
         } catch (Exception e) {
-            logger.warn("Exception occurred rendering source = " + source + ": " + e);
+            logger.warn("Exception occurred rendering source = " + source + ": " + e, e);
         }
+    }
+
+    private JSeparator separator() {
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        Dimension size = new Dimension(separator.getPreferredSize().width, 10);
+        separator.setVisible(true);
+        separator.setMaximumSize(size);
+        separator.setPreferredSize(size);
+        return separator;
+    }
+
+    private boolean hasImages(BufferedImage[] images) {
+        for (int i = 0; i < images.length; i++) {
+            BufferedImage image = images[i];
+            if (image != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private BufferedImage[] toBufferedImages(PlantUmlResult result) throws IOException {
+        PlantUmlResult.Diagram[] diagrams = result.getDiagrams();
+        //noinspection UndesirableClassUsage
+        final BufferedImage[] images = new BufferedImage[diagrams.length];
+        for (int i = 0; i < diagrams.length; i++) {
+            PlantUmlResult.Diagram diagram = diagrams[i];
+            if (diagram != null) {
+                images[i] = UIUtils.getBufferedImage(diagram.getDiagramBytes());
+            }
+        }
+        return images;
     }
 
     public int getZoom() {
@@ -190,7 +246,7 @@ public class PlantUmlToolWindow extends JPanel {
     }
 
     public void setPage(Project myProject, int page) {
-        if (page >= 0 && page < numPages) {
+        if (page >= -1 && page < numPages) {
             this.page = page;
             selectPageAction.setPage(page);
             renderLater(myProject);
@@ -203,6 +259,10 @@ public class PlantUmlToolWindow extends JPanel {
 
     public void prevPage(Project myProject) {
         setPage(myProject, this.page - 1);
+    }
+
+    public int getNumPages() {
+        return numPages;
     }
 
     public void setNumPages(Project myProject, int numPages) {

@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.PopupHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.action.CopyDiagramToClipboardAction;
+import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
@@ -69,7 +69,7 @@ public class UIUtils {
                     @NotNull
                     @Override
                     public AnAction[] getChildren(@Nullable AnActionEvent e) {
-                        return new AnAction[]{ActionManager.getInstance().getAction(CopyDiagramToClipboardAction.ACTION_ID)};
+                        return new AnAction[]{new CopyDiagramToClipboardContextAction()};
                     }
                 }).getComponent().show(comp, x, y);
 
