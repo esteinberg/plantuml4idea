@@ -1,6 +1,6 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
@@ -8,7 +8,7 @@ import org.plantuml.idea.util.UIUtils;
 /**
  * @author Eugene Steinberg
  */
-public abstract class ZoomAction extends AnAction {
+public abstract class ZoomAction extends DumbAwareAction {
     protected static int DEFAULT_ZOOM = 100;
     protected static int MAX_ZOOM = 500;
     protected static int MIN_ZOOM = 20;

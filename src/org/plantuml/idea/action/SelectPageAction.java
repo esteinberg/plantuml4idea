@@ -1,10 +1,10 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.util.UIUtils;
@@ -55,7 +55,7 @@ public class SelectPageAction extends ComboBoxAction {
     }
 
 
-    private class SetPageAction extends AnAction {
+    private class SetPageAction extends DumbAwareAction {
         private int page = 0;
 
         private SetPageAction(int page) {

@@ -1,10 +1,10 @@
 package org.plantuml.idea.action;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * @author Eugene Steinberg
  */
-public class CopyDiagramToClipboardContextAction extends AnAction {
+public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
 
     public CopyDiagramToClipboardContextAction() {
         super("Copy current diagram to clipboard", "Copy current diagram to clipboard", AllIcons.Actions.Copy);

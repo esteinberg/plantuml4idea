@@ -1,7 +1,7 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.plantuml.idea.toolwindow.AboutDialog;
 
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.*;
 /**
  * @author Eugene Steinberg
  */
-public class AboutAction extends AnAction {
+public class AboutAction extends DumbAwareAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         AboutDialog aboutDialog = new AboutDialog();

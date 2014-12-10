@@ -1,10 +1,10 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -19,7 +19,7 @@ import java.io.IOException;
 /**
  * @author Eugene Steinberg
  */
-public abstract class AbstractSaveDiagramAction extends AnAction {
+public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
     public static final String[] extensions;
     public static VirtualFile homeDir = null;

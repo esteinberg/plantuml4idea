@@ -1,8 +1,8 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
@@ -18,7 +18,7 @@ import java.io.IOException;
 /**
  * @author Eugene Steinberg
  */
-public class CopyDiagramToClipboardAction extends AnAction {
+public class CopyDiagramToClipboardAction extends DumbAwareAction {
     
 
     @Override
