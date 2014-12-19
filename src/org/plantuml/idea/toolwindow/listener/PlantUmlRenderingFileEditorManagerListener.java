@@ -1,0 +1,26 @@
+package org.plantuml.idea.toolwindow.listener;
+
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.util.UIUtils;
+
+public class PlantUmlRenderingFileEditorManagerListener implements FileEditorManagerListener {
+    private static Logger logger = Logger.getInstance(PlantUmlRenderingFileEditorManagerListener.class);
+
+    public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+        logger.debug("file opened ", file);
+    }
+
+    public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+        logger.debug("file closed = ", file);
+    }
+
+    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+        logger.debug("selection changed", event);
+        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject());
+    }
+}

@@ -40,7 +40,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);
                 }
-                int page = UIUtils.getToolWindow(project).getPage();
+                int page = UIUtils.getPlantUmlToolWindow(project).getPage();
                 PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
                         UIUtils.getSelectedDir(project), page);
                 final BufferedImage image = UIUtils.getBufferedImage(result.getFirstDiagramBytes());
@@ -54,7 +54,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
         super.update(e);
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
+            PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (toolWindow != null) {
                 e.getPresentation().setEnabled(toolWindow.getNumPages() == 1 || toolWindow.getPage() != -1);
             }

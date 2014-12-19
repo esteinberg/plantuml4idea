@@ -14,6 +14,6 @@ public class NextPageAction extends DumbAwareAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
         if (project != null)
-            UIUtils.getToolWindow(project).nextPage(project);
+            UIUtils.getPlantUmlToolWindow(project).nextPage();
     }
 }

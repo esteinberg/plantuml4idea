@@ -34,12 +34,15 @@
 
     <application-components>
         <!-- Add your application components here -->
+        <component>
+            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlApplicationComponent</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlToolWindowAutoOpener</implementation-class>
+            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlProjectComponent</implementation-class>
         </component>
     </project-components>
 

@@ -67,7 +67,7 @@ public class SelectPageAction extends ComboBoxAction {
         public void actionPerformed(AnActionEvent anActionEvent) {
             final Project project = anActionEvent.getProject();
             if (project != null) {
-                UIUtils.getToolWindow(project).setPage(project, page);
+                UIUtils.getPlantUmlToolWindow(project).setPage(page);
                 setPage(page);
             }
         }

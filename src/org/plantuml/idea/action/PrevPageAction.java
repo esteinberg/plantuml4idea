@@ -14,6 +14,6 @@ public class PrevPageAction extends DumbAwareAction {
     public void actionPerformed(AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
         if (project != null)
-            UIUtils.getToolWindow(project).prevPage(project);
+            UIUtils.getPlantUmlToolWindow(project).prevPage();
     }
 }
