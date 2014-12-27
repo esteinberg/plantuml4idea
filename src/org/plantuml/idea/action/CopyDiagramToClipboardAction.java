@@ -6,12 +6,12 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -40,11 +40,10 @@ public class CopyDiagramToClipboardAction extends AnAction {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);
                 }
-                int page = UIUtils.getToolWindow(project).getPage();
+                PlantUmlToolWindow umlToolWindow = UIUtils.getToolWindow(project);
                 PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
-                        UIUtils.getSelectedDir(project), page);
-                final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-                return image;
+                        UIUtils.getSelectedDir(project), umlToolWindow.getPage(), umlToolWindow.getZoom());
+                return UIUtils.getBufferedImage(result.getDiagramBytes());
             }
         });
     }

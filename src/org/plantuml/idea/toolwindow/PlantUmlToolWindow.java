@@ -20,6 +20,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +34,10 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -46,6 +51,7 @@ public class PlantUmlToolWindow extends JPanel {
 
     private ToolWindow toolWindow;
     private JLabel imageLabel;
+    private JScrollPane scrollPane;
 
     private int zoom = 100;
 
@@ -85,14 +91,17 @@ public class PlantUmlToolWindow extends JPanel {
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
         imageLabel = new JLabel();
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(JBColor.WHITE);
 
-        JScrollPane scrollPane = new JBScrollPane(imageLabel);
+        scrollPane = new JBScrollPane(imageLabel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
 
-    private void registerListeners(Project myProject) {
+    private void registerListeners(final Project myProject) {
         logger.debug("Registering listeners");
         MessageBus messageBus = myProject.getMessageBus();
         messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, plantUmlVirtualFileListener);
@@ -103,6 +112,39 @@ public class PlantUmlToolWindow extends JPanel {
         toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
 
         ProjectManager.getInstance().addProjectManagerListener(plantUmlProjectManagerListener);
+
+        imageLabel.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.isControlDown()) {
+                    setZoom(myProject, getZoom() - e.getWheelRotation() * 10);
+                } else {
+                    scrollPane.dispatchEvent(e);
+                }
+            }
+        });
+
+        imageLabel.addMouseMotionListener(new MouseMotionListener() {
+            private int x, y;
+
+            public void mouseDragged(MouseEvent e) {
+                JScrollBar h = scrollPane.getHorizontalScrollBar();
+                JScrollBar v = scrollPane.getVerticalScrollBar();
+
+                int dx = x - e.getXOnScreen();
+                int dy = y - e.getYOnScreen();
+
+                h.setValue(h.getValue() + dx);
+                v.setValue(v.getValue() + dy);
+
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+
+            public void mouseMoved(MouseEvent e) {
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+        });
 
         renderLater(myProject);
     }
@@ -164,13 +206,13 @@ public class PlantUmlToolWindow extends JPanel {
     private void renderWithBaseDir(Project myProject, String source, File baseDir, int pageNum) {
         if (source.isEmpty())
             return;
-        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
+        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum, zoom);
         try {
             final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
             if (image != null) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                     public void run() {
-                        UIUtils.setImage(image, imageLabel, zoom);
+                        UIUtils.setImage(image, imageLabel, 100);
                     }
                 });
             }
