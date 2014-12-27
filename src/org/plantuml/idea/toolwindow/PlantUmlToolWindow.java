@@ -116,7 +116,7 @@ public class PlantUmlToolWindow extends JPanel {
         imageLabel.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setZoom(myProject, getZoom() - e.getWheelRotation() * 10);
+                    setZoom(myProject, Math.max(getZoom() - e.getWheelRotation() * 10, 1));
                 } else {
                     scrollPane.dispatchEvent(e);
                 }
