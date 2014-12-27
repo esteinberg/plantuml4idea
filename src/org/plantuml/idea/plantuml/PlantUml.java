@@ -2,8 +2,12 @@ package org.plantuml.idea.plantuml;
 
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.ugraphic.ColorMapper;
+import net.sourceforge.plantuml.ugraphic.UGraphic;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
+import java.awt.geom.Dimension2D;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -50,11 +54,11 @@ public class PlantUml {
     }
 
     public static PlantUmlResult render(String source) {
-        return render(source, ImageFormat.PNG, 0);
+        return render(source, ImageFormat.PNG, 0, 100);
     }
 
-    public static PlantUmlResult render(String source, File baseDir, int page) {
-        return render(source, baseDir, ImageFormat.PNG, page);
+    public static PlantUmlResult render(String source, File baseDir, int page, int zoom) {
+        return render(source, baseDir, ImageFormat.PNG, page, zoom);
     }
 
     /**
@@ -67,7 +71,7 @@ public class PlantUml {
      * @param page    page to render
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, File baseDir, ImageFormat format, int page) {
+    public static PlantUmlResult render(String source, File baseDir, ImageFormat format, int page, int zoom) {
         PlantUmlResult render;
         File origDir = FileSystem.getInstance().getCurrentDir();
 
@@ -75,7 +79,7 @@ public class PlantUml {
             FileSystem.getInstance().setCurrentDir(baseDir);
 
         try {
-            render = render(source, format, page);
+            render = render(source, format, page, zoom);
         } finally {
             if (origDir != null)
                 FileSystem.getInstance().setCurrentDir(origDir);
@@ -134,7 +138,7 @@ public class PlantUml {
      * @return rendering result
      */
 
-    public static PlantUmlResult render(String source, ImageFormat format, int page) {
+    public static PlantUmlResult render(String source, ImageFormat format, int page, final int zoom) {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         String desc = null;
@@ -153,7 +157,12 @@ public class PlantUml {
                 }
             }
             // Write the image to "os"
-            desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()));
+            desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()){
+                @Override
+                public UGraphic createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
+                    return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
+                }
+            });
         } catch (Throwable e) {
             error = e.getMessage();
         }
