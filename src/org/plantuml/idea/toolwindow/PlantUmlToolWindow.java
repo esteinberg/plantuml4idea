@@ -290,5 +290,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
 
     }
+
+    public JPanel getImagesPanel() {
+        return imagesPanel;
+    }
 }
 

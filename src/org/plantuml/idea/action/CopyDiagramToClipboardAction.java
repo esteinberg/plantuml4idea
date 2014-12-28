@@ -4,11 +4,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -40,9 +39,10 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
                     throw new UnsupportedFlavorException(flavor);
                 }
                 PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-                PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
-                        UIUtils.getSelectedDir(project), umlToolWindow.getPage(), umlToolWindow.getZoom());
-                return UIUtils.getBufferedImage(result.getFirstDiagramBytes());
+                JPanel imagesPanel = umlToolWindow.getImagesPanel();
+                JLabel component = (JLabel) imagesPanel.getComponent(0);
+                ImageIcon icon = (ImageIcon) component.getIcon();
+                return icon.getImage();
             }
         });
     }
@@ -54,7 +54,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
         if (project != null) {
             PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (toolWindow != null) {
-                e.getPresentation().setEnabled(toolWindow.getNumPages() == 1 || toolWindow.getPage() != -1);
+                e.getPresentation().setEnabled(toolWindow.getImagesPanel().getComponentCount() == 1);
             }
         }
     }
