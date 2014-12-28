@@ -73,7 +73,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
         imagesPanel = new JPanel();
-
+        imagesPanel.setLayout(new BoxLayout(imagesPanel, BoxLayout.Y_AXIS));
+        
         scrollPane = new JBScrollPane(imagesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
