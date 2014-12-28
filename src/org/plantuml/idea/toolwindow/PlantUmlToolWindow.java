@@ -9,7 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.AncestorListenerAdapter;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -21,6 +21,10 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +37,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private ToolWindow toolWindow;
     private JPanel imagesPanel;
+    private JScrollPane scrollPane;
 
     private int zoom = 100;
 
@@ -66,12 +71,45 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
-        imagesPanel = new JPanel();
-        imagesPanel.setLayout(new BoxLayout(imagesPanel, BoxLayout.Y_AXIS));
-        
-        JScrollPane scrollPane = new JBScrollPane(imagesPanel);
-        add(scrollPane, BorderLayout.CENTER);
+        imageLabel = new JLabel();
+        imageLabel.setOpaque(true);
+        imageLabel.setBackground(JBColor.WHITE);
 
+        JScrollPane  scrollPane = new JBScrollPane(imageLabel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        add(scrollPane, BorderLayout.CENTER);
+        imageLabel.addMouseWheelListener(new MouseWheelListener() {
+                   public void mouseWheelMoved(MouseWheelEvent e) {
+                       if (e.isControlDown()) {
+                           setZoom(myProject, Math.max(getZoom() - e.getWheelRotation() * 10, 1));
+                       } else {
+                           scrollPane.dispatchEvent(e);
+                       }
+                   }
+               });
+       
+               imageLabel.addMouseMotionListener(new MouseMotionListener() {
+                   private int x, y;
+       
+                   public void mouseDragged(MouseEvent e) {
+                       JScrollBar h = scrollPane.getHorizontalScrollBar();
+                       JScrollBar v = scrollPane.getVerticalScrollBar();
+       
+                       int dx = x - e.getXOnScreen();
+                       int dy = y - e.getYOnScreen();
+       
+                       h.setValue(h.getValue() + dx);
+                       v.setValue(v.getValue() + dy);
+       
+                       x = e.getXOnScreen();
+                       y = e.getYOnScreen();
+                   }
+       
+                   public void mouseMoved(MouseEvent e) {
+                       x = e.getXOnScreen();
+                       y = e.getYOnScreen();
+                   }
+               });
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
 
@@ -122,7 +160,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
 
         try {
-            PlantUmlResult result = PlantUml.render(source, baseDir, pageNum);
+            PlantUmlResult result = PlantUml.render(source, baseDir, pageNum, zoom);
             final BufferedImage[] images = toBufferedImages(result);
 
             if (hasImages(images)) {
@@ -134,7 +172,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                             BufferedImage image = images[i];
                             JLabel label = new JLabel();
                             if (image != null) {
-                                UIUtils.setImage(image, label, zoom);
+                                UIUtils.setImage(image, label, 100);
                             } else {
                                 label.setText("Failed to render page " + i);
                             }

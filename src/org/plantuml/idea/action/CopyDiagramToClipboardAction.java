@@ -12,7 +12,6 @@ import org.plantuml.idea.util.UIUtils;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /**
@@ -40,11 +39,10 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);
                 }
-                int page = UIUtils.getPlantUmlToolWindow(project).getPage();
+                PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
                 PlantUmlResult result = PlantUml.render(UIUtils.getSelectedSourceWithCaret(project),
-                        UIUtils.getSelectedDir(project), page);
-                final BufferedImage image = UIUtils.getBufferedImage(result.getFirstDiagramBytes());
-                return image;
+                        UIUtils.getSelectedDir(project), umlToolWindow.getPage(), umlToolWindow.getZoom());
+                return UIUtils.getBufferedImage(result.getFirstDiagramBytes());
             }
         });
     }
