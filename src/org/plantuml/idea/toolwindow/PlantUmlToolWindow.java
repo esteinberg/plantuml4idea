@@ -9,6 +9,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.AncestorListenerAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
@@ -71,46 +72,50 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
-        imageLabel = new JLabel();
-        imageLabel.setOpaque(true);
-        imageLabel.setBackground(JBColor.WHITE);
+        imagesPanel = new JPanel();
 
-        JScrollPane  scrollPane = new JBScrollPane(imageLabel);
+        scrollPane = new JBScrollPane(imagesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
-        imageLabel.addMouseWheelListener(new MouseWheelListener() {
-                   public void mouseWheelMoved(MouseWheelEvent e) {
-                       if (e.isControlDown()) {
-                           setZoom(myProject, Math.max(getZoom() - e.getWheelRotation() * 10, 1));
-                       } else {
-                           scrollPane.dispatchEvent(e);
-                       }
-                   }
-               });
-       
-               imageLabel.addMouseMotionListener(new MouseMotionListener() {
-                   private int x, y;
-       
-                   public void mouseDragged(MouseEvent e) {
-                       JScrollBar h = scrollPane.getHorizontalScrollBar();
-                       JScrollBar v = scrollPane.getVerticalScrollBar();
-       
-                       int dx = x - e.getXOnScreen();
-                       int dy = y - e.getYOnScreen();
-       
-                       h.setValue(h.getValue() + dx);
-                       v.setValue(v.getValue() + dy);
-       
-                       x = e.getXOnScreen();
-                       y = e.getYOnScreen();
-                   }
-       
-                   public void mouseMoved(MouseEvent e) {
-                       x = e.getXOnScreen();
-                       y = e.getYOnScreen();
-                   }
-               });
+        
+        addScrollBarListeners(imagesPanel);
+
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
+    }
+
+    private void addScrollBarListeners(JComponent panel) {
+        panel.addMouseWheelListener(new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                if (e.isControlDown()) {
+                    setZoom(Math.max(getZoom() - e.getWheelRotation() * 10, 1));
+                } else {
+                    scrollPane.dispatchEvent(e);
+                }
+            }
+        });
+
+        panel.addMouseMotionListener(new MouseMotionListener() {
+            private int x, y;
+
+            public void mouseDragged(MouseEvent e) {
+                JScrollBar h = scrollPane.getHorizontalScrollBar();
+                JScrollBar v = scrollPane.getVerticalScrollBar();
+
+                int dx = x - e.getXOnScreen();
+                int dy = y - e.getYOnScreen();
+
+                h.setValue(h.getValue() + dx);
+                v.setValue(v.getValue() + dy);
+
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+
+            public void mouseMoved(MouseEvent e) {
+                x = e.getXOnScreen();
+                y = e.getYOnScreen();
+            }
+        });
     }
 
     @Override
@@ -171,6 +176,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         for (int i = 0; i < images.length; i++) {
                             BufferedImage image = images[i];
                             JLabel label = new JLabel();
+                            label.setOpaque(true);
+                            label.setBackground(JBColor.WHITE);
+                            addScrollBarListeners(label);
                             if (image != null) {
                                 UIUtils.setImage(image, label, 100);
                             } else {
