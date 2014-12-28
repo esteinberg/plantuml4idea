@@ -7,12 +7,16 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.PopupHandler;
+import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.action.CopyDiagramToClipboardAction;
+import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -21,14 +25,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Eugene Steinberg
  */
 public class UIUtils {
-    private static Map<Project, PlantUmlToolWindow> windowMap = new ConcurrentHashMap<Project, PlantUmlToolWindow>();
 
     public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
@@ -69,7 +70,7 @@ public class UIUtils {
                     @NotNull
                     @Override
                     public AnAction[] getChildren(@Nullable AnActionEvent e) {
-                        return new AnAction[]{ActionManager.getInstance().getAction(CopyDiagramToClipboardAction.ACTION_ID)};
+                        return new AnAction[]{new CopyDiagramToClipboardContextAction()};
                     }
                 }).getComponent().show(comp, x, y);
 
@@ -127,15 +128,48 @@ public class UIUtils {
         return baseDir;
     }
 
-    public static PlantUmlToolWindow getToolWindow(Project project) {
-        return windowMap.get(project);
+    @Nullable
+    public static PlantUmlToolWindow getPlantUmlToolWindow(Project project) {
+        PlantUmlToolWindow result = null;
+        ToolWindow toolWindow = getToolWindow(project);
+        if (toolWindow != null) {
+            result = getPlantUmlToolWindow(toolWindow);
+        }
+        return result;
     }
 
-    public static void addProject(Project project, PlantUmlToolWindow toolWindow) {
-        windowMap.put(project, toolWindow);
+    @Nullable
+    public static PlantUmlToolWindow getPlantUmlToolWindow(ToolWindow toolWindow) {
+        PlantUmlToolWindow result = null;
+        if (toolWindow != null) {
+            Content[] contents = toolWindow.getContentManager().getContents();
+            if (contents.length > 0) {
+                JComponent component = contents[0].getComponent();
+                //it can be JLabel "Initializing..."
+                if (component instanceof PlantUmlToolWindow) {
+                    result = (PlantUmlToolWindow) component;
+                }
+            }
+        }
+        return result;
     }
 
-    public static void removeProject(Project project) {
-        windowMap.remove(project);
+    public static void renderPlantUmlToolWindowLater(final Project project) {
+        if (project == null) return;
+
+        ToolWindow toolWindow = getToolWindow(project);
+        if (toolWindow == null || !toolWindow.isVisible()) {
+            return;
+        }
+
+        PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
+        if (plantUmlToolWindow != null) {
+            plantUmlToolWindow.renderLater();
+        }
+    }
+
+    @Nullable
+    private static ToolWindow getToolWindow(Project project) {
+        return ToolWindowManager.getInstance(project).getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 }

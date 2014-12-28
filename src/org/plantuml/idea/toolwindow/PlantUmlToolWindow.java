@@ -1,29 +1,17 @@
 package org.plantuml.idea.toolwindow;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.event.CaretEvent;
-import com.intellij.openapi.editor.event.CaretListener;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.project.ProjectManagerListener;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.AncestorListenerAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.messages.MessageBus;
-import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
@@ -40,48 +28,42 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-
-import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
+import java.io.IOException;
 
 /**
  * @author Eugene Steinberg
  */
-public class PlantUmlToolWindow extends JPanel {
+public class PlantUmlToolWindow extends JPanel implements Disposable {
     private static Logger logger = Logger.getInstance(PlantUmlToolWindow.class);
 
     private ToolWindow toolWindow;
-    private JLabel imageLabel;
+    private JPanel imagesPanel;
     private JScrollPane scrollPane;
 
     private int zoom = 100;
 
-    private int page = 0;
+    private int page = -1;
     private int numPages = 1;
 
     private String cachedSource = "";
     private int cachedPage = page;
     private int cachedZoom = zoom;
 
-    private FileEditorManagerListener plantUmlVirtualFileListener = new PlantUmlFileManagerListener();
-    private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
-    private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
     private AncestorListener plantUmlAncestorListener = new PlantUmlAncestorListener();
-    private ProjectManagerListener plantUmlProjectManagerListener = new PlantUmlProjectManagerListener();
 
     private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
 
     private SelectPageAction selectPageAction;
+    private Project project;
 
-    public PlantUmlToolWindow(Project myProject, ToolWindow toolWindow) {
+    public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
         super(new BorderLayout());
-
+        this.project = project;
         this.toolWindow = toolWindow;
-
-        UIUtils.addProject(myProject, this);
 
         setupUI();
 
-        registerListeners(myProject);
+        this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
     }
 
     private void setupUI() {
@@ -90,40 +72,30 @@ public class PlantUmlToolWindow extends JPanel {
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
-        imageLabel = new JLabel();
-        imageLabel.setOpaque(true);
-        imageLabel.setBackground(JBColor.WHITE);
-
-        scrollPane = new JBScrollPane(imageLabel);
+        imagesPanel = new JPanel();
+        imagesPanel.setLayout(new BoxLayout(imagesPanel, BoxLayout.Y_AXIS));
+        
+        scrollPane = new JBScrollPane(imagesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
+        
+        addScrollBarListeners(imagesPanel);
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
 
-    private void registerListeners(final Project myProject) {
-        logger.debug("Registering listeners");
-        MessageBus messageBus = myProject.getMessageBus();
-        messageBus.connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, plantUmlVirtualFileListener);
-
-        EditorFactory.getInstance().getEventMulticaster().addDocumentListener(plantUmlDocumentListener);
-        EditorFactory.getInstance().getEventMulticaster().addCaretListener(plantUmlCaretListener);
-
-        toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
-
-        ProjectManager.getInstance().addProjectManagerListener(plantUmlProjectManagerListener);
-
-        imageLabel.addMouseWheelListener(new MouseWheelListener() {
+    private void addScrollBarListeners(JComponent panel) {
+        panel.addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setZoom(myProject, Math.max(getZoom() - e.getWheelRotation() * 10, 1));
+                    setZoom(Math.max(getZoom() - e.getWheelRotation() * 10, 1));
                 } else {
                     scrollPane.dispatchEvent(e);
                 }
             }
         });
 
-        imageLabel.addMouseMotionListener(new MouseMotionListener() {
+        panel.addMouseMotionListener(new MouseMotionListener() {
             private int x, y;
 
             public void mouseDragged(MouseEvent e) {
@@ -145,17 +117,12 @@ public class PlantUmlToolWindow extends JPanel {
                 y = e.getYOnScreen();
             }
         });
-
-        renderLater(myProject);
     }
 
-    private void unregisterListeners() {
-        EditorFactory.getInstance().getEventMulticaster().removeDocumentListener(plantUmlDocumentListener);
-        EditorFactory.getInstance().getEventMulticaster().removeCaretListener(plantUmlCaretListener);
-
+    @Override
+    public void dispose() {
+        logger.debug("dispose");
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
-
-        ProjectManager.getInstance().removeProjectManagerListener(plantUmlProjectManagerListener);
     }
 
     private boolean renderRequired(String newSource) {
@@ -170,18 +137,8 @@ public class PlantUmlToolWindow extends JPanel {
         return false;
     }
 
-    private void renderLater(final Project project) {
-        if (project == null) return;
-
-        PlantUmlToolWindow toolWindow = UIUtils.getToolWindow(project);
-
-        if (toolWindow != this) {
-            if (toolWindow != null) {
-                toolWindow.renderLater(project);
-            }
-            return;
-        }
-
+    public void renderLater() {
+        logger.debug("renderLater ", project.getName());
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -195,7 +152,7 @@ public class PlantUmlToolWindow extends JPanel {
                         new Runnable() {
                             @Override
                             public void run() {
-                                renderWithBaseDir(project, source, selectedDir, page);
+                                renderWithBaseDir(source, selectedDir, page);
                             }
                         }
                 );
@@ -203,157 +160,140 @@ public class PlantUmlToolWindow extends JPanel {
         });
     }
 
-    private void renderWithBaseDir(Project myProject, String source, File baseDir, int pageNum) {
-        if (source.isEmpty())
+    private void renderWithBaseDir(String source, File baseDir, int pageNum) {
+        if (source.isEmpty()) {
             return;
-        PlantUmlResult result = PlantUml.render(source, baseDir, pageNum, zoom);
+        }
+
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getDiagramBytes());
-            if (image != null) {
+            PlantUmlResult result = PlantUml.render(source, baseDir, pageNum, zoom);
+            final BufferedImage[] images = toBufferedImages(result);
+
+            if (hasImages(images)) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
+
                     public void run() {
-                        UIUtils.setImage(image, imageLabel, 100);
+                        imagesPanel.removeAll();
+                        for (int i = 0; i < images.length; i++) {
+                            BufferedImage image = images[i];
+                            JLabel label = new JLabel();
+                            label.setOpaque(true);
+                            label.setBackground(JBColor.WHITE);
+                            addScrollBarListeners(label);
+                            if (image != null) {
+                                UIUtils.setImage(image, label, 100);
+                            } else {
+                                label.setText("Failed to render page " + i);
+                            }
+                            if (i != 0) {
+                                imagesPanel.add(separator());
+                            }
+                            imagesPanel.add(label);
+                        }
+                        imagesPanel.revalidate();
+                        imagesPanel.repaint();
                     }
                 });
+
             }
-            setNumPages(myProject, result.getPages());
+            if (!result.isError()) {
+                setNumPages(result.getPages());
+            }
         } catch (Exception e) {
-            logger.warn("Exception occurred rendering source = " + source + ": " + e);
+            logger.warn("Exception occurred rendering source = " + source + ": " + e, e);
         }
+    }
+
+    private JSeparator separator() {
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        Dimension size = new Dimension(separator.getPreferredSize().width, 10);
+        separator.setVisible(true);
+        separator.setMaximumSize(size);
+        separator.setPreferredSize(size);
+        return separator;
+    }
+
+    private boolean hasImages(BufferedImage[] images) {
+        for (int i = 0; i < images.length; i++) {
+            BufferedImage image = images[i];
+            if (image != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private BufferedImage[] toBufferedImages(PlantUmlResult result) throws IOException {
+        PlantUmlResult.Diagram[] diagrams = result.getDiagrams();
+        //noinspection UndesirableClassUsage
+        final BufferedImage[] images = new BufferedImage[diagrams.length];
+        for (int i = 0; i < diagrams.length; i++) {
+            PlantUmlResult.Diagram diagram = diagrams[i];
+            if (diagram != null) {
+                images[i] = UIUtils.getBufferedImage(diagram.getDiagramBytes());
+            }
+        }
+        return images;
     }
 
     public int getZoom() {
         return zoom;
     }
 
-    public void setZoom(Project myProject, int zoom) {
+    public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater(myProject);
+        renderLater();
     }
 
-    public void setPage(Project myProject, int page) {
-        if (page >= 0 && page < numPages) {
+    public void setPage(int page) {
+        if (page >= -1 && page < numPages) {
             this.page = page;
             selectPageAction.setPage(page);
-            renderLater(myProject);
+            renderLater();
         }
     }
 
-    public void nextPage(Project myProject) {
-        setPage(myProject, this.page + 1);
+    public void nextPage() {
+        setPage(this.page + 1);
     }
 
-    public void prevPage(Project myProject) {
-        setPage(myProject, this.page - 1);
+    public void prevPage() {
+        setPage(this.page - 1);
     }
 
-    public void setNumPages(Project myProject, int numPages) {
+    public int getNumPages() {
+        return numPages;
+    }
+
+    public void setNumPages(int numPages) {
         this.numPages = numPages;
         if (page >= numPages)
-            setPage(myProject, numPages - 1);
+            setPage(numPages - 1);
         selectPageAction.setNumPages(numPages);
-    }
-
-    private class PlantUmlFileManagerListener implements FileEditorManagerListener {
-        public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-            logger.debug("file opened " + file);
-        }
-
-        public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-            logger.debug("file closed = " + file);
-        }
-
-        public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-            logger.debug("selection changed" + event);
-            renderLater(event.getManager().getProject());
-        }
-    }
-
-    private class PlantUmlDocumentListener implements DocumentListener {
-
-        public void beforeDocumentChange(DocumentEvent event) {
-        }
-
-        public void documentChanged(DocumentEvent event) {
-            logger.debug("document changed " + event);
-            //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
-            if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());
-                for (Editor editor : editors) {
-                    renderLater(editor.getProject());
-                }
-            }
-        }
     }
 
     private boolean isProjectValid(Project project) {
         return project != null && !project.isDisposed();
     }
 
-    private class PlantUmlCaretListener implements CaretListener {
-        @Override
-        public void caretPositionChanged(final CaretEvent e) {
-            renderLater(e.getEditor().getProject());
-        }
-
-        @Override
-        public void caretAdded(CaretEvent e) {
-            renderLater(e.getEditor().getProject());
-        }
-
-        @Override
-        public void caretRemoved(CaretEvent e) {
-            // do nothing
-        }
-    }
-
-    private class PlantUmlAncestorListener implements AncestorListener {
-        @Override
-        public void ancestorAdded(AncestorEvent ancestorEvent) {
-            Project[] projects = ProjectManager.getInstance().getOpenProjects();
-            for (Project project : projects) {
-                renderLater(project);
-            }
-        }
-
-        @Override
-        public void ancestorRemoved(AncestorEvent ancestorEvent) {
-            // do nothing
-        }
-
-        @Override
-        public void ancestorMoved(AncestorEvent ancestorEvent) {
-            // do nothing
-
-        }
-    }
-
-    private class PlantUmlProjectManagerListener implements ProjectManagerListener {
-        @Override
-        public void projectOpened(Project project) {
-            logger.debug("opened project " + project);
-            registerListeners(project);
-        }
-
-        @Override
-        public boolean canCloseProject(Project project) {
-            return true;
-        }
-
-        @Override
-        public void projectClosed(Project project) {
-            logger.debug("closed project " + project);
-        }
-
-        @Override
-        public void projectClosing(Project project) {
-            UIUtils.removeProject(project);
-            unregisterListeners();
-        }
-    }
 
     public int getPage() {
         return page;
+    }
+
+    class PlantUmlAncestorListener extends AncestorListenerAdapter {
+        private Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);
+
+        @Override
+        public void ancestorAdded(AncestorEvent ancestorEvent) {
+            logger.debug("ancestorAdded ", project.getName());
+            renderLater();
+        }
+
+    }
+
+    public JPanel getImagesPanel() {
+        return imagesPanel;
     }
 }
 
