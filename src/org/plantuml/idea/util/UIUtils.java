@@ -14,6 +14,8 @@ import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
+import org.plantuml.idea.action.ExternalOpenDiagramAsPNGAction;
+import org.plantuml.idea.action.ExternalOpenDiagramAsSVGAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
@@ -70,7 +72,12 @@ public class UIUtils {
                     @NotNull
                     @Override
                     public AnAction[] getChildren(@Nullable AnActionEvent e) {
-                        return new AnAction[]{new CopyDiagramToClipboardContextAction()};
+                        return new AnAction[]{
+                                new CopyDiagramToClipboardContextAction(),
+                                Separator.getInstance(),
+                                new ExternalOpenDiagramAsPNGAction(),
+                                new ExternalOpenDiagramAsSVGAction()
+                        };
                     }
                 }).getComponent().show(comp, x, y);
 
