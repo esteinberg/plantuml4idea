@@ -1,15 +1,16 @@
 package org.plantuml.idea.action;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.util.UIUtils;
 
@@ -19,11 +20,11 @@ import java.io.IOException;
 /**
  * @author Eugene Steinberg
  */
-public abstract class AbstractSaveDiagramAction extends AnAction {
+public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
     public static final String[] extensions;
     public static VirtualFile homeDir = null;
-    private static VirtualFile lastFile = null;
+    private static VirtualFile lastDir = null;
     public static final String FILENAME = "diagram";
     Logger logger = Logger.getInstance(SaveDiagramToFileAction.class);
 
@@ -38,10 +39,19 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(AnActionEvent e) {
+    public void actionPerformed(@NotNull AnActionEvent e) {
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
 
-        final VirtualFile baseDir = lastFile == null ? homeDir : lastFile;
+        VirtualFile baseDir = lastDir;
+
+        if (baseDir == null) {
+            if (e.getProject() == null) {
+                baseDir = homeDir;
+            } else {
+                baseDir = e.getProject().getBaseDir();
+            }
+        }
+
         String defaultFileName = getDefaultFileName(e.getProject());
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
@@ -49,9 +59,11 @@ public abstract class AbstractSaveDiagramAction extends AnAction {
 
         if (wrapper != null) {
             try {
-                VirtualFile virtualFile = wrapper.getVirtualFile();
-                if (virtualFile != null)
-                    lastFile = virtualFile.getParent();
+                VirtualFile virtualFile = wrapper.getVirtualFile(true);
+                if (virtualFile != null) {
+                    lastDir = virtualFile.getParent();
+                    logger.info("lastDir set to " + lastDir);
+                }
                 File file = wrapper.getFile();
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String base = tokens[0];
