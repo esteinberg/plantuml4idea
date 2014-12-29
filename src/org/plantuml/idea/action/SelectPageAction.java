@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -32,10 +33,6 @@ public class SelectPageAction extends ComboBoxAction {
         return group;
     }
 
-    public void setNumPages(int numPages) {
-        this.numPages = numPages;
-    }
-
     public void setPage(final int page) {
         if (button != null) {
             ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -48,7 +45,7 @@ public class SelectPageAction extends ComboBoxAction {
     }
 
     private static String getDisplayPage(int page) {
-        if (page == - 1) {
+        if (page == -1) {
             return "All Pages";
         }
         return Integer.toString(page + 1);
@@ -64,11 +61,26 @@ public class SelectPageAction extends ComboBoxAction {
         }
 
         @Override
-        public void actionPerformed(AnActionEvent anActionEvent) {
+        public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
             final Project project = anActionEvent.getProject();
             if (project != null) {
-                UIUtils.getPlantUmlToolWindow(project).setPage(page);
+                PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+
+                if (plantUmlToolWindow != null)
+                    plantUmlToolWindow.setPage(page);
                 setPage(page);
+            }
+        }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+            if (plantUmlToolWindow != null) {
+                numPages = plantUmlToolWindow.getNumPages();
+                e.getPresentation().setEnabled(numPages > 1);
             }
         }
     }

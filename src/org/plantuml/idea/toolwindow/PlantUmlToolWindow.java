@@ -74,11 +74,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         imagesPanel = new JPanel();
         imagesPanel.setLayout(new BoxLayout(imagesPanel, BoxLayout.Y_AXIS));
-        
+
         scrollPane = new JBScrollPane(imagesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
         add(scrollPane, BorderLayout.CENTER);
-        
+
         addScrollBarListeners(imagesPanel);
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
@@ -214,8 +214,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     private boolean hasImages(BufferedImage[] images) {
-        for (int i = 0; i < images.length; i++) {
-            BufferedImage image = images[i];
+        for (BufferedImage image : images) {
             if (image != null) {
                 return true;
             }
@@ -269,17 +268,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         this.numPages = numPages;
         if (page >= numPages)
             setPage(numPages - 1);
-        selectPageAction.setNumPages(numPages);
     }
 
     private boolean isProjectValid(Project project) {
         return project != null && !project.isDisposed();
     }
 
-
-    public int getPage() {
-        return page;
-    }
 
     class PlantUmlAncestorListener extends AncestorListenerAdapter {
         private Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);

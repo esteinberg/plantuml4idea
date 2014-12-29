@@ -3,6 +3,8 @@ package org.plantuml.idea.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 /**
@@ -11,9 +13,22 @@ import org.plantuml.idea.util.UIUtils;
  */
 public class NextPageAction extends DumbAwareAction {
     @Override
-    public void actionPerformed(AnActionEvent anActionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
-        if (project != null)
-            UIUtils.getPlantUmlToolWindow(project).nextPage();
+        if (project != null) {
+            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+            if (plantUmlToolWindow != null)
+                plantUmlToolWindow.nextPage();
+        }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+            if (plantUmlToolWindow != null)
+                e.getPresentation().setEnabled(plantUmlToolWindow.getNumPages() > 1);
+        }
     }
 }
