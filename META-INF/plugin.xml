@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <description>PlantUML diagramming tool integration</description>
-    <version>1.4.14-SNAPSHOT</version>
+    <version>1.4.14</version>
     <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
@@ -14,7 +14,7 @@
             <li> supports multiple sources per file</li>
             <li> supports multi page diagrams</li>
             <li> supports PlantUML includes</li>
-            <li> diagram zoom </li>
+            <li> diagram zoom (Ctrl + wheel)</li>
             <li> PlantUML syntax error highlighting and intentions</li>
             <li> Simple PlantUML syntax keywords highlighting</li>
             <li> Copy current diagram (or all diagrams in file) to clipboard or save as PNG, EPS or SVG</li>
@@ -25,8 +25,11 @@
         <![CDATA[
                 <p>1.4.14</p>
                 <ul>
+                    <li> Show all pages for multi-page diagrams</li>
+                    <li> Smooth zoon</li>
                     <li> PlantUml tool window opens automatically if you navigate to PUML file</li>
                     <li> Right Click on diagram copies to clipboard</li>
+                    <li> Bugfixes and minor improvements</li>
                 </ul>
        ]]>
     </change-notes>
