@@ -1,5 +1,6 @@
 package org.plantuml.idea.plantuml;
 
+import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.graphic.HtmlColor;
@@ -24,6 +25,7 @@ import java.util.regex.Pattern;
 public class PlantUml {
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
     public static final String UMLSTART = "@start";
+    private static final Logger logger = Logger.getInstance(PlantUml.class);
 
     static {
         // Make sure settings are loaded and applied before we start rendering.
@@ -137,13 +139,9 @@ public class PlantUml {
      * @param format desired image format
      * @return rendering result
      */
-
     public static PlantUmlResult render(String source, ImageFormat format, int page, final int zoom) {
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
         String desc = null;
-        String error = null;
-        int pages = 1;
+        int totalPages = 1;
 
         try {
             // image generation.
@@ -153,20 +151,42 @@ public class PlantUml {
             if (blocks.size() > 0) {
                 Diagram system = blocks.get(0).getDiagram();
                 if (system != null) {
-                    pages = system.getNbImages();
+                    totalPages = system.getNbImages();
                 }
             }
-            // Write the image to "os"
-            desc = reader.generateImage(os, page, new FileFormatOption(format.getFormat()){
+
+            //image/error is not rendered when page >= totalPages
+            if (page >= totalPages) {
+                page = -1;
+            }
+            
+            PlantUmlResult.Diagram[] diagrams;
+            FileFormatOption formatOption = new FileFormatOption(format.getFormat()) {
                 @Override
                 public UGraphic createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
                     return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
                 }
-            });
+            };
+            if (page == -1) {
+                diagrams = new PlantUmlResult.Diagram[totalPages];
+                for (int i = 0; i < totalPages; i++) {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    desc = reader.generateImage(os, i, formatOption);
+                    diagrams[i] = new PlantUmlResult.Diagram(os.toByteArray());
+                }
+            } else {
+                diagrams = new PlantUmlResult.Diagram[1];
+                // Write the image to "os"
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                desc = reader.generateImage(os, page, formatOption);
+                diagrams[0] = new PlantUmlResult.Diagram(os.toByteArray());
+            }
+
+            return new PlantUmlResult(diagrams, desc, totalPages);
         } catch (Throwable e) {
-            error = e.getMessage();
+            logger.warn(e);
+            return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
-        return new PlantUmlResult(os.toByteArray(), desc, error, pages);
     }
 
     public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";

@@ -34,12 +34,15 @@
 
     <application-components>
         <!-- Add your application components here -->
+        <component>
+            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlApplicationComponent</implementation-class>
+        </component>
     </application-components>
 
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlToolWindowAutoOpener</implementation-class>
+            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlProjectComponent</implementation-class>
         </component>
     </project-components>
 
@@ -67,7 +70,7 @@
             <action id="PlantUML.PrevPage" description="Prev Page" class="org.plantuml.idea.action.PrevPageAction"
                     icon="/actions/back.png" text="Previous Page"/>
             <action id="PlantUML.SelectPage" description="Select Page" class="org.plantuml.idea.action.SelectPageAction"
-                    text="Select Page"/>
+                    text="All Pages"/>
 
             <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
                     icon="/actions/forward.png" text="Next Page"/>
