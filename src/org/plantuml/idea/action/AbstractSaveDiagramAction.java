@@ -79,7 +79,8 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 String fileNameTemplate = base + "-%03d." + extension;
 
                 PlantUml.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
-                        imageFormat, file.getAbsolutePath(), fileNameTemplate);
+                        imageFormat, file.getAbsolutePath(), fileNameTemplate,
+                        UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom());
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";

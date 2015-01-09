@@ -102,7 +102,7 @@ public class PlantUml {
      * @param fileNameFormat file naming scheme for further files
      * @throws IOException in case of rendering or saving fails
      */
-    public static void renderAndSave(String source, File baseDir, ImageFormat format, String fileName, String fileNameFormat)
+    public static void renderAndSave(String source, File baseDir, ImageFormat format, String fileName, String fileNameFormat, int zoom)
             throws IOException {
         File origDir = FileSystem.getInstance().getCurrentDir();
         FileOutputStream outputStream = null;
@@ -119,7 +119,7 @@ public class PlantUml {
                 for (int page = 0; page < pages; ++page) {
                     String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
                     outputStream = new FileOutputStream(fName);
-                    reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
+                    reader.generateImage(outputStream, imageСounter++, createFileFormatOption(format, zoom));
                     outputStream.close();
                 }
             }
@@ -139,7 +139,7 @@ public class PlantUml {
      * @param format desired image format
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, ImageFormat format, int page, final int zoom) {
+    public static PlantUmlResult render(String source, ImageFormat format, int page, int zoom) {
         String desc = null;
         int totalPages = 1;
 
@@ -161,12 +161,7 @@ public class PlantUml {
             }
             
             PlantUmlResult.Diagram[] diagrams;
-            FileFormatOption formatOption = new FileFormatOption(format.getFormat()) {
-                @Override
-                public UGraphic createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
-                    return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
-                }
-            };
+            FileFormatOption formatOption = createFileFormatOption(format, zoom);
             if (page == -1) {
                 diagrams = new PlantUmlResult.Diagram[totalPages];
                 for (int i = 0; i < totalPages; i++) {
@@ -187,6 +182,15 @@ public class PlantUml {
             logger.warn(e);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
+    }
+
+    private static FileFormatOption createFileFormatOption(final ImageFormat format, final int zoom) {
+        return new FileFormatOption(format.getFormat()) {
+            @Override
+            public UGraphic createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
+                return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
+            }
+        };
     }
 
     public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
