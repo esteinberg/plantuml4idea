@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ToolWindowType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantUmlFileType;
@@ -26,23 +27,25 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         VirtualFile newFile = event.getNewFile();
         VirtualFile oldFile = event.getOldFile();
-        if (isPlantUml(newFile)) {
-            ToolWindow window = getToolWindow(event);
-            if (window != null && !window.isVisible()) {
-                window.show(null);
-            }
-        } else if (isPlantUml(oldFile)) {
-            ToolWindow window = getToolWindow(event);
-            if (window != null && window.isVisible()) {
-                window.hide(null);
+
+        ToolWindow window = getToolWindow(event);
+        if (window != null && window.getType() == ToolWindowType.DOCKED) {
+            if (isPlantUml(newFile)) {
+                if (!window.isVisible()) {
+                    window.show(null);
+                }
+            } else if (isPlantUml(oldFile)) {
+                if (window.isVisible()) {
+                    window.hide(null);
+                }
             }
         }
     }
 
     @Nullable
     private ToolWindow getToolWindow(FileEditorManagerEvent event) {
-        Project project1 = event.getManager().getProject();
-        return ToolWindowManager.getInstance(project1).getToolWindow(PlantUmlToolWindowFactory.ID);
+        Project project = event.getManager().getProject();
+        return ToolWindowManager.getInstance(project).getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 
     private boolean isPlantUml(VirtualFile file) {
