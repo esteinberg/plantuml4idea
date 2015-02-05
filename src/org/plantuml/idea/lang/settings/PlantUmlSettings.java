@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
     private String dotExecutable = null;
     private boolean errorAnnotationEnabled = true;
+    private boolean autoHide = true;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -36,6 +37,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setErrorAnnotationEnabled(boolean errorAnnotationEnabled) {
         this.errorAnnotationEnabled = errorAnnotationEnabled;
+    }
+
+    public boolean isAutoHide() {
+        return autoHide;
+    }
+
+    public void setAutoHide(boolean autoHide) {
+        this.autoHide = autoHide;
     }
 
     @Nullable

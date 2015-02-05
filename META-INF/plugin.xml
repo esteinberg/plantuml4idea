@@ -68,6 +68,15 @@
             <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
                     icon="/actions/forward.png" text="Next Page"/>
             <separator/>
+   
+            <group id="PlantUML.Settings" icon="/general/settings.png" popup="true">
+                <action id="PlantUML.AutoHideToolWindowToggle" class="org.plantuml.idea.action.AutoHideToolWindowToggleAction"
+                        text="Auto Show/Hide Tool Window"/>
+                <action id="PlantUML.ShowSettings" class="org.plantuml.idea.action.ShowSettingsAction"
+                        text="Open Settings"/>
+            </group>
+
+            <separator/>
             <action id="PlantUML.About" description="About" icon="/actions/help.png"
                     class="org.plantuml.idea.action.AboutAction" text="About"/>
         </group>

@@ -11,6 +11,7 @@ import com.intellij.openapi.wm.ToolWindowType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
 public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
@@ -29,7 +30,7 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
         VirtualFile oldFile = event.getOldFile();
 
         ToolWindow window = getToolWindow(event);
-        if (window != null && window.getType() == ToolWindowType.DOCKED) {
+        if (window != null && window.getType() == ToolWindowType.DOCKED && PlantUmlSettings.getInstance().isAutoHide()) {
             if (isPlantUml(newFile)) {
                 if (!window.isVisible()) {
                     window.show(null);
