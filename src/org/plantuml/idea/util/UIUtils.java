@@ -176,7 +176,11 @@ public class UIUtils {
     }
 
     @Nullable
-    private static ToolWindow getToolWindow(Project project) {
-        return ToolWindowManager.getInstance(project).getToolWindow(PlantUmlToolWindowFactory.ID);
+    public static ToolWindow getToolWindow(Project project) {
+        ToolWindowManager instance = ToolWindowManager.getInstance(project);
+        if (instance == null) {
+            return null;
+        }
+        return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 }

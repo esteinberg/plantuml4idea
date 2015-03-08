@@ -3,16 +3,14 @@ package org.plantuml.idea.toolwindow.listener;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ToolWindowType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
+import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
 
@@ -45,8 +43,7 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
 
     @Nullable
     private ToolWindow getToolWindow(FileEditorManagerEvent event) {
-        Project project = event.getManager().getProject();
-        return ToolWindowManager.getInstance(project).getToolWindow(PlantUmlToolWindowFactory.ID);
+        return UIUtils.getToolWindow(event.getManager().getProject());
     }
 
     private boolean isPlantUml(VirtualFile file) {
