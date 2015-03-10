@@ -136,7 +136,7 @@ public class UIUtils {
     }
 
     @Nullable
-    public static PlantUmlToolWindow getPlantUmlToolWindow(Project project) {
+    public static PlantUmlToolWindow getPlantUmlToolWindow(@NotNull Project project) {
         PlantUmlToolWindow result = null;
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow != null) {
@@ -146,22 +146,30 @@ public class UIUtils {
     }
 
     @Nullable
-    public static PlantUmlToolWindow getPlantUmlToolWindow(ToolWindow toolWindow) {
+    public static PlantUmlToolWindow getPlantUmlToolWindow(@NotNull ToolWindow toolWindow) {
         PlantUmlToolWindow result = null;
-        if (toolWindow != null) {
-            Content[] contents = toolWindow.getContentManager().getContents();
-            if (contents.length > 0) {
-                JComponent component = contents[0].getComponent();
-                //it can be JLabel "Initializing..."
-                if (component instanceof PlantUmlToolWindow) {
-                    result = (PlantUmlToolWindow) component;
-                }
+        Content[] contents = toolWindow.getContentManager().getContents();
+        if (contents.length > 0) {
+            JComponent component = contents[0].getComponent();
+            //it can be JLabel "Initializing..."
+            if (component instanceof PlantUmlToolWindow) {
+                result = (PlantUmlToolWindow) component;
             }
         }
         return result;
     }
 
-    public static void renderPlantUmlToolWindowLater(final Project project) {
+
+    @Nullable
+    public static ToolWindow getToolWindow(@NotNull Project project) {
+        ToolWindowManager instance = ToolWindowManager.getInstance(project);
+        if (instance == null) {
+            return null;
+        }
+        return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
+    }
+
+    public static void renderPlantUmlToolWindowLater(@Nullable Project project) {
         if (project == null) return;
 
         ToolWindow toolWindow = getToolWindow(project);
@@ -173,14 +181,5 @@ public class UIUtils {
         if (plantUmlToolWindow != null) {
             plantUmlToolWindow.renderLater();
         }
-    }
-
-    @Nullable
-    public static ToolWindow getToolWindow(Project project) {
-        ToolWindowManager instance = ToolWindowManager.getInstance(project);
-        if (instance == null) {
-            return null;
-        }
-        return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 }
