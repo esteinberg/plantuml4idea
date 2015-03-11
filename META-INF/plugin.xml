@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <description>PlantUML diagramming tool integration</description>
-    <version>1.5.0</version>
+    <version>1.6.0-SNAPSHOT</version>
     <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
