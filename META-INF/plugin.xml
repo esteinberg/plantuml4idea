@@ -17,10 +17,9 @@
     </description>
     <change-notes>
         <![CDATA[
-                <p>1.5.0</p>
+                <p>1.6.0</p>
                 <ul>
-                    <li>Added a setting for automatic opening/hiding of tool window and changed to work only in docked mode</li>
-                    <li>NPE fix on start of PhpStorm</li>
+                    <li>PlantUml library upgrade to 8020</li>
                 </ul>
        ]]>
     </change-notes>

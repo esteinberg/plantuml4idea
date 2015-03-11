@@ -6,6 +6,7 @@ import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UGraphic2;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.awt.geom.Dimension2D;
@@ -187,7 +188,7 @@ public class PlantUml {
     private static FileFormatOption createFileFormatOption(final ImageFormat format, final int zoom) {
         return new FileFormatOption(format.getFormat()) {
             @Override
-            public UGraphic createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
+            public UGraphic2 createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
                 return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
             }
         };
