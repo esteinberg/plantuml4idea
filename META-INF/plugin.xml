@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
     <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
