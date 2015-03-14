@@ -3,13 +3,8 @@ package org.plantuml.idea.plantuml;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.ugraphic.ColorMapper;
-import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UGraphic2;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
-import java.awt.geom.Dimension2D;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -117,10 +112,11 @@ public class PlantUml {
             for (BlockUml block : blocks) {
                 Diagram diagram = block.getDiagram();
                 int pages = diagram.getNbImages();
+                zoomDiagram(diagram, zoom);
                 for (int page = 0; page < pages; ++page) {
                     String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
                     outputStream = new FileOutputStream(fName);
-                    reader.generateImage(outputStream, imageСounter++, createFileFormatOption(format, zoom));
+                    reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
                     outputStream.close();
                 }
             }
@@ -149,10 +145,16 @@ public class PlantUml {
             SourceStringReader reader = new SourceStringReader(source);
 
             List<BlockUml> blocks = reader.getBlocks();
-            if (blocks.size() > 0) {
-                Diagram system = blocks.get(0).getDiagram();
-                if (system != null) {
-                    totalPages = system.getNbImages();
+
+            for (int i = 0; i < blocks.size(); i++) {
+                BlockUml block = blocks.get(i);
+
+                Diagram diagram = block.getDiagram();
+                zoomDiagram(diagram, zoom);
+
+                // i do not know why totalPages is taken from diagram 0, but it was before me
+                if (i == 0) {
+                    totalPages = diagram.getNbImages();
                 }
             }
 
@@ -162,7 +164,7 @@ public class PlantUml {
             }
             
             PlantUmlResult.Diagram[] diagrams;
-            FileFormatOption formatOption = createFileFormatOption(format, zoom);
+            FileFormatOption formatOption = new FileFormatOption(format.getFormat());
             if (page == -1) {
                 diagrams = new PlantUmlResult.Diagram[totalPages];
                 for (int i = 0; i < totalPages; i++) {
@@ -185,13 +187,11 @@ public class PlantUml {
         }
     }
 
-    private static FileFormatOption createFileFormatOption(final ImageFormat format, final int zoom) {
-        return new FileFormatOption(format.getFormat()) {
-            @Override
-            public UGraphic2 createUGraphic(ColorMapper colorMapper, double dpiFactor, Dimension2D dim, HtmlColor mybackcolor, boolean rotation) {
-                return super.createUGraphic(colorMapper, dpiFactor * zoom / 100, dim, mybackcolor, rotation);
-            }
-        };
+    private static void zoomDiagram(Diagram diagram, int zoom) {
+        if (diagram instanceof UmlDiagram) {
+            UmlDiagram umlDiagram = (UmlDiagram) diagram;
+            umlDiagram.setScale(new ScaleSimple(zoom / 100f));
+        }
     }
 
     public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
