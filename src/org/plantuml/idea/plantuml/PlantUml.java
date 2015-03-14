@@ -138,7 +138,7 @@ public class PlantUml {
      */
     public static PlantUmlResult render(String source, ImageFormat format, int page, int zoom) {
         String desc = null;
-        int totalPages = 1;
+        int totalPages = 0;
 
         try {
             // image generation.
@@ -152,27 +152,24 @@ public class PlantUml {
                 Diagram diagram = block.getDiagram();
                 zoomDiagram(diagram, zoom);
 
-                // i do not know why totalPages is taken from diagram 0, but it was before me
-                if (i == 0) {
-                    totalPages = diagram.getNbImages();
-                }
+                totalPages = totalPages + diagram.getNbImages();
             }
 
             //image/error is not rendered when page >= totalPages
             if (page >= totalPages) {
                 page = -1;
             }
-            
+
             PlantUmlResult.Diagram[] diagrams;
             FileFormatOption formatOption = new FileFormatOption(format.getFormat());
-            if (page == -1) {
+            if (page == -1) {//render all images
                 diagrams = new PlantUmlResult.Diagram[totalPages];
                 for (int i = 0; i < totalPages; i++) {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                     desc = reader.generateImage(os, i, formatOption);
                     diagrams[i] = new PlantUmlResult.Diagram(os.toByteArray());
                 }
-            } else {
+            } else {//render single image
                 diagrams = new PlantUmlResult.Diagram[1];
                 // Write the image to "os"
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -182,7 +179,7 @@ public class PlantUml {
 
             return new PlantUmlResult(diagrams, desc, totalPages);
         } catch (Throwable e) {
-            logger.warn(e);
+            logger.error(e);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
     }
