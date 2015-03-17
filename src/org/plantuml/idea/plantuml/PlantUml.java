@@ -179,7 +179,7 @@ public class PlantUml {
 
             return new PlantUmlResult(diagrams, desc, totalPages);
         } catch (Throwable e) {
-            logger.error(e);
+            logger.error("Failed to render image", e, source);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
     }
