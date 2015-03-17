@@ -7,13 +7,16 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
+import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -47,8 +50,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                 SourceAnnotationResult sourceAnnotationResult = new SourceAnnotationResult(sourceOffset);
 
                 String source = sourceData.getValue();
-
-                sourceAnnotationResult.addAll(annotateSyntaxErrors(source));
+                sourceAnnotationResult.addAll(annotateSyntaxErrors(file, source));
 
                 sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
                         LanguagePatternHolder.INSTANCE.keywordsPattern,
@@ -71,22 +73,34 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     }
 
     @Nullable
-    private Collection<SourceAnnotation> annotateSyntaxErrors(String source) {
+    private Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source) {
         Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
-        SyntaxResult syntaxResult = checkSyntax(source);
+        SyntaxResult syntaxResult = checkSyntax(file, source);
         if (syntaxResult.isError()) {
-            ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
-                    syntaxResult.getErrors(),
-                    syntaxResult.getSuggest(),
-                    syntaxResult.getErrorLinePosition()
-            );
-            result.add(errorSourceAnnotation);
+            String beforeInclude = StringUtils.substringBefore(source, "!include");
+            int includeLineNumber = StringUtils.splitPreserveAllTokens(beforeInclude, "\n").length;
+            //todo hack because plantuml returns line number from source with inlined includes
+            if (syntaxResult.getErrorLinePosition() < includeLineNumber) {
+                ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
+                        syntaxResult.getErrors(),
+                        syntaxResult.getSuggest(),
+                        syntaxResult.getErrorLinePosition()
+                );
+                result.add(errorSourceAnnotation);
+            }
         }
         return result;
     }
 
-    private SyntaxResult checkSyntax(String source) {
-        return SyntaxChecker.checkSyntax(source);
+    private SyntaxResult checkSyntax(PsiFile file, String source) {
+        try {
+            File baseDir = new File(file.getVirtualFile().getParent().getPath());
+            FileSystem.getInstance().setCurrentDir(baseDir);
+            PlantUml.commitIncludes(source, baseDir);
+            return SyntaxChecker.checkSyntax(source);
+        } finally {
+            FileSystem.getInstance().reset();
+        }
     }
 
     private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {

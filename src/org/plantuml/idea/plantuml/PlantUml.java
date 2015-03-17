@@ -1,19 +1,25 @@
 package org.plantuml.idea.plantuml;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.ui.UIUtil;
 import net.sourceforge.plantuml.*;
+import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.preproc.Defines;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
 
 /**
  * @author Eugene Steinberg
@@ -52,10 +58,10 @@ public class PlantUml {
     }
 
     public static PlantUmlResult render(String source) {
-        return render(source, ImageFormat.PNG, 0, 100);
+        return render(source, null, 0, 100);
     }
 
-    public static PlantUmlResult render(String source, File baseDir, int page, int zoom) {
+    public static PlantUmlResult render(String source,  @Nullable File baseDir, int page, int zoom) {
         return render(source, baseDir, ImageFormat.PNG, page, zoom);
     }
 
@@ -69,21 +75,17 @@ public class PlantUml {
      * @param page    page to render
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, File baseDir, ImageFormat format, int page, int zoom) {
-        PlantUmlResult render;
-        File origDir = FileSystem.getInstance().getCurrentDir();
-
-        if (baseDir != null)
-            FileSystem.getInstance().setCurrentDir(baseDir);
-
+    public static PlantUmlResult render(String source, @Nullable File baseDir, ImageFormat format, int page, int zoom) {
         try {
-            render = render(source, format, page, zoom);
-        } finally {
-            if (origDir != null)
-                FileSystem.getInstance().setCurrentDir(origDir);
-        }
+            if (baseDir != null) {
+                FileSystem.getInstance().setCurrentDir(baseDir);
+            }
+            commitIncludes(source, baseDir);
 
-        return render;
+            return doRender(source, format, page, zoom);
+        } finally {
+            FileSystem.getInstance().reset();
+        }
     }
 
 
@@ -98,13 +100,14 @@ public class PlantUml {
      * @param fileNameFormat file naming scheme for further files
      * @throws IOException in case of rendering or saving fails
      */
-    public static void renderAndSave(String source, File baseDir, ImageFormat format, String fileName, String fileNameFormat, int zoom)
+    public static void renderAndSave(String source, @Nullable File baseDir, ImageFormat format, String fileName, String fileNameFormat, int zoom)
             throws IOException {
-        File origDir = FileSystem.getInstance().getCurrentDir();
         FileOutputStream outputStream = null;
-        if (baseDir != null)
-            FileSystem.getInstance().setCurrentDir(baseDir);
         try {
+            if (baseDir != null) {
+                FileSystem.getInstance().setCurrentDir(baseDir);
+            }
+            commitIncludes(source, baseDir);
             SourceStringReader reader = new SourceStringReader(source);
 
             List<BlockUml> blocks = reader.getBlocks();
@@ -121,10 +124,10 @@ public class PlantUml {
                 }
             }
         } finally {
-            if (outputStream != null)
+            FileSystem.getInstance().reset();
+            if (outputStream != null) {
                 outputStream.close();
-            if (origDir != null)
-                FileSystem.getInstance().setCurrentDir(origDir);
+            }
         }
 
     }
@@ -136,7 +139,7 @@ public class PlantUml {
      * @param format desired image format
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, ImageFormat format, int page, int zoom) {
+    private static PlantUmlResult doRender(String source, ImageFormat format, int page, int zoom) {
         String desc = null;
         int totalPages = 0;
 
@@ -191,12 +194,64 @@ public class PlantUml {
         }
     }
 
+    public static void commitIncludes(String source, @Nullable File baseDir) {
+        try {
+            if (baseDir != null) {
+                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir);
+                final Set<File> includedFiles = blockUmlBuilder.getIncludedFiles();
+                if (!includedFiles.isEmpty()) {
+                    saveModifiedFiles(includedFiles);
+                }
+            }
+        } catch (IOException e) {
+            logger.error(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
+        }
+    }
+
+    private static void saveModifiedFiles(final Set<File> files) {
+        final FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+        final Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
+
+        if (!unsavedDocuments.isEmpty()) {
+            //must be on EDT
+            UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+                @Override
+                public void run() {
+                    for (Document unsavedDocument : unsavedDocuments) {
+                        fileDocumentManager.saveDocument(unsavedDocument);
+                    }
+                }
+            });
+        }
+    }
+
+    @NotNull
+    private static Set<Document> getUnsavedDocuments(Set<File> files, FileDocumentManager fileDocumentManager) {
+        VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
+
+        Set<Document> unsavedDocuments = new HashSet<Document>();
+        for (File file : files) {
+            VirtualFile virtualFile = virtualFileManager.findFileByUrl("file://" + file.getAbsolutePath());
+            if (virtualFile != null) {
+                Document document = fileDocumentManager.getDocument(virtualFile);
+                if (document != null) {
+                    if (fileDocumentManager.isDocumentUnsaved(document)) {
+                        unsavedDocuments.add(document);
+                    }
+                }
+            }
+        }
+        return unsavedDocuments;
+    }
+
+
     public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
     private static Pattern sourcePattern =
             Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
 
     /**
      * Extracts all
+     *
      * @param text
      * @return
      */
