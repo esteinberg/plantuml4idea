@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.6.1</version>
+    <version>1.7.0-SNAPSHOT</version>
     <vendor>Eugene Steinberg</vendor>
     <idea-version since-build="8000"/>
 
@@ -8,9 +8,9 @@
 
     <change-notes>
         <![CDATA[
-            <p>1.6.1</p>
+            <p>1.7.0-SNAPSHOT</p>
             <ul>
-                <li>zooming fix after PlantUml library upgrade to 8020</li>
+                <li></li>
             </ul>
        ]]>
     </change-notes>
