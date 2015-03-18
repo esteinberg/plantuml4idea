@@ -12,6 +12,7 @@
             <ul>
                 <li>included file is automatically saved before rendering</li>
                 <li>syntax validation fix for !include (no syntax validation after !include is possible for now)</li>
+                <li>PlantUml library upgrade to 8021</li>
             </ul>
        ]]>
     </change-notes>
