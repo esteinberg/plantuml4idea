@@ -209,30 +209,26 @@ public class PlantUml {
     }
 
     private static void saveModifiedFiles(final Set<File> files) {
-        final FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-        final Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
-
-        if (!unsavedDocuments.isEmpty()) {
-            //must be on EDT
-            UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-                @Override
-                public void run() {
-                    for (Document unsavedDocument : unsavedDocuments) {
-                        fileDocumentManager.saveDocument(unsavedDocument);
-                    }
+        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
+            @Override
+            public void run() {
+                FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+                Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
+                for (Document unsavedDocument : unsavedDocuments) {
+                    fileDocumentManager.saveDocument(unsavedDocument);
                 }
-            });
-        }
+            }
+        });
     }
 
     @NotNull
     private static Set<Document> getUnsavedDocuments(Set<File> files, FileDocumentManager fileDocumentManager) {
         VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
-
         Set<Document> unsavedDocuments = new HashSet<Document>();
         for (File file : files) {
             VirtualFile virtualFile = virtualFileManager.findFileByUrl("file://" + file.getAbsolutePath());
             if (virtualFile != null) {
+                // allowed from event dispatch thread or inside read-action only
                 Document document = fileDocumentManager.getDocument(virtualFile);
                 if (document != null) {
                     if (fileDocumentManager.isDocumentUnsaved(document)) {
