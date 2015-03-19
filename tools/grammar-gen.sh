@@ -19,5 +19,5 @@ fi
 
 
 cd ..
-java -jar tools/JFlex.jar --sliceandcharat --skel /Users/mozg/Projects/IDE/intellij-community/tools/lexer/idea-flex.skeleton -d gen/org/plantuml/idea/lang/parser src/org/plantuml/idea/lang/parser/PlantUml.flex
+java -jar tools/JFlex.jar --sliceandcharat --skel tools/idea-flex.skeleton -d gen/org/plantuml/idea/lang/parser src/org/plantuml/idea/lang/parser/PlantUml.flex
 java -jar tools/GrammarKit/lib/grammar-kit.jar gen src/org/plantuml/idea/lang/parser/PlantUml.bnf
