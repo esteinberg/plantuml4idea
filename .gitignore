@@ -11,3 +11,11 @@ out
 .DS_Store
 target/
 plantuml4idea.zip
+
+# Generated files
+/gen/
+
+# Tools
+/tools/GrammarKit*
+/tools/*.skeleton
+/tools/*.jar

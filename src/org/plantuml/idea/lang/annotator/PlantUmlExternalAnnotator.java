@@ -2,9 +2,8 @@ package org.plantuml.idea.lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.FileSystem;
@@ -20,8 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Author: Eugene Steinberg
@@ -36,10 +33,19 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
 
     @Nullable
     @Override
-    public FileAnnotationResult doAnnotate(PsiFile file) {
-        FileAnnotationResult result = new FileAnnotationResult();
+    public FileAnnotationResult doAnnotate(final PsiFile file) {
+        final FileAnnotationResult result = new FileAnnotationResult();
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
+            @Override
+            public void run() {
+                doAnnotate1(file, result);
+            }
+        });
+        return result;
+    }
 
-        if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
+    public void doAnnotate1(PsiFile file, FileAnnotationResult result) {
+        if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled() && file.getFirstChild() != null) {
             String text = file.getFirstChild().getText();
 
             Map<Integer, String> sources = PlantUml.extractSources(text);
@@ -52,24 +58,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                 String source = sourceData.getValue();
                 sourceAnnotationResult.addAll(annotateSyntaxErrors(file, source));
 
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.keywordsPattern,
-                        DefaultLanguageHighlighterColors.KEYWORD));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.typesPattern,
-                        DefaultLanguageHighlighterColors.LABEL));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.preprocPattern,
-                        DefaultLanguageHighlighterColors.METADATA));
-
                 result.add(sourceAnnotationResult);
             }
-
-
         }
-        return result;
     }
 
     @Nullable
@@ -101,15 +92,6 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         } finally {
             FileSystem.getInstance().reset();
         }
-    }
-
-    private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {
-        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
-        Matcher matcher = pattern.matcher(source);
-        while (matcher.find()) {
-            result.add(new SyntaxHighlightAnnotation(matcher.start(), matcher.end(), textAttributesKey));
-        }
-        return result;
     }
 
     @Override
