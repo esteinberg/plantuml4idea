@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.7.0</version>
+    <version>2.0.0-SNAPSHOT</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 13+ -->
     <idea-version since-build="133.000"/>
@@ -9,11 +9,9 @@
 
     <change-notes>
         <![CDATA[
-            <p>1.7.0</p>
+            <p>2.0.0</p>
             <ul>
-                <li>included file is automatically saved before rendering</li>
-                <li>syntax validation fix for !include (no syntax validation after !include is possible for now)</li>
-                <li>PlantUml library upgrade to 8021</li>
+                <li></li>
             </ul>
        ]]>
     </change-notes>
