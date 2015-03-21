@@ -85,5 +85,11 @@
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>
+        <lang.syntaxHighlighterFactory key="PUML" implementationClass="org.plantuml.idea.lang.HighlighterFactory"/>
+        <annotator language="PUML" implementationClass="org.plantuml.idea.lang.annotator.PlantUmlAnnotator"/>
+        <colorSettingsPage implementation="org.plantuml.idea.lang.settings.PlantUmlColorsPage"/>
+        <multiHostInjector implementation="org.plantuml.idea.lang.injection.PlantUmlMultiHostInjector"/>
+        <javadocTagInfo implementation="org.plantuml.idea.lang.injection.StartUmlTagInfo"/>
+        <javadocTagInfo implementation="org.plantuml.idea.lang.injection.EndUmlTagInfo"/>
     </extensions>
 </idea-plugin>

@@ -27,3 +27,8 @@ Contributors:
 * To be able to generate many diagram types, you must have [Graphviz](http://plantuml.sourceforge.net/graphvizdot.html)
  installed on your machine. About screen tests your installation.
 
+# Developer notes
+
+* Grammar classes can be generated using tools/grammar-gen.sh
+* This script can run automatically when you run the plugin using "Plugin" Run/Debug confuguration. Just add the script
+ above as an external tool and make it run before the "Make" step.

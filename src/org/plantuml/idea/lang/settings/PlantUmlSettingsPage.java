@@ -36,7 +36,7 @@ public class PlantUmlSettingsPage implements Configurable {
     @Override
     public boolean isModified() {
         return !textFieldDotExecutable.getText().equals(PlantUmlSettings.getInstance().getDotExecutable())
-                || plantUMLErrorAnnotationExperimentalCheckBox.isSelected() == PlantUmlSettings.getInstance().isErrorAnnotationEnabled();
+                || plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != PlantUmlSettings.getInstance().isErrorAnnotationEnabled();
     }
 
     @Override

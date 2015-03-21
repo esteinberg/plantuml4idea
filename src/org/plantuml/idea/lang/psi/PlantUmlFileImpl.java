@@ -1,9 +1,11 @@
-package org.plantuml.idea.lang;
+package org.plantuml.idea.lang.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.lang.PlantUmlLanguage;
 
 /**
  * @author Eugene Steinberg

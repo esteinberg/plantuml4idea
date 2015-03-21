@@ -1,0 +1,385 @@
+
+{
+  parserClass="org.plantuml.idea.lang.parser.PlantUmlParser"
+
+  parserUtilClass="org.plantuml.idea.lang.parser.PlantUmlParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="PlantUml"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.plantuml.idea.lang.psi"
+  psiImplPackage="org.plantuml.idea.lang.psi.impl"
+
+  elementTypeHolderClass="org.plantuml.idea.lang.psi.PlantUmlTypes"
+  elementTypeClass="org.plantuml.idea.lang.psi.PlantUmlElementType"
+  tokenTypeClass="org.plantuml.idea.lang.psi.PlantUmlTokenType"
+
+  tokens=[
+    OPEN_CURLY_BRACE='{'
+    CLOSE_CURLY_BRACE='}'
+    LPAREN='('
+    RPAREN=')'
+    LBRACKET='['
+    RBRACKET=']'
+    LT='<'
+    GT='>'
+    COLON=':'
+    DOT='.'
+    COMMA=','
+    SLASH='/'
+    BACKSLASH='\'
+    DOLLAR_SIGN='$'
+    HASH_SIGN='#'
+    AT_SIGN='@'
+    MINUS_SIGN='-'
+    PLUS_SIGN='+'
+    STAR_SIGN='*'
+    EXCLAMATION_SIGN='!'
+    EQUALS_SIGN='='
+    PIPE_SIGN='|'
+    HAT_SIGN='^'
+    TILDE_SIGN='~'
+    DOUBLE_QUOTE_SIGN='"'
+
+    NEWLINE='\n'
+
+    START_UML='@startuml'
+    END_UML='@enduml'
+
+    CHAMELEON_TEXT='CHAMELEON_TEXT'
+  ]
+}
+
+simpleFile ::= item_*
+
+// noSpace_ is needed because we want to declare a meta noSpace which can't reference <<space>> directly :(
+private noSpace_ ::= !<<space>>
+private meta noSpace ::= noSpace_
+
+private crlf ::= CRLF
+private number ::= DIGITS <<noSpace>> '.' (<<noSpace>> DIGITS)? | '.' <<noSpace>> DIGITS | DIGITS
+
+private item_ ::= diagram | MULTI_LINE_COMMENT_TEXT
+
+diagram ::= START_UML (nosyntax | common_syntax | sequence_diagram | class_diagram | component_diagram | unknown_syntax) END_UML {pin=1}
+
+private nosyntax ::= CRLF* '!pragma nosyntax' CRLF <<consumeUntil (END_UML)>> {pin=2}
+private common_syntax ::= CRLF* '!pragma syntax common' CRLF <<command common_command>>* {pin=2}
+private unknown_syntax ::= <<command common_command>>*
+
+private next_line_recover ::= !CRLF !END_UML
+
+private stereotype ::= '<<' <<consumeUntil (CRLF | '>>') CHAMELEON_TEXT>> '>>'
+private text_to_eol ::= <<consumeUntil crlf CHAMELEON_TEXT>>
+private meta command ::= !END_UML <<command_with_recover <<cmd>>>> CRLF
+private meta command_with_recover ::= <<cmd>> {recoverWhile=next_line_recover}
+
+private common_command ::= comment | PRAGMA | title_def | legend_def | footer_def | header_def | skinparam_def
+  | minwidth_def | ROTATE | scale_def | hide_show_def | sprite_def | ()
+
+comment ::= ONE_LINE_COMMENT | multi_line_comment
+private multi_line_comment ::= MULTI_LINE_COMMENT_START MULTI_LINE_COMMENT_TEXT* MULTI_LINE_COMMENT_END {pin=1}
+
+title_def ::= (title_multi_line | title_single_line)
+private title_single_line ::= TITLE COLON? text_to_eol {pin=1}
+private title_multi_line ::= TITLE CRLF <<consumeUntil title_end CHAMELEON_TEXT>> title_end {pin=2}
+private title_end ::= END_TITLE | END TITLE
+
+alignment ::= LEFT | RIGHT | CENTER
+private meta multilineAlignedText ::= <<start>> alignment? CRLF <<consumeUntil (END <<start>> | <<end>>) CHAMELEON_TEXT>> (END <<start>> | <<end>>) {pin=1}
+private meta alignedText ::= alignment? <<start>> ':'? text_to_eol {pin=2}
+private meta multilineAlignedText2 ::= alignment? <<start>> CRLF <<consumeUntil (END <<start>> | <<end>>) CHAMELEON_TEXT>> (END <<start>> | <<end>>) {pin=3}
+private meta singleOrMultilineAlignedText ::= <<multilineAlignedText2 <<start>> <<end>>>> | <<alignedText <<start>>>>
+
+legend_def ::= <<multilineAlignedText (LEGEND) (END_LEGEND)>>
+
+footer_def ::= <<singleOrMultilineAlignedText (FOOTER) (END_FOOTER)>>
+
+header_def ::= <<singleOrMultilineAlignedText (HEADER) (END_HEADER)>>
+
+// TODO: parse name, stereotype and block content
+skinparam_def ::= skinparam_keyword <<consumeUntil (CRLF | '{' | '}') CHAMELEON_TEXT>> skinparam_block? {pin=1}
+private skinparam_keyword ::= SKINPARAM | SKINPARAMLOCKED
+private skinparam_block ::= '{' CRLF skinparam_item* '}' {pin=1}
+private skinparam_item ::= <<consumeUntil (CRLF | '}') CHAMELEON_TEXT>> CRLF
+
+minwidth_def ::= MINWIDTH number {pin=1}
+
+scale_def ::= SCALE (scale_width_and_height | scale_width_and_height_x | scale_width_or_height | scale_fraction) {pin=1}
+private scale_fraction ::= number ('/' number)?
+private scale_width_and_height ::= number ('x' | '*') number {pin=2}
+private scale_width_and_height_x ::= number <<xNumber>> {pin=2}
+private scale_width_or_height ::= number <<space>> (WIDTH | HEIGHT)
+
+hide_show_def ::= (HIDE | SHOW) hide_show_common_rest {pin=1}
+private hide_show_common_rest ::= hide_show_unlinked | hide_show_visibility | hide_show_other
+private hide_show_unlinked ::= UNLINKED {pin=1}
+private hide_show_visibility ::= visibility (',' visibility)* (MEMBERS | ATTRIBUTES | FIELDS | METHODS)? {pin=1}
+private hide_show_other ::= hide_show_gender* EMPTY? (MEMBERS | ATTRIBUTES | FIELDS | METHODS | STEREOTYPES | <<circleAny>>)
+private hide_show_gender ::= CLASS | INTERFACE | ENUM | ANNOTATION | ABSTRACT | !<<circleAny>> dotted_identifier | STRING_LITERAL
+ | stereotype
+private visibility ::= PUBLIC | PRIVATE | PROTECTED | PACKAGE
+
+// TODO: identifier can be $0
+sprite_def ::= SPRITE '$'? IDENTIFIER sprite_dim? sprite_data {pin=1}
+// TODO: replace CHAMELEON_TEXT
+private sprite_dim ::= '[' <<consumeUntil (CRLF | ']') CHAMELEON_TEXT>> ']'
+private sprite_data ::= sprite_multiline_data | text_to_eol
+private sprite_multiline_data ::= '{' CRLF sprite_multiline_item+ '}' {pin=1}
+private sprite_multiline_item ::= <<consumeUntil (CRLF | '}' | END_UML) CHAMELEON_TEXT>> CRLF
+
+
+
+hash_color ::= '#' <<noSpace>> color_component (<<noSpace>> ('-' | '\' | '|' | '/') <<noSpace>> color_component)?
+private color_component ::= number? <<noSpace>> IDENTIFIER | number
+
+// TODO: rule is more complex, see UrlBuilder;
+// TODO: highlight url, make it clickable
+url_element ::= '[[' <<consumeUntil (']]')>> ']]' {pin=1}
+
+
+private sequence_diagram ::= CRLF* sequence_pragma sequence_commands {pin=2}
+private sequence_commands ::= <<command (sequence_command | common_command)>>*
+private sequence_pragma ::= '!pragma syntax sequence' CRLF
+
+private sequence_command ::= s_activate_def | s_participant_def | s_arrow_def | s_note_def | s_box_def | s_grouping_def
+  | s_activate2_def | s_return_def | s_newpage_def | s_ignore_newpage_def | s_autonewpage_def | s_divider_def
+  | s_hspace_def | s_ref_def | s_skin_def | s_autonumber_def | s_autoactivate_def | s_hide_show_def | s_delay_def
+  | s_footbox_def | s_url_def
+
+private dotted_identifier_with_at ::= (IDENTIFIER | '.' | '@') (<<noSpace>> (IDENTIFIER | '.' | '@'))*
+
+s_activate_def ::= activate_keyword (dotted_identifier_with_at | STRING_LITERAL) hash_color? {pin=1}
+private activate_keyword ::= ACTIVATE | DEACTIVATE | DESTROY | CREATE
+
+s_participant_def ::= (CREATE? participant_type | CREATE) participant_text_and_alias stereotype? url_element? hash_color? {pin=1}
+private participant_type ::= PARTICIPANT | ACTOR | BOUNDARY | CONTROL | ENTITY | DATABASE
+private participant_text_and_alias ::= dotted_identifier_with_at AS STRING_LITERAL | ((STRING_LITERAL | dotted_identifier_with_at) AS)? dotted_identifier_with_at | STRING_LITERAL
+
+s_arrow_def ::= exo_arrow_definition | simple_arrow_definition
+
+s_participant_with_alias ::= dotted_identifier_with_at (AS STRING_LITERAL)? | STRING_LITERAL (AS dotted_identifier_with_at)?
+s_participant ::= dotted_identifier_with_at | STRING_LITERAL
+private arrow_dressing_and_body ::= (arrow_dressing_left <<noSpace>>)? arrow_body_and_style (<<noSpace>> arrow_dressing_right)?
+private arrow ::= (('o' | 'x') <<noSpace>>)? arrow_dressing_and_body (<<noSpace>> ('o' | 'x'))?
+private arrow_dressing_left ::= '<<' | '\\' | '//' | '<' | '\' | '/'
+private arrow_dressing_right ::= '>>' | '\\' | '//' | '>' | '\' | '/'
+private arrow_body_and_style ::= '-' (<<noSpace>> '-')* (<<noSpace>> arrow_style_list)? (<<noSpace>> '-')* | arrow_style_list (<<noSpace>> '-')+
+// TODO: for some reason spaces are allowed after '[' and before ']'
+private arrow_style_list ::= '[' <<noSpace>> arrow_style (<<noSpace>> ',' <<noSpace>> arrow_style)* <<noSpace>> ']' {pin=1}
+private arrow_style ::= hash_color | DOTTED | DASHED | BOLD | HIDDEN
+private arrow_activation ::= ('+' | '*' | '!' | '-')*
+
+private simple_arrow_definition ::= s_participant_with_alias arrow s_participant_with_alias arrow_activation? hash_color? (':' <<consumeUntil crlf CHAMELEON_TEXT>>)? {pin=2}
+// !(!CRLF)) is a look-ahead, could not find another way to check if it's end of line without capturing eol
+private exo_arrow_definition ::= (left_exo_arrow_definition | right_exo_arrow_definition) !(!CRLF)
+// TODO: arrow_dressing_and_body does not work for exo, need at least one dressing
+private left_exo_arrow_definition ::= (('?' | '[') 'o'?)? arrow_dressing_and_body 'o'? s_participant (':' text_to_eol)? {pin=2}
+private right_exo_arrow_definition ::= s_participant 'o'? arrow_dressing_and_body ('o'? ('?' | ']'))? (':' text_to_eol)?
+
+s_note_def ::= s_note1_definition | s_note_participant_definition
+private s_note1_definition ::= NOTE (s_note_arrow_sl_rest | s_note_arrow_ml_rest | s_note_participant_sl_rest | s_note_participant_ml_rest) {pin=1}
+private s_note_participant_definition ::= '/'? (NOTE | HNOTE | RNOTE) (s_note_participant_sl_rest | s_note_participant_ml_rest) {pin=2}
+private s_note_participant_sl_rest ::= s_note_pos_part_info ':' text_to_eol {pin=2}
+private s_note_participant_ml_rest ::= s_note_pos_part_info CRLF s_note_part_body_and_end {pin=2}
+private s_note_pos_part_info ::= s_note_position OF? s_participant (',' s_participant)? hash_color?
+private s_note_part_body_and_end ::= <<consumeUntil (s_rh_note_end | END_UML) CHAMELEON_TEXT>> s_rh_note_end
+private s_note_position ::= (RIGHT | LEFT | OVER)
+private s_rh_note_end ::= note_end | END (HNOTE | RNOTE) | END_HNOTE | END_RNOTE
+private note_end ::= END NOTE | END_NOTE
+private s_note_arrow_sl_rest ::= (RIGHT | LEFT) hash_color? ':' text_to_eol {pin=3}
+private s_note_arrow_ml_rest ::= (RIGHT | LEFT) hash_color? CRLF <<consumeUntil (note_end | END_UML) CHAMELEON_TEXT>> note_end {pin=3}
+
+s_box_def ::= BOX STRING_LITERAL? hash_color? CRLF ((sequence_command | common_command) CRLF)* (END BOX | END_BOX) {pin=1}
+
+s_grouping_def ::= group_keyword (<<noSpace>> hash_color)? hash_color? text_to_eol CRLF ((sequence_command | common_command) CRLF)* group_else_block* END {pin=1}
+private group_keyword ::= OPT | ALT | LOOP | PAR | PAR2 | BREAK | CRITICAL | GROUP
+private group_else_block ::= (ELSE | ALSO) hash_color? text_to_eol CRLF ((sequence_command | common_command) CRLF)* {pin=1}
+
+s_activate2_def ::= dotted_identifier_with_at ('++' | '--')
+
+s_return_def ::= RETURN text_to_eol {pin=1}
+
+s_newpage_def ::= NEWPAGE ':'? text_to_eol {pin=1}
+s_ignore_newpage_def ::= (IGNORE NEWPAGE | IGNORE_NEWPAGE) {pin=1}
+s_autonewpage_def ::= AUTONEWPAGE number {pin=1}
+
+s_divider_def ::= '==' <<consumeUntil ('==' | CRLF) CHAMELEON_TEXT>> '==' {pin=2}
+
+s_hspace_def ::= '||' number? '|'+ {pin=2}
+
+// TODO: url is not the same as in other places
+s_ref_def ::= REF (<<noSpace>> hash_color)? OVER s_participant (',' s_participant)* (s_ref_sl_rest | s_ref_ml_rest) {pin=1}
+private s_ref_sl_rest ::= ':' url_element? text_to_eol {pin=1}
+// TODO: this color is commented out in CommandReferenceMultilinesOverSeveral - check why, warn user
+private s_ref_ml_rest ::= hash_color? CRLF <<consumeUntil (END REF | END_REF | END_UML) CHAMELEON_TEXT>> (END REF | END_REF) {pin=2}
+
+// TODO: can validate with SkinUtils.loadSkin. Don't display as a string
+s_skin_def ::= SKIN text_to_eol {pin=1}
+
+s_autonumber_def ::= AUTONUMBER number? number? STRING_LITERAL? {pin=1}
+
+s_autoactivate_def ::= AUTOACTIVATE (ON | OFF) {pin=1}
+
+s_hide_show_def ::= (HIDE | SHOW) (FOOTBOX | hide_show_common_rest) {pin=1}
+
+s_delay_def ::= ellipsis (<<consumeUntil (ellipsis | CRLF) CHAMELEON_TEXT>> ellipsis)? {pin=1}
+private ellipsis ::= '...' | '…'
+
+// TODO: this is probably deprecated, warn?
+s_footbox_def ::= FOOTBOX (ON | OFF) {pin=1}
+
+s_url_def ::= URL (OF | FOR)? s_participant IS? url_element {pin=1}
+
+
+
+private component_diagram ::= CRLF* component_pragma component_commands {pin=2}
+private component_commands ::= <<command (component_command | common_command)>>*
+private component_pragma ::= '!pragma syntax component' CRLF
+
+private component_command ::= hide_show_footbox_def | d_namespaceseparator_def | rank_dir_def | NEWPAGE | page_def
+  | d_link_def | d_package_usymbol_def | d_note_def | d_url_def | d_create_element_multiline_def | d_create_element_def
+
+// TODO: no space
+private dotted_identifier ::= (IDENTIFIER | '.')+
+// TODO: this may break with quotes inside
+colon_literal ::= ':' <<consumeUntil (':' | CRLF) CHAMELEON_TEXT>> ':' {pin=1}
+bracket_literal ::= '[' <<consumeUntil ('[' | ']' | CRLF) CHAMELEON_TEXT>> ']' {pin=1}
+paren_literal ::= '(' <<consumeUntil (')' | CRLF) CHAMELEON_TEXT>> ')' {pin=1}
+
+hide_show_footbox_def ::= (HIDE | SHOW) FOOTBOX {pin=1}
+
+d_namespaceseparator_def ::= SET NAMESPACESEPARATOR text_to_eol {pin=1}
+
+rank_dir_def ::= (LEFT TO RIGHT | TOP TO BOTTOM) DIRECTION {pin=1}
+
+// TODO: spaces around 'x' are not required
+page_def ::= PAGE DIGITS 'x' DIGITS
+
+d_link_def ::= d_link_group STRING_LITERAL? d_link_arrow STRING_LITERAL? d_link_group (':' text_to_eol)? {pin=3}
+private d_link_arrow ::= (d_link_head2 <<noSpace>>)? body (<<noSpace>> body)*  (<<noSpace>> arrow_style_list)?
+  (<<noSpace>> direction <<noSpace>> !(!body))? (<<noSpace>> inside)? (<<noSpace>> arrow_style_list)? (<<noSpace>> body)*
+  (<<noSpace>> d_link_head1)?
+// TODO: this is very similar to d_entity + stereotype
+private d_link_group ::= ('()'? dotted_identifier | '()' STRING_LITERAL | colon_literal | !'[*]' bracket_literal
+  | !'(*)' paren_literal) stereotype?
+private d_link_head2 ::= '0)' | '<<' | '<' | '^' | '*' | '+' | '#' | '0' | ')' | '<|' | 'o'
+private d_link_head1 ::= '(0' | '>>' | '>' | '^' | '*' | '+' | '#' | '0' | '(' | '|>' | 'o'
+private body ::= '-' | '=' | '.' | '~'
+private direction ::= LEFT | RIGHT | UP | DOWN | 'le' | 'ri' | 'do' | 'l' | 'r' | 'u' | 'd'
+private inside ::= ('0' | '(0)' | '(0' | '0)') <<noSpace>> !(!body)
+
+// TODO: consume until space
+d_package_usymbol_def ::= usymbol d_package_name? (AS dotted_identifier)? stereotype?
+   url_element? hash_color? '{' CRLF ((component_command | common_command) CRLF)* '}'
+private usymbol ::= ARTIFACT | CARD | CLOUD | COMPONENT | DATABASE | FOLDER | FRAME | NODE | PACKAGE | RECTANGLE | STORAGE
+private d_package_name ::= STRING_LITERAL | <<consumeToken (!'#' !'{' !'}' !CRLF)>> <<consumeUntil ('#' | '{' | '}' | <<space>>)>>
+
+d_note_def ::= NOTE (AS dotted_identifier hash_color? d_note_ml_rest | d_note_positioned_rest | d_note_string_rest) {pin=1}
+private d_note_ml_rest ::= CRLF <<consumeUntil (note_end | END_UML) CHAMELEON_TEXT>> note_end {pin=1}
+private d_note_positioned_rest ::= d_note_positioned_link_rest | d_note_positioned_entity_rest
+private d_note_positioned_link_rest ::= d_note_position? ON LINK hash_color? (d_note_sl_rest | d_note_ml_rest) {pin=2}
+private d_note_positioned_entity_rest ::= d_note_position (OF d_entity)? hash_color? (d_note_sl_rest | d_note_positioned_ml_rest) {pin=1}
+private d_note_sl_rest ::= ':' text_to_eol {pin=1}
+private d_note_positioned_ml_rest ::= d_note_positioned_ml_brace_rest | d_note_ml_rest
+private d_note_positioned_ml_brace_rest ::= '{' CRLF <<consumeUntil (CRLF '}' | END_UML) CHAMELEON_TEXT>> CRLF '}' {pin=1}
+private d_note_string_rest ::= STRING_LITERAL AS dotted_identifier hash_color? {pin=1}
+private d_note_position ::= RIGHT | LEFT | TOP | BOTTOM
+private d_entity ::= '()'? dotted_identifier | '()'? STRING_LITERAL | colon_literal | bracket_literal | !'(*)' paren_literal
+
+// TODO: there is a subtle difference from s_url_def, identifier can't contain "@"
+private d_url_def ::= s_url_def
+
+d_create_element_def ::= d_symbol? d_code stereotype? url_element? hash_color?
+private d_symbol ::= ACTOR | AGENT | ARTIFACT | BOUNDARY | CLOUD | COMPONENT | CONTROL | DATABASE | ENTITY | FOLDER | FRAME
+  | INTERFACE | NODE | PACKAGE | RECTANGLE | STORAGE | USECASE | '()'
+private d_code ::= d_code_core stereotype? AS d_display | (d_display | dotted_identifier) stereotype? AS d_code_core | d_code_core | STRING_LITERAL
+// TODO: similar to d_entity
+private d_code_core ::= '()'? dotted_identifier | '()' STRING_LITERAL | colon_literal | paren_literal | bracket_literal
+private d_display ::= STRING_LITERAL | colon_literal | paren_literal | bracket_literal
+
+d_create_element_multiline_def ::= (USECASE | DATABASE) dotted_identifier stereotype? hash_color?
+  AS '"' <<consumeUntil ('"' CRLF | END_UML) CHAMELEON_TEXT>> '"' {pin=6}
+
+
+
+
+private class_diagram ::= CRLF* class_pragma <<class_commands (END_UML)>> {pin=2}
+private meta class_commands ::= <<command (!<<end>> (class_command | common_command))>>*
+private class_pragma ::= '!pragma syntax class' CRLF
+
+private class_command ::= rank_dir_def | page_def | c_add_method_def | c_note_def | c_package_def | c_namespace_def
+  | c_link_class_def | c_class_def | c_link_lollipop_def | c_stereotype_def | c_import_def | c_url_def| c_diamond_def
+  | c_mouseover_def | c_hide_show_def | c_namespaceseparator_def
+
+c_add_method_def ::= (dotted_identifier | STRING_LITERAL) ':' text_to_eol
+
+c_class_def ::= c_class_def_ | c_annotation_def
+private c_class_def_ ::= c_keyword c_class_rest c_class_body? {pin=1}
+// this is separate because it can't be multiline
+private c_annotation_def ::= ANNOTATION c_class_rest {pin=1}
+private c_class_rest ::= c_clas_def_name c_generic? stereotype? url_element? hash_color? c_line_color? c_extends? c_implements?
+private c_keyword ::= INTERFACE | ENUM | ABSTRACT CLASS | ABSTRACT | CLASS
+// TODO: rename these
+private c_clas_def_name ::= (STRING_LITERAL AS c_code) | (c_code AS STRING_LITERAL) | c_code | STRING_LITERAL
+private c_code ::= <<consumeToken (!'{' !'}' !STRING_LITERAL !'"' !'<' !'>' !CRLF !END_UML)>> (<<noSpace>> <<consumeToken (!'{' !'}' !STRING_LITERAL !'"' !'<' !'>' !CRLF !END_UML)>>)*
+private c_generic ::= !'<<' '<' c_generic_pattern '>' {pin=2}
+private c_generic_pattern ::= (<<consumeToken (!'<' !'>' !CRLF !END_UML)>> | '<' c_generic_pattern '>')*
+// TODO: IDENTIFIER -> \w+
+private c_line_color ::= '##' (<<noSpace>> '[' <<noSpace>> (DOTTED | DASHED | BOLD) <<noSpace>> ']')? (<<noSpace>> IDENTIFIER)? {pin=1}
+private c_extends ::= EXTENDS c_class_list {pin=1}
+private c_implements ::= IMPLEMENTS c_class_list {pin=1}
+private c_class_list ::= c_class_with_namespace (',' c_class_with_namespace)*
+private c_class_with_namespace ::= ('.' | '::')? <<noSpace>> IDENTIFIER (<<noSpace>> ('.' | '::') <<noSpace>> IDENTIFIER)*
+// TODO: parse members
+private c_class_body ::= '{' !(!CRLF) <<consumeUntil (CRLF '}' | END_UML)>> CRLF '}' {pin=1}
+
+c_note_def ::= NOTE (c_note_sl_rest | c_note_ml_rest | c_note_ent_rest | c_note_link_rest) {pin=1}
+private c_note_sl_rest ::= STRING_LITERAL AS dotted_identifier hash_color?
+private c_note_ml_rest ::= AS dotted_identifier hash_color? c_note_ml_text_rest {pin=1}
+// TODO: reusing d_note_position
+private c_note_ent_rest ::= d_note_position (OF (c_code | STRING_LITERAL))? hash_color? (c_note_sl_text_rest | c_note_ent_ml_rest)
+private c_note_sl_text_rest ::= ':' text_to_eol {pin=1}
+private c_note_ent_ml_rest ::= c_note_ml_curly_text_rest | c_note_ml_text_rest
+private c_note_ml_curly_text_rest ::= '{' CRLF <<consumeUntil ('}' | END_UML) CHAMELEON_TEXT>> '}' {pin=1}
+private c_note_ml_text_rest ::= CRLF <<consumeUntil (note_end | END_UML) CHAMELEON_TEXT>> note_end {pin=1}
+private c_note_link_rest ::= d_note_position? ON LINK hash_color? (c_note_sl_text_rest | c_note_ml_text_rest) {pin=2}
+
+// TODO: reusing d_package_name here
+c_package_def ::= PACKAGE d_package_name (AS dotted_identifier)? (c_package_rest | c_empty_package_rest) {pin=1}
+private c_package_rest ::= stereotype? url_element? hash_color? '{' CRLF <<class_commands '}'>> '}' {pin=5}
+private c_empty_package_rest ::= hash_color? '{' '}'
+
+private namespace_identifier ::= IDENTIFIER (<<noSpace>> (IDENTIFIER | '.' | ':'))*
+
+c_namespace_def ::= NAMESPACE namespace_identifier stereotype? hash_color? '{' CRLF <<class_commands '}'>> '}' {pin=1}
+
+c_stereotype_def ::= (dotted_identifier | STRING_LITERAL) stereotype?
+
+c_link_class_def ::= ('@' number)? c_ent_or_couple STRING_LITERAL? c_arrow (STRING_LITERAL c_ent_or_couple | c_ent_or_couple) (':' text_to_eol)? {pin=4}
+private c_ent_or_couple ::= <<c_entity ('.' | '::')>> | c_couple
+private meta c_entity ::= (INTERFACE | ENUM | ANNOTATION | ABSTRACT CLASS | ABSTRACT | CLASS)? (<<c_identifier <<separator>>>> | STRING_LITERAL) stereotype?
+private c_couple ::= '(' <<c_identifier ('.')>> ',' <<c_identifier ('.')>> ')'
+private meta c_identifier ::= (<<separator>> noSpace)? IDENTIFIER (noSpace <<separator>> noSpace IDENTIFIER)*
+// TODO: fix
+private c_arrow ::= (c_arrow_head_left <<noSpace>>)? c_arrow_body (<<noSpace>> arrow_style_list)? (<<noSpace>> direction)? (<<noSpace>> c_arrow_body)? (<<noSpace>> c_arrow_head_right)?
+private c_arrow_head_left ::= '<|' | '[|' | 'o' | '[' | '<' | '*' | '+' | '^'
+private c_arrow_body ::= ('-' | '=' | '.') (<<noSpace>> ('-' | '=' | '.'))*
+private c_arrow_head_right ::= '|>' | '|]' | 'o' | ']' | '>' | '*' | '+' | '^'
+
+c_link_lollipop_def ::= ('@' number)? <<c_entity ('.')>> STRING_LITERAL? c_lollipop STRING_LITERAL? <<c_entity ('.')>> (':' text_to_eol)? {pin=4}
+private c_lollipop ::= '()' <<noSpace>> c_arrow_body | c_arrow_body <<noSpace>> '()'
+
+c_import_def ::= IMPORT text_to_eol {pin=1}
+
+// these are exactly same
+c_url_def ::= d_url_def
+
+c_diamond_def ::= '<>' dotted_identifier {pin=1}
+
+c_mouseover_def ::= MOUSEOVER (dotted_identifier | STRING_LITERAL) '{' !(!CRLF) <<consumeUntil (CRLF '}' | END_UML) >> CRLF '}' {pin=1}
+
+c_hide_show_def ::= (HIDE | SHOW) (FOOTBOX | hide_show_common_rest | c_code) {pin=1}
+
+c_namespaceseparator_def ::= d_namespaceseparator_def
