@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.7.0</version>
+    <version>1.7.1</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 13+ -->
     <idea-version since-build="133.000"/>
@@ -9,6 +9,10 @@
 
     <change-notes>
         <![CDATA[
+            <p>1.7.1</p>
+            <ul>
+                <li>PlantUml library upgrade to 8025</li>
+            </ul>
             <p>1.7.0</p>
             <ul>
                 <li>included file is automatically saved before rendering</li>
