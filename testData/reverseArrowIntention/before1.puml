@@ -1,0 +1,8 @@
+' "Reverse arrows" "true"
+@startuml
+Alice <caret>-> Bob: Authentication Request
+Bob -<caret>-> Alice: Authentication Response
+Bob ---<caret>> Alice: Authentication Response
+Alice -<caret>- Bob: Another authentication Request
+Alice <--<caret> Bob: another authentication Response
+@enduml

@@ -82,11 +82,17 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <intentionAction>
+          <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>
+          <category>plantuml4idea</category>
+        </intentionAction>
+        
         <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
                     factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
         <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
+        <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
         <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
