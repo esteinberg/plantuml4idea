@@ -19,11 +19,12 @@ public class Arrow {
     public Arrow invoke() {
         if (caretWithinCharArray()) {
             if (isArrowCharAtCaret()) {
+                //traverse right to find the end
                 for (int i = caretOffset; i < chars.length; i++) {
                     if (!processPosition(i)) break;
                 }
             }
-            //we are on the right edge of the arrow
+            //traverse left to find the second end
             if (arrowEndsNotFound() && previousCharIsNotWhitespace()) {
                 for (int i = caretOffset - 1; i >= 0; i--) {//must step one char left, for cases when we are on far right edge 
                     if (!processPosition(i)) break;
