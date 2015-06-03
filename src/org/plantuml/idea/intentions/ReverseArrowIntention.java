@@ -89,7 +89,7 @@ public class ReverseArrowIntention extends BaseIntentionAction {
                 logger.debug("result: isArrow=" + arrow.isValidArrow() + ", end1=" + end1 + ",end2=" + end2);
             }
 
-            if (!validateOnly) {
+            if (!validateOnly && arrow.isValidArrow()) {
                 char[] reverse = ArrowUtils.cutArrowAndReverse(chars, end1, end2);
                 document.replaceString(lineStartOffset + end1, lineStartOffset + end2 + 1, new String(reverse));
             }
