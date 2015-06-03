@@ -1,8 +1,12 @@
 ' "Reverse arrows" "true"
 @startuml
+
 Alice <-    Bob: foo
 Alice <--   Bob: foo
 Alice <---  Bob: foo
+
+          
 Alice --    Bob: foo
 Alice -->   Bob: foo
+
 @enduml

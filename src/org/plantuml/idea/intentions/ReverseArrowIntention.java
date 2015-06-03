@@ -3,7 +3,6 @@ package org.plantuml.idea.intentions;
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -29,32 +28,48 @@ public class ReverseArrowIntention extends BaseIntentionAction {
     }
 
     @Override
-    public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
+    public boolean isAvailable(@NotNull Project project, final Editor editor, PsiFile file) {
         if (!file.getFileType().equals(PlantUmlFileType.PLANTUML_FILE_TYPE)) return false;
-
-        return new ReverseArrowCommand(editor).invoke(true);
+        boolean available = false;
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+            if (caret.isValid()) {
+                available = new ReverseArrowCommand(editor, caret).isAvailable();
+                if (available) {
+                    break;
+                }
+            }
+        }
+        return available;
     }
 
     @Override
     public void invoke(@NotNull Project project, final Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        editor.getCaretModel().runForEachCaret(new CaretAction() {
-            @Override
-            public void perform(Caret caret) {
-                new ReverseArrowCommand(editor).invoke(false);
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+            if (caret.isValid()) {
+                new ReverseArrowCommand(editor, caret).invoke();
             }
-        });
+        }
     }
 
     private class ReverseArrowCommand {
         private Editor editor;
+        private Caret caret;
 
-        public ReverseArrowCommand(Editor editor) {
+        public ReverseArrowCommand(Editor editor, Caret caret) {
             this.editor = editor;
+            this.caret = caret;
         }
 
-        public boolean invoke(boolean validateOnly) {
-            Caret currentCaret = editor.getCaretModel().getCurrentCaret();
-            int caretOffset = currentCaret.getOffset();
+        public boolean isAvailable() {
+            return invoke(true);
+        }
+
+        public boolean invoke() {
+            return invoke(false);
+        }
+
+        private boolean invoke(boolean validateOnly) {
+            int caretOffset = caret.getOffset();
             Document document = editor.getDocument();
             int lineNumber = document.getLineNumber(caretOffset);
             int lineStartOffset = document.getLineStartOffset(lineNumber);

@@ -1,8 +1,12 @@
 ' "Reverse arrows" "true"
-@startuml
+<caret>@startuml<caret>
+
 Alice <caret>->    Bob: foo
 Alice -<caret>->   Bob: foo
 Alice ---<caret>>  Bob: foo
+<caret>
+          <caret>
 Alice -<caret>-    Bob: foo
 Alice <--<caret>   Bob: foo
-@enduml
+
+<caret>@enduml<caret>
