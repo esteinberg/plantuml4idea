@@ -1,4 +1,4 @@
-package org.plantuml.idea.intention;
+package org.plantuml.idea.intentions;
 
 import org.junit.Test;
 import org.plantuml.idea.intentions.Arrow;
