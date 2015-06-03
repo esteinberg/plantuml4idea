@@ -83,15 +83,15 @@ public class ReverseArrowIntention extends BaseIntentionAction {
             }
 
             Arrow arrow = new Arrow(textOffset, chars).invoke();
-            int end1 = arrow.getStart();
-            int end2 = arrow.getEnd();
+            int start = arrow.getStart();
+            int end = arrow.getEnd();
             if (logger.isDebugEnabled()) {
-                logger.debug("result: isArrow=" + arrow.isValidArrow() + ", end1=" + end1 + ",end2=" + end2);
+                logger.debug("result: isArrow=" + arrow.isValidArrow() + ", start=" + start + ",end=" + end);
             }
 
             if (!validateOnly && arrow.isValidArrow()) {
-                char[] reverse = ArrowUtils.cutArrowAndReverse(chars, end1, end2);
-                document.replaceString(lineStartOffset + end1, lineStartOffset + end2 + 1, new String(reverse));
+                char[] reverse = ArrowUtils.cutArrowAndReverse(chars, start, end);
+                document.replaceString(lineStartOffset + start, lineStartOffset + end + 1, new String(reverse));
             }
             return arrow.isValidArrow();
         }

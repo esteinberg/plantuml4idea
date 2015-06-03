@@ -20,8 +20,8 @@ public class ArrowUtils {
     /**
      * return only the arrow
      */
-    public static char[] cutArrowAndReverse(char[] chars, int end1, int end2) {
-        char[] subarray = ArrayUtils.subarray(chars, end1, Math.min(end2 + 1, chars.length));
+    public static char[] cutArrowAndReverse(char[] chars, int start, int end) {
+        char[] subarray = ArrayUtils.subarray(chars, start, Math.min(end + 1, chars.length));
         ArrayUtils.reverse(subarray);
         for (int i = 0; i < subarray.length; i++) {
             subarray[i] = reverseArrowChar(subarray[i]);
