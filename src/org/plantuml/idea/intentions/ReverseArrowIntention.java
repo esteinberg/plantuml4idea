@@ -18,7 +18,7 @@ public class ReverseArrowIntention extends BaseIntentionAction {
     @NotNull
     @Override
     public String getFamilyName() {
-        return "Reverse arrows";
+        return "Reverse arrow";
     }
 
     @NotNull

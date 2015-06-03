@@ -84,7 +84,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <intentionAction>
           <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>
-          <category>plantuml4idea</category>
+          <category>plantuml4idea plugin</category>
         </intentionAction>
         
         <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
