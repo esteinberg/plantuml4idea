@@ -1,10 +1,15 @@
 package org.plantuml.idea.intentions;
 
+import java.util.Arrays;
+
 public class Arrow {
     private int caretOffset;
     private char[] chars;
-    private int end1 = -1;
-    private int end2 = -1;
+    private int[] ends = new int[]{-1, -1};
+    /**
+     * there are so many types of arrow, lets allow anything which contains - or .
+     */
+    private boolean containsArrowBody;
 
     public Arrow(int caretOffset, char... chars) {
         this.caretOffset = caretOffset;
@@ -12,86 +17,111 @@ public class Arrow {
     }
 
     public Arrow invoke() {
-        if (caretWithinCharArray() && arrowCharAtCaret() || previousIsArrowChar()) {
-            for (int i = caretOffset; i < chars.length; i++) {
-                if (!checkPosition(i)) break;
+        if (caretWithinCharArray()) {
+            if (isArrowCharAtCaret()) {
+                for (int i = caretOffset; i < chars.length; i++) {
+                    if (!processPosition(i)) break;
+                }
             }
-            if (arrowEndsNotFound()) {
+            //we are on the right edge of the arrow
+            if (arrowEndsNotFound() && previousCharIsNotWhitespace()) {
                 for (int i = caretOffset - 1; i >= 0; i--) {//must step one char left, for cases when we are on far right edge 
-                    if (!checkPosition(i)) break;
+                    if (!processPosition(i)) break;
                 }
             }
         }
         return this;
     }
 
-    private boolean checkPosition(int currentPosition) {
-        char currentChar = chars[currentPosition];
-        boolean currentCharIsPartOfArrow = isArrowChar(currentChar);
-        boolean continueTraversing = currentCharIsPartOfArrow;
+    private boolean isArrowCharAtCaret() {
+        char currentChar = chars[caretOffset];
+        return isNotWhitespace(currentChar);
+    }
 
-        if (currentCharIsArrowEdge(currentCharIsPartOfArrow, currentPosition)) {
-            if (end1 == -1) {
-                end1 = currentPosition;
-                continueTraversing = true;
-            } else {
-                end2 = currentPosition;
-                continueTraversing = false;
-            }
+    private boolean processPosition(int position) {
+        char currentChar = chars[position];
+        boolean currentIsNotWhitespace = isNotWhitespace(currentChar);
+
+        boolean continueTraversing = currentIsNotWhitespace; //continue traversing when caret is in middle
+        if (currentIsNotWhitespace && isOnEdge(position)) {
+            continueTraversing = savePosition(position);
+        }
+        if (isArrowBody(currentChar)) {
+            containsArrowBody = true;
         }
         return continueTraversing;
     }
 
-    private boolean currentCharIsArrowEdge(boolean currentCharIsPartOfArrow, int currentPosition) {
-        return currentCharIsPartOfArrow && notInMiddleOfArrow(currentPosition);
+    private boolean savePosition(int position) {
+        boolean continueTraversing;
+        if (ends[0] == -1) {
+            ends[0] = position;
+            continueTraversing = true;
+        } else {
+            ends[1] = position;
+            Arrays.sort(ends);
+            continueTraversing = false;
+        }
+        return continueTraversing;
     }
 
-    private boolean notInMiddleOfArrow(int currentPosition) {
+    private boolean isArrowBody(char currentChar) {
+        return currentChar == '-' || currentChar == '.';
+    }
+
+    private boolean isOnEdge(int currentPosition) {
         char charRight = chars.length > currentPosition + 1 ? chars[currentPosition + 1] : ' ';
         char charLeft = currentPosition - 1 >= 0 ? chars[currentPosition - 1] : ' ';
-        return !(isArrowChar(charLeft) && isArrowChar(charRight));
+        return isWhitespace(charLeft) || isWhitespace(charRight);
+    }
+
+
+    private boolean isNotWhitespace(char currentChar) {
+        return currentChar != ' ';
+    }
+
+    private boolean isWhitespace(char currentChar) {
+        return currentChar == ' ';
     }
 
     private boolean arrowEndsNotFound() {
-        return end1 == -1 || end2 == -1;
+        return ends[0] == -1 || ends[1] == -1;
     }
 
-    private boolean arrowCharAtCaret() {
-        return isArrowChar(chars[caretOffset]);
-    }
-
-    private boolean previousIsArrowChar() {
-        return caretOffset > 0 && isArrowChar(chars[caretOffset - 1]);
+    private boolean previousCharIsNotWhitespace() {
+        return caretOffset > 0 && isNotWhitespace(chars[caretOffset - 1]);
     }
 
     private boolean caretWithinCharArray() {
         return chars.length > caretOffset;
     }
 
-    private boolean isArrowChar(char aChar) {
-        return isArrowEndpoint(aChar) || isMiddleOfArrow(aChar);
-    }
-
-    private boolean isArrowEndpoint(char c) {
-        return c == '<' || c == '>';
-    }
-
-    private boolean isMiddleOfArrow(char c) {
-        return c == '-' || c == '.';
-    }
-
-    public int getEnd1() {
-        return end1;
-    }
-
-    public int getEnd2() {
-        return end2;
-    }
-
     public boolean isValidArrow() {
         if (arrowEndsNotFound()) {
             return false;
         }
-        return isArrowEndpoint(chars[end1]) || isArrowEndpoint(chars[end2]);
+        if (!containsArrowBody) {
+            return false;
+        }
+        return !(isArrowBody(chars[ends[0]]) && isArrowBody(chars[ends[1]]));
+    }
+
+    public int getStart() {
+        return ends[0];
+    }
+
+    public int getEnd() {
+        return ends[1];
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Arrow{");
+        sb.append("caretOffset=").append(caretOffset);
+        sb.append(", chars=").append(Arrays.toString(chars));
+        sb.append(", ends=").append(Arrays.toString(ends));
+        sb.append(", containsArrowBody=").append(containsArrowBody);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -9,18 +9,56 @@ import static org.junit.Assert.*;
 
 public class ArrowTest {
 
+    private static final int[] INVALID_POSITION = new int[]{-1, -1};
+
     @Test
-    public void arrowEndpoints() throws Exception {
-        caretOnPosition(0).of("->        ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(1).of(" ->       ").isArrow().hasEndpointsOn(1, 2);
-        caretOnPosition(2).of("  ->      ").isArrow().hasEndpointsOn(2, 3);
-        caretOnPosition(2).of("->        ").isArrow(true).hasEndpointsOn(0, 1);
-        caretOnPosition(3).of("  ->      ").isArrow(true).hasEndpointsOn(2, 3);
-        caretOnPosition(3).of("  --      ").isArrow(false).hasEndpointsOn(2, 3);
-        caretOnPosition(1).of("  ->      ").isArrow(false).hasEndpointsOn(-1, -1);
-        caretOnPosition(6).of("Alice --> ").isArrow().hasEndpointsOn(6, 8);
+    public void arrowFinding() throws Exception {
+        assertThat("->        ").withCaretOnPosition(0).hasEndpointsOn(0, 1);
+        assertThat(" ->       ").withCaretOnPosition(1).hasEndpointsOn(1, 2);
+        assertThat("->>>>     ").withCaretOnPosition(2).hasEndpointsOn(0, 4);
+        assertThat("  ->      ").withCaretOnPosition(2).hasEndpointsOn(2, 3);
+        assertThat("->        ").withCaretOnPosition(2).hasEndpointsOn(0, 1);
+        assertThat(" <-       ").withCaretOnPosition(3).hasEndpointsOn(1, 2);
+        assertThat("  ->      ").withCaretOnPosition(4).hasEndpointsOn(2, 3);
+        assertThat("  --      ").withCaretOnPosition(3).isNotValidArrow();
+        assertThat("  ->      ").withCaretOnPosition(1).isNotValidArrow();
+        assertThat("Alice --> ").withCaretOnPosition(6).hasEndpointsOn(6, 8);
 
+        //sequence 
+        assertThat("->x       ").hasEndpointsOn(0, 2);
+        assertThat("->>       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("-\\       ").withCaretOnPosition(0).hasEndpointsOn(0, 1);
+        assertThat("\\\\-     ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("//--      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("->o       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("o\\\\--   ").withCaretOnPosition(0).hasEndpointsOn(0, 4);
+        assertThat("<->       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("<->o      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("[->       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("[o->      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("[o->o     ").withCaretOnPosition(0).hasEndpointsOn(0, 4);
+        assertThat("[x->      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("[<-       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("[x<-      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat(" ->]      ").withCaretOnPosition(1).hasEndpointsOn(1, 3);
+        assertThat(" ->o]     ").withCaretOnPosition(1).hasEndpointsOn(1, 4);
+        assertThat(" o->o]    ").withCaretOnPosition(1).hasEndpointsOn(1, 5);
+        assertThat(" ->x]     ").withCaretOnPosition(1).hasEndpointsOn(1, 4);
+        assertThat(" <-]      ").withCaretOnPosition(1).hasEndpointsOn(1, 3);
+        assertThat(" x<-]     ").withCaretOnPosition(1).hasEndpointsOn(1, 4);
+        //class   
+        assertThat("<|--      ").withCaretOnPosition(1).hasEndpointsOn(0, 3);
+        assertThat("*--       ").hasEndpointsOn(0, 2);
+        assertThat("o--       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("..        ").withCaretOnPosition(0).isNotValidArrow();
+        assertThat("--        ").withCaretOnPosition(0).isNotValidArrow();
+        assertThat("<|..      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("-->       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("..>       ").withCaretOnPosition(0).hasEndpointsOn(0, 2);
+        assertThat("..|>      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
+        assertThat("<--*      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
 
+        //carets on all positions
         assertThat("  ->       ").hasEndpointsOn(2, 3);
         assertThat("  -->      ").hasEndpointsOn(2, 4);
         assertThat("  --->     ").hasEndpointsOn(2, 5);
@@ -30,139 +68,84 @@ public class ArrowTest {
         assertThat("  <->      ").hasEndpointsOn(2, 4);
         assertThat("  <-->     ").hasEndpointsOn(2, 5);
         assertThat("  <--->    ").hasEndpointsOn(2, 6);
-        assertThat("  --       ").isArrow(false).hasEndpointsOn(2, 3);
-        assertThat("           ").isArrow(false).hasEndpointsOn(-1, -1);
-
-
-        //sequence todo
-        caretOnPosition(0).of("->x    ").isArrow().hasEndpointsOn(0, 2);
-        caretOnPosition(0).of("->>    ").isArrow().hasEndpointsOn(0, 3);
-        caretOnPosition(0).of("-\\    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("\\\\-  ").isArrow().hasEndpointsOn(0, 2);
-        caretOnPosition(0).of("//--   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("->o    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("o\\\\--").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("<->    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("<->o   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[->    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[o->   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[o->o  ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[x->   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[<-    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("[x<-   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" ->]   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" ->o]  ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" o->o] ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" ->x]  ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" <-]   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of(" x<-]  ").isArrow().hasEndpointsOn(0, 1);
-        //class
-        caretOnPosition(0).of("<|--   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("*--    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("o--    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("..     ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("--     ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("<|..   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("-->    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("..>    ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("..|>   ").isArrow().hasEndpointsOn(0, 1);
-        caretOnPosition(0).of("<--*   ").isArrow().hasEndpointsOn(0, 1);
+        assertThat("  --       ").isNotValidArrow();
+        assertThat("           ").isNotValidArrow();
+        assertThat(" asdasdaas ").isNotValidArrow();
+        assertThat(" <><>><as> ").isNotValidArrow();
     }
 
     private AssertStep assertThat(String s) {
         return new AssertStep(s);
     }
 
-    private AssertStep caretOnPosition(int caretPosition) {
-        return new AssertStep(caretPosition);
-    }
-
     private class AssertStep {
         private int caretPosition = -1;
-        private String string;
-        private Boolean isArrow;
+        private String input;
+        private boolean expectValidArrow;
 
-        public AssertStep(int caretPosition) {
+        public AssertStep(String input) {
+            this.input = input;
+        }
+
+        public AssertStep withCaretOnPosition(int caretPosition) {
             this.caretPosition = caretPosition;
-        }
-
-        public AssertStep(String string) {
-            this.string = string;
-        }
-
-        public AssertStep of(String string) {
-            this.string = string;
             return this;
         }
 
         public AssertStep hasEndpointsOn(int i, int i1) {
-            if (caretPosition != -1) {
-                check(i, i1, caretPosition, isArrow, string, false);
+            expectValidArrow = true;
+            int[] expectedPosition = {i, i1};
+            Arrays.sort(expectedPosition);
+            execute(expectedPosition);
+            return this;
+        }
+
+        public void isNotValidArrow() {
+            expectValidArrow = false;
+            execute(INVALID_POSITION);
+        }
+
+        private void execute(int[] expectedPosition) {
+            if (fixedCaretPosition()) {
+                Arrow arrow = getArrow(caretPosition);
+                validate(expectedPosition, arrow);
             } else {
-                checkAllCaretPositions(i, i1);
-            }
-            return this;
-        }
-
-        private void checkAllCaretPositions(int i, int i1) {
-            for (int j = 0; j < string.length(); j++) {
-                check(i, i1, j, isArrow, string, true);
-            }
-        }
-
-        public AssertStep isArrow() {
-            isArrow = true;
-            return this;
-        }
-
-        public AssertStep isArrow(boolean b) {
-            isArrow = b;
-            return this;
-        }
-    }
-
-    static void check(int expected1, int expected2, int caret, Boolean isArrow, String string, boolean allCarets) {
-        Arrow endpointPosition = new Arrow(caret, string.toCharArray());
-        endpointPosition.invoke();
-
-
-        int[] expecteds = {expected1, expected2};
-        int[] actuals = {endpointPosition.getEnd1(), endpointPosition.getEnd2()};
-        Arrays.sort(expecteds);
-        Arrays.sort(actuals);
-
-        System.err.println("caretOn(" + caret + ").of(\"" + string + "\").isArrow(" + isArrow + ").andHasEndpointsOn(" + expected1 + ", " + expected2 + ");");
-        boolean caretOnArrow = isCaretOnArrow(caret, expecteds);//for all caret check
-        try {
-            if (allCarets) {
-                if (!caretOnArrow) {
-                    assertFalse(endpointPosition.isValidArrow());
-                    assertEquals(-1, actuals[0]);
-                    assertEquals(-1, actuals[1]);
-                } else {
-                    assertArrayEquals(Arrays.toString(expecteds) + " != " + Arrays.toString(actuals), expecteds, actuals);
-                    if (isArrow != null) {
-                        assertEquals(isArrow, endpointPosition.isValidArrow());
+                for (int caretPosition1 = 0; caretPosition1 < input.length(); caretPosition1++) {
+                    Arrow arrow = getArrow(caretPosition1);
+                    if (isCaretOnArrow(caretPosition1, expectedPosition)) {
+                        validate(expectedPosition, arrow);
                     } else {
-                        assertEquals(true, endpointPosition.isValidArrow());
+                        assertFalse(arrow.isValidArrow());
                     }
                 }
-            } else {
-                if (isArrow != null) {
-                    assertEquals(isArrow, endpointPosition.isValidArrow());
-                } else {
-                    assertEquals(true, endpointPosition.isValidArrow());
-                }
-                assertArrayEquals(Arrays.toString(expecteds) + " != " + Arrays.toString(actuals), expecteds, actuals);
             }
-        } catch (AssertionError e) {
-            //for debugging
-            throw e;
         }
+
+        private void validate(int[] expectedPosition, Arrow arrow) {
+            try {
+                assertEquals(arrow.toString(), expectValidArrow, arrow.isValidArrow());
+                if (expectValidArrow) {
+                    int[] actuals = {arrow.getStart(), arrow.getEnd()};
+                    assertArrayEquals(Arrays.toString(expectedPosition) + " != " + Arrays.toString(actuals), expectedPosition, actuals);
+                }
+            } catch (AssertionError e) {
+                //for debugging
+                throw e;
+            }
+        }
+
+        private boolean fixedCaretPosition() {
+            return caretPosition != -1;
+        }
+
+        private Arrow getArrow(int caretPosition) {
+            return new Arrow(caretPosition, input.toCharArray()).invoke();
+        }
+
     }
 
-    private static boolean isCaretOnArrow(int caret, int[] expecteds) {
-        return expecteds[0] <= caret && caret <= expecteds[1] + 1;
+    private static boolean isCaretOnArrow(int caret, int[] expectedPosition) {
+        return expectedPosition[0] <= caret && caret <= expectedPosition[1] + 1;
     }
 
 }

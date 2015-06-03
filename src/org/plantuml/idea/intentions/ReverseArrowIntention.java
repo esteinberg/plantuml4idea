@@ -32,7 +32,7 @@ public class ReverseArrowIntention extends BaseIntentionAction {
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile file) {
         if (!file.getFileType().equals(PlantUmlFileType.PLANTUML_FILE_TYPE)) return false;
 
-        return new ReverseArrow(editor).invoke(true);
+        return new ReverseArrowCommand(editor).invoke(true);
     }
 
     @Override
@@ -40,15 +40,15 @@ public class ReverseArrowIntention extends BaseIntentionAction {
         editor.getCaretModel().runForEachCaret(new CaretAction() {
             @Override
             public void perform(Caret caret) {
-                new ReverseArrow(editor).invoke(false);
+                new ReverseArrowCommand(editor).invoke(false);
             }
         });
     }
 
-    private class ReverseArrow {
+    private class ReverseArrowCommand {
         private Editor editor;
 
-        public ReverseArrow(Editor editor) {
+        public ReverseArrowCommand(Editor editor) {
             this.editor = editor;
         }
 
@@ -68,34 +68,19 @@ public class ReverseArrowIntention extends BaseIntentionAction {
             }
 
             Arrow arrow = new Arrow(textOffset, chars).invoke();
-            int end1 = arrow.getEnd1();
-            int end2 = arrow.getEnd2();
+            int end1 = arrow.getStart();
+            int end2 = arrow.getEnd();
             if (logger.isDebugEnabled()) {
                 logger.debug("result: isArrow=" + arrow.isValidArrow() + ", end1=" + end1 + ",end2=" + end2);
             }
 
             if (!validateOnly) {
-                reverse(chars, end1, end2);
-                document.replaceString(lineStartOffset, lineEndOffset, new String(chars));
+                char[] reverse = ArrowUtils.cutArrowAndReverse(chars, end1, end2);
+                document.replaceString(lineStartOffset + end1, lineStartOffset + end2 + 1, new String(reverse));
             }
             return arrow.isValidArrow();
         }
 
-        private void reverse(char[] chars, int end1, int end2) {
-            char aChar1 = chars[end1];
-            char aChar2 = chars[end2];
-            chars[end1] = reverseArrowPoint(aChar2);
-            chars[end2] = reverseArrowPoint(aChar1);
-        }
-
-        private char reverseArrowPoint(char aChar) {
-            switch (aChar) {
-                case '<':
-                    return '>';
-                case '>':
-                    return '<';
-            }
-            return aChar;
-        }
     }
+
 }

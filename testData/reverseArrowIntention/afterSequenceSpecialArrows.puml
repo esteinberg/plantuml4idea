@@ -1,0 +1,24 @@
+' "Reverse arrows" "true"
+@startuml
+Alice     x<-    Bob   : foo
+Alice     <<-    Bob   : foo
+Alice     //-    Bob   : foo
+Alice     -//    Bob   : foo
+Alice     --\\   Bob   : foo
+Alice     o<-    Bob   : foo
+Alice     --//o  Bob   : foo
+Alice     <->    Bob   : foo
+Alice     o<->   Bob   : foo
+<-]              Alice : foo
+<-o]             Alice : foo
+o<-o]            Alice : foo
+<-x]             Alice : foo
+->]              Alice : foo
+->x]             Alice : foo
+Bob      [<-           : foo
+Bob      [o<-          : foo
+Bob      [o<-o         : foo
+Bob      [x<-          : foo
+Bob      [->           : foo
+Bob      [->x          : foo
+@enduml
