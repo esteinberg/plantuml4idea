@@ -1,4 +1,4 @@
-' "Reverse arrows" "true"
+' "Reverse arrow" "true"
 @startuml
 
 Class01    <caret><|--   Class02

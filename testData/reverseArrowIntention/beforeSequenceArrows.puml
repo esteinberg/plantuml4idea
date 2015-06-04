@@ -1,4 +1,4 @@
-' "Reverse arrows" "true"
+' "Reverse arrow" "true"
 <caret>@startuml<caret>
 
 Alice <caret>->    Bob: foo
