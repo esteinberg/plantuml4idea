@@ -1,0 +1,24 @@
+' "Reverse arrow" "true"
+@startuml
+Alice     <caret>->x    Bob   : foo
+Alice     <caret>->>    Bob   : foo
+Alice     <caret>-\\    Bob   : foo
+Alice     <caret>\\-    Bob   : foo
+Alice     <caret>//--   Bob   : foo
+Alice     <caret>->o    Bob   : foo
+Alice     <caret>o\\--  Bob   : foo
+Alice     <caret><->    Bob   : foo
+Alice     <caret><->o   Bob   : foo
+<caret>[->              Alice : foo
+<caret>[o->             Alice : foo
+<caret>[o->o            Alice : foo
+<caret>[x->             Alice : foo
+<caret>[<-              Alice : foo
+<caret>[x<-             Alice : foo
+Bob      <caret>->]           : foo
+Bob      <caret>->o]          : foo
+Bob      <caret>o->o]         : foo
+Bob      <caret>->x]          : foo
+Bob      <caret><-]           : foo
+Bob      <caret>x<-]          : foo
+@enduml

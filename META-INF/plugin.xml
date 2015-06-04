@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.7.1</version>
+    <version>1.8</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 13+ -->
     <idea-version since-build="133.000"/>
@@ -9,6 +9,11 @@
 
     <change-notes>
         <![CDATA[
+            <p>1.8</p>
+            <ul>
+                <li>Reverse Arrow intention (only for PlantUML file types) - place caret on an arrow; Alt+Enter...</li>
+                <li>Enabled block and line comment actions (only for PlantUML file types)</li>
+            </ul>
             <p>1.7.1</p>
             <ul>
                 <li>PlantUml library upgrade to 8025</li>
@@ -82,11 +87,17 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <intentionAction>
+          <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>
+          <category>plantuml4idea plugin</category>
+        </intentionAction>
+        
         <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
                     factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
         <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
+        <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
         <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
