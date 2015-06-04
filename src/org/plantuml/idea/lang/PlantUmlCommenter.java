@@ -13,13 +13,13 @@ public class PlantUmlCommenter implements Commenter {
     @Nullable
     @Override
     public String getBlockCommentPrefix() {
-        return null;
+        return "/'";
     }
 
     @Nullable
     @Override
     public String getBlockCommentSuffix() {
-        return null;
+        return "'/";
     }
 
     @Nullable
