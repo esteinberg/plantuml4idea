@@ -1,11 +1,13 @@
 package org.plantuml.idea.intentions;
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
+import com.intellij.openapi.application.ex.ApplicationInfoEx;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.BuildNumber;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
@@ -14,6 +16,13 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 
 public class ReverseArrowIntention extends BaseIntentionAction {
     public static final Logger logger = Logger.getInstance(ReverseArrowIntention.class);
+    protected boolean supportsMultiCaret;
+
+    public ReverseArrowIntention() {
+        BuildNumber build = ApplicationInfoEx.getInstanceEx().getBuild();
+        //from 13.1 (135.475)
+        supportsMultiCaret = build.getBaselineVersion() >= 135 && build.getBuildNumber() >= 475;
+    }
 
     @NotNull
     @Override
@@ -30,34 +39,42 @@ public class ReverseArrowIntention extends BaseIntentionAction {
     @Override
     public boolean isAvailable(@NotNull Project project, final Editor editor, PsiFile file) {
         if (!file.getFileType().equals(PlantUmlFileType.PLANTUML_FILE_TYPE)) return false;
-        boolean available = false;
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-            if (caret.isValid()) {
-                available = new ReverseArrowCommand(editor, caret).isAvailable();
-                if (available) {
-                    break;
+        if (supportsMultiCaret) {
+            boolean available = false;
+            for (Caret caret : editor.getCaretModel().getAllCarets()) {
+                if (caret.isValid()) {
+                    available = new ReverseArrowCommand(editor, caret.getOffset()).isAvailable();
+                    if (available) {
+                        break;
+                    }
                 }
             }
+            return available;
+        } else {
+            return new ReverseArrowCommand(editor, editor.getCaretModel().getOffset()).isAvailable();
         }
-        return available;
     }
 
     @Override
     public void invoke(@NotNull Project project, final Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-            if (caret.isValid()) {
-                new ReverseArrowCommand(editor, caret).invoke();
+        if (supportsMultiCaret) {
+            for (Caret caret : editor.getCaretModel().getAllCarets()) {
+                if (caret.isValid()) {
+                    new ReverseArrowCommand(editor, caret.getOffset()).invoke();
+                }
             }
+        } else {
+            new ReverseArrowCommand(editor, editor.getCaretModel().getOffset()).invoke();
         }
     }
 
     private class ReverseArrowCommand {
         private Editor editor;
-        private Caret caret;
+        protected int caretOffset;
 
-        public ReverseArrowCommand(Editor editor, Caret caret) {
+        public ReverseArrowCommand(Editor editor, int caretOffset) {
             this.editor = editor;
-            this.caret = caret;
+            this.caretOffset = caretOffset;
         }
 
         public boolean isAvailable() {
@@ -69,7 +86,6 @@ public class ReverseArrowIntention extends BaseIntentionAction {
         }
 
         private boolean invoke(boolean validateOnly) {
-            int caretOffset = caret.getOffset();
             Document document = editor.getDocument();
             int lineNumber = document.getLineNumber(caretOffset);
             int lineStartOffset = document.getLineStartOffset(lineNumber);
