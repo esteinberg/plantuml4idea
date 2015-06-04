@@ -1,7 +1,6 @@
 package org.plantuml.idea.intentions;
 
 import org.junit.Test;
-import org.plantuml.idea.intentions.Arrow;
 
 import java.util.Arrays;
 
@@ -115,7 +114,7 @@ public class ArrowTest {
                     if (isCaretOnArrow(caretPosition1, expectedPosition)) {
                         validate(expectedPosition, arrow);
                     } else {
-                        assertFalse(arrow.isValidArrow());
+                        assertFalse(arrow.isValid());
                     }
                 }
             }
@@ -123,7 +122,7 @@ public class ArrowTest {
 
         private void validate(int[] expectedPosition, Arrow arrow) {
             try {
-                assertEquals(arrow.toString(), expectValidArrow, arrow.isValidArrow());
+                assertEquals(arrow.toString(), expectValidArrow, arrow.isValid());
                 if (expectValidArrow) {
                     int[] actuals = {arrow.getStart(), arrow.getEnd()};
                     assertArrayEquals(Arrays.toString(expectedPosition) + " != " + Arrays.toString(actuals), expectedPosition, actuals);
@@ -139,7 +138,7 @@ public class ArrowTest {
         }
 
         private Arrow getArrow(int caretPosition) {
-            return new Arrow(caretPosition, input.toCharArray()).invoke();
+            return Arrow.from(caretPosition, input.toCharArray());
         }
 
     }

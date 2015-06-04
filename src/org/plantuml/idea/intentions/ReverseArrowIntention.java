@@ -74,26 +74,26 @@ public class ReverseArrowIntention extends BaseIntentionAction {
             int lineNumber = document.getLineNumber(caretOffset);
             int lineStartOffset = document.getLineStartOffset(lineNumber);
             int lineEndOffset = document.getLineEndOffset(lineNumber);
-            String text = document.getText(TextRange.create(lineStartOffset, lineEndOffset));
-            int textOffset = caretOffset - lineStartOffset;
-            char[] chars = text.toCharArray();
+            String line = document.getText(TextRange.create(lineStartOffset, lineEndOffset));
+            int caretOffsetWithinLine = caretOffset - lineStartOffset;
+            char[] chars = line.toCharArray();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("invoking textOffset=" + textOffset + ", text='" + text + "'");
+                logger.debug("invoking caretOffsetWithinLine=" + caretOffsetWithinLine + ", line='" + line + "'");
             }
 
-            Arrow arrow = new Arrow(textOffset, chars).invoke();
+            Arrow arrow = Arrow.from(caretOffsetWithinLine, chars);
             int start = arrow.getStart();
             int end = arrow.getEnd();
             if (logger.isDebugEnabled()) {
-                logger.debug("result: isArrow=" + arrow.isValidArrow() + ", start=" + start + ",end=" + end);
+                logger.debug("result: isValid=" + arrow.isValid() + ", start=" + start + ", end=" + end);
             }
 
-            if (!validateOnly && arrow.isValidArrow()) {
+            if (!validateOnly && arrow.isValid()) {
                 char[] reverse = ArrowUtils.cutArrowAndReverse(chars, start, end);
                 document.replaceString(lineStartOffset + start, lineStartOffset + end + 1, new String(reverse));
             }
-            return arrow.isValidArrow();
+            return arrow.isValid();
         }
 
     }

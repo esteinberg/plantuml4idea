@@ -11,12 +11,16 @@ public class Arrow {
      */
     private boolean containsArrowBody;
 
-    public Arrow(int caretOffset, char... chars) {
+    public static Arrow from(int caretOffset, char[] chars) {
+        return new Arrow(caretOffset, chars).invoke();
+    }
+
+    private Arrow(int caretOffset, char... chars) {
         this.caretOffset = caretOffset;
         this.chars = chars;
     }
 
-    public Arrow invoke() {
+    private Arrow invoke() {
         if (caretWithinCharArray()) {
             if (isArrowCharAtCaret()) {
                 //traverse right to find the end
@@ -97,7 +101,7 @@ public class Arrow {
         return chars.length > caretOffset;
     }
 
-    public boolean isValidArrow() {
+    public boolean isValid() {
         if (arrowEndsNotFound()) {
             return false;
         }
