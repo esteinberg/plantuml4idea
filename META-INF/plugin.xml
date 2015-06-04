@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.7.1</version>
+    <version>1.8</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 13+ -->
     <idea-version since-build="133.000"/>
@@ -9,6 +9,11 @@
 
     <change-notes>
         <![CDATA[
+            <p>1.8</p>
+            <ul>
+                <li>Reverse Arrow intention (only for PlantUML file types) - place caret on an arrow; Alt+Enter...</li>
+                <li>Enabled block and line comment actions (only for PlantUML file types)</li>
+            </ul>
             <p>1.7.1</p>
             <ul>
                 <li>PlantUml library upgrade to 8025</li>
