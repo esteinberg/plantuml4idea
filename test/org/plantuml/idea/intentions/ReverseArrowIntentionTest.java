@@ -5,6 +5,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
+/**
+ * The first test fails with some SDKs and JDK 1.6 - IDEA-141019
+ * If you get  Invalid home path '...plugins-sandbox/test' then create the 'test' folder
+ */
 public class ReverseArrowIntentionTest extends LightIntentionActionTestCase {
 
     public void test() throws Exception {
