@@ -57,7 +57,6 @@ public class ArrowTest {
         assertThat("..|>      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
         assertThat("<--*      ").withCaretOnPosition(0).hasEndpointsOn(0, 3);
 
-        //carets on all positions
         assertThat("  ->       ").hasEndpointsOn(2, 3);
         assertThat("  -->      ").hasEndpointsOn(2, 4);
         assertThat("  --->     ").hasEndpointsOn(2, 5);
@@ -91,9 +90,9 @@ public class ArrowTest {
             return this;
         }
 
-        public AssertStep hasEndpointsOn(int i, int i1) {
+        public AssertStep hasEndpointsOn(int arrowStart, int arrowEnd) {
             expectValidArrow = true;
-            int[] expectedPosition = {i, i1};
+            int[] expectedPosition = {arrowStart, arrowEnd};
             Arrays.sort(expectedPosition);
             execute(expectedPosition);
             return this;
@@ -108,7 +107,7 @@ public class ArrowTest {
             if (fixedCaretPosition()) {
                 Arrow arrow = getArrow(caretPosition);
                 validate(expectedPosition, arrow);
-            } else {
+            } else { //check every caret position
                 for (int caretPosition1 = 0; caretPosition1 < input.length(); caretPosition1++) {
                     Arrow arrow = getArrow(caretPosition1);
                     if (isCaretOnArrow(caretPosition1, expectedPosition)) {
