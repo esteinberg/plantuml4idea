@@ -9,7 +9,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.AncestorListenerAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
@@ -138,7 +137,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void renderLater() {
-        logger.debug("renderLater ", project.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("renderLater " + project.getName());
+        }
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -275,13 +276,23 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
 
-    class PlantUmlAncestorListener extends AncestorListenerAdapter {
+    class PlantUmlAncestorListener implements AncestorListener {
         private Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);
 
         @Override
         public void ancestorAdded(AncestorEvent ancestorEvent) {
-            logger.debug("ancestorAdded ", project.getName());
+            logger.debug("ancestorAdded " + project.getName());
             renderLater();
+        }
+
+        @Override
+        public void ancestorRemoved(AncestorEvent event) {
+
+        }
+
+        @Override
+        public void ancestorMoved(AncestorEvent event) {
+
         }
 
     }

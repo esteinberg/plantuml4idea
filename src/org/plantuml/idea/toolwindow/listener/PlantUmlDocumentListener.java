@@ -16,7 +16,9 @@ public class PlantUmlDocumentListener implements DocumentListener {
     }
 
     public void documentChanged(DocumentEvent event) {
-        logger.debug("document changed ", event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("document changed " + event);
+        }
         //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
         if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
             Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());

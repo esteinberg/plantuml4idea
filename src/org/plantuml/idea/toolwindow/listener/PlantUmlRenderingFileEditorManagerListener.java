@@ -12,15 +12,21 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
     private static Logger logger = Logger.getInstance(PlantUmlRenderingFileEditorManagerListener.class);
 
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-        logger.debug("file opened ", file);
+        if (logger.isDebugEnabled()) {
+            logger.debug("file opened " + file);
+        }
     }
 
     public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-        logger.debug("file closed = ", file);
+        if (logger.isDebugEnabled()) {
+            logger.debug("file closed " + file);
+        }
     }
 
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        logger.debug("selection changed", event);
+        if (logger.isDebugEnabled()) {
+            logger.debug("selection changed " + event);
+        }
         UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject());
     }
 }

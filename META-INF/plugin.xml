@@ -2,8 +2,8 @@
     <name>PlantUML integration</name>
     <version>1.8</version>
     <vendor>Eugene Steinberg</vendor>
-    <!-- IJ 13+ -->
-    <idea-version since-build="133.000"/>
+    <!-- IJ 12+ -->
+    <idea-version since-build="129.000"/>
 
     <description>PlantUML diagramming tool integration</description>
 
