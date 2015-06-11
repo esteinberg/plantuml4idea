@@ -1,25 +1,20 @@
 package org.plantuml.idea.plantuml;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.util.ui.UIUtil;
 import net.sourceforge.plantuml.*;
-import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.preproc.Defines;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
 
 /**
  * @author Eugene Steinberg
@@ -80,7 +75,7 @@ public class PlantUml {
             if (baseDir != null) {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
-            commitIncludes(source, baseDir);
+            PlantUmlIncludes.commitIncludes(source, baseDir);
 
             return doRender(source, format, page, zoom);
         } finally {
@@ -107,7 +102,7 @@ public class PlantUml {
             if (baseDir != null) {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
-            commitIncludes(source, baseDir);
+            PlantUmlIncludes.commitIncludes(source, baseDir);
             SourceStringReader reader = new SourceStringReader(source);
 
             List<BlockUml> blocks = reader.getBlocks();
@@ -192,52 +187,6 @@ public class PlantUml {
             UmlDiagram umlDiagram = (UmlDiagram) diagram;
             umlDiagram.setScale(new ScaleSimple(zoom / 100f));
         }
-    }
-
-    public static void commitIncludes(String source, @Nullable File baseDir) {
-        try {
-            if (baseDir != null) {
-                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir);
-                final Set<File> includedFiles = blockUmlBuilder.getIncludedFiles();
-                if (!includedFiles.isEmpty()) {
-                    saveModifiedFiles(includedFiles);
-                }
-            }
-        } catch (IOException e) {
-            logger.error(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
-        }
-    }
-
-    private static void saveModifiedFiles(final Set<File> files) {
-        UIUtil.invokeAndWaitIfNeeded(new Runnable() {
-            @Override
-            public void run() {
-                FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-                Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
-                for (Document unsavedDocument : unsavedDocuments) {
-                    fileDocumentManager.saveDocument(unsavedDocument);
-                }
-            }
-        });
-    }
-
-    @NotNull
-    private static Set<Document> getUnsavedDocuments(Set<File> files, FileDocumentManager fileDocumentManager) {
-        VirtualFileManager virtualFileManager = VirtualFileManager.getInstance();
-        Set<Document> unsavedDocuments = new HashSet<Document>();
-        for (File file : files) {
-            VirtualFile virtualFile = virtualFileManager.findFileByUrl("file://" + file.getAbsolutePath());
-            if (virtualFile != null) {
-                // allowed from event dispatch thread or inside read-action only
-                Document document = fileDocumentManager.getDocument(virtualFile);
-                if (document != null) {
-                    if (fileDocumentManager.isDocumentUnsaved(document)) {
-                        unsavedDocuments.add(document);
-                    }
-                }
-            }
-        }
-        return unsavedDocuments;
     }
 
 

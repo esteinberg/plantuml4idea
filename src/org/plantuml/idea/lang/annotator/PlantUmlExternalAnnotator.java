@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlIncludes;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         try {
             File baseDir = new File(file.getVirtualFile().getParent().getPath());
             FileSystem.getInstance().setCurrentDir(baseDir);
-            PlantUml.commitIncludes(source, baseDir);
+            PlantUmlIncludes.commitIncludes(source, baseDir);
             return SyntaxChecker.checkSyntax(source);
         } finally {
             FileSystem.getInstance().reset();
