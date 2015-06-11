@@ -12,6 +12,7 @@
             <p>1.8</p>
             <ul>
                 <li>PlantUml library upgrade to 8026</li>
+                <li>Compatible with IntelliJ 12</li>
                 <li>Reverse Arrow intention (only for PlantUML file types) - place caret on an arrow; Alt+Enter...</li>
                 <li>Enabled block and line comment actions (only for PlantUML file types)</li>
             </ul>
