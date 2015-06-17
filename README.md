@@ -29,6 +29,14 @@ Contributors:
 
 # Developer notes
 
+There are following branches:
+
+### master
+* Contains new experimental syntax support
 * Grammar classes can be generated using tools/grammar-gen.sh
 * This script can run automatically when you run the plugin using "Plugin" Run/Debug confuguration. Just add the script
- above as an external tool and make it run before the "Make" step.
+above as an external tool and make it run before the "Make" step.
+
+### 1.x 
+* Current production branch
+* No setup needed, checkout and run.
