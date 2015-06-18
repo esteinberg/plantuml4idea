@@ -11,7 +11,6 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -65,9 +64,9 @@ public class AboutDialog extends JDialog {
     private void testDot() {
         PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT);
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getFirstDiagramBytes());
-            if (image != null) {
-                UIUtils.setImage(image, testDot, 100);
+            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null);
+            if (imageWithUrlData.getImage() != null) {
+                UIUtils.setImageWithUrlData(imageWithUrlData, testDot, 100);
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);

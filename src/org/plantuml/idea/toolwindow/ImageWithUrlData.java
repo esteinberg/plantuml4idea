@@ -24,7 +24,11 @@ import java.io.IOException;
 public class ImageWithUrlData {
     public ImageWithUrlData(byte[] imageData, byte[] svgData) throws IOException {
         this.parseImage(imageData);
-        this.parseUrls(svgData);
+        if (svgData == null) {
+            this.urls = new UrlData[0];
+        } else {
+            this.parseUrls(svgData);
+        }
     }
 
     public BufferedImage getImage() {
@@ -86,10 +90,10 @@ public class ImageWithUrlData {
     private UrlData createUrl(Node linkNode) {
         NamedNodeMap rectNodeAttributes = linkNode.getFirstChild().getAttributes();
         Rectangle rect = new Rectangle(
-                Integer.parseInt(rectNodeAttributes.getNamedItem("x").getNodeValue()),
-                Integer.parseInt(rectNodeAttributes.getNamedItem("y").getNodeValue()),
-                Integer.parseInt(rectNodeAttributes.getNamedItem("width").getNodeValue()),
-                Integer.parseInt(rectNodeAttributes.getNamedItem("height").getNodeValue())
+                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("x").getNodeValue()),
+                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("y").getNodeValue()),
+                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("width").getNodeValue()),
+                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("height").getNodeValue())
         );
 
        return new UrlData(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), rect);

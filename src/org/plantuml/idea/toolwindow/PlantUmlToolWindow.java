@@ -21,8 +21,10 @@ import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -113,33 +115,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 y = e.getYOnScreen();
             }
         });
-
-        panel.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
     }
 
     @Override
@@ -202,13 +177,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     public void run() {
                         imagesPanel.removeAll();
                         for (int i = 0; i < imagesWithData.length; i++) {
-                            BufferedImage image = imagesWithData[i].getImage();
+                            ImageWithUrlData imageWithData = imagesWithData[i];
                             JLabel label = new JLabel();
                             label.setOpaque(true);
                             label.setBackground(JBColor.WHITE);
                             addScrollBarListeners(label);
-                            if (image != null) {
-                                UIUtils.setImage(image, label, 100);
+                            if (imageWithData.getImage() != null) {
+                                UIUtils.setImageWithUrlData(imageWithData, label, 100);
                             } else {
                                 label.setText("Failed to render page " + i);
                             }

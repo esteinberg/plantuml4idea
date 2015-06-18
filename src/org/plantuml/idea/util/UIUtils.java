@@ -17,16 +17,20 @@ import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsPNGAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsSVGAction;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.toolwindow.ImageWithUrlData;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * @author Eugene Steinberg
@@ -41,22 +45,24 @@ public class UIUtils {
     /**
      * Scales the image and sets it to label
      *
-     * @param image source image
+     * @param imageWithUrlData source image and url data
      * @param label destination label
      * @param zoom  zoom factor
      */
-    public static void setImage(@NotNull BufferedImage image, JLabel label, int zoom) {
+    public static void setImageWithUrlData(@NotNull final ImageWithUrlData imageWithUrlData, JLabel label, int zoom) {
+        Image image = imageWithUrlData.getImage();
         int newWidth;
         int newHeight;
         Image scaledImage;
 
+
         if (zoom == 100) { // default zoom, no scaling
-            newWidth = image.getWidth();
-            newHeight = image.getHeight();
+            newWidth = image.getWidth(label);
+            newHeight = image.getHeight(label);
             scaledImage = image;
         } else {
-            newWidth = Math.round(image.getWidth() * zoom / 100.0f);
-            newHeight = Math.round(image.getHeight() * zoom / 100.0f);
+            newWidth = Math.round(image.getWidth(label) * zoom / 100.0f);
+            newHeight = Math.round(image.getHeight(label) * zoom / 100.0f);
             scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
         }
 
@@ -80,6 +86,40 @@ public class UIUtils {
                         };
                     }
                 }).getComponent().show(comp, x, y);
+
+            }
+        });
+        label.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
+                    if (url.getClickArea().contains(mouseEvent.getPoint())) {
+                        try {
+                            Desktop.getDesktop().browse(new URI(url.getUrl()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
 
             }
         });
