@@ -24,13 +24,14 @@ import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author Eugene Steinberg
@@ -49,7 +50,7 @@ public class UIUtils {
      * @param label destination label
      * @param zoom  zoom factor
      */
-    public static void setImageWithUrlData(@NotNull final ImageWithUrlData imageWithUrlData, JLabel label, int zoom) {
+    public static void setImageWithUrlData(@NotNull final ImageWithUrlData imageWithUrlData, final JLabel label, int zoom) {
         Image image = imageWithUrlData.getImage();
         int newWidth;
         int newHeight;
@@ -89,40 +90,41 @@ public class UIUtils {
 
             }
         });
-        label.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
-                    if (url.getClickArea().contains(mouseEvent.getPoint())) {
+
+        //Removing all children from image label and creating transparent buttons for each item with url
+
+        label.removeAll();
+
+        for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
+            try {
+                final URI uri = new URI(url.getUrl());
+                JButton button = new JButton("");
+                button.setLocation(url.getClickArea().getLocation());
+                button.setSize(url.getClickArea().getSize());
+
+                //Making buttons transparent
+                button.setOpaque(false);
+                button.setContentAreaFilled(false);
+                button.setBorderPainted(false);
+
+                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                //When user clicks on item, url is opened in default system browser
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
                         try {
-                            Desktop.getDesktop().browse(new URI(url.getUrl()));
-                        } catch (Exception e) {
+                            Desktop.getDesktop().browse(uri);
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }
+                });
+                label.add(button);
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
             }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
+        }
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
