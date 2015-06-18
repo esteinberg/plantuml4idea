@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;

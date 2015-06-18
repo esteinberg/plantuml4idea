@@ -14,6 +14,7 @@ import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 

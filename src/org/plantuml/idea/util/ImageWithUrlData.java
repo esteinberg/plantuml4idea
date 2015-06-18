@@ -1,7 +1,6 @@
-package org.plantuml.idea.toolwindow;
+package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
-import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -104,8 +103,8 @@ public class ImageWithUrlData {
 
     /**
      * If uri is a relative path, then assuming that full uri is file:/{path_to_diagram_file}/{uri}
-     * @param url
-     * @return
+     * @param url absolute or relative url
+     * @return absolute uri
      */
     private URI computeUri(String url, File baseDir) throws URISyntaxException {
         URI uri = new URI(url);

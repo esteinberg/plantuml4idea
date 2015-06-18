@@ -18,7 +18,6 @@ import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsPNGAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsSVGAction;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.toolwindow.ImageWithUrlData;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
