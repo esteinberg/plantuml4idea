@@ -168,7 +168,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         try {
             PlantUmlResult imageResult = PlantUml.render(source, baseDir, pageNum, zoom);
             PlantUmlResult svgResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.SVG, pageNum, zoom);
-            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult);
+            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
 
 
             if (hasImages(imagesWithData)) {
@@ -224,7 +224,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return false;
     }
 
-    private ImageWithUrlData[] toImagesWithUrlData(PlantUmlResult imageResult, PlantUmlResult svgResult) throws IOException {
+    private ImageWithUrlData[] toImagesWithUrlData(PlantUmlResult imageResult, PlantUmlResult svgResult, File baseDir) throws IOException {
         PlantUmlResult.Diagram[] imageDiagrams = imageResult.getDiagrams();
         PlantUmlResult.Diagram[] svgDiagrams = svgResult.getDiagrams();
         //noinspection UndesirableClassUsage
@@ -233,24 +233,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             PlantUmlResult.Diagram imageDiagram = imageDiagrams[i];
             PlantUmlResult.Diagram svgDiagram = svgDiagrams[i];
             if (imageDiagram != null) {
-                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes());
+                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes(), baseDir);
             }
         }
         return imagesWithUrlData;
     }
-
-//    private BufferedImage[] toBufferedImages(PlantUmlResult result) throws IOException {
-//        PlantUmlResult.Diagram[] diagrams = result.getDiagrams();
-//        //noinspection UndesirableClassUsage
-//        final BufferedImage[] images = new BufferedImage[diagrams.length];
-//        for (int i = 0; i < diagrams.length; i++) {
-//            PlantUmlResult.Diagram diagram = diagrams[i];
-//            if (diagram != null) {
-//                images[i] = UIUtils.getBufferedImage(diagram.getDiagramBytes());
-//            }
-//        }
-//        return images;
-//    }
 
     public int getZoom() {
         return zoom;

@@ -32,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * @author Eugene Steinberg
@@ -98,34 +97,30 @@ public class UIUtils {
         label.removeAll();
 
         for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
-            try {
-                final URI uri = new URI(url.getUrl());
-                JButton button = new JButton("");
-                button.setLocation(url.getClickArea().getLocation());
-                button.setSize(url.getClickArea().getSize());
+            final URI uri = url.getUri();
+            JButton button = new JButton("");
+            button.setLocation(url.getClickArea().getLocation());
+            button.setSize(url.getClickArea().getSize());
 
-                //Making buttons transparent
-                button.setOpaque(false);
-                button.setContentAreaFilled(false);
-                button.setBorderPainted(false);
+            //Making buttons transparent
+            button.setOpaque(false);
+            button.setContentAreaFilled(false);
+            button.setBorderPainted(false);
 
-                button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-                //When user clicks on item, url is opened in default system browser
-                button.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent actionEvent) {
-                        try {
-                            Desktop.getDesktop().browse(uri);
-                        } catch (IOException e) {
-                            logger.warn(e);
-                        }
+            //When user clicks on item, url is opened in default system browser
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        Desktop.getDesktop().browse(uri);
+                    } catch (IOException e) {
+                        logger.warn(e);
                     }
-                });
-                label.add(button);
-            } catch (URISyntaxException e) {
-                logger.warn(e);
-            }
+                }
+            });
+            label.add(button);
         }
     }
 

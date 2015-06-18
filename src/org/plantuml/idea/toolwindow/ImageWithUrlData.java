@@ -16,7 +16,10 @@ import javax.xml.xpath.XPathFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * @author koroandr
@@ -25,9 +28,9 @@ import java.io.IOException;
 public class ImageWithUrlData {
     Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
-    public ImageWithUrlData(byte[] imageData, byte[] svgData) throws IOException {
+    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir) throws IOException {
         this.parseImage(imageData);
-        this.parseUrls(svgData);
+        this.parseUrls(svgData, baseDir);
     }
 
     public BufferedImage getImage() {
@@ -39,20 +42,20 @@ public class ImageWithUrlData {
     }
 
     public class UrlData {
-        public UrlData(String url, Rectangle clickArea) {
-            this.url = url;
+        public UrlData(URI uri, Rectangle clickArea) {
+            this.uri = uri;
             this.clickArea = clickArea;
         }
 
-        public String getUrl() {
-            return url;
+        public URI getUri() {
+            return uri;
         }
 
         public Rectangle getClickArea() {
             return clickArea;
         }
 
-        private String url;
+        private URI uri;
         private Rectangle clickArea;
     }
 
@@ -60,7 +63,7 @@ public class ImageWithUrlData {
             this.image = UIUtils.getBufferedImage(imageData);
     }
 
-    private void parseUrls(byte [] svgData) {
+    private void parseUrls(byte [] svgData, File baseDir) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -76,7 +79,7 @@ public class ImageWithUrlData {
 
             UrlData[] urls = new UrlData[svgPaths.getLength()];
             for (int i = 0; i < svgPaths.getLength(); i++) {
-                urls[i] = createUrl(svgPaths.item(i));
+                urls[i] = createUrl(svgPaths.item(i), baseDir);
             }
 
             this.urls = urls;
@@ -87,7 +90,7 @@ public class ImageWithUrlData {
         }
     }
 
-    private UrlData createUrl(Node linkNode) {
+    private UrlData createUrl(Node linkNode, File baseDir) throws URISyntaxException {
         NamedNodeMap rectNodeAttributes = linkNode.getFirstChild().getAttributes();
         Rectangle rect = new Rectangle(
                 (int) Float.parseFloat(rectNodeAttributes.getNamedItem("x").getNodeValue()),
@@ -96,7 +99,21 @@ public class ImageWithUrlData {
                 (int) Float.parseFloat(rectNodeAttributes.getNamedItem("height").getNodeValue())
         );
 
-       return new UrlData(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), rect);
+       return new UrlData(this.computeUri(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), baseDir), rect);
+    }
+
+    /**
+     * If uri is a relative path, then assuming that full uri is file:/{path_to_diagram_file}/{uri}
+     * @param url
+     * @return
+     */
+    private URI computeUri(String url, File baseDir) throws URISyntaxException {
+        URI uri = new URI(url);
+        if (!uri.isAbsolute()) {
+            //Concatenating baseDir and relative URI
+            uri = new File(baseDir, url).toURI();
+        }
+        return uri;
     }
 
     private BufferedImage image;
