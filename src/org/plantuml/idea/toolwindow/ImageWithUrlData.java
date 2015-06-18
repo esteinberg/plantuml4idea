@@ -1,5 +1,6 @@
 package org.plantuml.idea.toolwindow;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -22,13 +23,11 @@ import java.io.IOException;
  *         18.06.15
  */
 public class ImageWithUrlData {
+    Logger logger = Logger.getInstance(ImageWithUrlData.class);
+
     public ImageWithUrlData(byte[] imageData, byte[] svgData) throws IOException {
         this.parseImage(imageData);
-        if (svgData == null) {
-            this.urls = new UrlData[0];
-        } else {
-            this.parseUrls(svgData);
-        }
+        this.parseUrls(svgData);
     }
 
     public BufferedImage getImage() {
@@ -83,7 +82,8 @@ public class ImageWithUrlData {
             this.urls = urls;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn(e);
+            this.urls = new UrlData[0];
         }
     }
 

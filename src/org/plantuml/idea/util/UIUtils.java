@@ -1,6 +1,7 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -37,6 +38,7 @@ import java.net.URISyntaxException;
  * @author Eugene Steinberg
  */
 public class UIUtils {
+    private static Logger logger = Logger.getInstance(UIUtils.class);
 
     public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
@@ -116,13 +118,13 @@ public class UIUtils {
                         try {
                             Desktop.getDesktop().browse(uri);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            logger.warn(e);
                         }
                     }
                 });
                 label.add(button);
             } catch (URISyntaxException e) {
-                e.printStackTrace();
+                logger.warn(e);
             }
         }
     }
