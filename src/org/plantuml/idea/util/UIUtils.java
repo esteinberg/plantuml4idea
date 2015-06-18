@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.CopyDiagramToClipboardContextAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsPNGAction;
 import org.plantuml.idea.action.ExternalOpenDiagramAsSVGAction;
+import org.plantuml.idea.components.TransparentButton;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
@@ -97,14 +98,9 @@ public class UIUtils {
 
         for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
             final URI uri = url.getUri();
-            JButton button = new JButton("");
+            TransparentButton button = new TransparentButton();
             button.setLocation(url.getClickArea().getLocation());
             button.setSize(url.getClickArea().getSize());
-
-            //Making buttons transparent
-            button.setOpaque(false);
-            button.setContentAreaFilled(false);
-            button.setBorderPainted(false);
 
             button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
