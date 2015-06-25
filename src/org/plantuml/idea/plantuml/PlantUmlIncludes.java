@@ -27,7 +27,7 @@ public class PlantUmlIncludes {
     public static void commitIncludes(String source, @Nullable File baseDir) {
         try {
             if (baseDir != null) {
-                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir);
+                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir, null);
                 final Set<File> includedFiles = blockUmlBuilder.getIncludedFiles();
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);

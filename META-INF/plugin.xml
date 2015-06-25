@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="129.000"/>
@@ -9,6 +9,10 @@
 
     <change-notes>
         <![CDATA[
+            <p>1.8.1</p>
+            <ul>
+                <li>PlantUml library upgrade to 8027</li>
+            </ul>
             <p>1.8</p>
             <ul>
                 <li>PlantUml library upgrade to 8026</li>
