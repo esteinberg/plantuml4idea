@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author koroandr
@@ -76,29 +78,40 @@ public class ImageWithUrlData {
 
             NodeList svgPaths = (NodeList)expression.evaluate(document, XPathConstants.NODESET);
 
-            UrlData[] urls = new UrlData[svgPaths.getLength()];
+            List<UrlData> urls = new ArrayList<UrlData>();
             for (int i = 0; i < svgPaths.getLength(); i++) {
-                urls[i] = createUrl(svgPaths.item(i), baseDir);
+                urls.addAll(createUrl(svgPaths.item(i), baseDir));
             }
 
-            this.urls = urls;
+            this.urls = urls.toArray(new UrlData[urls.size()]);
 
         } catch (Exception e) {
-            logger.warn(e);
+            logger.debug(e);
             this.urls = new UrlData[0];
         }
     }
 
-    private UrlData createUrl(Node linkNode, File baseDir) throws URISyntaxException {
-        NamedNodeMap rectNodeAttributes = linkNode.getFirstChild().getAttributes();
-        Rectangle rect = new Rectangle(
-                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("x").getNodeValue()),
-                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("y").getNodeValue()),
-                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("width").getNodeValue()),
-                (int) Float.parseFloat(rectNodeAttributes.getNamedItem("height").getNodeValue())
-        );
+    private List<UrlData> createUrl(Node linkNode, File baseDir) throws URISyntaxException {
+        List<UrlData> urls = new ArrayList<UrlData>();
 
-       return new UrlData(this.computeUri(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), baseDir), rect);
+        URI url = this.computeUri(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), baseDir);
+
+        for (int i = 0; i < linkNode.getChildNodes().getLength(); i++) {
+            Node child = linkNode.getChildNodes().item(i);
+            if (child.getNodeName().equals("rect")) {
+                NamedNodeMap nodeAttributes = child.getAttributes();
+                Rectangle rect = new Rectangle(
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("width").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("height").getNodeValue())
+                );
+
+                urls.add(new UrlData(url, rect));
+            }
+        }
+
+       return urls;
     }
 
     /**
