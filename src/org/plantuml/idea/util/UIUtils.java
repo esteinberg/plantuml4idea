@@ -1,6 +1,7 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -23,15 +24,19 @@ import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * @author Eugene Steinberg
  */
 public class UIUtils {
+    private static Logger logger = Logger.getInstance(UIUtils.class);
 
     public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
@@ -41,22 +46,24 @@ public class UIUtils {
     /**
      * Scales the image and sets it to label
      *
-     * @param image source image
+     * @param imageWithUrlData source image and url data
      * @param label destination label
      * @param zoom  zoom factor
      */
-    public static void setImage(@NotNull BufferedImage image, JLabel label, int zoom) {
+    public static void setImageWithUrlData(@NotNull final ImageWithUrlData imageWithUrlData, final JLabel label, int zoom) {
+        Image image = imageWithUrlData.getImage();
         int newWidth;
         int newHeight;
         Image scaledImage;
 
+
         if (zoom == 100) { // default zoom, no scaling
-            newWidth = image.getWidth();
-            newHeight = image.getHeight();
+            newWidth = image.getWidth(label);
+            newHeight = image.getHeight(label);
             scaledImage = image;
         } else {
-            newWidth = Math.round(image.getWidth() * zoom / 100.0f);
-            newHeight = Math.round(image.getHeight() * zoom / 100.0f);
+            newWidth = Math.round(image.getWidth(label) * zoom / 100.0f);
+            newHeight = Math.round(image.getHeight(label) * zoom / 100.0f);
             scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
         }
 
@@ -83,6 +90,34 @@ public class UIUtils {
 
             }
         });
+
+        //Removing all children from image label and creating transparent buttons for each item with url
+
+        label.removeAll();
+
+        for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
+            final URI uri = url.getUri();
+            JButton button = new JButton();
+            button.setContentAreaFilled(false);
+            button.setBorder(null);
+            button.setLocation(url.getClickArea().getLocation());
+            button.setSize(url.getClickArea().getSize());
+
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            //When user clicks on item, url is opened in default system browser
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    try {
+                        Desktop.getDesktop().browse(uri);
+                    } catch (IOException e) {
+                        logger.warn(e);
+                    }
+                }
+            });
+            label.add(button);
+        }
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
