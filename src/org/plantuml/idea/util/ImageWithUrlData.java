@@ -67,6 +67,14 @@ public class ImageWithUrlData {
     private void parseUrls(byte [] svgData, File baseDir) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            //http://stackoverflow.com/a/155874/685796
+            factory.setValidating(false);
+            factory.setNamespaceAware(true);
+            factory.setFeature("http://xml.org/sax/features/namespaces", false);
+            factory.setFeature("http://xml.org/sax/features/validation", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new ByteArrayInputStream(svgData));
 
