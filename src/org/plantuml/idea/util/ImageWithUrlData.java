@@ -1,0 +1,133 @@
+package org.plantuml.idea.util;
+
+import com.intellij.openapi.diagnostic.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author koroandr
+ *         18.06.15
+ */
+public class ImageWithUrlData {
+    Logger logger = Logger.getInstance(ImageWithUrlData.class);
+
+    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+        this.parseImage(imageData);
+        this.parseUrls(svgData, baseDir);
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public UrlData[] getUrls() {
+        return urls;
+    }
+
+    public class UrlData {
+        public UrlData(URI uri, Rectangle clickArea) {
+            this.uri = uri;
+            this.clickArea = clickArea;
+        }
+
+        public URI getUri() {
+            return uri;
+        }
+
+        public Rectangle getClickArea() {
+            return clickArea;
+        }
+
+        private URI uri;
+        private Rectangle clickArea;
+    }
+
+    private void parseImage(byte[] imageData) throws IOException{
+            this.image = UIUtils.getBufferedImage(imageData);
+    }
+
+    private void parseUrls(byte [] svgData, File baseDir) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new ByteArrayInputStream(svgData));
+
+            String xpathExpression = "//a";
+
+            XPathFactory xpf = XPathFactory.newInstance();
+            XPath xpath = xpf.newXPath();
+            XPathExpression expression = xpath.compile(xpathExpression);
+
+            NodeList svgPaths = (NodeList)expression.evaluate(document, XPathConstants.NODESET);
+
+            List<UrlData> urls = new ArrayList<UrlData>();
+            for (int i = 0; i < svgPaths.getLength(); i++) {
+                urls.addAll(createUrl(svgPaths.item(i), baseDir));
+            }
+
+            this.urls = urls.toArray(new UrlData[urls.size()]);
+
+        } catch (Exception e) {
+            logger.debug(e);
+            this.urls = new UrlData[0];
+        }
+    }
+
+    private List<UrlData> createUrl(Node linkNode, File baseDir) throws URISyntaxException {
+        List<UrlData> urls = new ArrayList<UrlData>();
+
+        URI url = this.computeUri(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), baseDir);
+
+        for (int i = 0; i < linkNode.getChildNodes().getLength(); i++) {
+            Node child = linkNode.getChildNodes().item(i);
+            if (child.getNodeName().equals("rect")) {
+                NamedNodeMap nodeAttributes = child.getAttributes();
+                Rectangle rect = new Rectangle(
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("width").getNodeValue()),
+                        (int) Float.parseFloat(nodeAttributes.getNamedItem("height").getNodeValue())
+                );
+
+                urls.add(new UrlData(url, rect));
+            }
+        }
+
+       return urls;
+    }
+
+    /**
+     * If uri is a relative path, then assuming that full uri is file:/{path_to_diagram_file}/{uri}
+     * @param url absolute or relative url
+     * @return absolute uri
+     */
+    private URI computeUri(String url, File baseDir) throws URISyntaxException {
+        URI uri = new URI(url);
+        if (!uri.isAbsolute()) {
+            //Concatenating baseDir and relative URI
+            uri = new File(baseDir, url).toURI();
+        }
+        return uri;
+    }
+
+    private BufferedImage image;
+    private UrlData[] urls;
+}

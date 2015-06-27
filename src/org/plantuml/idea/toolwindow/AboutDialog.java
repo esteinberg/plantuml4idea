@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -11,7 +12,6 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -65,9 +65,9 @@ public class AboutDialog extends JDialog {
     private void testDot() {
         PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT);
         try {
-            final BufferedImage image = UIUtils.getBufferedImage(result.getFirstDiagramBytes());
-            if (image != null) {
-                UIUtils.setImage(image, testDot, 100);
+            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null);
+            if (imageWithUrlData.getImage() != null) {
+                UIUtils.setImageWithUrlData(imageWithUrlData, testDot, 100);
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);

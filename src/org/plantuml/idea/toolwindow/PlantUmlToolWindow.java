@@ -14,6 +14,7 @@ import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
@@ -25,7 +26,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -167,22 +167,24 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
 
         try {
-            PlantUmlResult result = PlantUml.render(source, baseDir, pageNum, zoom);
-            final BufferedImage[] images = toBufferedImages(result);
+            PlantUmlResult imageResult = PlantUml.render(source, baseDir, pageNum, zoom);
+            PlantUmlResult svgResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.SVG, pageNum, zoom);
+            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
 
-            if (hasImages(images)) {
+
+            if (hasImages(imagesWithData)) {
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
 
                     public void run() {
                         imagesPanel.removeAll();
-                        for (int i = 0; i < images.length; i++) {
-                            BufferedImage image = images[i];
+                        for (int i = 0; i < imagesWithData.length; i++) {
+                            ImageWithUrlData imageWithData = imagesWithData[i];
                             JLabel label = new JLabel();
                             label.setOpaque(true);
                             label.setBackground(JBColor.WHITE);
                             addScrollBarListeners(label);
-                            if (image != null) {
-                                UIUtils.setImage(image, label, 100);
+                            if (imageWithData.getImage() != null) {
+                                UIUtils.setImageWithUrlData(imageWithData, label, 100);
                             } else {
                                 label.setText("Failed to render page " + i);
                             }
@@ -197,8 +199,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 });
 
             }
-            if (!result.isError()) {
-                setNumPages(result.getPages());
+            if (!imageResult.isError()) {
+                setNumPages(imageResult.getPages());
             }
         } catch (Exception e) {
             logger.warn("Exception occurred rendering source = " + source + ": " + e, e);
@@ -214,26 +216,28 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return separator;
     }
 
-    private boolean hasImages(BufferedImage[] images) {
-        for (BufferedImage image : images) {
-            if (image != null) {
+    private boolean hasImages(ImageWithUrlData[] imagesWithUrlData) {
+        for (ImageWithUrlData imageWithUrlData : imagesWithUrlData) {
+            if (imageWithUrlData.getImage() != null) {
                 return true;
             }
         }
         return false;
     }
 
-    private BufferedImage[] toBufferedImages(PlantUmlResult result) throws IOException {
-        PlantUmlResult.Diagram[] diagrams = result.getDiagrams();
+    private ImageWithUrlData[] toImagesWithUrlData(PlantUmlResult imageResult, PlantUmlResult svgResult, File baseDir) throws IOException {
+        PlantUmlResult.Diagram[] imageDiagrams = imageResult.getDiagrams();
+        PlantUmlResult.Diagram[] svgDiagrams = svgResult.getDiagrams();
         //noinspection UndesirableClassUsage
-        final BufferedImage[] images = new BufferedImage[diagrams.length];
-        for (int i = 0; i < diagrams.length; i++) {
-            PlantUmlResult.Diagram diagram = diagrams[i];
-            if (diagram != null) {
-                images[i] = UIUtils.getBufferedImage(diagram.getDiagramBytes());
+        final ImageWithUrlData[] imagesWithUrlData = new ImageWithUrlData[imageDiagrams.length];
+        for (int i = 0; i < imageDiagrams.length; i++) {
+            PlantUmlResult.Diagram imageDiagram = imageDiagrams[i];
+            PlantUmlResult.Diagram svgDiagram = svgDiagrams[i];
+            if (imageDiagram != null) {
+                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes(), baseDir);
             }
         }
-        return images;
+        return imagesWithUrlData;
     }
 
     public int getZoom() {
