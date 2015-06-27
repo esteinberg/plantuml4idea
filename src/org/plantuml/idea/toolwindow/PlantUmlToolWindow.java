@@ -12,6 +12,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.ImageWithUrlData;
@@ -59,6 +60,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
+        PlantUmlSettings.getInstance();  // Make sure settings are loaded and applied before we start rendering.
 
         setupUI();
 
