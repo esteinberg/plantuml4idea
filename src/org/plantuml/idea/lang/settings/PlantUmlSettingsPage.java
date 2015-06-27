@@ -42,7 +42,6 @@ public class PlantUmlSettingsPage implements Configurable {
         final VirtualFile toSelect = text == null || text.isEmpty() ? project.getBaseDir()
                 : LocalFileSystem.getInstance().findFileByPath(text);
 
-        // 10.5 does not have #chooseFile
         VirtualFile virtualFile = FileChooser.chooseFile(descriptor, project, toSelect);
         if (virtualFile != null) {
             target.setText(virtualFile.getPath());
