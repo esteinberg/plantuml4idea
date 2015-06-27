@@ -24,11 +24,6 @@ public class PlantUml {
     public static final String UMLSTART = "@start";
     private static final Logger logger = Logger.getInstance(PlantUml.class);
 
-    static {
-        // Make sure settings are loaded and applied before we start rendering.
-        PlantUmlSettings.getInstance();
-    }
-
     public enum ImageFormat {
         PNG {
             @Override
