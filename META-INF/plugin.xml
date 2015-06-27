@@ -12,6 +12,7 @@
             <p>1.8.1</p>
             <ul>
                 <li>PlantUml library upgrade to 8027</li>
+                <li>Support for "url of" (Thanks to Andrew Korolev)</li>
             </ul>
             <p>1.8</p>
             <ul>
