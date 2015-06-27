@@ -43,16 +43,16 @@ public class PlantUmlTest extends TestCase {
     }
 
     public void testExtractSourceWithComments() {
-        String source ="/**\n" +
+        String source = "/**\n" +
                 "* @startuml\n" +
                 "* Bob -> Alice: hello\n" +
                 "*/";
         String expected = "@startuml\n" +
                 "Bob -> Alice: hello\n" +
                 "*/";
-        assertEquals(expected,PlantUml.extractSource(source, source.length() / 2));
+        assertEquals(expected, PlantUml.extractSource(source, source.length() / 2));
 
-        source ="/*\n" +
+        source = "/*\n" +
                 " * @startuml\n" +
                 " * (*) -> Init\n" +
                 " * @enduml\n" +
@@ -60,6 +60,6 @@ public class PlantUmlTest extends TestCase {
         expected = "@startuml\n" +
                 "(*) -> Init\n" +
                 "@enduml";
-        assertEquals(expected,PlantUml.extractSource(source, source.length() / 2));
+        assertEquals(expected, PlantUml.extractSource(source, source.length() / 2));
     }
 }
