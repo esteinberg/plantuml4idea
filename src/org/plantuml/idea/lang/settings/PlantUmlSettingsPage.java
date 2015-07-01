@@ -24,10 +24,8 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextField textFieldDotExecutable;
     private JCheckBox plantUMLErrorAnnotationExperimentalCheckBox;
     private JButton browse;
-    private Project project;
 
-    public PlantUmlSettingsPage(Project project) {
-        this.project = project;
+    public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 browseForFile(textFieldDotExecutable);
@@ -39,10 +37,10 @@ public class PlantUmlSettingsPage implements Configurable {
         final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor();
         descriptor.setTitle("Select path to Graphviz/DOT executable (dot.exe)");
         String text = target.getText();
-        final VirtualFile toSelect = text == null || text.isEmpty() ? project.getBaseDir()
+        final VirtualFile toSelect = text == null || text.isEmpty() ? null
                 : LocalFileSystem.getInstance().findFileByPath(text);
 
-        VirtualFile virtualFile = FileChooser.chooseFile(descriptor, project, toSelect);
+        VirtualFile virtualFile = FileChooser.chooseFile(descriptor, null, toSelect);
         if (virtualFile != null) {
             target.setText(virtualFile.getPath());
         }
