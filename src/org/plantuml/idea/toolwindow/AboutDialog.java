@@ -63,7 +63,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT);
+        PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT, null, PlantUml.ImageFormat.PNG, 0, 100);
         try {
             final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null);
             if (imageWithUrlData.getImage() != null) {

@@ -7,13 +7,18 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
@@ -29,6 +34,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author Eugene Steinberg
@@ -41,10 +47,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private JScrollPane scrollPane;
 
     private int zoom = 100;
-
     private int page = -1;
     private int numPages = 1;
 
+    private volatile Set<File> cachedIncludedFiles;
+    private volatile File cachedBaseDir;
     private String cachedSource = "";
     private int cachedPage = page;
     private int cachedZoom = zoom;
@@ -145,22 +152,55 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                if (!isProjectValid(project))
-                    return;
-                final String source = UIUtils.getSelectedSourceWithCaret(project);
-                if (!renderRequired(source))
-                    return;
-                final File selectedDir = UIUtils.getSelectedDir(project);
-                lazyExecutor.execute(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                renderWithBaseDir(source, selectedDir, page);
-                            }
-                        }
-                );
+                if (isProjectValid(project)) {
+                    final String source = UIUtils.getSelectedSourceWithCaret(project);
+                    if (renderRequired(source)) {
+                        final File selectedDir = UIUtils.getSelectedDir(project);
+                        lazyExecutor.execute(new RenderWithBaseDirRunnable(source, selectedDir));
+                    } else if (includedFileChanged()) {
+                        lazyExecutor.execute(new RefreshImageRunnable());
+                    }
+                }
             }
         });
+    }
+
+    private boolean includedFileChanged() {
+        boolean result = false;
+        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+        if (selectedTextEditor != null) {
+            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+            VirtualFile file = fileDocumentManager.getFile(selectedTextEditor.getDocument());
+            if (file != null) {
+                String path = file.getPath();
+                if (cachedIncludedFiles != null && cachedIncludedFiles.contains(new File(path)) && fileDocumentManager.isDocumentUnsaved(selectedTextEditor.getDocument())) {
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    private class RefreshImageRunnable implements Runnable {
+        @Override
+        public void run() {
+            renderWithBaseDir(cachedSource, cachedBaseDir, cachedPage);
+        }
+    }
+
+    private class RenderWithBaseDirRunnable implements Runnable {
+        private final String source;
+        private final File selectedDir;
+
+        public RenderWithBaseDirRunnable(String source, File selectedDir) {
+            this.source = source;
+            this.selectedDir = selectedDir;
+        }
+
+        @Override
+        public void run() {
+            renderWithBaseDir(source, selectedDir, page);
+        }
     }
 
     private void renderWithBaseDir(String source, File baseDir, int pageNum) {
@@ -169,12 +209,16 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
 
         try {
-            PlantUmlResult imageResult = PlantUml.render(source, baseDir, pageNum, zoom);
+            Set<File> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
+
+            PlantUmlResult imageResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.PNG, pageNum, zoom);
             PlantUmlResult svgResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.SVG, pageNum, zoom);
             final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
 
 
             if (hasImages(imagesWithData)) {
+                cachedIncludedFiles = includedFiles;
+                cachedBaseDir = baseDir;
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
 
                     public void run() {

@@ -24,7 +24,7 @@ public class PlantUmlIncludes {
 
     private static final Logger logger = Logger.getInstance(PlantUmlIncludes.class);
 
-    public static void commitIncludes(String source, @Nullable File baseDir) {
+    public static Set<File> commitIncludes(String source, @Nullable File baseDir) {
         try {
             if (baseDir != null) {
                 BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir, null);
@@ -32,10 +32,12 @@ public class PlantUmlIncludes {
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);
                 }
+                return includedFiles;
             }
         } catch (IOException e) {
             logger.error(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
         }
+        return Collections.emptySet();
     }
 
     private static void saveModifiedFiles(final Set<File> files) {

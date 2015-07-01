@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -47,14 +46,6 @@ public class PlantUml {
         abstract FileFormat getFormat();
     }
 
-    public static PlantUmlResult render(String source) {
-        return render(source, null, 0, 100);
-    }
-
-    public static PlantUmlResult render(String source,  @Nullable File baseDir, int page, int zoom) {
-        return render(source, baseDir, ImageFormat.PNG, page, zoom);
-    }
-
     /**
      * Renders file with support of plantUML include ange paging features, setting base dir and page for plantUML
      * to provided values
@@ -70,7 +61,6 @@ public class PlantUml {
             if (baseDir != null) {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
-            PlantUmlIncludes.commitIncludes(source, baseDir);
 
             return doRender(source, format, page, zoom);
         } finally {
