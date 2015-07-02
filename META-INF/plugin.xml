@@ -13,6 +13,7 @@
             <ul>
                 <li>PlantUml library upgrade to 8027</li>
                 <li>Support for "url of" (Thanks to Andrew Korolev)</li>
+                <li>Reload of a diagram on change in included files</li>
             </ul>
             <p>1.8</p>
             <ul>
