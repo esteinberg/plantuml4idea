@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.ui.UIUtil;
 import net.sourceforge.plantuml.BlockUmlBuilder;
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +29,7 @@ public class PlantUmlIncludes {
         try {
             if (baseDir != null) {
                 BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir, null);
-                final Set<File> includedFiles = blockUmlBuilder.getIncludedFiles();
+                Set<File> includedFiles = FileWithSuffix.convert(blockUmlBuilder.getIncludedFiles());
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);
                 }
