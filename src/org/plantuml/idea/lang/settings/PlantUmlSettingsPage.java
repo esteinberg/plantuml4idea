@@ -23,6 +23,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextField textFieldDotExecutable;
     private JCheckBox plantUMLErrorAnnotationExperimentalCheckBox;
     private JButton browse;
+    private JTextField renderDelay;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -66,25 +67,43 @@ public class PlantUmlSettingsPage implements Configurable {
 
     @Override
     public boolean isModified() {
-        return !textFieldDotExecutable.getText().equals(PlantUmlSettings.getInstance().getDotExecutable())
-                || plantUMLErrorAnnotationExperimentalCheckBox.isSelected() == PlantUmlSettings.getInstance().isErrorAnnotationEnabled();
+        return isModified(PlantUmlSettings.getInstance());
     }
 
     @Override
     public void apply() throws ConfigurationException {
-
-        PlantUmlSettings.getInstance().setDotExecutable(textFieldDotExecutable.getText());
-        PlantUmlSettings.getInstance().setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
-
+        PlantUmlSettings instance = PlantUmlSettings.getInstance();
+        getData(instance);
+        instance.applyState();
     }
 
     @Override
     public void reset() {
-        textFieldDotExecutable.setText(PlantUmlSettings.getInstance().getDotExecutable());
-        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(PlantUmlSettings.getInstance().isErrorAnnotationEnabled());
+        setData(PlantUmlSettings.getInstance());
     }
 
     @Override
     public void disposeUIResources() {
+    }
+
+    public void setData(PlantUmlSettings data) {
+        textFieldDotExecutable.setText(data.getDotExecutable());
+        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
+        renderDelay.setText(data.getRenderDelay());
+    }
+
+    public void getData(PlantUmlSettings data) {
+        data.setDotExecutable(textFieldDotExecutable.getText());
+        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
+        data.setRenderDelay(renderDelay.getText());
+    }
+
+    public boolean isModified(PlantUmlSettings data) {
+        if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
+            return true;
+        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
+        if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
+            return true;
+        return false;
     }
 }

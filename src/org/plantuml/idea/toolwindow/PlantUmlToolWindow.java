@@ -58,7 +58,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private AncestorListener plantUmlAncestorListener = new PlantUmlAncestorListener();
 
-    private LazyApplicationPoolExecutor lazyExecutor = new LazyApplicationPoolExecutor();
+    private final LazyApplicationPoolExecutor lazyExecutor;
 
     private SelectPageAction selectPageAction;
     private Project project;
@@ -67,11 +67,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
-        PlantUmlSettings.getInstance();  // Make sure settings are loaded and applied before we start rendering.
+        PlantUmlSettings instance = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
 
         setupUI();
 
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
+        lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt());
     }
 
     private void setupUI() {
@@ -182,6 +183,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             }
         }
         return result;
+    }
+
+    public void applyNewSettings(PlantUmlSettings plantUmlSettings) {
+        lazyExecutor.setDelay(plantUmlSettings.getRenderDelayAsInt());
     }
 
     private class RefreshImageRunnable implements Runnable {

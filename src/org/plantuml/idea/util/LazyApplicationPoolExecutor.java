@@ -15,20 +15,21 @@ import java.util.concurrent.Future;
  */
 public class LazyApplicationPoolExecutor implements Executor {
 
-    public static final int DEFAULT_DELAY = 100;
-
     private Runnable next;
 
     private Future<?> future;
 
-    private int delay = DEFAULT_DELAY; // delay between command executions
+    private int delay; // delay between command executions
 
     public LazyApplicationPoolExecutor(int delay) {
         this.delay = delay;
     }
 
-    public LazyApplicationPoolExecutor() {
-        this(DEFAULT_DELAY);
+    public void setDelay(int delay) {
+        this.delay = delay;
+        synchronized (LazyApplicationPoolExecutor.this) {
+            LazyApplicationPoolExecutor.this.notifyAll();
+        }
     }
 
     /**
@@ -45,7 +46,9 @@ public class LazyApplicationPoolExecutor implements Executor {
             public void run() {
                 try {
                     command.run();
-                    Thread.sleep(delay);
+                    synchronized (LazyApplicationPoolExecutor.this) {
+                        LazyApplicationPoolExecutor.this.wait(delay);
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 } finally {
