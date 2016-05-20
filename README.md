@@ -36,6 +36,9 @@ There are following branches:
 * Current production branch
 * No setup needed, checkout and run.
 
+### 1.x
+* deprecated branch, to be deleted
+
 ### grammar
 * Contains new experimental syntax support
 * Grammar classes can be generated using tools/grammar-gen.sh
