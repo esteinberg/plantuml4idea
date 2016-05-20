@@ -57,7 +57,7 @@ public class PlantUmlRenderer {
         }
 
     }
-    
+
     /**
      * Renders file with support of plantUML include ange paging features, setting base dir and page for plantUML
      * to provided values
@@ -127,7 +127,7 @@ public class PlantUmlRenderer {
 
             return new PlantUmlResult(diagrams, desc, totalPages, renderRequest);
         } catch (Throwable e) {
-            logger.warn("Failed to render image " + renderRequest.getSource(), e);
+            logger.debug("Failed to render image " + renderRequest.getSource(), e);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
     }
