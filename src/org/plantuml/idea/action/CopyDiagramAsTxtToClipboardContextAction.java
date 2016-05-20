@@ -56,11 +56,14 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
                 }
 
                 PlantUmlLabel data = (PlantUmlLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-                RenderRequest renderRequest = data.getRenderRequest();
-                renderRequest.setFormat(getFormat());
-                PlantUmlResult render = renderRequest.render();
+                if (data != null) {
+                    RenderRequest renderRequest = data.getRenderRequest();
+                    renderRequest.setFormat(getFormat());
+                    PlantUmlResult render = renderRequest.render();
 
-                return new String(render.getFirstDiagramBytes(), CharsetToolkit.UTF8);
+                    return new String(render.getFirstDiagramBytes(), CharsetToolkit.UTF8);
+                }
+                return null;
             }
         });
     }
