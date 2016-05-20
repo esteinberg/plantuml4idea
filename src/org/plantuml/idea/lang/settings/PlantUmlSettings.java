@@ -2,7 +2,7 @@ package org.plantuml.idea.lang.settings;
 
 import com.intellij.openapi.components.*;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import net.sourceforge.plantuml.OptionFlags;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -28,7 +28,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         if ("".equals(dotExecutable)) {
             this.dotExecutable = null;
         }
-        OptionFlags.getInstance().setDotExecutable(this.dotExecutable);
+        GraphvizUtils.setDotExecutable(this.dotExecutable);
     }
 
     public boolean isErrorAnnotationEnabled() {
@@ -56,6 +56,6 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     @Override
     public void loadState(PlantUmlSettings state) {
         XmlSerializerUtil.copyBean(state, this);
-        OptionFlags.getInstance().setDotExecutable(dotExecutable);
+        GraphvizUtils.setDotExecutable(dotExecutable);
     }
 }
