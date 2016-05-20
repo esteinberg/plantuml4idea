@@ -51,6 +51,6 @@ public class RenderRequest {
     }
 
     public PlantUmlResult render() {
-        return PlantUml.render(this);
+        return PlantUmlRenderer.render(this);
     }
 }

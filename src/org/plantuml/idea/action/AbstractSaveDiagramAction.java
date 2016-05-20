@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlRenderer;
 import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
@@ -78,7 +79,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 String fileNameTemplate = base + "-%03d." + extension;
 
-                PlantUml.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
+                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
                         UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom());
 
