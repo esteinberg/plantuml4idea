@@ -17,23 +17,26 @@ import java.io.IOException;
  * @author Eugene Steinberg
  */
 public class CopyDiagramToClipboardAction extends DumbAwareAction {
-    
+
 
     @Override
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
 
         CopyPasteManager.getInstance().setContents(new Transferable() {
+            @Override
             public DataFlavor[] getTransferDataFlavors() {
                 return new DataFlavor[]{
                         DataFlavor.imageFlavor
                 };
             }
 
+            @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
                 return flavor.equals(DataFlavor.imageFlavor);
             }
 
+            @Override
             public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);

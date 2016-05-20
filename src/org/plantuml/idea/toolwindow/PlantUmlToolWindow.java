@@ -13,13 +13,13 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.plantuml.RenderRequest;
 import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
@@ -94,6 +94,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private void addScrollBarListeners(JComponent panel) {
         panel.addMouseWheelListener(new MouseWheelListener() {
+            @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
                     setZoom(Math.max(getZoom() - e.getWheelRotation() * 10, 1));
@@ -106,6 +107,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         panel.addMouseMotionListener(new MouseMotionListener() {
             private int x, y;
 
+            @Override
             public void mouseDragged(MouseEvent e) {
                 JScrollBar h = scrollPane.getHorizontalScrollBar();
                 JScrollBar v = scrollPane.getVerticalScrollBar();
@@ -120,6 +122,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 y = e.getYOnScreen();
             }
 
+            @Override
             public void mouseMoved(MouseEvent e) {
                 x = e.getXOnScreen();
                 y = e.getYOnScreen();
@@ -211,8 +214,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         try {
             Set<File> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
 
-            PlantUmlResult imageResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.PNG, pageNum, zoom);
-            PlantUmlResult svgResult = PlantUml.render(source, baseDir, PlantUml.ImageFormat.SVG, pageNum, zoom);
+            PlantUmlResult imageResult = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, pageNum, zoom).render();
+            PlantUmlResult svgResult = new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, pageNum, zoom).render();
             final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
 
 
@@ -221,19 +224,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 cachedBaseDir = baseDir;
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         imagesPanel.removeAll();
                         for (int i = 0; i < imagesWithData.length; i++) {
                             ImageWithUrlData imageWithData = imagesWithData[i];
-                            JLabel label = new JLabel();
-                            label.setOpaque(true);
-                            label.setBackground(JBColor.WHITE);
+                            PlantUmlLabel label = new PlantUmlLabel(imageWithData, i);
                             addScrollBarListeners(label);
-                            if (imageWithData.getImage() != null) {
-                                UIUtils.setImageWithUrlData(imageWithData, label, 100);
-                            } else {
-                                label.setText("Failed to render page " + i);
-                            }
+
                             if (i != 0) {
                                 imagesPanel.add(separator());
                             }
@@ -280,7 +278,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             PlantUmlResult.Diagram imageDiagram = imageDiagrams[i];
             PlantUmlResult.Diagram svgDiagram = svgDiagrams[i];
             if (imageDiagram != null) {
-                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes(), baseDir);
+                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes(), baseDir, imageResult.getRenderRequest());
             }
         }
         return imagesWithUrlData;

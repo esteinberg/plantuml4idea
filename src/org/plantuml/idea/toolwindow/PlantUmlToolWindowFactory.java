@@ -14,6 +14,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     public static final String ID = "PlantUML";
 
+    @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
         PlantUmlToolWindow plantUmlToolWindow = new PlantUmlToolWindow(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();

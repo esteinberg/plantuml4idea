@@ -12,9 +12,11 @@ import static com.intellij.codeInsight.completion.CompletionInitializationContex
 public class PlantUmlDocumentListener implements DocumentListener {
     private static Logger logger = Logger.getInstance(PlantUmlDocumentListener.class);
 
+    @Override
     public void beforeDocumentChange(DocumentEvent event) {
     }
 
+    @Override
     public void documentChanged(DocumentEvent event) {
         if (logger.isDebugEnabled()) {
             logger.debug("document changed " + event);

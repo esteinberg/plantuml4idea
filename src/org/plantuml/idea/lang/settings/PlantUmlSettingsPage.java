@@ -5,7 +5,6 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
@@ -27,6 +26,7 @@ public class PlantUmlSettingsPage implements Configurable {
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 browseForFile(textFieldDotExecutable);
             }

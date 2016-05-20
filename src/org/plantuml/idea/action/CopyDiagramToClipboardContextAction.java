@@ -25,16 +25,19 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
     public void actionPerformed(final AnActionEvent e) {
         CopyPasteManager.getInstance().setContents(new Transferable() {
 
+            @Override
             public DataFlavor[] getTransferDataFlavors() {
                 return new DataFlavor[]{
                         DataFlavor.imageFlavor
                 };
             }
 
+            @Override
             public boolean isDataFlavorSupported(DataFlavor flavor) {
                 return flavor.equals(DataFlavor.imageFlavor);
             }
 
+            @Override
             public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);

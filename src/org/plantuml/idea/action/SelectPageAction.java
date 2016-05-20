@@ -20,6 +20,7 @@ public class SelectPageAction extends ComboBoxAction {
     private int numPages = 1;
     ComboBoxButton button;
 
+    @Override
     @NotNull
     protected DefaultActionGroup createPopupActionGroup(JComponent button) {
         this.button = (ComboBoxButton) button;

@@ -1,6 +1,7 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.plantuml.idea.plantuml.RenderRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -29,9 +30,16 @@ import java.util.List;
 public class ImageWithUrlData {
     Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
-    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+    private final RenderRequest renderRequest;
+
+    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir, RenderRequest renderRequest) throws IOException {
+        this.renderRequest = renderRequest;
         this.parseImage(imageData);
         this.parseUrls(svgData, baseDir);
+    }
+
+    public RenderRequest getRenderRequest() {
+        return renderRequest;
     }
 
     public BufferedImage getImage() {
@@ -60,11 +68,11 @@ public class ImageWithUrlData {
         private Rectangle clickArea;
     }
 
-    private void parseImage(byte[] imageData) throws IOException{
-            this.image = UIUtils.getBufferedImage(imageData);
+    private void parseImage(byte[] imageData) throws IOException {
+        this.image = UIUtils.getBufferedImage(imageData);
     }
 
-    private void parseUrls(byte [] svgData, File baseDir) {
+    private void parseUrls(byte[] svgData, File baseDir) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             //http://stackoverflow.com/a/155874/685796
@@ -74,7 +82,7 @@ public class ImageWithUrlData {
             factory.setFeature("http://xml.org/sax/features/validation", false);
             factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
             factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-            
+
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new ByteArrayInputStream(svgData));
 
@@ -84,7 +92,7 @@ public class ImageWithUrlData {
             XPath xpath = xpf.newXPath();
             XPathExpression expression = xpath.compile(xpathExpression);
 
-            NodeList svgPaths = (NodeList)expression.evaluate(document, XPathConstants.NODESET);
+            NodeList svgPaths = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
 
             List<UrlData> urls = new ArrayList<UrlData>();
             for (int i = 0; i < svgPaths.getLength(); i++) {
@@ -119,11 +127,12 @@ public class ImageWithUrlData {
             }
         }
 
-       return urls;
+        return urls;
     }
 
     /**
      * If uri is a relative path, then assuming that full uri is file:/{path_to_diagram_file}/{uri}
+     *
      * @param url absolute or relative url
      * @return absolute uri
      */

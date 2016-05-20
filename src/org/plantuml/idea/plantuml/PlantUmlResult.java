@@ -13,11 +13,13 @@ public class PlantUmlResult {
     private String description;
     private String error;
     private int pages;
+    private RenderRequest renderRequest;
 
-    public PlantUmlResult(Diagram[] diagrams, String description, int totalPages) {
+    public PlantUmlResult(Diagram[] diagrams, String description, int totalPages, RenderRequest renderRequest) {
         this.diagrams = diagrams;
         this.description = description;
         this.pages = totalPages;
+        this.renderRequest = renderRequest;
     }
 
     public PlantUmlResult(String description, String error, int pages) {
@@ -32,6 +34,10 @@ public class PlantUmlResult {
             return new byte[0];
         }
         return diagrams[0].getDiagramBytes();
+    }
+
+    public RenderRequest getRenderRequest() {
+        return renderRequest;
     }
 
     public Diagram[] getDiagrams() {

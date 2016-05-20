@@ -101,6 +101,8 @@ public enum LanguageDescriptor {
 
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
             "startuml",
+            "startditaa",
+            "startdot",
             "enduml",
             "include",
             "define",

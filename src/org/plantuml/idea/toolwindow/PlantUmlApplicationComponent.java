@@ -16,18 +16,21 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
     public PlantUmlApplicationComponent() {
     }
 
+    @Override
     public void initComponent() {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.addDocumentListener(plantUmlDocumentListener);
         eventMulticaster.addCaretListener(plantUmlCaretListener);
     }
 
+    @Override
     public void disposeComponent() {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.removeDocumentListener(plantUmlDocumentListener);
         eventMulticaster.removeCaretListener(plantUmlCaretListener);
     }
 
+    @Override
     @NotNull
     public String getComponentName() {
         return "PlantUmlApplicationComponent";

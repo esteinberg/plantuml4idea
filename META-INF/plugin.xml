@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>1.9.0</version>
+    <version>2.0.0</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="129.000"/>
@@ -9,6 +9,11 @@
 
     <change-notes>
         <![CDATA[
+            <p>2.0.0</p>
+            <ul>
+               <li>PlantUml library upgrade to 8041</li>
+               <li>Images can be copied to clipboard as ASCII Art</li>
+            </ul>
             <p>1.9.0</p>
             <ul>
                <li>PlantUml library upgrade to 8036</li>

@@ -36,6 +36,18 @@ public class PlantUml {
                 return FileFormat.SVG;
             }
         },
+        UTXT {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.UTXT;
+            }
+        },
+        ATXT {
+            @Override
+            FileFormat getFormat() {
+                return FileFormat.ATXT;
+            }
+        },
         EPS {
             @Override
             FileFormat getFormat() {
@@ -50,19 +62,17 @@ public class PlantUml {
      * Renders file with support of plantUML include ange paging features, setting base dir and page for plantUML
      * to provided values
      *
-     * @param source  plantUML source code
-     * @param baseDir base dir to set
-     * @param format  desired image format
-     * @param page    page to render
+     * @param renderRequest
      * @return rendering result
      */
-    public static PlantUmlResult render(String source, @Nullable File baseDir, ImageFormat format, int page, int zoom) {
+    public static PlantUmlResult render(RenderRequest renderRequest) {
         try {
+            File baseDir = renderRequest.getBaseDir();
             if (baseDir != null) {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
 
-            return doRender(source, format, page, zoom);
+            return doRender(renderRequest);
         } finally {
             FileSystem.getInstance().reset();
         }
@@ -115,17 +125,16 @@ public class PlantUml {
     /**
      * Renders given source code into diagram
      *
-     * @param source plantUml source code
-     * @param format desired image format
+     * @param renderRequest
      * @return rendering result
      */
-    private static PlantUmlResult doRender(String source, ImageFormat format, int page, int zoom) {
+    private static PlantUmlResult doRender(RenderRequest renderRequest) {
         String desc = null;
         int totalPages = 0;
 
         try {
             // image generation.
-            SourceStringReader reader = new SourceStringReader(source);
+            SourceStringReader reader = new SourceStringReader(renderRequest.getSource());
 
             List<BlockUml> blocks = reader.getBlocks();
 
@@ -133,19 +142,19 @@ public class PlantUml {
                 BlockUml block = blocks.get(i);
 
                 Diagram diagram = block.getDiagram();
-                zoomDiagram(diagram, zoom);
+                zoomDiagram(diagram, renderRequest.getZoom());
 
                 totalPages = totalPages + diagram.getNbImages();
             }
 
             //image/error is not rendered when page >= totalPages
-            if (page >= totalPages) {
-                page = -1;
+            if (renderRequest.getPage() >= totalPages) {
+                renderRequest.setPage(-1);
             }
 
             PlantUmlResult.Diagram[] diagrams;
-            FileFormatOption formatOption = new FileFormatOption(format.getFormat());
-            if (page == -1) {//render all images
+            FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
+            if (renderRequest.getPage() == -1) {//render all images
                 diagrams = new PlantUmlResult.Diagram[totalPages];
                 for (int i = 0; i < totalPages; i++) {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -156,13 +165,13 @@ public class PlantUml {
                 diagrams = new PlantUmlResult.Diagram[1];
                 // Write the image to "os"
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
-                desc = reader.generateImage(os, page, formatOption);
+                desc = reader.generateImage(os, renderRequest.getPage(), formatOption);
                 diagrams[0] = new PlantUmlResult.Diagram(os.toByteArray());
             }
 
-            return new PlantUmlResult(diagrams, desc, totalPages);
+            return new PlantUmlResult(diagrams, desc, totalPages, renderRequest);
         } catch (Throwable e) {
-            logger.error("Failed to render image", e, source);
+            logger.warn("Failed to render image " + renderRequest.getSource(), e);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
     }

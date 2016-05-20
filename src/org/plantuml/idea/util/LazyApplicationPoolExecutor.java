@@ -37,9 +37,11 @@ public class LazyApplicationPoolExecutor implements Executor {
      *
      * @param command command to be executed.
      */
+    @Override
     public synchronized void execute(@NotNull final Runnable command) {
 
         next = new Runnable() {
+            @Override
             public void run() {
                 try {
                     command.run();

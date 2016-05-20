@@ -11,18 +11,21 @@ import org.plantuml.idea.util.UIUtils;
 public class PlantUmlRenderingFileEditorManagerListener implements FileEditorManagerListener {
     private static Logger logger = Logger.getInstance(PlantUmlRenderingFileEditorManagerListener.class);
 
+    @Override
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
         if (logger.isDebugEnabled()) {
             logger.debug("file opened " + file);
         }
     }
 
+    @Override
     public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
         if (logger.isDebugEnabled()) {
             logger.debug("file closed " + file);
         }
     }
 
+    @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         if (logger.isDebugEnabled()) {
             logger.debug("selection changed " + event);

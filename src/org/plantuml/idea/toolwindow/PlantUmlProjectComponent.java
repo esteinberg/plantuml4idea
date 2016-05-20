@@ -29,6 +29,7 @@ public class PlantUmlProjectComponent implements ProjectComponent {
     public void disposeComponent() {
     }
 
+    @Override
     @NotNull
     public String getComponentName() {
         return "PlantUmlToolWindowAutoOpener";

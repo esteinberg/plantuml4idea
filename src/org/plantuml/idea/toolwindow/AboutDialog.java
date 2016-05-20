@@ -3,8 +3,8 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlResult;
+import org.plantuml.idea.plantuml.RenderRequest;
 import org.plantuml.idea.util.ImageWithUrlData;
-import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -20,7 +20,7 @@ public class AboutDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JEditorPane aboutEditorPane;
-    private JLabel testDot;
+    private PlantUmlLabel testDot;
 
     public AboutDialog() {
         setContentPane(contentPane);
@@ -37,6 +37,7 @@ public class AboutDialog extends JDialog {
 
     private void ok() {
         buttonOK.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 onOK();
             }
@@ -63,11 +64,11 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        PlantUmlResult result = PlantUml.render(PlantUml.TESTDOT, null, PlantUml.ImageFormat.PNG, 0, 100);
+        PlantUmlResult result = PlantUml.render(new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100));
         try {
-            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null);
+            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null, result.getRenderRequest());
             if (imageWithUrlData.getImage() != null) {
-                UIUtils.setImageWithUrlData(imageWithUrlData, testDot, 100);
+                testDot.setup(imageWithUrlData, 100);
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);
