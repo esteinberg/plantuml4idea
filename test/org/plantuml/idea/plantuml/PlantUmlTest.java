@@ -42,6 +42,13 @@ public class PlantUmlTest extends TestCase {
                 intermediateText1.length() + dotSource.length() / 2));
     }
 
+    public void testExtractDiitaSource() {
+
+        String dotSource = "@startditaa\n diitacode\n @endditaa";
+        assertEquals(dotSource, PlantUml.extractSource(intermediateText1 + dotSource + intermediateText2,
+                intermediateText1.length() + dotSource.length() / 2));
+    }
+
     public void testExtractSourceWithComments() {
         String source = "/**\n" +
                 "* @startuml\n" +

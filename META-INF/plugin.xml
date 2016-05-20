@@ -13,6 +13,7 @@
             <ul>
                <li>PlantUml library upgrade to 8041</li>
                <li>Images can be copied to clipboard as ASCII Art</li>
+               <li>fixed: @startditaa` not recognized</li>
             </ul>
             <p>1.9.0</p>
             <ul>

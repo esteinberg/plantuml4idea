@@ -98,7 +98,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             File baseDir = new File(file.getVirtualFile().getParent().getPath());
             FileSystem.getInstance().setCurrentDir(baseDir);
             PlantUmlIncludes.commitIncludes(source, baseDir);
-            return SyntaxChecker.checkSyntax(source);
+            return SyntaxChecker.checkSyntaxFair(source);
         } finally {
             FileSystem.getInstance().reset();
         }
