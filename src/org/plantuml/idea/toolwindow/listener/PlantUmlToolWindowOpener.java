@@ -1,5 +1,6 @@
 package org.plantuml.idea.toolwindow.listener;
 
+import com.intellij.lang.LanguageUtil;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -8,7 +9,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.lang.PlantUmlLanguage;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
@@ -47,6 +48,6 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
     }
 
     private boolean isPlantUml(VirtualFile file) {
-        return file != null && file.getFileType() == PlantUmlFileType.PLANTUML_FILE_TYPE;
+        return file != null && LanguageUtil.getFileLanguage(file) == PlantUmlLanguage.INSTANCE;
     }
 }
