@@ -263,7 +263,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater(LazyApplicationPoolExecutor.Delay.NOW);
+        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
     }
 
     public void setPage(int page) {
