@@ -24,6 +24,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox plantUMLErrorAnnotationExperimentalCheckBox;
     private JButton browse;
     private JTextField renderDelay;
+    private JTextField cacheSize;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -90,12 +91,14 @@ public class PlantUmlSettingsPage implements Configurable {
         textFieldDotExecutable.setText(data.getDotExecutable());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         renderDelay.setText(data.getRenderDelay());
+        cacheSize.setText(data.getCacheSize());
     }
 
     public void getData(PlantUmlSettings data) {
         data.setDotExecutable(textFieldDotExecutable.getText());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setRenderDelay(renderDelay.getText());
+        data.setCacheSize(cacheSize.getText());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -103,6 +106,8 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
+            return true;
+        if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
             return true;
         return false;
     }

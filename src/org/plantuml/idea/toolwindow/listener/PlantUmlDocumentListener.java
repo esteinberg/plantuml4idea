@@ -20,7 +20,7 @@ public class PlantUmlDocumentListener implements DocumentListener {
     @Override
     public void documentChanged(DocumentEvent event) {
         if (logger.isDebugEnabled()) {
-            logger.debug("document changed " + event);
+            logger.debug("document changed ");
         }
         //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
         if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {

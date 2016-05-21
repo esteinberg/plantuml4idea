@@ -24,15 +24,15 @@ public class PlantUmlLabel extends JLabel {
     public PlantUmlLabel() {
     }
 
-    public PlantUmlLabel(ImageWithUrlData imageWithData, int i) {
-        setup(imageWithData, i);
+    public PlantUmlLabel(ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
+        setup(imageWithData, i, renderRequest);
     }
 
     public RenderRequest getRenderRequest() {
         return renderRequest;
     }
 
-    public void setup(ImageWithUrlData imageWithData, int i) {
+    public void setup(ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.getImage() != null) {
@@ -40,7 +40,7 @@ public class PlantUmlLabel extends JLabel {
         } else {
             setText("Failed to render page " + i);
         }
-        renderRequest = imageWithData.getRenderRequest();
+        this.renderRequest = renderRequest;
     }
 
     /**

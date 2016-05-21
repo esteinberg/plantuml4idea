@@ -8,6 +8,7 @@ import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -22,6 +23,12 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
+
+        PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+        JPanel imagesPanel = umlToolWindow.getImagesPanel();
+        JLabel component = (JLabel) imagesPanel.getComponent(0);
+        ImageIcon icon = (ImageIcon) component.getIcon();
+        final Image image = icon.getImage();
 
         CopyPasteManager.getInstance().setContents(new Transferable() {
             @Override
@@ -41,11 +48,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
                 if (!flavor.equals(DataFlavor.imageFlavor)) {
                     throw new UnsupportedFlavorException(flavor);
                 }
-                PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-                JPanel imagesPanel = umlToolWindow.getImagesPanel();
-                JLabel component = (JLabel) imagesPanel.getComponent(0);
-                ImageIcon icon = (ImageIcon) component.getIcon();
-                return icon.getImage();
+                return image;
             }
         });
     }

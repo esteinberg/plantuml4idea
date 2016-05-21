@@ -74,11 +74,17 @@ public class UIUtils {
 
             final Document document = selectedTextEditor.getDocument();
             final VirtualFile file = FileDocumentManager.getInstance().getFile(document);
-            if (file != null) {
-                VirtualFile parent = file.getParent();
-                if (parent != null && parent.isDirectory()) {
-                    baseDir = new File(parent.getPath());
-                }
+            baseDir = getParent(file);
+        }
+        return baseDir;
+    }
+
+    public static File getParent(VirtualFile file) {
+        File baseDir = null;
+        if (file != null) {
+            VirtualFile parent = file.getParent();
+            if (parent != null && parent.isDirectory()) {
+                baseDir = new File(parent.getPath());
             }
         }
         return baseDir;
@@ -131,5 +137,6 @@ public class UIUtils {
             plantUmlToolWindow.renderLater(delay);
         }
     }
+
 
 }

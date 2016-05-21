@@ -20,7 +20,7 @@ Contributors:
 * PlantUML tool window renders PlantUML source code under caret in currently selected editor
 * Supports multiple sources per file
 * Supports pagination and zoom
-* Can copy diagram to clipboard or export as PNG, EPS or SVG
+* Can copy diagram to clipboard or export as PNG, EPS or SVG, ASCII Art
 
 # Tips
 
@@ -31,6 +31,8 @@ Contributors:
 # Developer notes
 
 There are following branches:
+
+* debug logs can be enabled by adding '#org.plantuml' to [Help | Debug Log Settings] 
 
 ### master
 * Current production branch

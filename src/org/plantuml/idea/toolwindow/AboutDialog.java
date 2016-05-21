@@ -65,11 +65,11 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        PlantUmlResult result = PlantUmlRenderer.render(new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100));
+        PlantUmlResult result = PlantUmlRenderer.render(new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null), null);
         try {
-            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null, result.getRenderRequest());
+            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null);
             if (imageWithUrlData.getImage() != null) {
-                testDot.setup(imageWithUrlData, 100);
+                testDot.setup(imageWithUrlData, 100, result.getRenderRequest());
             }
         } catch (IOException e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);

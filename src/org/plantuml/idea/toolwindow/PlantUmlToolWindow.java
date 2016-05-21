@@ -7,16 +7,14 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.*;
+import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
@@ -29,8 +27,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Eugene Steinberg
@@ -44,13 +42,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private int zoom = 100;
     private int page = -1;
-    private int numPages = 1;
 
-    private volatile Set<File> cachedIncludedFiles;
-    private volatile File cachedBaseDir;
-    private String cachedSource = "";
-    private int cachedPage = page;
-    private int cachedZoom = zoom;
+    private RenderCache renderCache = new RenderCache(10);
 
     private AncestorListener plantUmlAncestorListener;
 
@@ -58,6 +51,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private SelectPageAction selectPageAction;
     private Project project;
+    private AtomicInteger sequence = new AtomicInteger();
 
     public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -135,123 +129,122 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
-    private boolean renderRequired(String newSource) {
-        if (newSource.isEmpty())
-            return false;
-        if (!newSource.equals(cachedSource) || page != cachedPage || zoom != cachedZoom) {
-            cachedSource = newSource;
-            cachedPage = page;
-            cachedZoom = zoom;
-            return true;
-        }
-        return false;
-    }
 
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("renderLater ", project.getName(), " ", delay);
-        }
+        logger.debug("renderLater ", project.getName(), " ", delay);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (isProjectValid(project)) {
+                    VirtualFile selectedFile = UIUtils.getSelectedFile(project);
+                    String sourceFilePath = selectedFile.getPath();
                     final String source = UIUtils.getSelectedSourceWithCaret(project);
-                    if (delay == LazyApplicationPoolExecutor.Delay.NOW || renderRequired(source)) {
+
+                    if ("".equals(source)) { //is included file or some crap?
+                        RenderCache.RenderCacheItem last = renderCache.displayedItem; //todo check all items for included file
+                        if (last != null && last.isIncludedFile(selectedFile)) {
+                            if (last.isIncludedFileChanged(selectedFile)) {
+                                logger.debug("includes changed, executing command");
+                                lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), page, zoom, null), delay);
+                            } else if (last.renderRequired(project, source, page)) {
+                                logger.debug("render required");
+                                lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), page, zoom, last), delay);
+                            } else {
+                                logger.debug("include file, not changed");
+                            }
+                        } else {
+                            logger.debug("empty source, not include file from last image");
+                        }
+                        return;
+                    }
+
+                    if (delay == LazyApplicationPoolExecutor.Delay.NOW) {
+                        logger.debug("executing Delay.NOW");
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(new RenderWithBaseDirRunnable(source, selectedDir), delay);
-                    } else if (includedFileChanged()) {
-                        lazyExecutor.execute(new RefreshImageRunnable(), delay);
+                        lazyExecutor.execute(getCommand(sourceFilePath, source, selectedDir, page, zoom, null), delay);
+                        return;
+                    }
+
+                    RenderCache.RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, page, zoom);
+                    if (cachedItem == null || cachedItem.renderRequired(project, source, page)) {
+                        logger.debug("render required");
+                        final File selectedDir = UIUtils.getSelectedDir(project);
+                        lazyExecutor.execute(getCommand(sourceFilePath, source, selectedDir, page, zoom, cachedItem), delay);
+                    } else {
+                        if (!renderCache.isDisplayed(cachedItem, page)) {
+                            logger.debug("displaying cached item ", cachedItem);
+                            cachedItem.setVersion(sequence.incrementAndGet());
+                            displayDiagram(cachedItem);
+                        } else {
+                            logger.debug("item already displayed ", cachedItem);
+                        }
                     }
                 }
             }
         });
     }
 
-    private boolean includedFileChanged() {
-        boolean result = false;
-        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
-        if (selectedTextEditor != null) {
-            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-            VirtualFile file = fileDocumentManager.getFile(selectedTextEditor.getDocument());
-            if (file != null) {
-                String path = file.getPath();
-                if (cachedIncludedFiles != null && cachedIncludedFiles.contains(new File(path)) && fileDocumentManager.isDocumentUnsaved(selectedTextEditor.getDocument())) {
-                    result = true;
-                }
-            }
-        }
-        return result;
-    }
 
-    public void applyNewSettings(PlantUmlSettings plantUmlSettings) {
-        lazyExecutor.setDelay(plantUmlSettings.getRenderDelayAsInt());
-    }
-
-    private class RefreshImageRunnable implements Runnable {
-        @Override
-        public void run() {
-            renderWithBaseDir(cachedSource, cachedBaseDir, cachedPage);
-        }
-    }
-
-    private class RenderWithBaseDirRunnable implements Runnable {
-        private final String source;
-        private final File selectedDir;
-
-        public RenderWithBaseDirRunnable(String source, File selectedDir) {
-            this.source = source;
-            this.selectedDir = selectedDir;
-        }
-
-        @Override
-        public void run() {
-            renderWithBaseDir(source, selectedDir, page);
-        }
-    }
-
-    private void renderWithBaseDir(String source, File baseDir, int pageNum) {
-        if (source.isEmpty()) {
-            return;
-        }
-
-        try {
-            Set<File> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
-
-            PlantUmlResult imageResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, pageNum, zoom));
-            PlantUmlResult svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, pageNum, zoom));
-            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
-
-
-            if (hasImages(imagesWithData)) {
-                cachedIncludedFiles = includedFiles;
-                cachedBaseDir = baseDir;
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
+    @NotNull
+    protected RenderCommand getCommand(String selectedFile, final String source, final File baseDir, final int page, final int zoom, RenderCache.RenderCacheItem cachedItem) {
+        logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
+        return new RenderCommand(selectedFile, source, baseDir, page, zoom, cachedItem, sequence.incrementAndGet()) {
+            @NotNull
+            @Override
+            protected Runnable postRender(final String sourceFilePath, final PlantUmlResult imageResult, final ImageWithUrlData[] imagesWithData, final Map<File, Long> includedFiles) {
+                return new Runnable() {
 
                     @Override
                     public void run() {
-                        imagesPanel.removeAll();
-                        for (int i = 0; i < imagesWithData.length; i++) {
-                            ImageWithUrlData imageWithData = imagesWithData[i];
-                            PlantUmlLabel label = new PlantUmlLabel(imageWithData, i);
-                            addScrollBarListeners(label);
-
-                            if (i != 0) {
-                                imagesPanel.add(separator());
-                            }
-                            imagesPanel.add(label);
-                        }
-                        imagesPanel.revalidate();
-                        imagesPanel.repaint();
+                        RenderCache.RenderCacheItem newItem = new RenderCache.RenderCacheItem(sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imagesWithData, imageResult.getRenderRequest().getVersion());
+                        renderCache.addToCache(newItem);
+                        displayDiagram(newItem);
                     }
-                });
+                };
+            }
+        };
+    }
 
-            }
-            if (!imageResult.isError()) {
-                setNumPages(imageResult.getPages());
-            }
-        } catch (Exception e) {
-            logger.warn("Exception occurred rendering source = " + source + ": " + e, e);
+    public void displayDiagram(RenderCache.RenderCacheItem cachedItem) {
+        if (renderCache.isOlderRequest(cachedItem)) {
+            logger.debug("skipping displaying older result", cachedItem);
+            return;
         }
+        logger.debug("displaying item ", cachedItem);
+        renderCache.displayedItem = cachedItem;
+        ImageWithUrlData[] imagesWithData = cachedItem.getImagesWithData();
+        PlantUmlResult imageResult = cachedItem.getImageResult();
+        imagesPanel.removeAll();
+        if (this.page >= imageResult.getPages()) {
+            this.page = -1;
+            selectPageAction.setPage(page);
+        }
+        if (this.page == -1) {
+            for (int i = 0; i < imagesWithData.length; i++) {
+                displayImage(imageResult, i, imagesWithData[i]);
+            }
+        } else {
+            displayImage(imageResult, page, imagesWithData[page]);
+        }
+        imagesPanel.revalidate();
+        imagesPanel.repaint();
+    }
+
+    public void displayImage(PlantUmlResult imageResult, int i, ImageWithUrlData imageWithData) {
+        logger.debug("displaying image ", i);
+        PlantUmlLabel label = new PlantUmlLabel(imageWithData, i, imageResult.getRenderRequest());
+        addScrollBarListeners(label);
+
+        if (i != 0) {
+            imagesPanel.add(separator());
+        }
+        imagesPanel.add(label);
+    }
+
+
+    public void applyNewSettings(PlantUmlSettings plantUmlSettings) {
+        lazyExecutor.setDelay(plantUmlSettings.getRenderDelayAsInt());
+        renderCache.setMaxCacheSize(plantUmlSettings.getCacheSizeAsInt());
     }
 
     private JSeparator separator() {
@@ -263,29 +256,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return separator;
     }
 
-    private boolean hasImages(ImageWithUrlData[] imagesWithUrlData) {
-        for (ImageWithUrlData imageWithUrlData : imagesWithUrlData) {
-            if (imageWithUrlData.getImage() != null) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private ImageWithUrlData[] toImagesWithUrlData(PlantUmlResult imageResult, PlantUmlResult svgResult, File baseDir) throws IOException {
-        PlantUmlResult.Diagram[] imageDiagrams = imageResult.getDiagrams();
-        PlantUmlResult.Diagram[] svgDiagrams = svgResult.getDiagrams();
-        //noinspection UndesirableClassUsage
-        final ImageWithUrlData[] imagesWithUrlData = new ImageWithUrlData[imageDiagrams.length];
-        for (int i = 0; i < imageDiagrams.length; i++) {
-            PlantUmlResult.Diagram imageDiagram = imageDiagrams[i];
-            PlantUmlResult.Diagram svgDiagram = svgDiagrams[i];
-            if (imageDiagram != null) {
-                imagesWithUrlData[i] = new ImageWithUrlData(imageDiagram.getDiagramBytes(), svgDiagram.getDiagramBytes(), baseDir, imageResult.getRenderRequest());
-            }
-        }
-        return imagesWithUrlData;
-    }
 
     public int getZoom() {
         return zoom;
@@ -297,7 +267,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void setPage(int page) {
-        if (page >= -1 && page < numPages) {
+        if (page >= -1 && page < getNumPages()) {
             this.page = page;
             selectPageAction.setPage(page);
             renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
@@ -313,14 +283,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public int getNumPages() {
-        return numPages;
+        int pages = -1;
+        RenderCache.RenderCacheItem last = renderCache.displayedItem;
+        if (last != null) {
+            PlantUmlResult imageResult = last.getImageResult();
+            if (imageResult != null) {
+                pages = imageResult.getPages();
+            }
+        }
+        return pages;
     }
 
-    public void setNumPages(int numPages) {
-        this.numPages = numPages;
-        if (page >= numPages)
-            setPage(numPages - 1);
-    }
 
     private boolean isProjectValid(Project project) {
         return project != null && !project.isDisposed();

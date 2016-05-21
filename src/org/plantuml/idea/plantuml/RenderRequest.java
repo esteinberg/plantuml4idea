@@ -3,23 +3,29 @@ package org.plantuml.idea.plantuml;
 import java.io.File;
 
 public class RenderRequest {
-    private File baseDir;
-    private String source;
-    private PlantUml.ImageFormat format;
-    private int page;
-    private int zoom;
+    private final File baseDir;
+    private final String source;
+    private final PlantUml.ImageFormat format;
+    private final int page;
+    private final int zoom;
+    private final Integer version;
 
-    /**
-     * @param baseDir
-     * @param source  plantUml source code
-     * @param format  desired image format
-     */
-    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom) {
+    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom, Integer version) {
         this.baseDir = baseDir;
         this.source = source;
         this.format = format;
         this.page = page;
         this.zoom = zoom;
+        this.version = version;
+    }
+
+    public RenderRequest(RenderRequest renderRequest, PlantUml.ImageFormat format) {
+        this.baseDir = renderRequest.baseDir;
+        this.source = renderRequest.source;
+        this.format = format;
+        this.page = renderRequest.page;
+        this.zoom = renderRequest.zoom;
+        this.version = null;
     }
 
     public File getBaseDir() {
@@ -42,12 +48,9 @@ public class RenderRequest {
         return zoom;
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
 
-    public void setFormat(PlantUml.ImageFormat format) {
-        this.format = format;
+    public Integer getVersion() {
+        return version;
     }
 
 }

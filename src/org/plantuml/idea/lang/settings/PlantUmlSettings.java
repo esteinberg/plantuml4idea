@@ -22,6 +22,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
     private String renderDelay = "100";
+    private String cacheSize = "10";
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -51,6 +52,18 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         this.autoHide = autoHide;
     }
 
+    public String getCacheSize() {
+        return cacheSize;
+    }
+
+    public int getCacheSizeAsInt() {
+        return Utils.asInt(cacheSize, 10);
+    }
+
+    public void setCacheSize(String cacheSize) {
+        this.cacheSize = String.valueOf(Math.max(0, Utils.asInt(cacheSize, 10)));
+    }
+
     public String getRenderDelay() {
         return renderDelay;
     }
@@ -60,8 +73,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public void setRenderDelay(String renderDelay) {
-        int i = Utils.asInt(renderDelay, 100);
-        this.renderDelay = String.valueOf(i);
+        this.renderDelay = String.valueOf(Math.max(0, Utils.asInt(renderDelay, 100)));
     }
 
     @Nullable
@@ -92,7 +104,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         } else {
             GraphvizUtils.setDotExecutable(dotExecutable);
         }
-        
+
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (toolWindow != null) {

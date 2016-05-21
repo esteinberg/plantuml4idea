@@ -1,7 +1,6 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
-import org.plantuml.idea.plantuml.RenderRequest;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -30,16 +29,30 @@ import java.util.List;
 public class ImageWithUrlData {
     Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
-    private final RenderRequest renderRequest;
+    private BufferedImage image;
+    private UrlData[] urls;
 
-    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir, RenderRequest renderRequest) throws IOException {
-        this.renderRequest = renderRequest;
+    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir) throws IOException {
         this.parseImage(imageData);
         this.parseUrls(svgData, baseDir);
     }
 
-    public RenderRequest getRenderRequest() {
-        return renderRequest;
+    public ImageWithUrlData(ImageWithUrlData input) {
+        image = input.image;
+        UrlData[] urls = input.getUrls();
+        if (urls != null) {
+            this.urls = new UrlData[urls.length];
+            for (int i = 0; i < urls.length; i++) {
+                this.urls[i] = urls[i];
+            }
+        }
+    }
+
+    public static ImageWithUrlData deepClone(ImageWithUrlData imageWithUrlData) {
+        if (imageWithUrlData != null) {
+            return new ImageWithUrlData(imageWithUrlData);
+        }
+        return null;
     }
 
     public BufferedImage getImage() {
@@ -145,6 +158,4 @@ public class ImageWithUrlData {
         return uri;
     }
 
-    private BufferedImage image;
-    private UrlData[] urls;
 }

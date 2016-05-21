@@ -7,6 +7,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -23,6 +24,9 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
+        JLabel data = (JLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageIcon icon = (ImageIcon) data.getIcon();
+        final Image image = icon.getImage();
         CopyPasteManager.getInstance().setContents(new Transferable() {
 
             @Override
@@ -43,9 +47,7 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
                     throw new UnsupportedFlavorException(flavor);
                 }
 
-                JLabel data = (JLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-                ImageIcon icon = (ImageIcon) data.getIcon();
-                return icon.getImage();
+                return image;
             }
         });
     }

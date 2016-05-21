@@ -15,9 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
 
@@ -25,20 +23,24 @@ public class PlantUmlIncludes {
 
     private static final Logger logger = Logger.getInstance(PlantUmlIncludes.class);
 
-    public static Set<File> commitIncludes(String source, @Nullable File baseDir) {
+    public static Map<File, Long> commitIncludes(String source, @Nullable File baseDir) {
         try {
             if (baseDir != null) {
+                HashMap<File, Long> fileLongHashMap = new HashMap<File, Long>();
                 BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir, null);
                 Set<File> includedFiles = FileWithSuffix.convert(blockUmlBuilder.getIncludedFiles());
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);
                 }
-                return includedFiles;
+                for (File includedFile : includedFiles) {
+                    fileLongHashMap.put(includedFile, includedFile.lastModified());
+                }
+                return fileLongHashMap;
             }
         } catch (IOException e) {
             logger.error(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
         }
-        return Collections.emptySet();
+        return Collections.emptyMap();
     }
 
     private static void saveModifiedFiles(final Set<File> files) {
