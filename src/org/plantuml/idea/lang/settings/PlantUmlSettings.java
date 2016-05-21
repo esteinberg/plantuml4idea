@@ -22,7 +22,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
     private String renderDelay = "100";
-    private String cacheSize = "10";
+    private String cacheSize = "5";
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
