@@ -95,14 +95,14 @@ public class ReverseArrowIntention extends BaseIntentionAction {
             char[] chars = line.toCharArray();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("invoking caretOffsetWithinLine=" + caretOffsetWithinLine + ", line='" + line + "'");
+                logger.debug("invoking caretOffsetWithinLine=", caretOffsetWithinLine, ", line='", line, "'");
             }
 
             Arrow arrow = Arrow.from(caretOffsetWithinLine, chars);
             int start = arrow.getStart();
             int end = arrow.getEnd();
             if (logger.isDebugEnabled()) {
-                logger.debug("result: isValid=" + arrow.isValid() + ", start=" + start + ", end=" + end);
+                logger.debug("result: isValid=", arrow.isValid(), ", start=", start, ", end=" + end);
             }
 
             if (!validateOnly && arrow.isValid()) {

@@ -16,16 +16,12 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlIncludes;
-import org.plantuml.idea.plantuml.PlantUmlResult;
-import org.plantuml.idea.plantuml.RenderRequest;
+import org.plantuml.idea.plantuml.*;
 import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
-import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -56,7 +52,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private int cachedPage = page;
     private int cachedZoom = zoom;
 
-    private AncestorListener plantUmlAncestorListener = new PlantUmlAncestorListener();
+    private AncestorListener plantUmlAncestorListener;
 
     private final LazyApplicationPoolExecutor lazyExecutor;
 
@@ -71,8 +67,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         setupUI();
 
-        this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
         lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt());
+        plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
+        //must be last
+        this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
     }
 
     private void setupUI() {
@@ -149,20 +147,20 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return false;
     }
 
-    public void renderLater() {
+    public void renderLater(final LazyApplicationPoolExecutor.Delay delay) {
         if (logger.isDebugEnabled()) {
-            logger.debug("renderLater " + project.getName());
+            logger.debug("renderLater ", project.getName(), " ", delay);
         }
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (isProjectValid(project)) {
                     final String source = UIUtils.getSelectedSourceWithCaret(project);
-                    if (renderRequired(source)) {
+                    if (delay == LazyApplicationPoolExecutor.Delay.NOW || renderRequired(source)) {
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(new RenderWithBaseDirRunnable(source, selectedDir));
+                        lazyExecutor.execute(new RenderWithBaseDirRunnable(source, selectedDir), delay);
                     } else if (includedFileChanged()) {
-                        lazyExecutor.execute(new RefreshImageRunnable());
+                        lazyExecutor.execute(new RefreshImageRunnable(), delay);
                     }
                 }
             }
@@ -219,8 +217,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         try {
             Set<File> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
 
-            PlantUmlResult imageResult = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, pageNum, zoom).render();
-            PlantUmlResult svgResult = new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, pageNum, zoom).render();
+            PlantUmlResult imageResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, pageNum, zoom));
+            PlantUmlResult svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, pageNum, zoom));
             final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
 
 
@@ -295,14 +293,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater();
+        renderLater(LazyApplicationPoolExecutor.Delay.NOW);
     }
 
     public void setPage(int page) {
         if (page >= -1 && page < numPages) {
             this.page = page;
             selectPageAction.setPage(page);
-            renderLater();
+            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
         }
     }
 
@@ -328,27 +326,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return project != null && !project.isDisposed();
     }
 
-
-    class PlantUmlAncestorListener implements AncestorListener {
-        private Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);
-
-        @Override
-        public void ancestorAdded(AncestorEvent ancestorEvent) {
-            logger.debug("ancestorAdded " + project.getName());
-            renderLater();
-        }
-
-        @Override
-        public void ancestorRemoved(AncestorEvent event) {
-
-        }
-
-        @Override
-        public void ancestorMoved(AncestorEvent event) {
-
-        }
-
-    }
 
     public JPanel getImagesPanel() {
         return imagesPanel;

@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.CharsetToolkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlRenderer;
 import org.plantuml.idea.plantuml.PlantUmlResult;
 import org.plantuml.idea.plantuml.RenderRequest;
 import org.plantuml.idea.toolwindow.PlantUmlLabel;
@@ -59,7 +60,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
                 if (data != null) {
                     RenderRequest renderRequest = data.getRenderRequest();
                     renderRequest.setFormat(getFormat());
-                    PlantUmlResult render = renderRequest.render();
+                    PlantUmlResult render = PlantUmlRenderer.render(renderRequest);
 
                     return new String(render.getFirstDiagramBytes(), CharsetToolkit.UTF8);
                 }

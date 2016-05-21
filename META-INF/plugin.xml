@@ -13,7 +13,8 @@
             <ul>
                <li>PlantUml library upgrade to 8041</li>
                <li>Images can be copied to clipboard as ASCII Art</li>
-               <li>fixed: @startditaa` not recognized</li>
+               <li>Fixed: @startditaa` not recognized</li>
+               <li>Added a configurable delay between key up event and rendering run</li>
             </ul>
             <p>1.9.0</p>
             <ul>
@@ -52,6 +53,10 @@
 
     <actions>
         <group id="PlantUML.Toolbar" description="PlantUML toolbar">
+            <action id="PlantUML.RenderNow" description="Render now"
+                    class="org.plantuml.idea.action.RenderNowAction"
+                    icon="/actions/refresh.png" text="Render PlantUml diagram"
+            />
             <action id="PlantUML.CopyToClipboard" description="Copy current diagram to clipboard"
                     class="org.plantuml.idea.action.CopyDiagramToClipboardAction"
                     icon="/actions/copy.png" text="Copy current diagram to clipboard"

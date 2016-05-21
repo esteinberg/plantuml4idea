@@ -72,7 +72,11 @@ public class PlantUmlRenderer {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
 
-            return doRender(renderRequest);
+            long start = System.currentTimeMillis();
+            PlantUmlResult plantUmlResult = doRender(renderRequest);
+            long total = System.currentTimeMillis() - start;
+            logger.debug("rendered ", renderRequest.getFormat(), " in ", total, "ms");
+            return plantUmlResult;
         } finally {
             FileSystem.getInstance().reset();
         }
@@ -127,7 +131,7 @@ public class PlantUmlRenderer {
 
             return new PlantUmlResult(diagrams, desc, totalPages, renderRequest);
         } catch (Throwable e) {
-            logger.debug("Failed to render image " + renderRequest.getSource(), e);
+            logger.error("Failed to render image " + renderRequest.getSource(), e);
             return new PlantUmlResult(desc, e.getMessage(), totalPages);
         }
     }

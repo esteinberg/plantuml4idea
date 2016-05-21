@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow.listener;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
+import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlCaretListener implements CaretListener {
@@ -11,13 +12,13 @@ public class PlantUmlCaretListener implements CaretListener {
     @Override
     public void caretPositionChanged(final CaretEvent e) {
         logger.debug("caretPositionChanged");
-        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject());
+        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
     }
 
     @Override
     public void caretAdded(CaretEvent e) {
         logger.debug("caretAdded");
-        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject());
+        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
     }
 
     @Override

@@ -50,7 +50,4 @@ public class RenderRequest {
         this.format = format;
     }
 
-    public PlantUmlResult render() {
-        return PlantUmlRenderer.render(this);
-    }
 }

@@ -118,7 +118,7 @@ public class UIUtils {
         return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 
-    public static void renderPlantUmlToolWindowLater(@Nullable Project project) {
+    public static void renderPlantUmlToolWindowLater(@Nullable Project project, LazyApplicationPoolExecutor.Delay delay) {
         if (project == null) return;
 
         ToolWindow toolWindow = getToolWindow(project);
@@ -128,7 +128,8 @@ public class UIUtils {
 
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
         if (plantUmlToolWindow != null) {
-            plantUmlToolWindow.renderLater();
+            plantUmlToolWindow.renderLater(delay);
         }
     }
+
 }
