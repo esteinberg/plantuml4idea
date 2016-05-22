@@ -139,21 +139,29 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     final String source = UIUtils.getSelectedSourceWithCaret(project);
 
                     if ("".equals(source)) { //is included file or some crap?
+                        logger.debug("empty source");
                         VirtualFile selectedFile = UIUtils.getSelectedFile(project);
                         RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file
 
                         if (last != null && last.isIncludedFile(selectedFile)) {
+                            logger.debug("include file selected");
                             if (last.isIncludedFileChanged(selectedFile)) {
                                 logger.debug("includes changed, executing command");
                                 lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), page, zoom, null, delay), delay);
-                            } else if (last.renderRequired(project, source, page)) {
+                            } else if (last.renderRequired(project, last.getSource(), page)) {
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), page, zoom, last, delay), delay);
+                            } else if (!renderCache.isDisplayed(last, page)) {
+                                logger.debug("displaying cached item ", last);
+                                displayExistingDiagram(last);
                             } else {
                                 logger.debug("include file, not changed");
                             }
+                        } else if (last != null && !renderCache.isDisplayed(last, page)) {
+                            logger.debug("empty source, not include file, displaying cached item ", last);
+                             displayExistingDiagram(last);   
                         } else {
-                            logger.debug("empty source, not include file from last image");
+                            logger.debug("nothing needed");
                         }
                         return;
                     }
@@ -175,9 +183,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     } else {
                         if (!renderCache.isDisplayed(cachedItem, page)) {
                             logger.debug("displaying cached item ", cachedItem);
-                            cachedItem.setVersion(sequence.incrementAndGet());
-                            cachedItem.setPage(page);
-                            displayDiagram(cachedItem);
+                            displayExistingDiagram(cachedItem);
                         } else {
                             logger.debug("item already displayed ", cachedItem);
                         }
@@ -185,6 +191,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 }
             }
         });
+    }
+
+    public void displayExistingDiagram(RenderCacheItem last) {
+        last.setVersion(sequence.incrementAndGet());
+        last.setPage(page);
+        displayDiagram(last);
     }
 
 
