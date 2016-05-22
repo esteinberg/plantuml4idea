@@ -63,7 +63,7 @@ public class RenderCacheItem {
                 }
             }
         } else {
-            if (imagesWithData.length < page || !imagesWithData[page].getSource().equals(source)) {
+            if (imagesWithData.length <= page || !imagesWithData[page].getSource().equals(source)) {
                 return true;
             }
         }
@@ -79,7 +79,7 @@ public class RenderCacheItem {
                 }
             }
         } else {
-            if (imagesWithData.length < page || imagesWithData[page] == null) {
+            if (imagesWithData.length <= page || imagesWithData[page] == null) {
                 return true;
             }
         }

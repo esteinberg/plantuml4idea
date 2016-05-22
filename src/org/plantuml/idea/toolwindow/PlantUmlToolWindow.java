@@ -255,6 +255,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         RenderResult imageResult = cacheItem.getImageResult();
 
         imagesPanel.removeAll();
+        if (this.page >= imageResult.getPages()) {
+            this.page = -1;
+        }
         if (this.page == -1) {
             for (int i = 0; i < imagesWithData.length; i++) {
                 displayImage(cacheItem, imageResult, i, imagesWithData[i]);
