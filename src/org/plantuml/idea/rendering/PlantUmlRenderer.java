@@ -78,7 +78,6 @@ public class PlantUmlRenderer {
             if (baseDir != null) {
                 FileSystem.getInstance().setCurrentDir(baseDir);
             }
-
             long start = System.currentTimeMillis();
             RenderResult renderResult = doRender(renderRequest, cachedItem);
             long total = System.currentTimeMillis() - start;
@@ -202,10 +201,13 @@ public class PlantUmlRenderer {
 
     @NotNull
     private static RenderResult.Diagram generateImage(SourceStringReader reader, FileFormatOption formatOption, int i) throws IOException {
-        logger.debug("generating ", formatOption.getFileFormat(), " for page ", i);
+        long start = System.currentTimeMillis();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         String description = reader.generateImage(os, i, formatOption);
-        return new RenderResult.Diagram(i, description, os.toByteArray());
+        long total = System.currentTimeMillis() - start;
+        RenderResult.Diagram diagram = new RenderResult.Diagram(i, description, os.toByteArray());
+        logger.debug("generated ", formatOption.getFileFormat(), " for page ", i, " in ", total, "ms");
+        return diagram;
     }
 
     static void zoomDiagram(Diagram diagram, int zoom) {

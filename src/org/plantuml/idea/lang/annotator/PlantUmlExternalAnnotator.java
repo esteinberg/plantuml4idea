@@ -2,6 +2,7 @@ package org.plantuml.idea.lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -24,11 +25,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.System.currentTimeMillis;
+
 /**
  * Author: Eugene Steinberg
  * Date: 9/13/14
  */
 public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAnnotationResult> {
+    private static final Logger logger = Logger.getInstance(PlantUmlExternalAnnotator.class);
     @Nullable
     @Override
     public PsiFile collectInformation(@NotNull PsiFile file) {
@@ -76,7 +80,11 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     @Nullable
     private Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source) {
         Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+
+        long start = currentTimeMillis();
         SyntaxResult syntaxResult = checkSyntax(file, source);
+        logger.debug("syntax checked in ", currentTimeMillis() - start, "ms");
+        
         if (syntaxResult.isError()) {
             String beforeInclude = StringUtils.substringBefore(source, "!include");
             int includeLineNumber = StringUtils.splitPreserveAllTokens(beforeInclude, "\n").length;
@@ -94,6 +102,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     }
 
     private SyntaxResult checkSyntax(PsiFile file, String source) {
+
         try {
             File baseDir = new File(file.getVirtualFile().getParent().getPath());
             FileSystem.getInstance().setCurrentDir(baseDir);

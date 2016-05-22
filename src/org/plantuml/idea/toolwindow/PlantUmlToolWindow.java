@@ -190,12 +190,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         return;
                     }
 
-                    RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, zoom);
+                    RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
                         lazyExecutor.execute(getCommand(sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay), delay);
                     } else {
+                        logger.debug("render not required");
                         if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
                             logger.debug("displaying cached item ", cachedItem);
                             displayExistingDiagram(cachedItem);
