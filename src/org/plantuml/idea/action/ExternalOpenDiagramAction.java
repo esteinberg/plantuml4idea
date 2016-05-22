@@ -6,7 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;

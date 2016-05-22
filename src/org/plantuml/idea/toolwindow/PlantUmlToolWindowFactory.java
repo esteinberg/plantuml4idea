@@ -6,7 +6,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import org.plantuml.idea.util.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 
 /**
  * @author Eugene Steinberg

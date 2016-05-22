@@ -13,6 +13,7 @@ import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 

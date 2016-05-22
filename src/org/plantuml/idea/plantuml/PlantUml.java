@@ -18,36 +18,36 @@ public class PlantUml {
     public enum ImageFormat {
         PNG {
             @Override
-            FileFormat getFormat() {
+            public FileFormat getFormat() {
                 return FileFormat.PNG;
             }
         },
         SVG {
             @Override
-            FileFormat getFormat() {
+            public FileFormat getFormat() {
                 return FileFormat.SVG;
             }
         },
         UTXT {
             @Override
-            FileFormat getFormat() {
+            public FileFormat getFormat() {
                 return FileFormat.UTXT;
             }
         },
         ATXT {
             @Override
-            FileFormat getFormat() {
+            public FileFormat getFormat() {
                 return FileFormat.ATXT;
             }
         },
         EPS {
             @Override
-            FileFormat getFormat() {
+            public FileFormat getFormat() {
                 return FileFormat.EPS;
             }
         };
 
-        abstract FileFormat getFormat();
+        public abstract FileFormat getFormat();
     }
     public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
     private static Pattern sourcePattern =

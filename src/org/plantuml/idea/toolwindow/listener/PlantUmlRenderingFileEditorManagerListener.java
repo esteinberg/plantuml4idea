@@ -6,7 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.util.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlRenderingFileEditorManagerListener implements FileEditorManagerListener {
@@ -26,6 +26,9 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
         }
     }
 
+    /**
+     * tab switch
+     */
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         if (logger.isDebugEnabled()) {

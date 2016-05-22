@@ -1,4 +1,7 @@
-package org.plantuml.idea.plantuml;
+package org.plantuml.idea.rendering;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.plantuml.idea.plantuml.PlantUml;
 
 import java.io.File;
 
@@ -48,9 +51,19 @@ public class RenderRequest {
         return zoom;
     }
 
-
     public Integer getVersion() {
         return version;
     }
 
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("baseDir", baseDir)
+                .append("format", format)
+                .append("page", page)
+                .append("zoom", zoom)
+                .append("version", version)
+                .toString();
+    }
 }

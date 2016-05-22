@@ -2,9 +2,9 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlRenderer;
-import org.plantuml.idea.plantuml.PlantUmlResult;
-import org.plantuml.idea.plantuml.RenderRequest;
+import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.util.ImageWithUrlData;
 
 import javax.swing.*;
@@ -65,9 +65,9 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        PlantUmlResult result = PlantUmlRenderer.render(new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null), null);
+        RenderResult result = PlantUmlRenderer.render(new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null), null);
         try {
-            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(result.getFirstDiagramBytes(), null, null);
+            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(null, result.getFirstDiagramBytes(), null, null);
             if (imageWithUrlData.getImage() != null) {
                 testDot.setup(imageWithUrlData, 100, result.getRenderRequest());
             }

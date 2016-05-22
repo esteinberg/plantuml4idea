@@ -7,7 +7,7 @@ import com.intellij.ui.PopupHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.*;
-import org.plantuml.idea.plantuml.RenderRequest;
+import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.util.ImageWithUrlData;
 
 import javax.swing.*;

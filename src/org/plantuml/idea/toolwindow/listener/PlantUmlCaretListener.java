@@ -4,7 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import org.plantuml.idea.util.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlCaretListener implements CaretListener {

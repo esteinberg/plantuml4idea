@@ -1,11 +1,12 @@
-package org.plantuml.idea.plantuml;
+package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.toolwindow.RenderCache;
+import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.ImageWithUrlData;
 
 import java.io.ByteArrayOutputStream;
@@ -71,7 +72,7 @@ public class PlantUmlRenderer {
      * @param cachedItem
      * @return rendering result
      */
-    public static PlantUmlResult render(RenderRequest renderRequest, RenderCache.RenderCacheItem cachedItem) {
+    public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
         try {
             File baseDir = renderRequest.getBaseDir();
             if (baseDir != null) {
@@ -79,10 +80,10 @@ public class PlantUmlRenderer {
             }
 
             long start = System.currentTimeMillis();
-            PlantUmlResult plantUmlResult = doRender(renderRequest, cachedItem);
+            RenderResult renderResult = doRender(renderRequest, cachedItem);
             long total = System.currentTimeMillis() - start;
             logger.debug("rendered ", renderRequest.getFormat(), " in ", total, "ms");
-            return plantUmlResult;
+            return renderResult;
         } finally {
             FileSystem.getInstance().reset();
         }
@@ -95,7 +96,7 @@ public class PlantUmlRenderer {
      * @param cachedItem
      * @return rendering result
      */
-    private static PlantUmlResult doRender(RenderRequest renderRequest, RenderCache.RenderCacheItem cachedItem) {
+    private static RenderResult doRender(RenderRequest renderRequest, RenderCacheItem cachedItem) {
 
         try {
             // image generation.
@@ -110,26 +111,34 @@ public class PlantUmlRenderer {
             }
 
 
-            List<PlantUmlResult.Diagram> result = new ArrayList<PlantUmlResult.Diagram>();
+            List<RenderResult.Diagram> result = new ArrayList<RenderResult.Diagram>();
             FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
-
+            boolean renderAll = false;
 
             if (cachedItem != null && totalPages > 1 && cachedItem.getImagesWithData().length == totalPages) {
                 logger.debug("incremental rendering, totalPages=", totalPages);
-                String cachedSource = cachedItem.getSource();
-                String[] cachedSourceSplit = cachedSource.split("@newpage");
                 String[] renderRequestSplit = renderRequest.getSource().split("@newpage");
 
-                if (cachedSourceSplit.length == renderRequestSplit.length && renderRequestSplit.length == totalPages) {
+                if (renderRequestSplit.length == totalPages) {
                     if (renderRequestPage == -1) {
                         for (int i = 0; i < totalPages; i++) {
-                            generateImageIfNecessary(cachedItem, reader, i, result, formatOption, cachedSourceSplit, renderRequestSplit);
+                            generateImageIfNecessary(cachedItem, reader, i, result, formatOption, renderRequestSplit);
                         }
                     } else {
-                        generateImageIfNecessary(cachedItem, reader, renderRequestPage, result, formatOption, cachedSourceSplit, renderRequestSplit);
+                        generateImageIfNecessary(cachedItem, reader, renderRequestPage, result, formatOption, renderRequestSplit);
                     }
+                } else {
+                    logger.debug("number of pages changed, or included file contains a newpage");
+                    renderAll = true;
                 }
             } else {
+                logger.debug("no incremental rendering");
+                renderAll = true;
+            }
+
+
+            if (renderAll) {
+                logger.debug("render all");
                 if (renderRequestPage == -1) {//render all images
                     for (int i = 0; i < totalPages; i++) {
                         result.add(generateImage(reader, formatOption, i));
@@ -139,11 +148,10 @@ public class PlantUmlRenderer {
                 }
             }
 
-
-            return new PlantUmlResult(result, totalPages, renderRequest);
+            return new RenderResult(result, totalPages, renderRequest);
         } catch (Throwable e) {
             logger.error("Failed to render image " + renderRequest.getSource(), e);
-            return new PlantUmlResult(Collections.EMPTY_LIST, 0, renderRequest);
+            return new RenderResult(Collections.EMPTY_LIST, 0, renderRequest);
         }
     }
 
@@ -162,27 +170,37 @@ public class PlantUmlRenderer {
         return totalPages;
     }
 
-    private static void generateImageIfNecessary(RenderCache.RenderCacheItem cachedItem, SourceStringReader reader, int renderRequestPage, List<PlantUmlResult.Diagram> result, FileFormatOption formatOption, String[] cachedSourceSplit, String[] renderRequestSplit) throws IOException {
-        if (shouldGenerate(cachedItem, cachedSourceSplit, renderRequestSplit, renderRequestPage)) {
+    private static void generateImageIfNecessary(RenderCacheItem cachedItem, SourceStringReader reader, int renderRequestPage, List<RenderResult.Diagram> result, FileFormatOption formatOption, String[] renderRequestSplit) throws IOException {
+        if (shouldGenerate(cachedItem, renderRequestSplit, renderRequestPage)) {
             result.add(generateImage(reader, formatOption, renderRequestPage));
         } else {
             logger.debug("page ", renderRequestPage, " no change");
         }
     }
 
-    private static boolean shouldGenerate(RenderCache.RenderCacheItem cachedItem, String[] cachedSourceSplit, String[] renderRequestSplit, int i) {
-        String renderRequestPiece = renderRequestSplit[i];
-        String cachedSourcePiece = cachedSourceSplit[i];
+    private static boolean shouldGenerate(RenderCacheItem cachedItem, String[] renderRequestSplit, int i) {
         ImageWithUrlData imageWithUrlData = cachedItem.getImagesWithData()[i];
-        return imageWithUrlData == null || !renderRequestPiece.equals(cachedSourcePiece);
+        if (imageWithUrlData == null) return true;
+
+        String source = imageWithUrlData.getSource();
+        if (source == null) return true;
+
+        String[] split = source.split("@newpage");
+        if (split.length != renderRequestSplit.length) return true;
+
+        String renderRequestPiece = renderRequestSplit[i];
+        String cachedSourcePiece = split[i];
+        if (!renderRequestPiece.equals(cachedSourcePiece)) return true;
+
+        return false;
     }
 
     @NotNull
-    private static PlantUmlResult.Diagram generateImage(SourceStringReader reader, FileFormatOption formatOption, int i) throws IOException {
+    private static RenderResult.Diagram generateImage(SourceStringReader reader, FileFormatOption formatOption, int i) throws IOException {
         logger.debug("generating ", formatOption.getFileFormat(), " for page ", i);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        reader.generateImage(os, i, formatOption);
-        return new PlantUmlResult.Diagram(i, os.toByteArray());
+        String description = reader.generateImage(os, i, formatOption);
+        return new RenderResult.Diagram(i, description, os.toByteArray());
     }
 
     static void zoomDiagram(Diagram diagram, int zoom) {

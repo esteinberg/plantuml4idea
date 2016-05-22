@@ -5,7 +5,6 @@
 *.ear
 
 # Idea files
-*.iml
 .idea
 out
 .DS_Store

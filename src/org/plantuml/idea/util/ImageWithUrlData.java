@@ -1,6 +1,8 @@
 package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -27,18 +29,21 @@ import java.util.List;
  *         18.06.15
  */
 public class ImageWithUrlData {
-    Logger logger = Logger.getInstance(ImageWithUrlData.class);
+    static Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
     private BufferedImage image;
+    private String source;
     private UrlData[] urls;
 
-    public ImageWithUrlData(byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+    public ImageWithUrlData(String source, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+        this.source = source;
         this.parseImage(imageData);
         this.parseUrls(svgData, baseDir);
     }
 
     public ImageWithUrlData(ImageWithUrlData input) {
-        image = input.image;
+        this.source = input.getSource();
+        this.image = input.image;
         UrlData[] urls = input.getUrls();
         if (urls != null) {
             this.urls = new UrlData[urls.length];
@@ -57,6 +62,10 @@ public class ImageWithUrlData {
 
     public BufferedImage getImage() {
         return image;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public UrlData[] getUrls() {
@@ -158,4 +167,10 @@ public class ImageWithUrlData {
         return uri;
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("hasImage", image != null)
+                .toString();
+    }
 }

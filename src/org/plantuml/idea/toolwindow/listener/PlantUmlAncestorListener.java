@@ -1,16 +1,18 @@
-package org.plantuml.idea.toolwindow;
+package org.plantuml.idea.toolwindow.listener;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.plantuml.idea.util.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
-class PlantUmlAncestorListener implements AncestorListener {
+public class PlantUmlAncestorListener implements AncestorListener {
+    private static Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);
+
     private PlantUmlToolWindow plantUmlToolWindow;
     private Project project;
-    private Logger logger = Logger.getInstance(PlantUmlAncestorListener.class);
 
     public PlantUmlAncestorListener(PlantUmlToolWindow plantUmlToolWindow, Project project) {
         this.plantUmlToolWindow = plantUmlToolWindow;

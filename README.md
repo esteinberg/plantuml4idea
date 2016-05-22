@@ -27,12 +27,13 @@ Contributors:
 * Don't forget that @startuml tag is required.
 * To be able to generate many diagram types, you must have [Graphviz](http://plantuml.sourceforge.net/graphvizdot.html)
  installed on your machine. About screen tests your installation.
+* Image cache size can be tuned in the settings, if you have not enough heap.
 
 # Developer notes
 
-There are following branches:
-
 * debug logs can be enabled by adding '#org.plantuml' to [Help | Debug Log Settings] 
+
+##There are following branches:
 
 ### master
 * Current production branch

@@ -3,8 +3,8 @@ package org.plantuml.idea.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
-import org.plantuml.idea.util.LazyApplicationPoolExecutor;
 import org.plantuml.idea.util.UIUtils;
 
 import java.text.SimpleDateFormat;

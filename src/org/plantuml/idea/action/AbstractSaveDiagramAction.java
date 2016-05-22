@@ -12,7 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
