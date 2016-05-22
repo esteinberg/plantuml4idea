@@ -3,12 +3,9 @@ package org.plantuml.idea.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
-import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 
@@ -18,19 +15,20 @@ import javax.swing.*;
  */
 public class SelectPageAction extends ComboBoxAction {
     private int numPages = 1;
-    ComboBoxButton button;
+    private PlantUmlToolWindow plantUmlToolWindow;
+
+    public SelectPageAction(PlantUmlToolWindow plantUmlToolWindow) {
+        this.plantUmlToolWindow = plantUmlToolWindow;
+    }
 
     @Override
     @NotNull
     protected DefaultActionGroup createPopupActionGroup(JComponent button) {
-        this.button = (ComboBoxButton) button;
         DefaultActionGroup group = new DefaultActionGroup();
-
         group.add(new SetPageAction(-1));
         for (int i = 0; i < numPages; i++) {
             group.add(new SetPageAction(i));
         }
-
         return group;
     }
 
@@ -53,26 +51,14 @@ public class SelectPageAction extends ComboBoxAction {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-            final Project project = anActionEvent.getProject();
-            if (project != null) {
-                PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-
-                if (plantUmlToolWindow != null)
-                    plantUmlToolWindow.setPage(page);
-            }
+            plantUmlToolWindow.setPage(page);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project != null) {
-            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-            if (plantUmlToolWindow != null) {
-                numPages = plantUmlToolWindow.getNumPages();
-                e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getPage()));
-                e.getPresentation().setEnabled(numPages > 1);
-            }
-        }
+        numPages = plantUmlToolWindow.getNumPages();
+        e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getPage()));
+        e.getPresentation().setEnabled(numPages > 1);
     }
 }

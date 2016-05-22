@@ -1,10 +1,7 @@
 package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionGroup;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -12,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.*;
@@ -68,8 +66,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     private void setupUI() {
-        ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("PlantUML.Toolbar");
-        final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, true);
+        DefaultActionGroup newGroup = getActionGroup();
+        final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, newGroup, true);
         actionToolbar.setTargetComponent(this);
         add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
 
@@ -83,6 +81,23 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         addScrollBarListeners(imagesPanel);
 
         selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
+    }
+
+    @NotNull
+    private DefaultActionGroup getActionGroup() {
+        DefaultActionGroup group = (DefaultActionGroup) ActionManager.getInstance().getAction("PlantUML.Toolbar");
+        DefaultActionGroup newGroup = new DefaultActionGroup();
+        AnAction[] childActionsOrStubs = group.getChildActionsOrStubs();
+        for (int i = 0; i < childActionsOrStubs.length; i++) {
+            AnAction stub = childActionsOrStubs[i];
+            newGroup.add(stub);
+            if (stub instanceof ActionStub) {
+                if (((ActionStub) stub).getClassName().equals(NextPageAction.class.getName())) {
+                    newGroup.add(new SelectPageAction(this));
+                }
+            }
+        }
+        return newGroup;
     }
 
     private void addScrollBarListeners(JComponent panel) {

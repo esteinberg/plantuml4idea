@@ -82,8 +82,6 @@
                     icon="/actions/back.png" text="Previous Page"/>
             <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
                     icon="/actions/forward.png" text="Next Page"/>
-            <action id="PlantUML.SelectPage" description="Select Page" class="org.plantuml.idea.action.SelectPageAction"
-                    text="All Pages"/>
 
             <separator/>
 
