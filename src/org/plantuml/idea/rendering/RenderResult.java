@@ -13,12 +13,10 @@ public class RenderResult {
 
     private final List<Diagram> diagrams;
     private final int pages;
-    private final RenderRequest renderRequest;
 
-    public RenderResult(@NotNull List<Diagram> diagrams, int totalPages, @NotNull RenderRequest renderRequest) {
+    public RenderResult(@NotNull List<Diagram> diagrams, int totalPages) {
         this.diagrams = diagrams;
         this.pages = totalPages;
-        this.renderRequest = renderRequest;
     }
 
     public byte[] getFirstDiagramBytes() {
@@ -28,9 +26,6 @@ public class RenderResult {
         return diagrams.get(0).getDiagramBytes();
     }
 
-    public RenderRequest getRenderRequest() {
-        return renderRequest;
-    }
 
     public List<Diagram> getDiagrams() {
         return diagrams;
@@ -40,6 +35,17 @@ public class RenderResult {
     public int getPages() {
         return pages;
     }
+
+    public boolean hasError() {
+        for (Diagram diagram : diagrams) {
+            String description = diagram.getDescription();
+            if (description == null || description.isEmpty() || "(Error)".equals(description)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static class Diagram {
 
@@ -80,7 +86,6 @@ public class RenderResult {
         return new ToStringBuilder(this)
                 .append("diagrams", diagrams)
                 .append("pages", pages)
-                .append("renderRequest", renderRequest)
                 .toString();
     }
 }

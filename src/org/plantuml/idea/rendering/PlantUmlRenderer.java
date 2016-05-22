@@ -117,7 +117,7 @@ public class PlantUmlRenderer {
 
             if (cachedItem != null && totalPages > 1 && cachedItem.getImagesWithData().length == totalPages) {
                 logger.debug("incremental rendering, totalPages=", totalPages);
-                String[] renderRequestSplit = renderRequest.getSource().split("@newpage");
+                String[] renderRequestSplit = splitNewPage(renderRequest.getSource());
 
                 if (renderRequestSplit.length == totalPages) {
                     if (renderRequestPage == -1) {
@@ -132,7 +132,7 @@ public class PlantUmlRenderer {
                     renderAll = true;
                 }
             } else {
-                logger.debug("no incremental rendering");
+                logger.debug("no incremental rendering.  totalPages=", totalPages, ", cachedPages=", cachedItem != null ? cachedItem.getImagesWithData().length : null);
                 renderAll = true;
             }
 
@@ -147,12 +147,17 @@ public class PlantUmlRenderer {
                     result.add(generateImage(reader, formatOption, renderRequestPage));
                 }
             }
-
-            return new RenderResult(result, totalPages, renderRequest);
+            logger.debug("RenderResult totalPages=", totalPages);
+            return new RenderResult(result, totalPages);
         } catch (Throwable e) {
             logger.error("Failed to render image " + renderRequest.getSource(), e);
-            return new RenderResult(Collections.EMPTY_LIST, 0, renderRequest);
+            return new RenderResult(Collections.EMPTY_LIST, 0);
         }
+    }
+
+    @NotNull
+    public static String[] splitNewPage(String source) {
+        return source.split("\\n\\s*@?newpage\\s*\\n");
     }
 
     private static int zoomDiagram(RenderRequest renderRequest, SourceStringReader reader) {
@@ -185,7 +190,7 @@ public class PlantUmlRenderer {
         String source = imageWithUrlData.getSource();
         if (source == null) return true;
 
-        String[] split = source.split("@newpage");
+        String[] split = splitNewPage(source);
         if (split.length != renderRequestSplit.length) return true;
 
         String renderRequestPiece = renderRequestSplit[i];

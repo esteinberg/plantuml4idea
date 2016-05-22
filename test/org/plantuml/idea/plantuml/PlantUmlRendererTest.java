@@ -28,4 +28,29 @@ public class PlantUmlRendererTest {
         Assert.assertNotNull(render.getDiagrams().get(0));
     }
 
+    @Test
+    public void splitNewPage() throws Exception {
+        String[] strings = PlantUmlRenderer.splitNewPage("@startuml\n" +
+                "xx1\n" +
+                " newpage \n" +
+                "xx3\n" +
+                "    @newpage    \n" +
+                "xx4\n" +
+                "@newpage\n" +
+                "xx5\n" +
+                "@enduml");
+
+        Assert.assertArrayEquals(
+                new String[]{
+                        "@startuml\n" +
+                                "xx1"
+                        ,
+                        "xx3"
+                        ,
+                        "xx4"
+                        ,
+                        "xx5\n@enduml"},
+                strings);
+    }
+
 }

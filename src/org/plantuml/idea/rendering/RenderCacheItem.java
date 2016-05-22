@@ -6,6 +6,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.util.ImageWithUrlData;
 
 import java.io.File;
@@ -23,21 +24,27 @@ public class RenderCacheItem {
     private final String source;
     private final File baseDir;
     private final int zoom;
-    private int page;
     private final Map<File, Long> includedFiles;
     private final RenderResult imageResult;
     private final ImageWithUrlData[] imagesWithData;
+    private final RenderRequest renderRequest;
+    private int requestedPage;
 
-    public RenderCacheItem(String sourceFilePath, String source, File baseDir, int zoom, int page, Map<File, Long> includedFiles, RenderResult imageResult, ImageWithUrlData[] imagesWithData, Integer version) {
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult imageResult, ImageWithUrlData[] imagesWithData, Integer version) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
         this.zoom = zoom;
-        this.page = page;
+        this.requestedPage = requestedPage;
         this.includedFiles = includedFiles;
         this.imageResult = imageResult;
         this.imagesWithData = imagesWithData;
         this.version = version;
+        this.renderRequest = renderRequest;
+    }
+
+    public RenderRequest getRenderRequest() {
+        return renderRequest;
     }
 
     public boolean renderRequired(Project project, String source, int page) {
@@ -158,22 +165,23 @@ public class RenderCacheItem {
         return zoom;
     }
 
-    public int getPage() {
-        return page;
+    public int getRequestedPage() {
+        return requestedPage;
     }
 
-    public void setPage(int page) {
-        this.page = page;
+    public void setRequestedPage(int requestedPage) {
+        this.requestedPage = requestedPage;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("version", version)
+                .append("renderRequest", renderRequest)
                 .append("sourceFilePath", sourceFilePath)
                 .append("baseDir", baseDir)
                 .append("zoom", zoom)
-                .append("page", page)
+                .append("page", requestedPage)
                 .append("includedFiles", includedFiles)
                 .append("imageResult", imageResult)
                 .append("imagesWithData", Arrays.toString(imagesWithData))

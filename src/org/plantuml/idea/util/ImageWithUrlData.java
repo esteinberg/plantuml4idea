@@ -33,10 +33,12 @@ public class ImageWithUrlData {
 
     private BufferedImage image;
     private String source;
+    private String description;
     private UrlData[] urls;
 
-    public ImageWithUrlData(String source, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+    public ImageWithUrlData(String source, String description, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
         this.source = source;
+        this.description = description;
         this.parseImage(imageData);
         this.parseUrls(svgData, baseDir);
     }
@@ -170,6 +172,7 @@ public class ImageWithUrlData {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("description", description)
                 .append("hasImage", image != null)
                 .toString();
     }

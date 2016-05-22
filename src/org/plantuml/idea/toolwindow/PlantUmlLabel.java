@@ -32,7 +32,7 @@ public class PlantUmlLabel extends JLabel {
         return renderRequest;
     }
 
-    public void setup(ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
+    public void setup(@NotNull ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.getImage() != null) {

@@ -51,14 +51,14 @@ public class SelectPageAction extends ComboBoxAction {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-            plantUmlToolWindow.setPage(page);
+            plantUmlToolWindow.setSelectedPage(page);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
         numPages = plantUmlToolWindow.getNumPages();
-        e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getPage()));
+        e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getSelectedPage()));
         e.getPresentation().setEnabled(numPages > 1);
     }
 }

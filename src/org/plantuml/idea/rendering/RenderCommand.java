@@ -45,9 +45,10 @@ public abstract class RenderCommand implements Runnable {
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
 
-            final RenderResult imageResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version), cachedItem);
+            final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version);
+            final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
             RenderResult svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, page, zoom, version), cachedItem);
-            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(imageResult, svgResult, baseDir);
+            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(source, imageResult, svgResult, baseDir);
 
 
             if (hasImages(imagesWithData)) {
@@ -55,7 +56,8 @@ public abstract class RenderCommand implements Runnable {
 
                     @Override
                     public void run() {
-                        postRenderOnEDT(imageResult, imagesWithData, includedFiles);
+                        RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imagesWithData, version);
+                        postRenderOnEDT(newItem);
                     }
                 });
 
@@ -68,7 +70,7 @@ public abstract class RenderCommand implements Runnable {
         }
     }
 
-    protected abstract void postRenderOnEDT(RenderResult imageResult, ImageWithUrlData[] imagesWithData, Map<File, Long> includedFiles);
+    protected abstract void postRenderOnEDT(RenderCacheItem newItem);
 
     private boolean hasImages(ImageWithUrlData[] imagesWithUrlData) {
         for (ImageWithUrlData imageWithUrlData : imagesWithUrlData) {
@@ -79,9 +81,7 @@ public abstract class RenderCommand implements Runnable {
         return false;
     }
 
-    private ImageWithUrlData[] toImagesWithUrlData(RenderResult imageResult, RenderResult svgResult, File baseDir) throws IOException {
-        RenderRequest renderRequest = imageResult.getRenderRequest();
-        String source = renderRequest.getSource();
+    private ImageWithUrlData[] toImagesWithUrlData(String source, RenderResult imageResult, RenderResult svgResult, File baseDir) throws IOException {
         List<RenderResult.Diagram> imageDiagrams = imageResult.getDiagrams();
         List<RenderResult.Diagram> svgDiagrams = svgResult.getDiagrams();
         int pages = imageResult.getPages();
@@ -110,7 +110,7 @@ public abstract class RenderCommand implements Runnable {
                     logger.error("pngBytes are null for: " + imageDiagram);
                     continue;
                 }
-                imagesWithUrlData[page] = new ImageWithUrlData(source, pngBytes, svgBytes, baseDir);
+                imagesWithUrlData[page] = new ImageWithUrlData(source, imageDiagram.getDescription(), pngBytes, svgBytes, baseDir);
             }
         }
         return imagesWithUrlData;

@@ -57,7 +57,7 @@ public class RenderCache {
     }
 
     public boolean isDisplayed(RenderCacheItem cachedItem, int page) {
-        return displayedItem == cachedItem && cachedItem.getPage() == page;
+        return displayedItem == cachedItem && cachedItem.getRequestedPage() == page;
     }
 
     public RenderCacheItem getDisplayedItem() {
