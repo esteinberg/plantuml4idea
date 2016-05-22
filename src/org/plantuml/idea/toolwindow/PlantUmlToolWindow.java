@@ -240,10 +240,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         RenderResult imageResult = cacheItem.getImageResult();
 
         imagesPanel.removeAll();
-        if (this.page >= imageResult.getPages()) {
-            this.page = -1;
-            selectPageAction.setPage(page);
-        }
         if (this.page == -1) {
             for (int i = 0; i < imagesWithData.length; i++) {
                 displayImage(cacheItem, imageResult, i, imagesWithData[i]);
@@ -298,7 +294,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (page >= -1 && page < getNumPages()) {
             logger.debug("page ", page, " selected");
             this.page = page;
-            selectPageAction.setPage(page);
             renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
         }
     }
@@ -323,6 +318,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return pages;
     }
 
+    public int getPage() {
+        return page;
+    }
 
     private boolean isProjectValid(Project project) {
         return project != null && !project.isDisposed();

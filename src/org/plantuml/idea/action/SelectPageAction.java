@@ -34,16 +34,6 @@ public class SelectPageAction extends ComboBoxAction {
         return group;
     }
 
-    public void setPage(final int page) {
-        if (button != null) {
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    button.setText(getDisplayPage(page));
-                }
-            });
-        }
-    }
 
     private static String getDisplayPage(int page) {
         if (page == -1) {
@@ -69,7 +59,6 @@ public class SelectPageAction extends ComboBoxAction {
 
                 if (plantUmlToolWindow != null)
                     plantUmlToolWindow.setPage(page);
-                setPage(page);
             }
         }
     }
@@ -81,6 +70,7 @@ public class SelectPageAction extends ComboBoxAction {
             PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (plantUmlToolWindow != null) {
                 numPages = plantUmlToolWindow.getNumPages();
+                e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getPage()));
                 e.getPresentation().setEnabled(numPages > 1);
             }
         }
