@@ -97,6 +97,10 @@ public class ImageWithUrlData {
     }
 
     private void parseUrls(byte[] svgData, File baseDir) {
+        if (svgData == null || svgData.length == 0) {
+            urls = new UrlData[0];
+            return;
+        }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             //http://stackoverflow.com/a/155874/685796

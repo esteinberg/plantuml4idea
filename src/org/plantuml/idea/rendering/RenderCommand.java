@@ -3,6 +3,8 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.ImageWithUrlData;
@@ -23,8 +25,9 @@ public abstract class RenderCommand implements Runnable {
     protected int zoom;
     protected RenderCacheItem cachedItem;
     protected int version;
+    private boolean renderUrlLinks;
 
-    public RenderCommand(String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version) {
+    public RenderCommand(String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
@@ -32,6 +35,7 @@ public abstract class RenderCommand implements Runnable {
         this.zoom = zoom;
         this.cachedItem = cachedItem;
         this.version = version;
+        this.renderUrlLinks = renderUrlLinks;
     }
 
     @Override
@@ -47,7 +51,10 @@ public abstract class RenderCommand implements Runnable {
 
             final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version);
             final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
-            RenderResult svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, page, zoom, version), cachedItem);
+            RenderResult svgResult = null;
+            if (renderUrlLinks) {
+                svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, page, zoom, version), cachedItem);
+            }
             final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(source, imageResult, svgResult, baseDir);
 
 
@@ -81,9 +88,9 @@ public abstract class RenderCommand implements Runnable {
         return false;
     }
 
-    private ImageWithUrlData[] toImagesWithUrlData(String source, RenderResult imageResult, RenderResult svgResult, File baseDir) throws IOException {
+    private ImageWithUrlData[] toImagesWithUrlData(@NotNull String source, @NotNull RenderResult imageResult, @Nullable RenderResult svgResult, File baseDir) throws IOException {
         List<RenderResult.Diagram> imageDiagrams = imageResult.getDiagrams();
-        List<RenderResult.Diagram> svgDiagrams = svgResult.getDiagrams();
+        List<RenderResult.Diagram> svgDiagrams = svgResult != null ? svgResult.getDiagrams() : null;
         int pages = imageResult.getPages();
 
         //noinspection UndesirableClassUsage
@@ -100,12 +107,12 @@ public abstract class RenderCommand implements Runnable {
 
         for (int i = 0; i < imageDiagrams.size(); i++) {
             RenderResult.Diagram imageDiagram = imageDiagrams.get(i);
-            RenderResult.Diagram svgDiagram = svgDiagrams.get(i);
+            RenderResult.Diagram svgDiagram = svgDiagrams != null ? svgDiagrams.get(i) : null;
 
             if (imageDiagram != null) {
                 int page = imageDiagram.getPage();
                 byte[] pngBytes = imageDiagram.getDiagramBytes();
-                byte[] svgBytes = svgDiagram.getDiagramBytes();
+                byte[] svgBytes = svgDiagram != null ? svgDiagram.getDiagramBytes() : new byte[0];
                 if (pngBytes == null) {
                     logger.error("pngBytes are null for: " + imageDiagram);
                     continue;

@@ -25,6 +25,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JButton browse;
     private JTextField renderDelay;
     private JTextField cacheSize;
+    private JCheckBox renderUrlLinks;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -89,26 +90,29 @@ public class PlantUmlSettingsPage implements Configurable {
 
     public void setData(PlantUmlSettings data) {
         textFieldDotExecutable.setText(data.getDotExecutable());
-        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         renderDelay.setText(data.getRenderDelay());
         cacheSize.setText(data.getCacheSize());
+        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
+        renderUrlLinks.setSelected(data.isRenderUrlLinks());
     }
 
     public void getData(PlantUmlSettings data) {
         data.setDotExecutable(textFieldDotExecutable.getText());
-        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setRenderDelay(renderDelay.getText());
         data.setCacheSize(cacheSize.getText());
+        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
+        data.setRenderUrlLinks(renderUrlLinks.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
         if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
             return true;
-        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
             return true;
         if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
             return true;
+        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
+        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
         return false;
     }
 }

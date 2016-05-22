@@ -21,11 +21,20 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
+    private boolean renderUrlLinks = false;
     private String renderDelay = "100";
     private String cacheSize = "5";
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
+    }
+
+    public boolean isRenderUrlLinks() {
+        return renderUrlLinks;
+    }
+
+    public void setRenderUrlLinks(boolean renderUrlLinks) {
+        this.renderUrlLinks = renderUrlLinks;
     }
 
     public String getDotExecutable() {
