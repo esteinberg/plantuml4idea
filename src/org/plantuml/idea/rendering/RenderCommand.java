@@ -95,11 +95,18 @@ public abstract class RenderCommand implements Runnable {
 
         //noinspection UndesirableClassUsage
         ImageWithUrlData[] imagesWithUrlData;
-        if (cachedItem != null) {
-            imagesWithUrlData = clone(cachedItem.getImagesWithData());
-            if (imagesWithUrlData.length != pages) {
-                imagesWithUrlData = new ImageWithUrlData[pages];
+        if (cachedItem != null && cachedItem.getImagesWithData().length == pages) {
+            ImageWithUrlData[] imagesWithData = cachedItem.getImagesWithData();
+            ImageWithUrlData[] result = new ImageWithUrlData[imagesWithData.length];
+            for (int i = 0; i < imagesWithData.length; i++) {
+                if (i == page) {
+                    //requested to render, update source in case there was no change in this page, so it does not get rendered again all the time
+                    result[i] = ImageWithUrlData.deepCloneWithNewSource(imagesWithData[i], source);
+                } else {
+                    result[i] = imagesWithData[i];
+                } 
             }
+            imagesWithUrlData = result;
         } else {
             imagesWithUrlData = new ImageWithUrlData[pages];
         }
@@ -121,15 +128,6 @@ public abstract class RenderCommand implements Runnable {
             }
         }
         return imagesWithUrlData;
-    }
-
-    private ImageWithUrlData[] clone(ImageWithUrlData[] imagesWithData) {
-        ImageWithUrlData[] result = new ImageWithUrlData[imagesWithData.length];
-        for (int i = 0; i < imagesWithData.length; i++) {
-            result[i] = ImageWithUrlData.deepClone(imagesWithData[i]);
-
-        }
-        return result;
     }
 
     @Override

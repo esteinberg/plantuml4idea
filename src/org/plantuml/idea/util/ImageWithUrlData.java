@@ -2,6 +2,7 @@ package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.http.annotation.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -28,36 +29,40 @@ import java.util.List;
  * @author koroandr
  *         18.06.15
  */
+@Immutable
 public class ImageWithUrlData {
     static Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
-    private BufferedImage image;
-    private String source;
-    private String description;
-    private UrlData[] urls;
+    private final BufferedImage image;
+    private final String source;
+    private final String description;
+    private final UrlData[] urls;
 
     public ImageWithUrlData(String source, String description, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
         this.source = source;
         this.description = description;
-        this.parseImage(imageData);
-        this.parseUrls(svgData, baseDir);
+        this.image = UIUtils.getBufferedImage(imageData);
+        this.urls = this.parseUrls(svgData, baseDir);
     }
 
-    public ImageWithUrlData(ImageWithUrlData input) {
-        this.source = input.getSource();
+    public ImageWithUrlData(ImageWithUrlData input, String newSource) {
+        this.source = newSource;
         this.image = input.image;
+        this.description = input.description;
         UrlData[] urls = input.getUrls();
         if (urls != null) {
             this.urls = new UrlData[urls.length];
             for (int i = 0; i < urls.length; i++) {
                 this.urls[i] = urls[i];
             }
-        }
+        } else {
+            this.urls = new UrlData[0];
+        } 
     }
 
-    public static ImageWithUrlData deepClone(ImageWithUrlData imageWithUrlData) {
+    public static ImageWithUrlData deepCloneWithNewSource(ImageWithUrlData imageWithUrlData, String newSource) {
         if (imageWithUrlData != null) {
-            return new ImageWithUrlData(imageWithUrlData);
+            return new ImageWithUrlData(imageWithUrlData, newSource);
         }
         return null;
     }
@@ -75,6 +80,8 @@ public class ImageWithUrlData {
     }
 
     public class UrlData {
+        private final URI uri;
+        private final Rectangle clickArea;
         public UrlData(URI uri, Rectangle clickArea) {
             this.uri = uri;
             this.clickArea = clickArea;
@@ -88,18 +95,11 @@ public class ImageWithUrlData {
             return clickArea;
         }
 
-        private URI uri;
-        private Rectangle clickArea;
     }
 
-    private void parseImage(byte[] imageData) throws IOException {
-        this.image = UIUtils.getBufferedImage(imageData);
-    }
-
-    private void parseUrls(byte[] svgData, File baseDir) {
+    private UrlData[] parseUrls(byte[] svgData, File baseDir) {
         if (svgData == null || svgData.length == 0) {
-            urls = new UrlData[0];
-            return;
+            return new UrlData[0];
         }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -127,11 +127,11 @@ public class ImageWithUrlData {
                 urls.addAll(createUrl(svgPaths.item(i), baseDir));
             }
 
-            this.urls = urls.toArray(new UrlData[urls.size()]);
+            return urls.toArray(new UrlData[urls.size()]);
 
         } catch (Exception e) {
             logger.debug(e);
-            this.urls = new UrlData[0];
+            return new UrlData[0];
         }
     }
 
