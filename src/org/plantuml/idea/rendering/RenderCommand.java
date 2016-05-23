@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
+import org.plantuml.idea.toolwindow.ExucutionTimeLabel;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public abstract class RenderCommand implements Runnable {
     protected int version;
     protected boolean renderUrlLinks;
     protected LazyApplicationPoolExecutor.Delay delay;
+    protected ExucutionTimeLabel label;
 
     public enum Reason {
         INCLUDES,
@@ -33,7 +35,7 @@ public abstract class RenderCommand implements Runnable {
         SOURCE
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExucutionTimeLabel label) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
@@ -44,25 +46,27 @@ public abstract class RenderCommand implements Runnable {
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
         this.delay = delay;
+        this.label = label;
     }
 
     @Override
     public void run() {
-        if (source.isEmpty()) {
-            logger.debug("source is empty");
-            return;
-        }
-
         try {
+            if (source.isEmpty()) {
+                logger.debug("source is empty");
+                return;
+            }
+            long start = System.currentTimeMillis();
+            label.setState(ExucutionTimeLabel.State.EXECUTING);
+            
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
 
             final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version, renderUrlLinks);
             final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
 
-
             ImageItem[] imageItems = joinDiagrams(imageResult, cachedItem);
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version, total);
             if (hasImages(newItem.getImageItems())) {
 
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -76,10 +80,13 @@ public abstract class RenderCommand implements Runnable {
             } else {
                 logger.debug("no images rendered");
             }
-
+            long total = System.currentTimeMillis() - start;
+            label.setState(ExucutionTimeLabel.State.DONE, total);
         } catch (RenderingCancelledException e) {
             logger.info("command interrupted");
+            label.setState(ExucutionTimeLabel.State.CANCELLED);
         } catch (Exception e) {
+            label.setState(ExucutionTimeLabel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
     }

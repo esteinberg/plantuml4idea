@@ -3,6 +3,7 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.toolwindow.ExucutionTimeLabel;
 
 import java.util.concurrent.Future;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.Future;
 public class LazyApplicationPoolExecutor {
     public static final Logger logger = Logger.getInstance(LazyApplicationPoolExecutor.class);
     protected static final int MILLION = 1000000;
+    private final ExucutionTimeLabel executionTimeLabel;
 
     protected RenderCommand nextCommand;
     protected long startAfterNanos;
@@ -26,7 +28,8 @@ public class LazyApplicationPoolExecutor {
     protected long delayNanos; // delay between command executions
     protected final Object POOL_THREAD_STICK = new Object();
 
-    public LazyApplicationPoolExecutor(int delayMillis) {
+    public LazyApplicationPoolExecutor(int delayMillis, @NotNull ExucutionTimeLabel executionTimeLabel) {
+        this.executionTimeLabel = executionTimeLabel;
         setDelay(delayMillis);
         startAfterNanos = 0;
     }
@@ -98,6 +101,7 @@ public class LazyApplicationPoolExecutor {
             future = ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                 @Override
                 public void run() {
+                    executionTimeLabel.setState(ExucutionTimeLabel.State.WAITING);
                     RenderCommand polledCommand = null;
                     try {
                         long delayRemaining = getRemainingDelayMillis();

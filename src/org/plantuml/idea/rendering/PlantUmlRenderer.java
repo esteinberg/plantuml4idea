@@ -156,6 +156,8 @@ public class PlantUmlRenderer {
             try {
                 ImageItem imageItem = new ImageItem(page, generateImage(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page));
                 renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(imageItem), 1));
+            } catch (RenderingCancelledException e) {
+                throw e;
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }

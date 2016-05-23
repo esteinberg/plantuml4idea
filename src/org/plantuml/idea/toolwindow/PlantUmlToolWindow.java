@@ -49,6 +49,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private Project project;
     private AtomicInteger sequence = new AtomicInteger();
     public boolean renderUrlLinks;
+    public ExucutionTimeLabel executionTimeLabel;
 
     public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -58,7 +59,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         setupUI();
 
-        lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt());
+        lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt(), executionTimeLabel);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
@@ -96,6 +97,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 }
             }
         }
+        executionTimeLabel = new ExucutionTimeLabel();
+        newGroup.add(executionTimeLabel);
         return newGroup;
     }
 
@@ -219,13 +222,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
         int version = sequence.incrementAndGet();
-        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks);
+        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionTimeLabel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks) {
-            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExucutionTimeLabel label) {
+            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
