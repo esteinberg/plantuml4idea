@@ -3,6 +3,7 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -346,8 +347,22 @@ public class PlantUmlRenderer {
     static void zoomDiagram(Diagram diagram, int zoom) {
         if (diagram instanceof UmlDiagram) {
             UmlDiagram umlDiagram = (UmlDiagram) diagram;
-            umlDiagram.setScale(new ScaleSimple(zoom / 100f));
-        }
+            Scale scale = umlDiagram.getScale();
+            if (scale == null) {
+                umlDiagram.setScale(new ScaleSimple(zoom / 100f));
+            }
+        } else if (diagram instanceof NewpagedDiagram) {
+            NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
+            for (Diagram page : newpagedDiagram.getDiagrams()) {
+                if (page instanceof DescriptionDiagram) {
+                    DescriptionDiagram descriptionDiagram = (DescriptionDiagram) page;
+                    Scale scale = descriptionDiagram.getScale();
+                    if (scale == null) {
+                        descriptionDiagram.setScale(new ScaleSimple(zoom / 100f));
+                    }
+                }
+            }
+        } 
     }
 
 }
