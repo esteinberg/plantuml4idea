@@ -212,6 +212,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
+        executionTimeLabel.setState(ExucutionTimeLabel.State.DONE, 0);
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
         displayDiagram(last);
