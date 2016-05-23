@@ -66,7 +66,7 @@ public abstract class RenderCommand implements Runnable {
             final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
 
             ImageItem[] imageItems = joinDiagrams(imageResult, cachedItem);
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version, total);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version);
             if (hasImages(newItem.getImageItems())) {
 
                 ApplicationManager.getApplication().invokeLater(new Runnable() {

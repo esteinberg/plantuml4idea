@@ -29,7 +29,7 @@ public class RenderCacheItem {
     private final ImageItem[] imageItems;
     private int requestedPage;
 
-    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version, long executionTime) {
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
