@@ -104,6 +104,10 @@ public class PlantUmlRenderer {
         }
     }
 
+    enum Strategy {
+        PARTIAL,
+        NORMAL
+    }
     @NotNull
     public static RenderResult partialRender(RenderRequest renderRequest, RenderCacheItem cachedItem, long start, String[] sourceSplit) {
         List<RenderResult> renderResults = new ArrayList<RenderResult>();
@@ -134,7 +138,7 @@ public class PlantUmlRenderer {
                 allDiagrams.add(diagram);
             }
         }
-        renderResult = new RenderResult(allDiagrams, sourceSplit.length);
+        renderResult = new RenderResult(Strategy.PARTIAL, allDiagrams, sourceSplit.length);
         return renderResult;
     }
 
@@ -152,7 +156,7 @@ public class PlantUmlRenderer {
             FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
             try {
                 RenderResult.Diagram diagram = new RenderResult.Diagram(page, generateImage(renderRequest.getSource(), partialSource, reader, formatOption, 0));//todo
-                renderResults.add(new RenderResult(Arrays.asList(diagram), 1));
+                renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(diagram), 1));
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -234,10 +238,10 @@ public class PlantUmlRenderer {
                 }
             }
             logger.debug("RenderResult totalPages=", totalPages);
-            return new RenderResult(result, totalPages);
+            return new RenderResult(Strategy.NORMAL, result, totalPages);
         } catch (Throwable e) {
             logger.error("Failed to render image " + documentSource, e);
-            return new RenderResult(Collections.EMPTY_LIST, 0);
+            return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0);
         }
     }
 

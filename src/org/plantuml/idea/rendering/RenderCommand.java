@@ -129,12 +129,12 @@ public abstract class RenderCommand implements Runnable {
                 imagesWithUrlData[page] = new ImageWithUrlData(imageDiagram.getDocumentSource(), imageDiagram.getPageSource(), description, pngBytes, svgBytes, baseDir);
             }
         }
-        for (int i = 0; i < imagesWithUrlData.length; i++) {
-            ImageWithUrlData imageWithUrlData = imagesWithUrlData[i];
-            if (imageWithUrlData == null) {
-                logger.debug("imageWithUrlData == null,  cachedItem.getImagesWithData()=", cachedItem.getImagesWithData(), ", imageResult=", imageResult);
-            }
-        }
+//        for (int i = 0; i < imagesWithUrlData.length; i++) {
+//            ImageWithUrlData imageWithUrlData = imagesWithUrlData[i];
+//            if (imageWithUrlData == null) {
+//                logger.debug("imageWithUrlData == null,  cachedItem=", cachedItem, ", imageResult=", imageResult);
+//            }
+//        }
         return imagesWithUrlData;
     }
 
