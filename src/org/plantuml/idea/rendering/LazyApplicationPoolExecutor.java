@@ -8,8 +8,8 @@ import java.util.concurrent.Future;
 
 
 /**
- * This Executor executes Runnables sequentially and is so lazy that it executes only last Runnable submitted while
- * previously scheduled Runnable is running. Useful when you want to submit a lot of cumulative Runnables without
+ * This Executor executes Runnables sequentially and is so lazy that it executes only last RenderCommand submitted while
+ * previously scheduled RenderCommand is running. Useful when you want to submit a lot of cumulative Runnables without
  * performance impact.
  *
  * @author Eugene Steinberg
@@ -19,7 +19,7 @@ public class LazyApplicationPoolExecutor {
     public static final Logger logger = Logger.getInstance(LazyApplicationPoolExecutor.class);
     protected static final int MILLION = 1000000;
 
-    protected Runnable nextCommand;
+    protected RenderCommand nextCommand;
     protected long startAfterNanos;
 
     protected Future<?> future;
@@ -41,13 +41,13 @@ public class LazyApplicationPoolExecutor {
     }
 
     /**
-     * Lazily executes the Runnable. Command will be queued for execution, but can be swallowed by another command
+     * Lazily executes the RenderCommand. Command will be queued for execution, but can be swallowed by another command
      * if it will be submitted before this command will be scheduled for execution
      *
      * @param command command to be executed.
      * @param delay
      */
-    public synchronized void execute(@NotNull final Runnable command, Delay delay) {
+    public synchronized void execute(@NotNull final RenderCommand command, Delay delay) {
         logger.debug("#execute ", command, " delay=", delay);
         nextCommand = command;
 
@@ -61,7 +61,7 @@ public class LazyApplicationPoolExecutor {
         }
 
         if (future == null || future.isDone()) {
-            scheduleNext();
+            scheduleNext(null);
         }
     }
 
@@ -73,18 +73,30 @@ public class LazyApplicationPoolExecutor {
         return (startAfterNanos - System.nanoTime()) / MILLION;
     }
 
-    private synchronized Runnable pollCommand() {
-        Runnable next = LazyApplicationPoolExecutor.this.nextCommand;
+    private synchronized RenderCommand pollCommand() {
+        RenderCommand next = LazyApplicationPoolExecutor.this.nextCommand;
         LazyApplicationPoolExecutor.this.nextCommand = null;
         return next;
     }
 
-    private synchronized void scheduleNext() {
+    private synchronized void scheduleNext(final RenderCommand previousCommand) {
         logger.debug("scheduleNext");
+        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES) {
+            if (previousCommand.page == nextCommand.page
+                    && previousCommand.zoom == nextCommand.zoom
+                    && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
+                    && previousCommand.source.equals(nextCommand.source)) {
+                logger.debug("nextCommand is same as previous, skipping");
+                nextCommand = null;
+            }
+        }
+        
+        
         if (nextCommand != null) {
             future = ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                 @Override
                 public void run() {
+                    RenderCommand polledCommand = null;
                     try {
                         long delayRemaining = getRemainingDelayMillis();
                         while (delayRemaining - 5 > 0) {//tolerance
@@ -95,17 +107,17 @@ public class LazyApplicationPoolExecutor {
                             delayRemaining = getRemainingDelayMillis();
                         }
 
-                        Runnable command = pollCommand();
-                        if (command != null) {
-                            logger.debug("running command ", command);
-                            command.run();
+                        polledCommand = pollCommand();
+                        if (polledCommand != null) {
+                            logger.debug("running command ", polledCommand);
+                            polledCommand.run();
                             setStartAfter();
                         }
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
                         if (!Thread.currentThread().isInterrupted())
-                            scheduleNext(); //needed to execute the very last command
+                            scheduleNext(polledCommand); //needed to execute the very last command
                     }
                 }
 
