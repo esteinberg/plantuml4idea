@@ -23,7 +23,7 @@ import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_PARTIAL_R
 
 public class PlantUmlRenderer {
     private static final Logger logger = Logger.getInstance(PlantUmlRenderer.class);
-    private static final Pattern PATTERN = Pattern.compile("\\n\\s*@?newpage\\s*\\n");
+    private static final Pattern PATTERN = Pattern.compile("\\n\\s*@?newpage(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
 
 
     /**
