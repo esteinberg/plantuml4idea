@@ -253,11 +253,17 @@ public class PlantUmlRenderer {
         for (int i = 0; i < blocks.size(); i++) {
             BlockUml block = blocks.get(i);
 
+            long start = System.currentTimeMillis();
             Diagram diagram = block.getDiagram();
+            logger.debug("getDiagram done in  ", System.currentTimeMillis() - start, " ms");
+
+            start = System.currentTimeMillis();
             zoomDiagram(diagram, renderRequest.getZoom());
+            logger.debug("zoom diagram done in  ", System.currentTimeMillis() - start, " ms");
 
             totalPages = totalPages + diagram.getNbImages();
         }
+
         return totalPages;
     }
 
