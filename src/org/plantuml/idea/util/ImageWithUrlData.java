@@ -2,7 +2,6 @@ package org.plantuml.idea.util;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.http.annotation.Immutable;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -29,50 +28,60 @@ import java.util.List;
  * @author koroandr
  *         18.06.15
  */
-@Immutable
 public class ImageWithUrlData {
     static Logger logger = Logger.getInstance(ImageWithUrlData.class);
 
     private final BufferedImage image;
-    private final String source;
+    private final String documentSource;
+    private String pageSource;
     private final String description;
     private final UrlData[] urls;
 
-    public ImageWithUrlData(String source, String description, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
-        this.source = source;
+    public ImageWithUrlData(String documentSource, String pageSource, String description, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
+        this.documentSource = documentSource;
+        this.pageSource = pageSource;
         this.description = description;
         this.image = UIUtils.getBufferedImage(imageData);
         this.urls = this.parseUrls(svgData, baseDir);
     }
 
-    public ImageWithUrlData(ImageWithUrlData input, String newSource) {
-        this.source = newSource;
-        this.image = input.image;
-        this.description = input.description;
-        UrlData[] urls = input.getUrls();
-        if (urls != null) {
-            this.urls = new UrlData[urls.length];
-            for (int i = 0; i < urls.length; i++) {
-                this.urls[i] = urls[i];
-            }
-        } else {
-            this.urls = new UrlData[0];
-        } 
-    }
+//    public ImageWithUrlData(ImageWithUrlData input, String newSource) {
+//        this.documentSource = newSource;
+//        this.pageSource = pageSource;
+//        this.image = input.image;
+//        this.description = input.description;
+//        UrlData[] urls = input.getUrls();
+//        if (urls != null) {
+//            this.urls = new UrlData[urls.length];
+//            for (int i = 0; i < urls.length; i++) {
+//                this.urls[i] = urls[i];
+//            }
+//        } else {
+//            this.urls = new UrlData[0];
+//        } 
+//    }
+//
+//    public static ImageWithUrlData deepCloneWithNewSource(ImageWithUrlData imageWithUrlData, String newSource) {
+//        if (imageWithUrlData != null) {
+//            return new ImageWithUrlData(imageWithUrlData, newSource);
+//        }
+//        return null;
+//    }
 
-    public static ImageWithUrlData deepCloneWithNewSource(ImageWithUrlData imageWithUrlData, String newSource) {
-        if (imageWithUrlData != null) {
-            return new ImageWithUrlData(imageWithUrlData, newSource);
-        }
-        return null;
+    public void setPageSource(String pageSource) {
+        this.pageSource = pageSource;
     }
 
     public BufferedImage getImage() {
         return image;
     }
 
-    public String getSource() {
-        return source;
+    public String getDocumentSource() {
+        return documentSource;
+    }
+
+    public String getPageSource() {
+        return pageSource;
     }
 
     public UrlData[] getUrls() {

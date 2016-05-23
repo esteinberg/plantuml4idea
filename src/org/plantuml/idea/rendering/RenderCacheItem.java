@@ -48,13 +48,13 @@ public class RenderCacheItem {
     }
 
     public boolean renderRequired(Project project, String source, int page) {
+        if (this.requestedPage != page) {
+            return true;
+        }
         if (!this.source.equals(source)) {
             return true;
         }
         if (imageMissing(page)) {
-            return true;
-        }
-        if (imageSourceChanged(page, source)) {
             return true;
         }
 
@@ -65,12 +65,12 @@ public class RenderCacheItem {
         if (page == -1) {
             for (int i = 0; i < imagesWithData.length; i++) {
                 ImageWithUrlData imageWithUrlData = imagesWithData[i];
-                if (imageWithUrlData != null && !source.equals(imageWithUrlData.getSource())) {
+                if (imageWithUrlData != null && !source.equals(imageWithUrlData.getDocumentSource())) {
                     return true;
                 }
             }
         } else {
-            if (imagesWithData.length > page && !imagesWithData[page].getSource().equals(source)) {
+            if (imagesWithData.length > page && !imagesWithData[page].getDocumentSource().equals(source)) {
                 return true;
             }
         }
@@ -186,5 +186,15 @@ public class RenderCacheItem {
                 .append("imageResult", imageResult)
                 .append("imagesWithData", Arrays.toString(imagesWithData))
                 .toString();
+    }
+
+    public String getImagesWithDataPageSource(int page) {
+        if (imagesWithData.length > page) {
+            ImageWithUrlData imageWithUrlData = imagesWithData[page];
+            if (imageWithUrlData != null) {
+                return imageWithUrlData.getPageSource();
+            }
+        }
+        return null;
     }
 }

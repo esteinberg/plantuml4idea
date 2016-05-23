@@ -16,6 +16,7 @@ public enum LanguagePatternHolder {
 
     private final Joiner PipeJoiner = Joiner.on("|");
 
+    public final Pattern pluginSettingsPattern = createPattern(LanguageDescriptor.INSTANCE.pluginSettingsPattern, "");
     public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern(LanguageDescriptor.INSTANCE.preproc, "[@|!]");

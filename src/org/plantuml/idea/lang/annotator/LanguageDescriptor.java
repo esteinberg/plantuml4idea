@@ -11,6 +11,8 @@ import java.util.List;
 public enum LanguageDescriptor {
     INSTANCE;
 
+    public static final String IDEA_PARTIAL_RENDER = "idea.partialRender";
+    public static final String IDEA_DISABLE_SYNTAX_CHECK = "idea.disableSyntaxCheck";
     public final List<String> types = Collections.unmodifiableList(Arrays.asList(
             "actor",
             "participant",
@@ -98,6 +100,12 @@ public enum LanguageDescriptor {
             "again",
             "kill"
     ));
+
+    public final List<String> pluginSettingsPattern = Collections.unmodifiableList(Arrays.asList(
+            IDEA_PARTIAL_RENDER,
+            IDEA_DISABLE_SYNTAX_CHECK
+    ));
+
 
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
             "startuml",

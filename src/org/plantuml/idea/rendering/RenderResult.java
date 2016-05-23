@@ -49,14 +49,30 @@ public class RenderResult {
 
     public static class Diagram {
 
-        private int page;
-        private String description;
-        private byte[] diagramBytes;
+        private final int page;
+        private final String description;
+        private final byte[] diagramBytes;
+        private final String pageSource;
+        private final String documentSource;
 
-        public Diagram(int page, String description, byte[] diagramBytes) {
+        public Diagram(String documentSource, String pageSource, int page, String description, byte[] diagramBytes) {
+            this.pageSource = pageSource;
+            this.documentSource = documentSource;
             this.page = page;
             this.description = description;
             this.diagramBytes = diagramBytes;
+        }
+
+        public Diagram(int page, Diagram description) {
+            this.page = page;
+            this.description = description.description;
+            this.pageSource = description.pageSource;
+            this.documentSource = description.documentSource;
+            this.diagramBytes = description.diagramBytes;
+        }
+
+        public String getDocumentSource() {
+            return documentSource;
         }
 
         public String getDescription() {
@@ -71,6 +87,10 @@ public class RenderResult {
             return diagramBytes;
         }
 
+        public String getPageSource() {
+            return pageSource;
+        }
+
         @Override
         public String toString() {
             return new ToStringBuilder(this)
@@ -79,6 +99,7 @@ public class RenderResult {
                     .append("diagramBytesLength", diagramBytes == null ? "null" : diagramBytes.length)
                     .toString();
         }
+
     }
 
     @Override

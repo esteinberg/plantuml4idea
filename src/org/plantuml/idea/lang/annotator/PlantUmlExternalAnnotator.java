@@ -21,11 +21,13 @@ import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.System.currentTimeMillis;
+import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_DISABLE_SYNTAX_CHECK;
 
 /**
  * Author: Eugene Steinberg
@@ -62,6 +64,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                         DefaultLanguageHighlighterColors.KEYWORD));
 
                 sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.pluginSettingsPattern,
+                        DefaultLanguageHighlighterColors.KEYWORD));
+
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
                         LanguagePatternHolder.INSTANCE.typesPattern,
                         DefaultLanguageHighlighterColors.LABEL));
 
@@ -79,8 +85,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
 
     @Nullable
     private Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source) {
+        if (source.contains(IDEA_DISABLE_SYNTAX_CHECK)) {
+            return Collections.emptyList();
+        }
         Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
-
         long start = currentTimeMillis();
         SyntaxResult syntaxResult = checkSyntax(file, source);
         logger.debug("syntax checked in ", currentTimeMillis() - start, "ms");

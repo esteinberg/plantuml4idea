@@ -18,6 +18,7 @@ import java.util.Map;
 public abstract class RenderCommand implements Runnable {
     public static final Logger logger = Logger.getInstance(RenderCommand.class);
 
+    protected Reason reason;
     protected String sourceFilePath;
     protected final String source;
     protected final File baseDir;
@@ -27,7 +28,14 @@ public abstract class RenderCommand implements Runnable {
     protected int version;
     private boolean renderUrlLinks;
 
-    public RenderCommand(String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks) {
+    public enum Reason {
+        INCLUDES,
+        PAGE_OR_SOURCE,
+        SOURCE
+    }
+
+    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks) {
+        this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
@@ -94,21 +102,14 @@ public abstract class RenderCommand implements Runnable {
         int pages = imageResult.getPages();
 
         //noinspection UndesirableClassUsage
-        ImageWithUrlData[] imagesWithUrlData;
-        if (cachedItem != null && cachedItem.getImagesWithData().length == pages) {
+        ImageWithUrlData[] imagesWithUrlData = new ImageWithUrlData[pages];
+        if (cachedItem != null) {
             ImageWithUrlData[] imagesWithData = cachedItem.getImagesWithData();
-            ImageWithUrlData[] result = new ImageWithUrlData[imagesWithData.length];
             for (int i = 0; i < imagesWithData.length; i++) {
-                if (i == page) {
-                    //requested to render, update source in case there was no change in this page, so it does not get rendered again all the time
-                    result[i] = ImageWithUrlData.deepCloneWithNewSource(imagesWithData[i], source);
-                } else {
-                    result[i] = imagesWithData[i];
-                } 
+                if (pages > i) {
+                    imagesWithUrlData[i] = imagesWithData[i];
+                }
             }
-            imagesWithUrlData = result;
-        } else {
-            imagesWithUrlData = new ImageWithUrlData[pages];
         }
 
 
@@ -124,15 +125,24 @@ public abstract class RenderCommand implements Runnable {
                     logger.error("pngBytes are null for: " + imageDiagram);
                     continue;
                 }
-                imagesWithUrlData[page] = new ImageWithUrlData(source, imageDiagram.getDescription(), pngBytes, svgBytes, baseDir);
+                String description = imageDiagram.getDescription();
+                imagesWithUrlData[page] = new ImageWithUrlData(imageDiagram.getDocumentSource(), imageDiagram.getPageSource(), description, pngBytes, svgBytes, baseDir);
+            }
+        }
+        for (int i = 0; i < imagesWithUrlData.length; i++) {
+            ImageWithUrlData imageWithUrlData = imagesWithUrlData[i];
+            if (imageWithUrlData == null) {
+                logger.debug("imageWithUrlData == null,  cachedItem.getImagesWithData()=", cachedItem.getImagesWithData(), ", imageResult=", imageResult);
             }
         }
         return imagesWithUrlData;
     }
 
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("reason", reason)
                 .append("sourceFilePath", sourceFilePath)
                 .append("selectedDir", baseDir.getName())
                 .append("page", page)

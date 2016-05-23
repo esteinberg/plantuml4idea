@@ -162,10 +162,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                             logger.debug("include file selected");
                             if (last.isIncludedFileChanged(selectedFile)) {
                                 logger.debug("includes changed, executing command");
-                                lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, null, delay), delay);
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, null, delay), delay);
                             } else if (last.renderRequired(project, last.getSource(), selectedPage)) {
                                 logger.debug("render required");
-                                lazyExecutor.execute(getCommand(last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay), delay);
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_OR_SOURCE, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay), delay);
                             } else if (!renderCache.isDisplayed(last, selectedPage)) {
                                 logger.debug("displaying cached item ", last);
                                 displayExistingDiagram(last);
@@ -186,7 +186,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     if (delay == LazyApplicationPoolExecutor.Delay.NOW) {
                         logger.debug("executing Delay.NOW");
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(getCommand(sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay), delay);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE, sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay), delay);
                         return;
                     }
 
@@ -194,7 +194,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(getCommand(sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay), delay);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_OR_SOURCE, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay), delay);
                     } else {
                         logger.debug("render not required");
                         if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
@@ -217,17 +217,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
 
     @NotNull
-    protected RenderCommand getCommand(String selectedFile, final String source, final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
+    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
         int version = sequence.incrementAndGet();
-        return new MyRenderCommand(selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks);
+        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks);
     }
 
     private class MyRenderCommand extends RenderCommand {
         private final LazyApplicationPoolExecutor.Delay delay;
 
-        public MyRenderCommand(String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks) {
-            super(selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks) {
+            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks);
             this.delay = delay;
         }
 
@@ -269,10 +269,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         imagesPanel.removeAll();
         if (requestedPage == -1) {
+            logger.debug("displaying images ", requestedPage);
             for (int i = 0; i < imagesWithData.length; i++) {
                 displayImage(cacheItem, imageResult, i, imagesWithData[i]);
             }
         } else {
+            logger.debug("displaying image ", requestedPage);
             displayImage(cacheItem, imageResult, requestedPage, imagesWithData[requestedPage]);
         }
         imagesPanel.revalidate();
@@ -283,7 +285,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + i + ", cacheItem=" + cacheItem);
         }
-        logger.debug("displaying image ", i);
         PlantUmlLabel label = new PlantUmlLabel(imageWithData, i, cacheItem.getRenderRequest());
         addScrollBarListeners(label);
 
