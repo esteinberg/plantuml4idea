@@ -7,8 +7,8 @@ import com.intellij.ui.PopupHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.*;
+import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
-import org.plantuml.idea.util.ImageWithUrlData;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +24,7 @@ public class PlantUmlLabel extends JLabel {
     public PlantUmlLabel() {
     }
 
-    public PlantUmlLabel(ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
+    public PlantUmlLabel(ImageItem imageWithData, int i, RenderRequest renderRequest) {
         setup(imageWithData, i, renderRequest);
     }
 
@@ -32,11 +32,11 @@ public class PlantUmlLabel extends JLabel {
         return renderRequest;
     }
 
-    public void setup(@NotNull ImageWithUrlData imageWithData, int i, RenderRequest renderRequest) {
+    public void setup(@NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.getImage() != null) {
-            setImageWithUrlData(imageWithData, this, 100);
+            setDiagram(imageWithData, this, 100);
         } else {
             setText("Failed to render page " + i);
         }
@@ -46,12 +46,12 @@ public class PlantUmlLabel extends JLabel {
     /**
      * Scales the image and sets it to label
      *
-     * @param imageWithUrlData source image and url data
+     * @param imageItem source image and url data
      * @param label            destination label
      * @param zoom             zoom factor
      */
-    private static void setImageWithUrlData(@NotNull final ImageWithUrlData imageWithUrlData, final JLabel label, int zoom) {
-        Image image = imageWithUrlData.getImage();
+    private static void setDiagram(@NotNull final ImageItem imageItem, final JLabel label, int zoom) {
+        Image image = imageItem.getImage();
         int newWidth;
         int newHeight;
         Image scaledImage;
@@ -98,7 +98,7 @@ public class PlantUmlLabel extends JLabel {
 
         label.removeAll();
 
-        for (ImageWithUrlData.UrlData url : imageWithUrlData.getUrls()) {
+        for (ImageItem.UrlData url : imageItem.getUrls()) {
             final URI uri = url.getUri();
             JButton button = new JButton();
             button.setContentAreaFilled(false);

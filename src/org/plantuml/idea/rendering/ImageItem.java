@@ -1,8 +1,7 @@
-package org.plantuml.idea.util;
+package org.plantuml.idea.rendering;
 
-import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -18,58 +17,46 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author koroandr
- *         18.06.15
- */
-public class ImageWithUrlData {
-    static Logger logger = Logger.getInstance(ImageWithUrlData.class);
+import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
-    private final BufferedImage image;
-    private final String documentSource;
-    private String pageSource;
+public class ImageItem {
+
+    private final int page;
     private final String description;
+    private final byte[] imageBytes;
+    private final String documentSource;
+    private final BufferedImage image;
     private final UrlData[] urls;
 
-    public ImageWithUrlData(String documentSource, String pageSource, String description, @NotNull byte[] imageData, byte[] svgData, File baseDir) throws IOException {
-        this.documentSource = documentSource;
+    private String pageSource;
+
+    public ImageItem(File baseDir, String documentSource, String pageSource, int page, String description, byte[] imageBytes, byte[] svgBytes) {
         this.pageSource = pageSource;
+        this.documentSource = documentSource;
+        this.page = page;
         this.description = description;
-        this.image = UIUtils.getBufferedImage(imageData);
-        this.urls = this.parseUrls(svgData, baseDir);
+        this.imageBytes = imageBytes;
+        try {
+            this.image = UIUtils.getBufferedImage(imageBytes);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        this.urls = this.parseUrls(svgBytes, baseDir);
     }
 
-//    public ImageWithUrlData(ImageWithUrlData input, String newSource) {
-//        this.documentSource = newSource;
-//        this.pageSource = pageSource;
-//        this.image = input.image;
-//        this.description = input.description;
-//        UrlData[] urls = input.getUrls();
-//        if (urls != null) {
-//            this.urls = new UrlData[urls.length];
-//            for (int i = 0; i < urls.length; i++) {
-//                this.urls[i] = urls[i];
-//            }
-//        } else {
-//            this.urls = new UrlData[0];
-//        } 
-//    }
-//
-//    public static ImageWithUrlData deepCloneWithNewSource(ImageWithUrlData imageWithUrlData, String newSource) {
-//        if (imageWithUrlData != null) {
-//            return new ImageWithUrlData(imageWithUrlData, newSource);
-//        }
-//        return null;
-//    }
-
-    public void setPageSource(String pageSource) {
-        this.pageSource = pageSource;
+    public ImageItem(int page, ImageItem description) {
+        this.page = page;
+        this.description = description.description;
+        this.pageSource = description.pageSource;
+        this.documentSource = description.documentSource;
+        this.imageBytes = description.imageBytes;
+        this.image = description.image;
+        this.urls = description.urls;
     }
 
     public BufferedImage getImage() {
@@ -80,12 +67,28 @@ public class ImageWithUrlData {
         return documentSource;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+
     public String getPageSource() {
         return pageSource;
     }
 
     public UrlData[] getUrls() {
         return urls;
+    }
+
+    public void setPageSource(String pageSource) {
+        this.pageSource = pageSource;
     }
 
     public class UrlData {
@@ -181,13 +184,14 @@ public class ImageWithUrlData {
         }
         return uri;
     }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("page", page)
                 .append("pageSourceAttached", pageSource != null)
                 .append("description", description)
-                .append("hasImage", image != null)
+                .append("diagramBytesLength", imageBytes == null ? "null" : imageBytes.length)
                 .toString();
     }
+
 }

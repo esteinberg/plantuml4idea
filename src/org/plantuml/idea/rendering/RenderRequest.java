@@ -12,14 +12,16 @@ public class RenderRequest {
     private final int page;
     private final int zoom;
     private final Integer version;
+    private boolean renderUrlLinks;
 
-    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom, Integer version) {
+    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom, Integer version, boolean renderUrlLinks) {
         this.baseDir = baseDir;
         this.source = source;
         this.format = format;
         this.page = page;
         this.zoom = zoom;
         this.version = version;
+        this.renderUrlLinks = renderUrlLinks;
     }
 
     public RenderRequest(RenderRequest renderRequest, PlantUml.ImageFormat format) {
@@ -55,6 +57,9 @@ public class RenderRequest {
         return version;
     }
 
+    public boolean isRenderUrlLinks() {
+        return renderUrlLinks;
+    }
 
     @Override
     public String toString() {
@@ -63,6 +68,7 @@ public class RenderRequest {
                 .append("format", format)
                 .append("page", page)
                 .append("zoom", zoom)
+                .append("renderUrlLinks", renderUrlLinks)
                 .append("version", version)
                 .toString();
     }

@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.util.ImageWithUrlData;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,20 +24,20 @@ public class RenderCacheItem {
     private final File baseDir;
     private final int zoom;
     private final Map<File, Long> includedFiles;
-    private final RenderResult imageResult;
-    private final ImageWithUrlData[] imagesWithData;
     private final RenderRequest renderRequest;
+    private final RenderResult renderResult;
+    private final ImageItem[] imageItems;
     private int requestedPage;
 
-    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult imageResult, ImageWithUrlData[] imagesWithData, Integer version) {
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
         this.zoom = zoom;
         this.requestedPage = requestedPage;
         this.includedFiles = includedFiles;
-        this.imageResult = imageResult;
-        this.imagesWithData = imagesWithData;
+        this.renderResult = renderResult;
+        this.imageItems = imageItems;
         this.version = version;
         this.renderRequest = renderRequest;
     }
@@ -63,14 +62,14 @@ public class RenderCacheItem {
 
     private boolean imageSourceChanged(int page, String source) {
         if (page == -1) {
-            for (int i = 0; i < imagesWithData.length; i++) {
-                ImageWithUrlData imageWithUrlData = imagesWithData[i];
-                if (imageWithUrlData != null && !source.equals(imageWithUrlData.getDocumentSource())) {
+            for (int i = 0; i < imageItems.length; i++) {
+                ImageItem imageItem = imageItems[i];
+                if (imageItem != null && !source.equals(imageItem.getDocumentSource())) {
                     return true;
                 }
             }
         } else {
-            if (imagesWithData.length > page && !imagesWithData[page].getDocumentSource().equals(source)) {
+            if (imageItems.length > page && !imageItems[page].getDocumentSource().equals(source)) {
                 return true;
             }
         }
@@ -79,14 +78,14 @@ public class RenderCacheItem {
 
     private boolean imageMissing(int page) {
         if (page == -1) {
-            for (int i = 0; i < imagesWithData.length; i++) {
-                ImageWithUrlData imageWithUrlData = imagesWithData[i];
-                if (imageWithUrlData == null) {
+            for (int i = 0; i < imageItems.length; i++) {
+                ImageItem imageItem = imageItems[i];
+                if (imageItem == null) {
                     return true;
                 }
             }
         } else {
-            if (imagesWithData.length > page && imagesWithData[page] == null) {
+            if (imageItems.length > page && imageItems[page] == null) {
                 return true;
             }
         }
@@ -106,12 +105,12 @@ public class RenderCacheItem {
         return baseDir;
     }
 
-    public RenderResult getImageResult() {
-        return imageResult;
+    public RenderResult getRenderResult() {
+        return renderResult;
     }
 
-    public ImageWithUrlData[] getImagesWithData() {
-        return imagesWithData;
+    public ImageItem[] getImageItems() {
+        return imageItems;
     }
 
     public boolean isIncludedFileChanged(VirtualFile file) {
@@ -183,16 +182,16 @@ public class RenderCacheItem {
                 .append("zoom", zoom)
                 .append("page", requestedPage)
                 .append("includedFiles", includedFiles)
-                .append("imageResult", imageResult)
-                .append("imagesWithData", Arrays.toString(imagesWithData))
+                .append("imageResult", renderResult)
+                .append("imagesWithData", Arrays.toString(imageItems))
                 .toString();
     }
 
     public String getImagesWithDataPageSource(int page) {
-        if (imagesWithData.length > page) {
-            ImageWithUrlData imageWithUrlData = imagesWithData[page];
-            if (imageWithUrlData != null) {
-                return imageWithUrlData.getPageSource();
+        if (imageItems.length > page) {
+            ImageItem imageItem = imageItems[page];
+            if (imageItem != null) {
+                return imageItem.getPageSource();
             }
         }
         return null;

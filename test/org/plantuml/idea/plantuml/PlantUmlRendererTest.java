@@ -13,19 +13,19 @@ public class PlantUmlRendererTest {
     public void render() throws Exception {
         RenderResult render = PlantUmlRenderer.render(new RenderRequest(new File(""), "@startuml\n" +
                 "xxx->yyy\n" +
-                "@enduml", PlantUml.ImageFormat.PNG, 0, 100, null), null);
+                "@enduml", PlantUml.ImageFormat.PNG, 0, 100, null, false), null);
         Assert.assertNotNull(render);
         Assert.assertNotNull(render.getFirstDiagramBytes());
-        Assert.assertNotNull(render.getDiagrams().get(0));
+        Assert.assertNotNull(render.getImageItems().get(0));
     }
 
     @Test
     public void renderBrokenImage() throws Exception {
         RenderResult render = PlantUmlRenderer.render(new RenderRequest(new File(""), "@startuml\n" +
                 "xxx\n" +
-                "@enduml", PlantUml.ImageFormat.PNG, 0, 0, null), null);
+                "@enduml", PlantUml.ImageFormat.PNG, 0, 0, null, false), null);
         Assert.assertNotNull(render);
-        Assert.assertNotNull(render.getDiagrams().get(0));
+        Assert.assertNotNull(render.getImageItems().get(0));
     }
 
     @Test
@@ -45,11 +45,11 @@ public class PlantUmlRendererTest {
                         "@startuml\n" +
                                 "xx1"
                         ,
-                        "xx3"
+                        "\nxx3"
                         ,
-                        "xx4"
+                        "\nxx4"
                         ,
-                        "xx5\n@enduml"},
+                        "\nxx5\n@enduml"},
                 strings);
     }
 

@@ -2,10 +2,10 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.util.ImageWithUrlData;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -65,14 +65,14 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null);
+        RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false);
         RenderResult result = PlantUmlRenderer.render(renderRequest, null);
         try {
-            final ImageWithUrlData imageWithUrlData = new ImageWithUrlData(null, null, null, result.getFirstDiagramBytes(), null, null);
-            if (imageWithUrlData.getImage() != null) {
-                testDot.setup(imageWithUrlData, 100, renderRequest);
+            final ImageItem imageItem = new ImageItem(null, null, null, 0, "", result.getFirstDiagramBytes(), null);
+            if (imageItem.getImage() != null) {
+                testDot.setup(imageItem, 100, renderRequest);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);
         }
     }

@@ -4,10 +4,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
-import org.plantuml.idea.util.ImageWithUrlData;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,21 +57,18 @@ public abstract class RenderCommand implements Runnable {
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
 
-            final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version);
+            final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version, renderUrlLinks);
             final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
-            RenderResult svgResult = null;
-            if (renderUrlLinks) {
-                svgResult = PlantUmlRenderer.render(new RenderRequest(baseDir, source, PlantUml.ImageFormat.SVG, page, zoom, version), cachedItem);
-            }
-            final ImageWithUrlData[] imagesWithData = toImagesWithUrlData(source, imageResult, svgResult, baseDir);
 
 
-            if (hasImages(imagesWithData)) {
+            ImageItem[] imageItems = joinDiagrams(imageResult, cachedItem);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version);
+            if (hasImages(newItem.getImageItems())) {
+
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imagesWithData, version);
                         postRenderOnEDT(newItem);
                     }
                 });
@@ -91,24 +86,22 @@ public abstract class RenderCommand implements Runnable {
 
     protected abstract void postRenderOnEDT(RenderCacheItem newItem);
 
-    private boolean hasImages(ImageWithUrlData[] imagesWithUrlData) {
-        for (ImageWithUrlData imageWithUrlData : imagesWithUrlData) {
-            if (imageWithUrlData != null && imageWithUrlData.getImage() != null) {
+    private boolean hasImages(ImageItem[] imagesWithUrlData) {
+        for (ImageItem imageItem : imagesWithUrlData) {
+            if (imageItem != null) {
                 return true;
             }
         }
         return false;
     }
 
-    private ImageWithUrlData[] toImagesWithUrlData(@NotNull String source, @NotNull RenderResult imageResult, @Nullable RenderResult svgResult, File baseDir) throws IOException {
-        List<RenderResult.Diagram> imageDiagrams = imageResult.getDiagrams();
-        List<RenderResult.Diagram> svgDiagrams = svgResult != null ? svgResult.getDiagrams() : null;
-        int pages = imageResult.getPages();
+    private ImageItem[] joinDiagrams(@NotNull RenderResult renderResult, RenderCacheItem cachedItem) throws IOException {
+        int pages = renderResult.getPages();
 
         //noinspection UndesirableClassUsage
-        ImageWithUrlData[] imagesWithUrlData = new ImageWithUrlData[pages];
+        ImageItem[] imagesWithUrlData = new ImageItem[pages];
         if (cachedItem != null) {
-            ImageWithUrlData[] imagesWithData = cachedItem.getImagesWithData();
+            ImageItem[] imagesWithData = cachedItem.getImageItems();
             for (int i = 0; i < imagesWithData.length; i++) {
                 if (pages > i) {
                     imagesWithUrlData[i] = imagesWithData[i];
@@ -116,29 +109,13 @@ public abstract class RenderCommand implements Runnable {
             }
         }
 
-
-        for (int i = 0; i < imageDiagrams.size(); i++) {
-            RenderResult.Diagram imageDiagram = imageDiagrams.get(i);
-            RenderResult.Diagram svgDiagram = svgDiagrams != null ? svgDiagrams.get(i) : null;
-
-            if (imageDiagram != null) {
-                int page = imageDiagram.getPage();
-                byte[] pngBytes = imageDiagram.getDiagramBytes();
-                byte[] svgBytes = svgDiagram != null ? svgDiagram.getDiagramBytes() : new byte[0];
-                if (pngBytes == null) {
-                    logger.error("pngBytes are null for: " + imageDiagram);
-                    continue;
-                }
-                String description = imageDiagram.getDescription();
-                imagesWithUrlData[page] = new ImageWithUrlData(imageDiagram.getDocumentSource(), imageDiagram.getPageSource(), description, pngBytes, svgBytes, baseDir);
+        List<ImageItem> imageImageItems = renderResult.getImageItems();
+        for (int i = 0; i < imageImageItems.size(); i++) {
+            ImageItem imageImageItem = imageImageItems.get(i);
+            if (imageImageItem != null) {
+                imagesWithUrlData[imageImageItem.getPage()] = imageImageItem;
             }
         }
-//        for (int i = 0; i < imagesWithUrlData.length; i++) {
-//            ImageWithUrlData imageWithUrlData = imagesWithUrlData[i];
-//            if (imageWithUrlData == null) {
-//                logger.debug("imageWithUrlData == null,  cachedItem=", cachedItem, ", imageResult=", imageResult);
-//            }
-//        }
         return imagesWithUrlData;
     }
 

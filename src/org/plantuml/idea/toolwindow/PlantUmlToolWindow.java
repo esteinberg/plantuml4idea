@@ -14,7 +14,6 @@ import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.listener.PlantUmlAncestorListener;
-import org.plantuml.idea.util.ImageWithUrlData;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -236,7 +235,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     renderCache.removeFromCache(cachedItem);
                 }
             }
-            if (!newItem.getImageResult().hasError()) {
+            if (!newItem.getRenderResult().hasError()) {
                 renderCache.addToCache(newItem);
             }
             logger.debug("displaying item ", newItem);
@@ -251,8 +250,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
         renderCache.setDisplayedItem(cacheItem);
 
-        ImageWithUrlData[] imagesWithData = cacheItem.getImagesWithData();
-        RenderResult imageResult = cacheItem.getImageResult();
+        ImageItem[] imagesWithData = cacheItem.getImageItems();
+        RenderResult imageResult = cacheItem.getRenderResult();
         int requestedPage = cacheItem.getRequestedPage();
 
         if (requestedPage >= imageResult.getPages()) {
@@ -279,7 +278,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         imagesPanel.repaint();
     }
 
-    public void displayImage(RenderCacheItem cacheItem, int i, ImageWithUrlData imageWithData) {
+    public void displayImage(RenderCacheItem cacheItem, int i, ImageItem imageWithData) {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + i + ", cacheItem=" + cacheItem);
         }
@@ -338,7 +337,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         int pages = -1;
         RenderCacheItem last = renderCache.getDisplayedItem();
         if (last != null) {
-            RenderResult imageResult = last.getImageResult();
+            RenderResult imageResult = last.getRenderResult();
             if (imageResult != null) {
                 pages = imageResult.getPages();
             }

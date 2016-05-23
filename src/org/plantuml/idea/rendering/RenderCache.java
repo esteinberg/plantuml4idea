@@ -34,7 +34,7 @@ public class RenderCache {
 
         //not cached as non error items
         if (displayedItem != null
-                && displayedItem.getImageResult().hasError()
+                && displayedItem.getRenderResult().hasError()
                 && !displayedItem.renderRequired(project, source, selectedPage)) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
