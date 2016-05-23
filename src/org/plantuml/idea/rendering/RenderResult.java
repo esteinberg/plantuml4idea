@@ -95,6 +95,7 @@ public class RenderResult {
         public String toString() {
             return new ToStringBuilder(this)
                     .append("page", page)
+                    .append("pageSourceAttached", pageSource != null)
                     .append("description", description)
                     .append("diagramBytesLength", diagramBytes == null ? "null" : diagramBytes.length)
                     .toString();

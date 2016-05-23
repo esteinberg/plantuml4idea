@@ -81,7 +81,7 @@ public abstract class RenderCommand implements Runnable {
             }
 
         } catch (Exception e) {
-            logger.warn("Exception occurred rendering source = " + source + ": " + e, e);
+            logger.error("Exception occurred rendering " + this, e);
         }
     }
 

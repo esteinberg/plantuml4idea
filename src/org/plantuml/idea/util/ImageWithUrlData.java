@@ -185,6 +185,7 @@ public class ImageWithUrlData {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("pageSourceAttached", pageSource != null)
                 .append("description", description)
                 .append("hasImage", image != null)
                 .toString();
