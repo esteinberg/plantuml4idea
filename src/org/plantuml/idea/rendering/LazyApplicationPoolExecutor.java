@@ -124,8 +124,7 @@ public class LazyApplicationPoolExecutor {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } finally {
-                        if (!Thread.currentThread().isInterrupted())
-                            scheduleNext(polledCommand); //needed to execute the very last command
+                        scheduleNext(polledCommand); //needed to execute the very last command
                     }
                 }
 
