@@ -224,11 +224,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     private class MyRenderCommand extends RenderCommand {
-        private final LazyApplicationPoolExecutor.Delay delay;
 
         public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks) {
-            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks);
-            this.delay = delay;
+            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay);
         }
 
         @Override
@@ -271,17 +269,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (requestedPage == -1) {
             logger.debug("displaying images ", requestedPage);
             for (int i = 0; i < imagesWithData.length; i++) {
-                displayImage(cacheItem, imageResult, i, imagesWithData[i]);
+                displayImage(cacheItem, i, imagesWithData[i]);
             }
         } else {
             logger.debug("displaying image ", requestedPage);
-            displayImage(cacheItem, imageResult, requestedPage, imagesWithData[requestedPage]);
+            displayImage(cacheItem, requestedPage, imagesWithData[requestedPage]);
         }
         imagesPanel.revalidate();
         imagesPanel.repaint();
     }
 
-    public void displayImage(RenderCacheItem cacheItem, RenderResult imageResult, int i, ImageWithUrlData imageWithData) {
+    public void displayImage(RenderCacheItem cacheItem, int i, ImageWithUrlData imageWithData) {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + i + ", cacheItem=" + cacheItem);
         }

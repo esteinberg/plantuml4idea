@@ -155,7 +155,7 @@ public class PlantUmlRenderer {
             }
             FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
             try {
-                RenderResult.Diagram diagram = new RenderResult.Diagram(page, generateImage(renderRequest.getSource(), partialSource, reader, formatOption, 0));//todo
+                RenderResult.Diagram diagram = new RenderResult.Diagram(page, generateImage(renderRequest.getSource(), partialSource, reader, formatOption, 0));
                 renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(diagram), 1));
             } catch (Throwable e) {
                 throw new RuntimeException(e);
@@ -239,6 +239,8 @@ public class PlantUmlRenderer {
             }
             logger.debug("RenderResult totalPages=", totalPages);
             return new RenderResult(Strategy.NORMAL, result, totalPages);
+        } catch (RenderingCancelledException e) {
+            throw e;
         } catch (Throwable e) {
             logger.error("Failed to render image " + documentSource, e);
             return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0);
@@ -251,6 +253,7 @@ public class PlantUmlRenderer {
     }
 
     private static int zoomDiagram(RenderRequest renderRequest, SourceStringReader reader) {
+        logger.debug("zoooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
 
@@ -258,6 +261,7 @@ public class PlantUmlRenderer {
             BlockUml block = blocks.get(i);
 
             long start = System.currentTimeMillis();
+            checkCancel();
             Diagram diagram = block.getDiagram();
             logger.debug("getDiagram done in  ", System.currentTimeMillis() - start, " ms");
 
@@ -269,6 +273,12 @@ public class PlantUmlRenderer {
         }
 
         return totalPages;
+    }
+
+    private static void checkCancel() {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RenderingCancelledException();
+        }
     }
 
     private static void generateImageIfNecessary(String documentSource, RenderCacheItem cachedItem, SourceStringReader reader, int renderRequestPage, List<RenderResult.Diagram> result, FileFormatOption formatOption, String[] renderRequestSplit) throws IOException {
@@ -297,9 +307,16 @@ public class PlantUmlRenderer {
 
     @NotNull
     private static RenderResult.Diagram generateImage(String documentSource, String pageSource, SourceStringReader reader, FileFormatOption formatOption, int i) throws IOException {
+        checkCancel();
         long start = System.currentTimeMillis();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        String description = reader.generateImage(os, i, formatOption);
+        String description = null;
+        try {
+            description = reader.generateImage(os, i, formatOption);
+        } catch (NullPointerException e) {
+            throw new RenderingCancelledException(e);//todo  http://plantuml.sourceforge.net/qa/?qa=4552/npe-while-generating-image-when-interrupted
+        }
+
         if (description.contains("entities")) {
             description = "ok";
         }

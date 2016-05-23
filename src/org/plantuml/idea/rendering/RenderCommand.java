@@ -26,7 +26,8 @@ public abstract class RenderCommand implements Runnable {
     protected int zoom;
     protected RenderCacheItem cachedItem;
     protected int version;
-    private boolean renderUrlLinks;
+    protected boolean renderUrlLinks;
+    protected LazyApplicationPoolExecutor.Delay delay;
 
     public enum Reason {
         INCLUDES,
@@ -34,7 +35,7 @@ public abstract class RenderCommand implements Runnable {
         SOURCE
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
@@ -44,6 +45,7 @@ public abstract class RenderCommand implements Runnable {
         this.cachedItem = cachedItem;
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
+        this.delay = delay;
     }
 
     @Override
@@ -80,6 +82,8 @@ public abstract class RenderCommand implements Runnable {
                 logger.debug("no images rendered");
             }
 
+        } catch (RenderingCancelledException e) {
+            logger.info("command interrupted");
         } catch (Exception e) {
             logger.error("Exception occurred rendering " + this, e);
         }

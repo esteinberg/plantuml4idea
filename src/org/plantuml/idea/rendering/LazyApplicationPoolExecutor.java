@@ -62,6 +62,8 @@ public class LazyApplicationPoolExecutor {
 
         if (future == null || future.isDone()) {
             scheduleNext(null);
+        } else if (delay == Delay.NOW) {
+            future.cancel(true);
         }
     }
 
@@ -81,7 +83,7 @@ public class LazyApplicationPoolExecutor {
 
     private synchronized void scheduleNext(final RenderCommand previousCommand) {
         logger.debug("scheduleNext");
-        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES) {
+        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.delay != Delay.NOW) {
             if (previousCommand.page == nextCommand.page
                     && previousCommand.zoom == nextCommand.zoom
                     && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
@@ -110,7 +112,9 @@ public class LazyApplicationPoolExecutor {
                         polledCommand = pollCommand();
                         if (polledCommand != null) {
                             logger.debug("running command ", polledCommand);
+                            long start = System.currentTimeMillis();
                             polledCommand.run();
+                            logger.debug("command executed in ", System.currentTimeMillis() - start, "ms");
                             setStartAfter();
                         }
                     } catch (InterruptedException e) {
