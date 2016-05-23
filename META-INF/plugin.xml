@@ -15,7 +15,11 @@
                <li>Images can be copied to clipboard as ASCII Art</li>
                <li>Fixed: @startditaa` not recognized</li>
                <li>Added a configurable delay between key up event and rendering run</li>
+               <li>Disabled URL links rendering by default - doubles rendering time</li>
                <li>A lot of caching and optimizations</li>
+               <li>Added partial rendering mode - useful in large files - the document will be splitted by (@)newpage and
+               each piece will be rendered by itself.</li>
+               <li>Added intentions to disable syntax check, and enable partial rendering/li>
             </ul>
             <p>1.9.0</p>
             <ul>
@@ -103,6 +107,14 @@
     <extensions defaultExtensionNs="com.intellij">
         <intentionAction>
             <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>
+            <category>plantuml4idea plugin</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.plantuml.idea.intentions.AddPartialRenderOptionIntention</className>
+            <category>plantuml4idea plugin</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.plantuml.idea.intentions.AddNoSyntaxCheckOptionIntention</className>
             <category>plantuml4idea plugin</category>
         </intentionAction>
 
