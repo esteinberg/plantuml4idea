@@ -48,9 +48,9 @@ public class LazyApplicationPoolExecutor {
      * if it will be submitted before this command will be scheduled for execution
      *
      * @param command command to be executed.
-     * @param delay
      */
-    public synchronized void execute(@NotNull final RenderCommand command, Delay delay) {
+    public synchronized void execute(@NotNull final RenderCommand command) {
+        Delay delay = command.delay;
         logger.debug("#execute ", command, " delay=", delay);
         nextCommand = command;
 
@@ -65,7 +65,7 @@ public class LazyApplicationPoolExecutor {
 
         if (future == null || future.isDone()) {
             scheduleNext(null);
-        } else if (delay == Delay.NOW) {
+        } else if (command.reason == RenderCommand.Reason.REFRESH) {
             future.cancel(true);
         }
     }
@@ -86,7 +86,7 @@ public class LazyApplicationPoolExecutor {
 
     private synchronized void scheduleNext(final RenderCommand previousCommand) {
         logger.debug("scheduleNext");
-        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.delay != Delay.NOW) {
+        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.reason != RenderCommand.Reason.REFRESH) {
             if (previousCommand.page == nextCommand.page
                     && previousCommand.zoom == nextCommand.zoom
                     && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
@@ -95,13 +95,13 @@ public class LazyApplicationPoolExecutor {
                 nextCommand = null;
             }
         }
-        
-        
+
+
         if (nextCommand != null) {
             future = ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
                 @Override
                 public void run() {
-                    executionTimeLabel.setState(ExucutionTimeLabel.State.WAITING);
+                    executionTimeLabel.state(ExucutionTimeLabel.State.WAITING);
                     RenderCommand polledCommand = null;
                     try {
                         long delayRemaining = getRemainingDelayMillis();

@@ -1,0 +1,41 @@
+?empty source - included file or not plantuml content
+    ?displayed item exist 
+    &refresh requested
+        +execute REFRESH
+    ?displayed item exist
+    &selected included file 
+        ?included file changed
+            +execute INCLUDES
+        ?different page selected
+            +execute PAGE_SELECTED
+        =include file, nothing needed - cursor move
+    ?displayed item exist
+    &displayed different page
+        +display requested page
+        -nothing needed - cursor move
+---------------------------------------------------------
+=pageuml content selected  
+?refresh requested
+    execute REFRESH
+---------------------------------------------------------
+=get cached item
+    return displayed item?
+        &no error for normal rendering
+        &page not changed
+        &source not changed
+        &image not missing - todo not needed probably
+    iterate cache
+        ?file path equal
+        &zoom equal
+            +try to find equal source, or return newest
+            -null
+---------------------------------------------------------
+?not cached
+|cached & source changed
+|cached & page changed
+|cached & selected page missing - todo not needed probably
+|cached & included file changed
+    execute SOURCE_OR_PAGE
+?not displayed selected page
+    display selected page
+=item already displayed, nothing needed

@@ -31,8 +31,9 @@ public abstract class RenderCommand implements Runnable {
 
     public enum Reason {
         INCLUDES,
-        PAGE_OR_SOURCE,
-        SOURCE
+        PAGE_SELECTED,
+        REFRESH,
+        SOURCE_OR_PAGE
     }
 
     public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExucutionTimeLabel label) {
@@ -57,16 +58,16 @@ public abstract class RenderCommand implements Runnable {
                 return;
             }
             long start = System.currentTimeMillis();
-            label.setState(ExucutionTimeLabel.State.EXECUTING);
-            
+            label.state(ExucutionTimeLabel.State.EXECUTING);
+
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
 
-            final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version, renderUrlLinks);
-            final RenderResult imageResult = PlantUmlRenderer.render(renderRequest, cachedItem);
+            final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version, renderUrlLinks, reason);
+            final RenderResult result = PlantUmlRenderer.render(renderRequest, cachedItem);
 
-            ImageItem[] imageItems = joinDiagrams(imageResult, cachedItem);
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, imageResult, imageItems, version);
+            ImageItem[] imageItems = joinDiagrams(result, cachedItem);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, imageItems, version);
             if (hasImages(newItem.getImageItems())) {
 
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -81,12 +82,12 @@ public abstract class RenderCommand implements Runnable {
                 logger.debug("no images rendered");
             }
             long total = System.currentTimeMillis() - start;
-            label.setState(ExucutionTimeLabel.State.DONE, total);
+            label.state(ExucutionTimeLabel.State.DONE, total, result.getImageItems().size());
         } catch (RenderingCancelledException e) {
             logger.info("command interrupted");
-            label.setState(ExucutionTimeLabel.State.CANCELLED);
-        } catch (Exception e) {
-            label.setState(ExucutionTimeLabel.State.ERROR);
+            label.state(ExucutionTimeLabel.State.CANCELLED);
+        } catch (Throwable e) {
+            label.state(ExucutionTimeLabel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
     }

@@ -13,8 +13,9 @@ public class RenderRequest {
     private final int zoom;
     private final Integer version;
     private boolean renderUrlLinks;
+    private RenderCommand.Reason reason;
 
-    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom, Integer version, boolean renderUrlLinks) {
+    public RenderRequest(File baseDir, String source, PlantUml.ImageFormat format, int page, int zoom, Integer version, boolean renderUrlLinks, RenderCommand.Reason reason) {
         this.baseDir = baseDir;
         this.source = source;
         this.format = format;
@@ -22,6 +23,7 @@ public class RenderRequest {
         this.zoom = zoom;
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
+        this.reason = reason;
     }
 
     public RenderRequest(RenderRequest renderRequest, PlantUml.ImageFormat format) {
@@ -61,6 +63,10 @@ public class RenderRequest {
         return renderUrlLinks;
     }
 
+    public RenderCommand.Reason getReason() {
+        return reason;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -69,7 +75,13 @@ public class RenderRequest {
                 .append("page", page)
                 .append("zoom", zoom)
                 .append("renderUrlLinks", renderUrlLinks)
+                .append("reason", reason)
                 .append("version", version)
                 .toString();
     }
+
+    public boolean requestedRefreshOrIncludesChanged() {
+        return reason == RenderCommand.Reason.REFRESH || reason == RenderCommand.Reason.INCLUDES;
+    }
+
 }

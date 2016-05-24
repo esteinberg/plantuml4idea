@@ -46,6 +46,16 @@ public class RenderCacheItem {
         return renderRequest;
     }
 
+    public boolean renderRequired(Project project, int page) {
+        if (this.requestedPage != page) {
+            return true;
+        }
+        if (imageMissing(page)) {
+            return true;
+        }
+        return includedFilesChanged(project);
+    }
+
     public boolean renderRequired(Project project, String source, int page) {
         if (this.requestedPage != page) {
             return true;
@@ -187,7 +197,7 @@ public class RenderCacheItem {
                 .toString();
     }
 
-    public String getImagesWithDataPageSource(int page) {
+    public String getImagesItemPageSource(int page) {
         if (imageItems.length > page) {
             ImageItem imageItem = imageItems[page];
             if (imageItem != null) {
@@ -196,4 +206,6 @@ public class RenderCacheItem {
         }
         return null;
     }
+
+
 }

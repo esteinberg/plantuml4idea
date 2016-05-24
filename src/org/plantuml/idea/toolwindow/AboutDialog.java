@@ -2,10 +2,7 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.ImageItem;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
-import org.plantuml.idea.rendering.RenderRequest;
-import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.rendering.*;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -65,7 +62,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false);
+        RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
         RenderResult result = PlantUmlRenderer.render(renderRequest, null);
         try {
             final ImageItem imageItem = new ImageItem(null, null, null, 0, "", result.getFirstDiagramBytes(), null);

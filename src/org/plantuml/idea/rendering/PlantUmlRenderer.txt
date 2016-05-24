@@ -1,0 +1,36 @@
+?Contains partial option
+    +Partial rendering
+        ?cache - different page count (vs splitted document)
+        |cache - different rendering type
+        |requested rendering of all pages
+        |requested page >= total pages
+            +render all
+                @single page render for all pages
+            -render single page
+                ?no cache
+                |requested refresh
+                |includes change - anywhere in document TODO check if include is contained in the page?
+                |cache - different rendering type
+                |cache - no or different page source
+                    +generate image
+                        ? contain includede new page  / page count > 1 
+                            + error  - TODO render 2 images into 1
+                    -page not changed, return
+TODO check ASCII and exporting
+               
+    -Normal rendering
+        ?rendering type not changed
+        &not contain included new page 
+        &cache - same page count (vs total by plantuml)
+            +incremental rendering - render only what changed
+                ?page not cached
+                |requested refresh
+                |requested because includes changed
+                |page source changed (or null vs cached item)
+                    +render
+                    -not render, update document source in cached image - to not request render next time? TODO
+            -render requested pages
+                ?not contain included new page 
+                    +set page source
+                    -page source null
+    

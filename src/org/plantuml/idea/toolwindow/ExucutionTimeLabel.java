@@ -13,7 +13,7 @@ import java.awt.*;
 public class ExucutionTimeLabel extends DumbAwareAction implements CustomComponentAction {
     private JLabel comp;
     private volatile State state;
-    private volatile String total;
+    private volatile String message;
     public static String DESCRIPTION;
 
     {
@@ -46,15 +46,22 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
         return label;
     }
 
-    public void setState(State b) {
+    public void state(State b) {
         state = b;
 
         updateOnEDT();
     }
 
-    public void setState(State state, long total) {
+    public void state(State state, long total, int itemsRendered) {
         this.state = state;
-        this.total = String.valueOf(total) + "ms";
+        this.message = String.valueOf(total) + "ms - " + itemsRendered + " page" + (itemsRendered == 1 ? "" : "s");
+
+        updateOnEDT();
+    }
+
+    public void state(State state, String message) {
+        this.state = state;
+        this.message = message;
 
         updateOnEDT();
     }
@@ -70,7 +77,7 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
 
     private void updateLabel() {
         if (state != null) {
-            state.update(comp, total);
+            state.update(comp, message);
         }
     }
 

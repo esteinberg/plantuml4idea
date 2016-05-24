@@ -39,8 +39,8 @@ public class RenderCache {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }
-        
-        
+
+
         while (iterator.hasNext()) {
             RenderCacheItem next = iterator.next();
             if (next.getSourceFilePath().equals(sourceFilePath) && next.getZoom() == zoom) {
@@ -98,5 +98,12 @@ public class RenderCache {
         if (displayedItem == cachedItem) {
             displayedItem = null;
         }
+    }
+
+    public boolean isSameFile(RenderCacheItem cachedItem) {
+        if (displayedItem != null && cachedItem != null) {
+            return displayedItem.getSourceFilePath().equals(cachedItem.getSourceFilePath());
+        }
+        return false;
     }
 }

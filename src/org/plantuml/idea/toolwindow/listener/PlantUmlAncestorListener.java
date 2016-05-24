@@ -22,7 +22,7 @@ public class PlantUmlAncestorListener implements AncestorListener {
     @Override
     public void ancestorAdded(AncestorEvent ancestorEvent) {
         logger.debug("ancestorAdded ", project.getName());
-        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
     }
 
     @Override

@@ -58,7 +58,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         PlantUmlSettings instance = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
 
         setupUI();
-
         lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt(), executionTimeLabel);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         //must be last
@@ -147,7 +146,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
 
-    public void renderLater(final LazyApplicationPoolExecutor.Delay delay) {
+    public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
         logger.debug("renderLater ", project.getName(), " ", delay);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
@@ -158,25 +157,27 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     if ("".equals(source)) { //is included file or some crap?
                         logger.debug("empty source");
                         VirtualFile selectedFile = UIUtils.getSelectedFile(project);
-                        RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file
+                        RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file?
+
+                        if (last != null && reason == RenderCommand.Reason.REFRESH) {
+                            logger.debug("empty source, executing command, reason=", reason);
+                            lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, null, delay));
+                        }
 
                         if (last != null && last.isIncludedFile(selectedFile)) {
                             logger.debug("include file selected");
                             if (last.isIncludedFileChanged(selectedFile)) {
                                 logger.debug("includes changed, executing command");
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, null, delay), delay);
-                            } else if (last.renderRequired(project, last.getSource(), selectedPage)) {
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
+                            } else if (last.renderRequired(project, selectedPage)) {
                                 logger.debug("render required");
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_OR_SOURCE, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay), delay);
-                            } else if (!renderCache.isDisplayed(last, selectedPage)) {
-                                logger.debug("displaying cached item ", last);
-                                displayExistingDiagram(last);
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_SELECTED, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {
                                 logger.debug("include file, not changed");
                             }
                         } else if (last != null && !renderCache.isDisplayed(last, selectedPage)) {
                             logger.debug("empty source, not include file, displaying cached item ", last);
-                             displayExistingDiagram(last);   
+                            displayExistingDiagram(last);
                         } else {
                             logger.debug("nothing needed");
                         }
@@ -185,26 +186,24 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                     String sourceFilePath = UIUtils.getSelectedFile(project).getPath();
 
-                    if (delay == LazyApplicationPoolExecutor.Delay.NOW) {
-                        logger.debug("executing Delay.NOW");
+                    if (reason == RenderCommand.Reason.REFRESH) {
+                        logger.debug("executing command, reason=", reason);
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE, sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay), delay);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay));
                         return;
                     }
 
                     RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
+
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_OR_SOURCE, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay), delay);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_OR_PAGE, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
+                    } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
+                        logger.debug("render not required, displaying cached item ", cachedItem);
+                        displayExistingDiagram(cachedItem);
                     } else {
-                        logger.debug("render not required");
-                        if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
-                            logger.debug("displaying cached item ", cachedItem);
-                            displayExistingDiagram(cachedItem);
-                        } else {
-                            logger.debug("item already displayed ", cachedItem);
-                        }
+                        logger.debug("render not required, item already displayed ", cachedItem);
                     }
                 }
             }
@@ -212,7 +211,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
-        executionTimeLabel.setState(ExucutionTimeLabel.State.DONE, 0);
+        executionTimeLabel.state(ExucutionTimeLabel.State.DONE, "cached");
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
         displayDiagram(last);
@@ -234,7 +233,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         @Override
         public void postRenderOnEDT(RenderCacheItem newItem) {
-            if (delay == LazyApplicationPoolExecutor.Delay.NOW) {
+            if (reason == Reason.REFRESH) {
                 if (cachedItem != null) {
                     renderCache.removeFromCache(cachedItem);
                 }
@@ -318,14 +317,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
     }
 
     public void setSelectedPage(int selectedPage) {
         if (selectedPage >= -1 && selectedPage < getNumPages()) {
             logger.debug("page ", selectedPage, " selected");
             this.selectedPage = selectedPage;
-            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
+            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
         }
     }
 

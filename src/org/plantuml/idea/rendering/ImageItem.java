@@ -29,11 +29,11 @@ public class ImageItem {
     private final int page;
     private final String description;
     private final byte[] imageBytes;
-    private final String documentSource;
     private final BufferedImage image;
     private final UrlData[] urls;
 
-    private String pageSource;
+    private final String pageSource;
+    private String documentSource;
 
     public ImageItem(File baseDir, String documentSource, String pageSource, int page, String description, byte[] imageBytes, byte[] svgBytes) {
         this.pageSource = pageSource;
@@ -57,6 +57,10 @@ public class ImageItem {
         this.imageBytes = description.imageBytes;
         this.image = description.image;
         this.urls = description.urls;
+    }
+
+    public void setDocumentSource(String documentSource) {
+        this.documentSource = documentSource;
     }
 
     public BufferedImage getImage() {
@@ -87,13 +91,10 @@ public class ImageItem {
         return urls;
     }
 
-    public void setPageSource(String pageSource) {
-        this.pageSource = pageSource;
-    }
-
     public class UrlData {
         private final URI uri;
         private final Rectangle clickArea;
+
         public UrlData(URI uri, Rectangle clickArea) {
             this.uri = uri;
             this.clickArea = clickArea;
@@ -184,6 +185,7 @@ public class ImageItem {
         }
         return uri;
     }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)

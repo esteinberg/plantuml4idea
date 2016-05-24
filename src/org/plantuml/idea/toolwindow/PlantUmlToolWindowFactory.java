@@ -22,7 +22,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         Content content = contentFactory.createContent(plantUmlToolWindow, "", false);
         toolWindow.getContentManager().addContent(content);
 
-        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
     }
 
 }

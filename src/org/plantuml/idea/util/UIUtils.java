@@ -135,7 +135,7 @@ public class UIUtils {
 
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
         if (plantUmlToolWindow != null) {
-            plantUmlToolWindow.renderLater(delay);
+            plantUmlToolWindow.renderLater(delay, null);
         }
     }
 

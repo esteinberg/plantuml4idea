@@ -34,6 +34,6 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
         if (logger.isDebugEnabled()) {
             logger.debug("selection changed ", event);
         }
-        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.NOW);
+        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
     }
 }
