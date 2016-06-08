@@ -39,7 +39,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private int zoom = 100;
     private int selectedPage = -1;
 
-    private RenderCache renderCache = new RenderCache(10);
+    private RenderCache renderCache;
 
     private AncestorListener plantUmlAncestorListener;
 
@@ -55,13 +55,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
-        PlantUmlSettings instance = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
 
         setupUI();
-        lazyExecutor = new LazyApplicationPoolExecutor(instance.getRenderDelayAsInt(), executionTimeLabel);
+        lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionTimeLabel);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
+        renderCache = new RenderCache(settings.getCacheSizeAsInt());
     }
 
     private void setupUI() {
