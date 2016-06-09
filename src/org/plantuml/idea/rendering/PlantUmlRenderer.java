@@ -207,7 +207,7 @@ public class PlantUmlRenderer {
 
             int totalPages = zoomDiagram(renderRequest, reader);
             if (totalPages == 0) {
-                throw new RuntimeException("no pages");//todo
+                return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0);
             }
 
             //image/error is not rendered when page >= totalPages
@@ -334,7 +334,12 @@ public class PlantUmlRenderer {
 
         ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
 
-        String description = reader.generateImage(imageStream, i, formatOption);
+        String description = null;
+        try {
+            description = reader.generateImage(imageStream, i, formatOption);
+        } catch (Exception e) {
+            throw new RenderingCancelledException(e);
+        }
 
         logger.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms");
 
