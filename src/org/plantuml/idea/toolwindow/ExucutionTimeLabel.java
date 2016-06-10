@@ -11,9 +11,9 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ExucutionTimeLabel extends DumbAwareAction implements CustomComponentAction {
-    private JLabel comp;
+    private JLabel label;
     private volatile State state;
-    private volatile String message;
+    private volatile String message = "---";
     public static String DESCRIPTION;
 
     {
@@ -39,11 +39,14 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
 
     @Override
     public JComponent createCustomComponent(Presentation presentation) {
-        final JPanel label = new JPanel();
-        this.comp = new JLabel("---");
-        label.setToolTipText(DESCRIPTION);
-        label.add(this.comp);
-        return label;
+        final JPanel panel = new JPanel();
+        this.label = new JLabel("---");
+        Font font = label.getFont();
+        Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
+        label.setFont(boldFont);
+        panel.setToolTipText(DESCRIPTION);
+        panel.add(this.label);
+        return panel;
     }
 
     public void state(State b) {
@@ -77,7 +80,7 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
 
     private void updateLabel() {
         if (state != null) {
-            state.update(comp, message);
+            state.update(label, message);
         }
     }
 
@@ -85,7 +88,7 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
     public enum State {
         WAITING(JBColor.GRAY, "Delay waiting - gray"),
         EXECUTING(JBColor.GREEN, "Executing - green"),
-        CANCELLED(JBColor.BLUE, "Cancelled - blue"),
+        CANCELLED(JBColor.PINK, "Cancelled - pink"),
         ERROR(JBColor.RED, "Error - red"),
         DONE(JBColor.BLACK, "Done - black/white");
 
