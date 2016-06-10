@@ -61,7 +61,7 @@ public class RenderCache {
     }
 
     public void addToCache(RenderCacheItem cacheItem) {
-        if (cacheItems.size() > 0 && cacheItems.size() + 1 >= maxCacheSize) {
+        if (cacheItems.size() > 0 && cacheItems.size() + 1 > maxCacheSize) {
             cacheItems.removeFirst();
         }
         cacheItems.add(cacheItem);
