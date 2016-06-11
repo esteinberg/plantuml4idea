@@ -19,7 +19,7 @@ import javax.swing.*;
 public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
 
     public CopyPlantUmlServerLinkContextAction() {
-        super("Copy PlantUML Server link", "Generate PlantUML Server link to clipboard", AllIcons.Ide.Link);
+        super("Copy as PlantUML Server link", "Generate PlantUML Server link to clipboard", AllIcons.Ide.Link);
     }
 
     public CopyPlantUmlServerLinkContextAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
