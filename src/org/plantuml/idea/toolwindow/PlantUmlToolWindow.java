@@ -109,6 +109,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 if (e.isControlDown()) {
                     setZoom(Math.max(getZoom() - e.getWheelRotation() * 10, 1));
                 } else {
+                    e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
                 }
             }

@@ -9,6 +9,10 @@
 
     <change-notes>
         <![CDATA[
+            <p>2.1.0</p>
+            <ul>
+               <li>scrolling fixed for 2016.2</li>
+            </ul>
             <p>2.0.0</p>
             <ul>
                <li>PlantUml library upgrade to 8042</li>
@@ -19,7 +23,7 @@
                <li>A lot of caching and optimizations</li>
                <li>Added incremental rendering - only changed pages will be rendered</li>
                <li>Added partial rendering mode - useful in large files - the document will be splitted by (@)newpage and each piece will be rendered by itself.</li>
-               <li>Added intentions to disable syntax check, and enable partial rendering - available on the start tag (@startuml,...) /li>
+               <li>Added intentions to disable syntax check, and enable partial rendering - available on the start tag (@startuml,...)</li>
             </ul>
             <p>1.9.0</p>
             <ul>
