@@ -4,9 +4,6 @@ import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 
-/**
- * @author Eugene Steinberg
- */
 public class CopyDiagramAsUnicodeTxtToClipboardContextAction extends CopyDiagramAsTxtToClipboardContextAction {
 
     public CopyDiagramAsUnicodeTxtToClipboardContextAction() {

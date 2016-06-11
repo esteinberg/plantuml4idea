@@ -19,9 +19,6 @@ import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.UnsupportedEncodingException;
 
-/**
- * @author Eugene Steinberg
- */
 public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
 
     private static final DataFlavor FLAVOR = DataFlavor.stringFlavor;
