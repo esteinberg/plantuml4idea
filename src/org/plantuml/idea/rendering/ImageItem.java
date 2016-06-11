@@ -29,18 +29,20 @@ public class ImageItem {
     private final int page;
     private final String description;
     private final byte[] imageBytes;
+    private final PlantUmlRenderer.RenderingType renderingType;
     private final BufferedImage image;
     private final UrlData[] urls;
 
     private final String pageSource;
     private String documentSource;
 
-    public ImageItem(File baseDir, String documentSource, String pageSource, int page, String description, byte[] imageBytes, byte[] svgBytes) {
+    public ImageItem(File baseDir, String documentSource, String pageSource, int page, String description, byte[] imageBytes, byte[] svgBytes, PlantUmlRenderer.RenderingType renderingType) {
         this.pageSource = pageSource;
         this.documentSource = documentSource;
         this.page = page;
         this.description = description;
         this.imageBytes = imageBytes;
+        this.renderingType = renderingType;
         try {
             this.image = UIUtils.getBufferedImage(imageBytes);
         } catch (Exception e) {
@@ -57,6 +59,11 @@ public class ImageItem {
         this.imageBytes = description.imageBytes;
         this.image = description.image;
         this.urls = description.urls;
+        this.renderingType = description.renderingType;
+    }
+
+    public PlantUmlRenderer.RenderingType getRenderingType() {
+        return renderingType;
     }
 
     public void setDocumentSource(String documentSource) {

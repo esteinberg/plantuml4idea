@@ -182,7 +182,7 @@ public class PlantUmlRenderer {
             throw new RuntimeException("partial rendering not supported with @newpage in included file");
         }
         try {
-            ImageItem imageItem = new ImageItem(page, generateImage(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page));
+            ImageItem imageItem = new ImageItem(page, generateImage(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL));
             renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(imageItem), 1));
         } catch (RenderingCancelledException e) {
             throw e;
@@ -250,14 +250,14 @@ public class PlantUmlRenderer {
                         if (!containsIncludedNewPage) {
                             pageSource = sourceSplit[i];
                         }
-                        result.add(generateImage(renderRequest, documentSource, pageSource, reader, formatOption, i, i));
+                        result.add(generateImage(renderRequest, documentSource, pageSource, reader, formatOption, i, i, RenderingType.NORMAL));
                     }
                 } else {//render single image
                     String pageSource = null;
                     if (!containsIncludedNewPage) {
                         pageSource = sourceSplit[renderRequestPage];
                     }
-                    result.add(generateImage(renderRequest, documentSource, pageSource, reader, formatOption, renderRequestPage, renderRequestPage));
+                    result.add(generateImage(renderRequest, documentSource, pageSource, reader, formatOption, renderRequestPage, renderRequestPage, RenderingType.NORMAL));
                 }
             }
             logger.debug("RenderResult totalPages=", totalPages);
@@ -306,7 +306,7 @@ public class PlantUmlRenderer {
 
     private static void generateImageIfNecessary(RenderRequest renderRequest, String documentSource, RenderCacheItem cachedItem, SourceStringReader reader, int i, List<ImageItem> result, FileFormatOption formatOption, String[] renderRequestSplit) throws IOException {
         if (shouldGenerate(renderRequest, cachedItem, renderRequestSplit, i)) {
-            result.add(generateImage(renderRequest, documentSource, renderRequestSplit[i], reader, formatOption, i, i));
+            result.add(generateImage(renderRequest, documentSource, renderRequestSplit[i], reader, formatOption, i, i, RenderingType.NORMAL));
         } else {
             logger.debug("page ", i, " no change, updating source");
             cachedItem.getImageItems()[i].setDocumentSource(documentSource); //TODO needed?
@@ -328,7 +328,7 @@ public class PlantUmlRenderer {
     }
 
     @NotNull
-    private static ImageItem generateImage(RenderRequest renderRequest, String documentSource, String pageSource, SourceStringReader reader, FileFormatOption formatOption, int i, int logPage) throws IOException {
+    private static ImageItem generateImage(RenderRequest renderRequest, String documentSource, String pageSource, SourceStringReader reader, FileFormatOption formatOption, int i, int logPage, RenderingType renderingType) throws IOException {
         checkCancel();
         long start = System.currentTimeMillis();
 
@@ -353,7 +353,7 @@ public class PlantUmlRenderer {
             description = "ok";
         }
 
-        return new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, i, description, imageStream.toByteArray(), svgBytes);
+        return new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, i, description, imageStream.toByteArray(), svgBytes, renderingType);
     }
 
     private static byte[] generateSvg(SourceStringReader reader, int i) throws IOException {
@@ -386,4 +386,8 @@ public class PlantUmlRenderer {
         }
     }
 
+    public enum RenderingType {
+        PARTIAL,
+        NORMAL
+    }
 }

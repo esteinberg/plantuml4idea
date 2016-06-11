@@ -11,8 +11,9 @@
         <![CDATA[
             <p>2.1.0</p>
             <ul>
-               <li>scrolling fixed for 2016.2</li>
-               <li>remembering selected page per file</li>
+               <li>Scrolling fixed for 2016.2</li>
+               <li>Remembering selected page per file</li>
+               <li>Generating PlantUML Server link to clipboard</li>
             </ul>
             <p>2.0.0</p>
             <ul>

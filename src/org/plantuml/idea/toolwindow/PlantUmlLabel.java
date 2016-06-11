@@ -20,12 +20,18 @@ import java.net.URI;
 public class PlantUmlLabel extends JLabel {
     private static Logger logger = Logger.getInstance(PlantUmlLabel.class);
     private RenderRequest renderRequest;
+    private ImageItem imageWithData;
 
     public PlantUmlLabel() {
     }
 
     public PlantUmlLabel(ImageItem imageWithData, int i, RenderRequest renderRequest) {
-        setup(imageWithData, i, renderRequest);
+        this.imageWithData = imageWithData;
+        setup(this.imageWithData, i, renderRequest);
+    }
+
+    public ImageItem getImageWithData() {
+        return imageWithData;
     }
 
     public RenderRequest getRenderRequest() {
@@ -86,7 +92,9 @@ public class PlantUmlLabel extends JLabel {
                                 new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
                                 Separator.getInstance(),
                                 new ExternalOpenDiagramAsPNGAction(),
-                                new ExternalOpenDiagramAsSVGAction()
+                                new ExternalOpenDiagramAsSVGAction(),
+                                Separator.getInstance(),
+                                new CopyPlantUmlServerLinkContextAction()
                         };
                     }
                 }).getComponent().show(comp, x, y);
