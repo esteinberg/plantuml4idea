@@ -12,6 +12,7 @@
             <p>2.1.0</p>
             <ul>
                <li>scrolling fixed for 2016.2</li>
+               <li>remembering selected page per file</li>
             </ul>
             <p>2.0.0</p>
             <ul>
@@ -132,5 +133,6 @@
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>
+        <applicationService serviceImplementation="org.plantuml.idea.toolwindow.SelectedPagePersistentStateComponent"/>
     </extensions>
 </idea-plugin>

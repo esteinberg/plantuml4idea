@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.util.UIUtils;
 
 import static com.intellij.codeInsight.completion.CompletionInitializationContext.DUMMY_IDENTIFIER;
@@ -34,7 +35,7 @@ public class PlantUmlDocumentListener implements DocumentListener {
         if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
             Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());
             for (Editor editor : editors) {
-                UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY);
+                UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
             }
         }
     }

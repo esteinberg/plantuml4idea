@@ -31,9 +31,12 @@ public abstract class RenderCommand implements Runnable {
 
     public enum Reason {
         INCLUDES,
-        PAGE_SELECTED,
+        FILE_SWITCHED,
         REFRESH,
-        SOURCE_OR_PAGE
+        /* no function*/
+        CARET,
+        /* no function*/
+        SOURCE_PAGE_ZOOM
     }
 
     public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExucutionTimeLabel label) {

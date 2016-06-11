@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlRenderingFileEditorManagerListener implements FileEditorManagerListener {
@@ -34,6 +35,6 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
         if (logger.isDebugEnabled()) {
             logger.debug("selection changed ", event);
         }
-        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
     }
 }

@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlCaretListener implements CaretListener {
@@ -17,7 +18,7 @@ public class PlantUmlCaretListener implements CaretListener {
             return;//console            
         }
         logger.debug("caretPositionChanged");
-        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.CARET);
     }
 
     @Override
@@ -26,7 +27,7 @@ public class PlantUmlCaretListener implements CaretListener {
             return;//console            
         }
         logger.debug("caretAdded");
-        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY);
+        UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.CARET);
     }
 
     @Override

@@ -1,22 +1,30 @@
 ?empty source - included file or not plantuml content
-    ?displayed item exist 
-    &refresh requested
-        +execute REFRESH
-    ?displayed item exist
-    &selected included file 
-        ?included file changed
-            +execute INCLUDES
-        ?different page selected
-            +execute PAGE_SELECTED
-        =include file, nothing needed - cursor move
-    ?displayed item exist
-    &displayed different page
-        +display requested page
-        -nothing needed - cursor move
+    =get displayed item - todo check all items for included file?
+        #?displayed item exist 
+        #&file switched
+        #    set selected page
+        ?displayed item exist 
+        &refresh requested
+            +execute REFRESH
+        ?displayed item exist
+        &selected included file 
+            ?included file changed
+                +execute INCLUDES
+            ?different page selected
+                +execute PAGE_SELECTED
+            =include file, nothing needed - cursor move
+        ?displayed item exist
+        &displayed different page
+            +display requested page
+            -nothing needed - cursor move
 ---------------------------------------------------------
 =pageuml content selected  
 ?refresh requested
     execute REFRESH
+    return
+---------------------------------------------------------
+?file switched
+    set selected page
 ---------------------------------------------------------
 =get cached item
     return displayed item?

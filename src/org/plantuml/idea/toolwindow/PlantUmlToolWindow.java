@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -50,6 +51,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private AtomicInteger sequence = new AtomicInteger();
     public boolean renderUrlLinks;
     public ExucutionTimeLabel executionTimeLabel;
+    private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
 
     public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -63,6 +65,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
         renderCache = new RenderCache(settings.getCacheSizeAsInt());
+        selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
     }
 
     private void setupUI() {
@@ -161,6 +164,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         VirtualFile selectedFile = UIUtils.getSelectedFile(project);
                         RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file?
 
+//                        if (last != null && reason == RenderCommand.Reason.FILE_SWITCHED) {
+//                            selectedPage = selectedPagePersistentStateComponent.getPage(last.getSourceFilePath());
+//                            logger.debug("file switched, setting selected page ",selectedPage);
+//                        }
+                        
                         if (last != null && reason == RenderCommand.Reason.REFRESH) {
                             logger.debug("empty source, executing command, reason=", reason);
                             lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, null, delay));
@@ -173,7 +181,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else if (last.renderRequired(project, selectedPage)) {
                                 logger.debug("render required");
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.PAGE_SELECTED, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {
                                 logger.debug("include file, not changed");
                             }
@@ -188,6 +196,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                     String sourceFilePath = UIUtils.getSelectedFile(project).getPath();
 
+
                     if (reason == RenderCommand.Reason.REFRESH) {
                         logger.debug("executing command, reason=", reason);
                         final File selectedDir = UIUtils.getSelectedDir(project);
@@ -195,12 +204,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         return;
                     }
 
+                    if (reason == RenderCommand.Reason.FILE_SWITCHED) {
+                        selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                        logger.debug("file switched, setting selected page ", selectedPage);
+                    }
+                    
                     RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
 
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_OR_PAGE, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
                     } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
                         logger.debug("render not required, displaying cached item ", cachedItem);
                         displayExistingDiagram(cachedItem);
@@ -319,14 +333,15 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
+        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
     }
 
     public void setSelectedPage(int selectedPage) {
         if (selectedPage >= -1 && selectedPage < getNumPages()) {
             logger.debug("page ", selectedPage, " selected");
             this.selectedPage = selectedPage;
-            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
+            selectedPagePersistentStateComponent.setPage(selectedPage, renderCache.getDisplayedItem());
+            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }
     }
 

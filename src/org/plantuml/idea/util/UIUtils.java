@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
@@ -125,7 +126,7 @@ public class UIUtils {
         return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 
-    public static void renderPlantUmlToolWindowLater(@Nullable Project project, LazyApplicationPoolExecutor.Delay delay) {
+    public static void renderPlantUmlToolWindowLater(@Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         if (project == null) return;
 
         ToolWindow toolWindow = getToolWindow(project);
@@ -135,7 +136,7 @@ public class UIUtils {
 
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
         if (plantUmlToolWindow != null) {
-            plantUmlToolWindow.renderLater(delay, null);
+            plantUmlToolWindow.renderLater(delay, reason);
         }
     }
 

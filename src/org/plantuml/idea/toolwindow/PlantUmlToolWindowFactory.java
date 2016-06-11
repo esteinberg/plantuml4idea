@@ -7,6 +7,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
 
 /**
  * @author Eugene Steinberg
@@ -22,7 +23,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         Content content = contentFactory.createContent(plantUmlToolWindow, "", false);
         toolWindow.getContentManager().addContent(content);
 
-        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, null);
+        plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
     }
 
 }
