@@ -18,12 +18,14 @@ import org.plantuml.idea.util.Utils;
  */
 @State(name = "PlantUmlSettings", storages = {@Storage(file = StoragePathMacros.APP_CONFIG + "/plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
+    public static final int CACHE_SIZE_DEFAULT_VALUE = 5;
+    
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
     private boolean renderUrlLinks = false;
     private String renderDelay = "100";
-    private String cacheSize = "5";
+    private String cacheSize = String.valueOf(CACHE_SIZE_DEFAULT_VALUE);
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -66,11 +68,11 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public int getCacheSizeAsInt() {
-        return Utils.asInt(cacheSize, 10);
+        return Utils.asInt(cacheSize, CACHE_SIZE_DEFAULT_VALUE);
     }
 
     public void setCacheSize(String cacheSize) {
-        this.cacheSize = String.valueOf(Math.max(0, Utils.asInt(cacheSize, 10)));
+        this.cacheSize = String.valueOf(Math.max(0, Utils.asInt(cacheSize, CACHE_SIZE_DEFAULT_VALUE)));
     }
 
     public String getRenderDelay() {
