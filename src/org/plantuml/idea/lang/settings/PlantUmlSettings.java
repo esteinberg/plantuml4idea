@@ -18,13 +18,15 @@ import org.plantuml.idea.util.Utils;
  */
 @State(name = "PlantUmlSettings", storages = {@Storage(file = StoragePathMacros.APP_CONFIG + "/plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
-    public static final int CACHE_SIZE_DEFAULT_VALUE = 5;
-    
+
+    private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
+    private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
+
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
     private boolean renderUrlLinks = false;
-    private String renderDelay = "100";
+    private String renderDelay = String.valueOf(RENDER_DELAY_DEFAULT_VALUE);
     private String cacheSize = String.valueOf(CACHE_SIZE_DEFAULT_VALUE);
 
     public static PlantUmlSettings getInstance() {
@@ -80,11 +82,11 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public int getRenderDelayAsInt() {
-        return Utils.asInt(renderDelay, 100);
+        return Utils.asInt(renderDelay, RENDER_DELAY_DEFAULT_VALUE);
     }
 
     public void setRenderDelay(String renderDelay) {
-        this.renderDelay = String.valueOf(Math.max(0, Utils.asInt(renderDelay, 100)));
+        this.renderDelay = String.valueOf(Math.max(0, Utils.asInt(renderDelay, RENDER_DELAY_DEFAULT_VALUE)));
     }
 
     @Nullable
