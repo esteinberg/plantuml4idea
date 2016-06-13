@@ -335,7 +335,7 @@ public class PlantUmlRenderer {
 
     @NotNull
     private static List<String> getTitles(int totalPages, List<BlockUml> blocks) {
-        List<String> titles = new ArrayList<>(totalPages);
+        List<String> titles = new ArrayList<String>(totalPages);
         for (BlockUml block : blocks) {
             Diagram diagram = block.getDiagram();
             if (diagram instanceof SequenceDiagram) {
