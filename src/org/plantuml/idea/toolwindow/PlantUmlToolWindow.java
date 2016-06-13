@@ -369,6 +369,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return selectedPage;
     }
 
+    public RenderCacheItem getDisplayedItem() {
+        return renderCache.getDisplayedItem();
+    }
+
     private boolean isProjectValid(Project project) {
         return project != null && !project.isDisposed();
     }

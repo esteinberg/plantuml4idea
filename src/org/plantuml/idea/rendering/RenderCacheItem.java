@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class RenderCacheItem {
@@ -25,11 +26,12 @@ public class RenderCacheItem {
     private final int zoom;
     private final Map<File, Long> includedFiles;
     private final RenderRequest renderRequest;
+    private final List<String> titles;
     private final RenderResult renderResult;
     private final ImageItem[] imageItems;
     private int requestedPage;
 
-    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version) {
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version, List<String> titles) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
@@ -40,10 +42,15 @@ public class RenderCacheItem {
         this.imageItems = imageItems;
         this.version = version;
         this.renderRequest = renderRequest;
+        this.titles = titles;
     }
 
     public RenderRequest getRenderRequest() {
         return renderRequest;
+    }
+
+    public List<String> getTitles() {
+        return titles;
     }
 
     public boolean renderRequired(Project project, int page) {

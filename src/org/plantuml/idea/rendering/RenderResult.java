@@ -14,11 +14,17 @@ public class RenderResult {
     private PlantUmlRenderer.Strategy strategy;
     private final List<ImageItem> imageItems;
     private final int pages;
+    private final List<String> titles;
 
-    public RenderResult(PlantUmlRenderer.Strategy strategy, @NotNull List<ImageItem> imageItems, int totalPages) {
+    public RenderResult(PlantUmlRenderer.Strategy strategy, @NotNull List<ImageItem> imageItems, int totalPages, List<String> titles) {
         this.strategy = strategy;
         this.imageItems = imageItems;
         this.pages = totalPages;
+        this.titles = titles;
+    }
+
+    public List<String> getTitles() {
+        return titles;
     }
 
     public byte[] getFirstDiagramBytes() {

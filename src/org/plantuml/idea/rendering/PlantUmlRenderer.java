@@ -1,9 +1,16 @@
 package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.Pair;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
 import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
+import net.sourceforge.plantuml.sequencediagram.Event;
+import net.sourceforge.plantuml.sequencediagram.Newpage;
+import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
+import org.apache.commons.lang.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -134,7 +141,7 @@ public class PlantUmlRenderer {
 
         logger.debug("partial rendering done ", System.currentTimeMillis() - start, "ms");
 
-        RenderResult renderResult = joinResults(sourceSplit, renderResults);
+        RenderResult renderResult = joinResults(sourceSplit, renderResults, cachedItem);
         logger.debug("result prepared ", System.currentTimeMillis() - start, "ms");
         return renderResult;
     }
@@ -158,7 +165,7 @@ public class PlantUmlRenderer {
     }
 
     @NotNull
-    public static RenderResult joinResults(String[] sourceSplit, List<RenderResult> renderResults) {
+    public static RenderResult joinResults(String[] sourceSplit, List<RenderResult> renderResults, RenderCacheItem cachedItem) {
         RenderResult renderResult;
         List<ImageItem> allImageItems = new ArrayList<ImageItem>();
         for (int i = 0; i < renderResults.size(); i++) {
@@ -169,21 +176,46 @@ public class PlantUmlRenderer {
                 allImageItems.add(imageItem);
             }
         }
-        renderResult = new RenderResult(Strategy.PARTIAL, allImageItems, sourceSplit.length);
+        List<String> allTitles = Arrays.asList(new String[sourceSplit.length]);
+        if (cachedItem != null) {
+            List<String> titles = cachedItem.getTitles();
+            for (int i = 0; i < titles.size(); i++) {
+                String s = titles.get(i);
+                if (allTitles.size() > i) {
+                    allTitles.set(i, s);
+                }
+            }
+        }
+        for (int i = 0; i < renderResults.size(); i++) {
+            RenderResult result = renderResults.get(i);
+            List<ImageItem> imageItems = result.getImageItems();
+            ImageItem imageItem = imageItems.get(0);
+            int page = imageItem.getPage();
+            if (!result.getTitles().isEmpty()) {
+                String element = result.getTitles().get(0);
+                allTitles.set(page, element);
+            }
+        }
+        renderResult = new RenderResult(Strategy.PARTIAL, allImageItems, sourceSplit.length, allTitles);
         return renderResult;
     }
 
     public static void generateImage(RenderRequest renderRequest, List<RenderResult> renderResults, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = new SourceStringReader(partialSource);
-        int totalPages = zoomDiagram(renderRequest, reader);
+        Pair<Integer, List<String>> pages = zoomDiagram(renderRequest, reader);
+        Integer totalPages = pages.first;
+        List<String> titles = pages.second;
+        
         if (totalPages > 1) {
-            //todo multi image diagram for included pages with newpage
-            throw new RuntimeException("partial rendering not supported with @newpage in included file");
+            throw new NotImplementedException("partial rendering not supported with @newpage in included file, and it won't be");
+        }
+        if (titles.size() > 1) {
+            logger.warn("too many titles " + Arrays.toString(titles.toArray()) + ", partialSource=" + partialSource);
         }
         try {
             ImageItem imageItem = new ImageItem(page, generateImage(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL));
-            renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(imageItem), 1));
+            renderResults.add(new RenderResult(Strategy.PARTIAL, Arrays.asList(imageItem), 1, titles));
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
@@ -205,9 +237,12 @@ public class PlantUmlRenderer {
             // image generation.
             SourceStringReader reader = new SourceStringReader(documentSource);
 
-            int totalPages = zoomDiagram(renderRequest, reader);
+            Pair<Integer, List<String>> pages = zoomDiagram(renderRequest, reader);
+            Integer totalPages = pages.first;
+            List<String> titles = pages.second;
+            
             if (totalPages == 0) {
-                return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0);
+                return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0, titles);
             }
 
             //image/error is not rendered when page >= totalPages
@@ -261,12 +296,12 @@ public class PlantUmlRenderer {
                 }
             }
             logger.debug("RenderResult totalPages=", totalPages);
-            return new RenderResult(Strategy.NORMAL, result, totalPages);
+            return new RenderResult(Strategy.NORMAL, result, totalPages, titles);
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
             logger.error("Failed to render image " + documentSource, e);
-            return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0);
+            return new RenderResult(Strategy.NORMAL, Collections.EMPTY_LIST, 0, Collections.EMPTY_LIST);
         }
     }
 
@@ -275,7 +310,7 @@ public class PlantUmlRenderer {
         return PATTERN.split(source);
     }
 
-    private static int zoomDiagram(RenderRequest renderRequest, SourceStringReader reader) {
+    private static Pair<Integer, List<String>> zoomDiagram(RenderRequest renderRequest, SourceStringReader reader) {
         logger.debug("zooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
@@ -294,8 +329,45 @@ public class PlantUmlRenderer {
 
             totalPages = totalPages + diagram.getNbImages();
         }
+        List<String> titles = getTitles(totalPages, blocks);
+        return new Pair<Integer, List<String>>(totalPages, titles);
+    }
 
-        return totalPages;
+    @NotNull
+    private static List<String> getTitles(int totalPages, List<BlockUml> blocks) {
+        List<String> titles = new ArrayList<>(totalPages);
+        for (BlockUml block : blocks) {
+            Diagram diagram = block.getDiagram();
+            if (diagram instanceof SequenceDiagram) {
+                SequenceDiagram sequenceDiagram = (SequenceDiagram) diagram;
+                addTitle(titles, sequenceDiagram.getTitle().getDisplay());
+                List<Event> events = sequenceDiagram.events();
+                for (Event event : events) {
+                    if (event instanceof Newpage) {
+                        Display title = ((Newpage) event).getTitle();
+                        addTitle(titles, title);
+                    }
+                }
+            } else if (diagram instanceof NewpagedDiagram) {
+                NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
+                List<Diagram> diagrams = newpagedDiagram.getDiagrams();
+                for (Diagram diagram1 : diagrams) {
+                    if (diagram1 instanceof UmlDiagram) {
+                        DisplayPositionned title = ((UmlDiagram) diagram1).getTitle();
+                        addTitle(titles, title.getDisplay());
+                    }
+                }
+            }
+        }
+        return titles;
+    }
+
+    private static void addTitle(List<String> titles, Display display) {
+        if (display.size() > 0) {
+            titles.add(display.asStringWithHiddenNewLine());
+        } else {
+            titles.add(null);
+        }
     }
 
     private static void checkCancel() {
