@@ -1,11 +1,13 @@
 package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 
 import java.io.File;
 
 public class RenderRequest {
+    @Nullable
     private final File baseDir;
     private final String source;
     private final PlantUml.ImageFormat format;
@@ -35,6 +37,7 @@ public class RenderRequest {
         this.version = null;
     }
 
+    @Nullable
     public File getBaseDir() {
         return baseDir;
     }

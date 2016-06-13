@@ -118,7 +118,7 @@ public class ImageItem {
     }
 
     private UrlData[] parseUrls(byte[] svgData, File baseDir) {
-        if (svgData == null || svgData.length == 0) {
+        if (svgData == null || svgData.length == 0 || baseDir == null) {
             return new UrlData[0];
         }
         try {

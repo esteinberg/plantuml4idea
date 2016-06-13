@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
@@ -53,7 +54,7 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean renderRequired(Project project, int page) {
+    public boolean renderRequired(@NotNull Project project, int page) {
         if (this.requestedPage != page) {
             return true;
         }
@@ -63,7 +64,7 @@ public class RenderCacheItem {
         return includedFilesChanged(project);
     }
 
-    public boolean renderRequired(Project project, String source, int page) {
+    public boolean renderRequired(@NotNull Project project, String source, int page) {
         if (this.requestedPage != page) {
             return true;
         }
@@ -130,7 +131,7 @@ public class RenderCacheItem {
         return imageItems;
     }
 
-    public boolean isIncludedFileChanged(VirtualFile file) {
+    public boolean isIncludedFileChanged(@NotNull VirtualFile file) {
         File key = new File(file.getPath());
         Long aLong = includedFiles.get(key);
         if (aLong != null) {
@@ -143,7 +144,7 @@ public class RenderCacheItem {
         return false;
     }
 
-    private boolean includedFilesChanged(Project project) {
+    private boolean includedFilesChanged(@NotNull Project project) {
         boolean result = false;
         Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
         if (selectedTextEditor != null) {
@@ -163,7 +164,10 @@ public class RenderCacheItem {
         return result;
     }
 
-    public boolean isIncludedFile(VirtualFile file) {
+    public boolean isIncludedFile(@Nullable VirtualFile file) {
+        if (file == null) {
+            return false;
+        }
         File key = new File(file.getPath());
         Long aLong = includedFiles.get(key);
         return aLong != null;

@@ -59,6 +59,7 @@ public class UIUtils {
     }
 
 
+    @Nullable
     public static VirtualFile getSelectedFile(Project myProject) {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         VirtualFile file = null;
@@ -69,6 +70,7 @@ public class UIUtils {
         return file;
     }
 
+    @Nullable
     public static File getSelectedDir(Project myProject) {
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         File baseDir = null;
@@ -81,7 +83,8 @@ public class UIUtils {
         return baseDir;
     }
 
-    public static File getParent(VirtualFile file) {
+    @Nullable
+    public static File getParent(@Nullable VirtualFile file) {
         File baseDir = null;
         if (file != null) {
             VirtualFile parent = file.getParent();
