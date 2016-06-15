@@ -81,6 +81,7 @@ public class LazyApplicationPoolExecutor {
     private synchronized RenderCommand pollCommand() {
         RenderCommand next = LazyApplicationPoolExecutor.this.nextCommand;
         LazyApplicationPoolExecutor.this.nextCommand = null;
+        Thread.interrupted(); //clear flag
         return next;
     }
 
