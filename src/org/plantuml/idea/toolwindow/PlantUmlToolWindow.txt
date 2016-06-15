@@ -38,6 +38,9 @@
             +try to find equal source, or return newest
             -null
 ---------------------------------------------------------
+?no cached item
+    set persisted selected page
+---------------------------------------------------------
 ?not cached
 |cached & source changed
 |cached & selected page image missing

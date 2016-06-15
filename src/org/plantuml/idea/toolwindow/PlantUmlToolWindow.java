@@ -212,6 +212,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     
                     RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
 
+                    if (cachedItem == null && reason != RenderCommand.Reason.FILE_SWITCHED) {
+                        selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                        logger.debug("setting selected page from storage ", selectedPage);
+                    }
+                   
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
