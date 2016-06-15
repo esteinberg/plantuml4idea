@@ -43,7 +43,7 @@ public class PlantUmlFileType extends LanguageFileType {
     }
 
     @Override
-    public String getCharset(@NotNull VirtualFile virtualFile, byte[] bytes) {
+    public String getCharset(@NotNull VirtualFile virtualFile, @NotNull byte[] bytes) {
         return "UTF-8";
     }
 }

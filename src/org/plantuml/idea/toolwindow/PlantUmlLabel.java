@@ -44,7 +44,7 @@ public class PlantUmlLabel extends JLabel {
         if (imageWithData.getImage() != null) {
             setDiagram(imageWithData, this, 100);
         } else {
-            setText("Failed to render page " + i);
+            setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
         this.renderRequest = renderRequest;
     }

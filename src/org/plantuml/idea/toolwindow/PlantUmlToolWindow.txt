@@ -10,7 +10,8 @@
         &selected included file 
             ?included file changed
                 +execute INCLUDES
-            ?different page selected
+            ?selected page missing
+            |different zoom
                 +execute PAGE_SELECTED
             =include file, nothing needed - cursor move
         ?displayed item exist
@@ -29,9 +30,8 @@
 =get cached item
     return displayed item?
         &no error for normal rendering
-        &page not changed
         &source not changed
-        &image not missing - todo not needed probably
+        &image not missing 
     iterate cache
         ?file path equal
         &zoom equal
@@ -40,8 +40,7 @@
 ---------------------------------------------------------
 ?not cached
 |cached & source changed
-|cached & page changed
-|cached & selected page missing - todo not needed probably
+|cached & selected page image missing
 |cached & included file changed
     execute SOURCE_OR_PAGE
 ?not displayed selected page

@@ -6,12 +6,9 @@ import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 import org.apache.commons.lang.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import static org.plantuml.idea.rendering.PlantUmlRenderer.getTitles;
 import static org.plantuml.idea.rendering.PlantUmlRenderer.zoomDiagram;
 
 public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
@@ -19,102 +16,84 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
 
     @NotNull
-    public RenderResult partialRender(RenderRequest renderRequest, RenderCacheItem cachedItem, long start, String[] sourceSplit) {
-        List<RenderResult> renderResults = new ArrayList<RenderResult>();
+    public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, long start, String[] sourceSplit) {
         FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
-        boolean renderAll = cachedPageCountChanged(cachedItem, sourceSplit.length)
-                || RenderingType.PARTIAL.renderingTypeChanged(cachedItem)
-                || renderRequest.getPage() == -1
-                || renderRequest.getPage() >= sourceSplit.length;
 
-        if (renderAll) {
-            logger.debug("render all pages ");
+        RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, sourceSplit.length);
             for (int page = 0; page < sourceSplit.length; page++) {
-                renderPartial(renderRequest, cachedItem, renderResults, page, sourceSplit, formatOption);
+                processPage(renderRequest, cachedItem, sourceSplit[page], formatOption, renderResult, page);
             }
-        } else {
-            logger.debug("render single page");
-            renderPartial(renderRequest, cachedItem, renderResults, renderRequest.getPage(), sourceSplit, formatOption);
-        }
 
         logger.debug("partial rendering done ", System.currentTimeMillis() - start, "ms");
-
-        RenderResult renderResult = joinResults(sourceSplit, renderResults, cachedItem);
-        logger.debug("result prepared ", System.currentTimeMillis() - start, "ms");
         return renderResult;
     }
 
-    private void renderPartial(RenderRequest renderRequest, RenderCacheItem cachedItem, List<RenderResult> renderResults, int page, String[] sources, FileFormatOption formatOption) {
+    public void processPage(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, String s, FileFormatOption formatOption, RenderResult renderResult, int page) {
         long partialPageProcessingStart = System.currentTimeMillis();
-        String partialSource = "@startuml\n" + sources[page] + "\n@enduml";
-        if (cachedItem == null
+        String partialSource = "@startuml\n" + s + "\n@enduml";
+
+        boolean obsolete = cachedItem == null
                 || renderRequest.requestedRefreshOrIncludesChanged()
                 || RenderingType.PARTIAL.renderingTypeChanged(cachedItem)
-                || !partialSource.equals(cachedItem.getImagesItemPageSource(page))) {
-            renderImage(renderRequest, renderResults, page, formatOption, partialSource);
+                || renderRequest.getZoom() != cachedItem.getZoom()
+                || !partialSource.equals(cachedItem.getImagesItemPageSource(page));
+
+        boolean pageSelected = renderRequest.getPage() == -1 || renderRequest.getPage() == page;
+        boolean shouldRender = pageSelected && (obsolete || !cachedItem.hasImage(page));
+
+        if (shouldRender) {
+            renderResult.addRenderedImage(renderImage(renderRequest, page, formatOption, partialSource));
+        } else if (obsolete) {
+            renderResult.addUpdatedTitle(updateTitle(renderRequest, page, partialSource));
         } else {
-            logger.debug("page ", page, " not changed");
+            logger.debug("page ", page, " cached");
+            renderResult.addCachedImage(cachedItem.getImageItem(page));
         }
-        logger.debug("partial page ", page, " rendering done in ", System.currentTimeMillis() - partialPageProcessingStart, "ms");
+        logger.debug("processing of page ", page, " done in ", System.currentTimeMillis() - partialPageProcessingStart, "ms");
     }
 
-    private void renderImage(RenderRequest renderRequest, List<RenderResult> renderResults, int page, FileFormatOption formatOption, String partialSource) {
+    private ImageItem updateTitle(RenderRequest renderRequest, int page, String partialSource) {
+        long start = System.currentTimeMillis();
+        logger.debug("updating title, page ", page);
+
+        SourceStringReader reader = new SourceStringReader(partialSource);
+        String title = getTitle(reader);
+        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title);
+
+        logger.debug("updateTitle " + (System.currentTimeMillis() - start));
+
+        return imageItem;
+    }
+
+    private String getTitle(SourceStringReader reader) {
+        Titles titles = getTitles(1, reader.getBlocks());
+        if (titles.size() > 1) {
+            throw new NotImplementedException("partial rendering not supported with @newpage in included file, and it won't be");
+        }
+        return titles.get(0);
+    }
+
+
+    private ImageItem renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = new SourceStringReader(partialSource);
-        Pair<Integer, List<String>> pages = zoomDiagram(reader, renderRequest.getZoom());
+        Pair<Integer, Titles> pages = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = pages.first;
-        List<String> titles = pages.second;
+        Titles titles = pages.second;
 
         if (totalPages > 1) {
             throw new NotImplementedException("partial rendering not supported with @newpage in included file, and it won't be");
         }
         if (titles.size() > 1) {
-            logger.warn("too many titles " + Arrays.toString(titles.toArray()) + ", partialSource=" + partialSource);
+            logger.warn("too many titles " + titles + ", partialSource=" + partialSource);
         }
         try {
-            ImageItem imageItem = new ImageItem(page, generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL));
-            renderResults.add(new RenderResult(RenderingType.PARTIAL, Collections.singletonList(imageItem), 1, titles));
+            return new ImageItem(page, generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0)));
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @NotNull
-    private RenderResult joinResults(String[] sourceSplit, List<RenderResult> renderResults, RenderCacheItem cachedItem) {
-        RenderResult renderResult;
-        List<ImageItem> allImageItems = new ArrayList<ImageItem>();
-        for (int i = 0; i < renderResults.size(); i++) {
-            RenderResult x = renderResults.get(i);
-            List<ImageItem> imageItems = x.getImageItems();
-            for (int i1 = 0; i1 < imageItems.size(); i1++) {
-                ImageItem imageItem = imageItems.get(i1);
-                allImageItems.add(imageItem);
-            }
-        }
-        List<String> allTitles = Arrays.asList(new String[sourceSplit.length]);
-        if (cachedItem != null) {
-            List<String> titles = cachedItem.getTitles();
-            for (int i = 0; i < titles.size(); i++) {
-                String s = titles.get(i);
-                if (allTitles.size() > i) {
-                    allTitles.set(i, s);
-                }
-            }
-        }
-        for (int i = 0; i < renderResults.size(); i++) {
-            RenderResult result = renderResults.get(i);
-            List<ImageItem> imageItems = result.getImageItems();
-            ImageItem imageItem = imageItems.get(0);
-            int page = imageItem.getPage();
-            if (!result.getTitles().isEmpty()) {
-                String element = result.getTitles().get(0);
-                allTitles.set(page, element);
-            }
-        }
-        renderResult = new RenderResult(RenderingType.PARTIAL, allImageItems, sourceSplit.length, allTitles);
-        return renderResult;
     }
 
 

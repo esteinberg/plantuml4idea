@@ -77,7 +77,7 @@ public class PlantUmlRenderer {
         }
     }
 
-    public static Pair<Integer, List<String>> zoomDiagram(SourceStringReader reader, int zoom) {
+    public static Pair<Integer, Titles> zoomDiagram(SourceStringReader reader, int zoom) {
         logger.debug("zooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
@@ -96,8 +96,8 @@ public class PlantUmlRenderer {
 
             totalPages = totalPages + diagram.getNbImages();
         }
-        List<String> titles = getTitles(totalPages, blocks);
-        return new Pair<Integer, List<String>>(totalPages, titles);
+        Titles titles = getTitles(totalPages, blocks);
+        return new Pair<Integer, Titles>(totalPages, titles);
     }
 
     private static void zoomDiagram(Diagram diagram, int zoom) {
@@ -122,7 +122,7 @@ public class PlantUmlRenderer {
     }
 
     @NotNull
-    protected static List<String> getTitles(int totalPages, List<BlockUml> blocks) {
+    protected static Titles getTitles(int totalPages, List<BlockUml> blocks) {
         List<String> titles = new ArrayList<String>(totalPages);
         for (BlockUml block : blocks) {
             Diagram diagram = block.getDiagram();
@@ -145,10 +145,21 @@ public class PlantUmlRenderer {
                         addTitle(titles, title.getDisplay());
                     }
                 }
+            } else if (diagram instanceof UmlDiagram) {
+                DisplayPositionned title = ((UmlDiagram) diagram).getTitle();
+                addTitle(titles, title.getDisplay());
+            } else if (diagram instanceof PSystemError) {
+                DisplayPositionned title = ((PSystemError) diagram).getTitle();
+                if (title == null) {
+                    titles.add(null);
+                } else {
+                    addTitle(titles, title.getDisplay());
+                }
             }
         }
-        return titles;
+        return new Titles(titles);
     }
+
 
     protected static void addTitle(List<String> titles, Display display) {
         if (display.size() > 0) {

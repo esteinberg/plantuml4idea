@@ -5,13 +5,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class RenderCacheItem {
@@ -27,12 +27,12 @@ public class RenderCacheItem {
     private final int zoom;
     private final Map<File, Long> includedFiles;
     private final RenderRequest renderRequest;
-    private final List<String> titles;
+    private final String[] titles;
     private final RenderResult renderResult;
     private final ImageItem[] imageItems;
     private int requestedPage;
 
-    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version, List<String> titles) {
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.baseDir = baseDir;
@@ -43,31 +43,32 @@ public class RenderCacheItem {
         this.imageItems = imageItems;
         this.version = version;
         this.renderRequest = renderRequest;
-        this.titles = titles;
+        this.titles = new String[imageItems.length];
+        for (int i = 0; i < imageItems.length; i++) {
+            ImageItem imageItem = imageItems[i];
+            titles[i] = imageItem != null ? imageItem.getTitle() : null;
+        }
     }
 
     public RenderRequest getRenderRequest() {
         return renderRequest;
     }
 
-    public List<String> getTitles() {
+    public String[] getTitles() {
         return titles;
     }
 
-    public boolean renderRequired(@NotNull Project project, int page) {
-        if (this.requestedPage != page) {
+    public boolean renderRequired(@NotNull Project project, int page, int zoom) {
+        if (imageMissing(page)) {
             return true;
         }
-        if (imageMissing(page)) {
+        if (zoom != this.zoom) {
             return true;
         }
         return includedFilesChanged(project);
     }
 
     public boolean renderRequired(@NotNull Project project, String source, int page) {
-        if (this.requestedPage != page) {
-            return true;
-        }
         if (!this.source.equals(source)) {
             return true;
         }
@@ -78,32 +79,15 @@ public class RenderCacheItem {
         return includedFilesChanged(project);
     }
 
-    private boolean imageSourceChanged(int page, String source) {
-        if (page == -1) {
-            for (int i = 0; i < imageItems.length; i++) {
-                ImageItem imageItem = imageItems[i];
-                if (imageItem != null && !source.equals(imageItem.getDocumentSource())) {
-                    return true;
-                }
-            }
-        } else {
-            if (imageItems.length > page && !imageItems[page].getDocumentSource().equals(source)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean imageMissing(int page) {
         if (page == -1) {
             for (int i = 0; i < imageItems.length; i++) {
-                ImageItem imageItem = imageItems[i];
-                if (imageItem == null) {
+                if (!hasImage(i)) {
                     return true;
                 }
             }
         } else {
-            if (imageItems.length > page && imageItems[page] == null) {
+            if (!hasImage(page)) {
                 return true;
             }
         }
@@ -218,5 +202,28 @@ public class RenderCacheItem {
         return null;
     }
 
+    @Nullable
+    public ImageItem getImageItem(int page) {
+        return imageItems.length > page ? imageItems[page] : null;
+    }
 
+    public boolean hasImage(int i) {
+        ImageItem imageItem = getImageItem(i);
+        if (imageItem != null) {
+            return imageItem.hasImage();
+        }
+        return false;
+    }
+
+    public boolean titleChaged(String s, int i) {
+        ImageItem imageItem = getImageItem(i);
+        if (imageItem != null) {
+            String title = imageItem.getTitle();
+            if (title == null && s == null) {
+                return false;
+            }
+            return !StringUtils.equals(s, title);
+        }
+        return true;
+    }
 }

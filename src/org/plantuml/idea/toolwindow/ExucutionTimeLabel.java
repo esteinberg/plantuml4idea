@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
+import org.plantuml.idea.rendering.RenderResult;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,10 +56,16 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
         updateOnEDT();
     }
 
-    public void state(State state, long total, int itemsRendered) {
+    public void state(State state, long total, RenderResult result) {
+        int rendered = result.getRendered();
+        int updatedTitles = result.getUpdatedTitles();
+        int cached = result.getCached();
+        
         this.state = state;
-        this.message = String.valueOf(total) + "ms - " + itemsRendered + " page" + (itemsRendered == 1 ? "" : "s");
-
+        this.message = String.valueOf(total) + "ms "
+                + rendered + " rendered "
+                + updatedTitles + " invalidated "
+                + cached + " cached";
         updateOnEDT();
     }
 

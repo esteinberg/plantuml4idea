@@ -31,7 +31,7 @@ import java.io.IOException;
 public class UIUtils {
     private static Logger logger = Logger.getInstance(UIUtils.class);
 
-    public static BufferedImage getBufferedImage(byte[] imageBytes) throws IOException {
+    public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
         return ImageIO.read(input);
     }

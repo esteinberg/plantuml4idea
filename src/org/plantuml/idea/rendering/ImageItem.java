@@ -1,6 +1,8 @@
 package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -15,6 +17,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URI;
@@ -27,57 +30,93 @@ import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 public class ImageItem {
 
     private final int page;
+    @Nullable
     private final String description;
-    private final byte[] imageBytes;
+    @NotNull
     private final RenderingType renderingType;
+    @Nullable 
     private final BufferedImage image;
+    @NotNull
     private final UrlData[] urls;
-
+    @Nullable
+    private final String title;
+    @Nullable
     private final String pageSource;
-    private String documentSource;
+    @NotNull
+    private final String documentSource;
 
-    public ImageItem(File baseDir, String documentSource, String pageSource, int page, String description, byte[] imageBytes, byte[] svgBytes, RenderingType renderingType) {
+    public ImageItem(@NotNull ImageItem item, @NotNull String documentSource, @Nullable String title) {
+        this.page = item.page;
+        this.description = item.description;
+        this.pageSource = item.pageSource;
+        this.image = item.image;
+        this.urls = item.urls;
+        this.renderingType = item.renderingType;
+
+        this.documentSource = documentSource;
+        this.title = title;
+    }
+
+    public ImageItem(@NotNull File baseDir,
+                     @NotNull String documentSource,
+                     @Nullable String pageSource,
+                     int page,
+                     @Nullable String description,
+                     @Nullable byte[] imageBytes,
+                     @Nullable byte[] svgBytes,
+                     @NotNull RenderingType renderingType,
+                     @Nullable String title) {
         this.pageSource = pageSource;
         this.documentSource = documentSource;
         this.page = page;
         this.description = description;
-        this.imageBytes = imageBytes;
         this.renderingType = renderingType;
-        try {
-            this.image = UIUtils.getBufferedImage(imageBytes);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.title = title;
+        if (imageBytes != null) {
+            try {
+                this.image = UIUtils.getBufferedImage(imageBytes);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            this.image = null;
+        } 
         this.urls = this.parseUrls(svgBytes, baseDir);
     }
 
-    public ImageItem(int page, ImageItem description) {
+    public ImageItem(int page, ImageItem item) {
         this.page = page;
-        this.description = description.description;
-        this.pageSource = description.pageSource;
-        this.documentSource = description.documentSource;
-        this.imageBytes = description.imageBytes;
-        this.image = description.image;
-        this.urls = description.urls;
-        this.renderingType = description.renderingType;
+        this.description = item.description;
+        this.pageSource = item.pageSource;
+        this.documentSource = item.documentSource;
+        this.image = item.image;
+        this.urls = item.urls;
+        this.renderingType = item.renderingType;
+        this.title = item.title;
     }
 
+    @Nullable
+    public String getTitle() {
+        return title;
+    }
+
+    @NotNull
     public RenderingType getRenderingType() {
         return renderingType;
     }
 
-    public void setDocumentSource(String documentSource) {
-        this.documentSource = documentSource;
-    }
 
+    @Nullable
     public BufferedImage getImage() {
         return image;
     }
 
+    @NotNull
     public String getDocumentSource() {
         return documentSource;
     }
 
+    @Nullable
     public String getDescription() {
         return description;
     }
@@ -86,14 +125,24 @@ public class ImageItem {
         return page;
     }
 
-    public byte[] getImageBytes() {
-        return imageBytes;
+    public boolean hasImage() {
+        return image != null;
     }
 
+    public byte[] getImageBytes() {
+        if (image != null) {
+            DataBufferByte dataBuffer = (DataBufferByte) image.getRaster().getDataBuffer();
+            return dataBuffer.getData();
+        }
+        return null;
+    }
+
+    @Nullable
     public String getPageSource() {
         return pageSource;
     }
 
+    @NotNull
     public UrlData[] getUrls() {
         return urls;
     }
@@ -197,9 +246,9 @@ public class ImageItem {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("page", page)
-                .append("pageSourceAttached", pageSource != null)
                 .append("description", description)
-                .append("diagramBytesLength", imageBytes == null ? "null" : imageBytes.length)
+                .append("title", title)
+                .append("hasImage", hasImage())
                 .toString();
     }
 

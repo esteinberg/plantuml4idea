@@ -1,21 +1,17 @@
 ?Contains partial option
     +Partial rendering
-        ?cache - different page count (vs splitted document)
-        |cache - different rendering type
-        |requested rendering of all pages
-        |requested page >= total pages
-            +render all
-                @single page render for all pages
-            -render single page
-                ?no cache
-                |requested refresh
-                |includes change - anywhere in document TODO check if include is contained in the page?
-                |cache - different rendering type
-                |cache - no or different page source
-                    +generate image
-                        ? contain includede new page  / page count > 1 
-                            + error  - TODO render 2 images into 1
-                    -page not changed, return
+        =iterate all pages
+            ?no cache
+            |requested refresh or includes change - anywhere in document TODO check if include is contained in the page?
+            |cache - different rendering type
+            |cache - different zoom
+            |cache - no or different page source
+                +cache obsolete
+                    ?page selected to render
+                    &<cache obsolete> || cache - no image rendered  
+                        +render
+                        -return title item only, without image
+                -return cached image
 TODO check ASCII and exporting
                
     -Normal rendering
@@ -23,12 +19,16 @@ TODO check ASCII and exporting
         &not contain included new page 
         &cache - same page count (vs total by plantuml)
             +incremental rendering - render only what changed
-                ?page not cached
-                |requested refresh
-                |requested because includes changed
+                ?requested refresh or includes change 
+                |cache - different zoom
                 |page source changed (or null vs cached item)
-                    +render
-                    -not render, update document source in cached image - to not request render next time? TODO
+                |title changed - split by newpage eats title, so check of page source change does not work 
+                    +cache obsolete
+                        ?page selected to render
+                        &<cache obsolete> || cache - no image rendered  
+                            +render
+                            -return title item only, without image
+                    -return cached image, update document source in cached image - to not request render next time? TODO
             -render requested pages
                 ?not contain included new page 
                     +set page source

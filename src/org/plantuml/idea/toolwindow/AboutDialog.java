@@ -10,6 +10,7 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -43,7 +44,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void about() {
-        aboutEditorPane.setText("<html><body> <p> PlantUML for Idea plugin</p><p>(c) Eugene Steinberg, 2012</p><p><a href=\"https://github.com/esteinberg/plantuml4idea\">PlantUML4idea on GitHub</a></p></body></html>");
+        aboutEditorPane.setText("<html><body>PlantUML for Idea plugin</p><p>(c) Eugene Steinberg, 2012</p><p><a href=\"https://github.com/esteinberg/plantuml4idea\">PlantUML4idea on GitHub</a></p></body></html>");
         aboutEditorPane.addHyperlinkListener(
                 new BrowseHyperlinkListener()
         );
@@ -62,11 +63,11 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest(new File(""), PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
         RenderResult result = PlantUmlRenderer.render(renderRequest, null);
         try {
-            final ImageItem imageItem = new ImageItem(null, null, null, 0, "", result.getFirstDiagramBytes(), null, RenderingType.NORMAL);
-            if (imageItem.getImage() != null) {
+            final ImageItem imageItem = result.getImageItem(0);
+            if (imageItem != null) {
                 testDot.setup(imageItem, 100, renderRequest);
             }
         } catch (Exception e) {

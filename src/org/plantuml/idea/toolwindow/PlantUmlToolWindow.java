@@ -180,7 +180,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                             if (last.isIncludedFileChanged(selectedFile)) {
                                 logger.debug("includes changed, executing command");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
-                            } else if (last.renderRequired(project, selectedPage)) {
+                            } else if (last.renderRequired(project, selectedPage, zoom)) {
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {

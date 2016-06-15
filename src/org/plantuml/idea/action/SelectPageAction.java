@@ -9,7 +9,6 @@ import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
 import javax.swing.*;
-import java.util.List;
 
 /**
  * Author: Eugene Steinberg
@@ -18,7 +17,7 @@ import java.util.List;
 public class SelectPageAction extends ComboBoxAction {
     private int numPages = 1;
     private PlantUmlToolWindow plantUmlToolWindow;
-    private List<String> titles;
+    private String[] titles;
 
     public SelectPageAction(PlantUmlToolWindow plantUmlToolWindow) {
         this.plantUmlToolWindow = plantUmlToolWindow;
@@ -41,8 +40,9 @@ public class SelectPageAction extends ComboBoxAction {
             return "All Pages";
         }
         String pageNumber = Integer.toString(page + 1);
-        if (titles != null && titles.size() == numPages && titles.get(page) != null) {
-            return pageNumber + " - " + titles.get(page);
+        String[] titles = this.titles;
+        if (titles != null && titles.length > page && titles[page] != null) {
+            return pageNumber + " - " + titles[page];
         } else {
             return pageNumber;
         }

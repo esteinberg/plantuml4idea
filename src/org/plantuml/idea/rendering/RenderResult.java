@@ -1,8 +1,9 @@
 package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -14,18 +15,20 @@ public class RenderResult {
     private RenderingType strategy;
     private final List<ImageItem> imageItems;
     private final int pages;
-    private final List<String> titles;
+    private int rendered;
+    private int updatedTitles;
+    private int cached;
 
-    public RenderResult(RenderingType strategy, @NotNull List<ImageItem> imageItems, int totalPages, List<String> titles) {
+    public RenderResult(RenderingType strategy, int totalPages) {
         this.strategy = strategy;
-        this.imageItems = imageItems;
+        if (totalPages == 0) {
+            this.imageItems = Collections.emptyList();
+        } else {
+            this.imageItems = new ArrayList<ImageItem>(totalPages);
+        } 
         this.pages = totalPages;
-        this.titles = titles;
     }
 
-    public List<String> getTitles() {
-        return titles;
-    }
 
     public byte[] getFirstDiagramBytes() {
         if (imageItems.size() == 0) {
@@ -63,8 +66,55 @@ public class RenderResult {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("diagrams", imageItems)
                 .append("pages", pages)
+                .append("rendered", rendered)
+                .append("updatedTitles", updatedTitles)
+                .append("cached", cached)
+                .append("diagrams", imageItems)
                 .toString();
+    }
+
+    public void addRenderedImage(ImageItem imageItem) {
+        imageItems.add(imageItem);
+        rendered++;
+    }
+
+    public void addUpdatedTitle(ImageItem imageItem) {
+        imageItems.add(imageItem);
+        updatedTitles++;
+    }
+
+    public void addCachedImage(ImageItem imageItem) {
+        imageItems.add(imageItem);
+        if (imageItem.hasImage()) {
+            cached++;
+        }
+    }
+
+    public void add(ImageItem item) {
+        imageItems.add(item);
+    }
+
+    public ImageItem getImageItem(int i) {
+        return imageItems.size() > i ? imageItems.get(i) : null;
+    }
+
+    public int getRendered() {
+        return rendered;
+    }
+
+    public int getUpdatedTitles() {
+        return updatedTitles;
+    }
+
+    public int getCached() {
+        return cached;
+    }
+
+    public void add(ImageItem imageItem, boolean titleChanged) {
+        imageItems.add(imageItem);
+        if (titleChanged) {
+            updatedTitles++;
+        }
     }
 }

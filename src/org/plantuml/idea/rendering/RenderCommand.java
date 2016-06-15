@@ -3,14 +3,11 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.toolwindow.ExucutionTimeLabel;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 
@@ -69,8 +66,8 @@ public abstract class RenderCommand implements Runnable {
             final RenderRequest renderRequest = new RenderRequest(baseDir, source, PlantUml.ImageFormat.PNG, page, zoom, version, renderUrlLinks, reason);
             final RenderResult result = PlantUmlRenderer.render(renderRequest, cachedItem);
 
-            ImageItem[] imageItems = joinDiagrams(result, cachedItem);
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, imageItems, version, result.getTitles());
+            ImageItem[] imageItems = result.getImageItems().toArray(new ImageItem[result.getImageItems().size()]);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, imageItems, version);
             
             if (hasImages(newItem.getImageItems())) {
 
@@ -86,9 +83,10 @@ public abstract class RenderCommand implements Runnable {
                 logger.debug("no images rendered");
             }
             long total = System.currentTimeMillis() - start;
-            label.state(ExucutionTimeLabel.State.DONE, total, result.getImageItems().size());
+            label.state(ExucutionTimeLabel.State.DONE, total, result);
         } catch (RenderingCancelledException e) {
-            logger.info("command interrupted");
+            e.printStackTrace();
+            logger.info("command interrupted", e);
             label.state(ExucutionTimeLabel.State.CANCELLED);
         } catch (Throwable e) {
             label.state(ExucutionTimeLabel.State.ERROR);
@@ -105,30 +103,6 @@ public abstract class RenderCommand implements Runnable {
             }
         }
         return false;
-    }
-
-    private ImageItem[] joinDiagrams(@NotNull RenderResult renderResult, RenderCacheItem cachedItem) throws IOException {
-        int pages = renderResult.getPages();
-
-        //noinspection UndesirableClassUsage
-        ImageItem[] imagesWithUrlData = new ImageItem[pages];
-        if (cachedItem != null) {
-            ImageItem[] imagesWithData = cachedItem.getImageItems();
-            for (int i = 0; i < imagesWithData.length; i++) {
-                if (pages > i) {
-                    imagesWithUrlData[i] = imagesWithData[i];
-                }
-            }
-        }
-
-        List<ImageItem> imageImageItems = renderResult.getImageItems();
-        for (int i = 0; i < imageImageItems.size(); i++) {
-            ImageItem imageImageItem = imageImageItems.get(i);
-            if (imageImageItem != null) {
-                imagesWithUrlData[imageImageItem.getPage()] = imageImageItem;
-            }
-        }
-        return imagesWithUrlData;
     }
 
 

@@ -32,7 +32,7 @@ public class RenderCache {
         boolean checkCurrentItemSourceEquals = true;
         Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
 
-        //not cached as non error items
+        //error not cached in ArrayDeque
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
                 && !displayedItem.renderRequired(project, source, selectedPage)) {
