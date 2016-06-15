@@ -11,12 +11,12 @@ import java.util.List;
  */
 public class RenderResult {
 
-    private PlantUmlRenderer.Strategy strategy;
+    private RenderingType strategy;
     private final List<ImageItem> imageItems;
     private final int pages;
     private final List<String> titles;
 
-    public RenderResult(PlantUmlRenderer.Strategy strategy, @NotNull List<ImageItem> imageItems, int totalPages, List<String> titles) {
+    public RenderResult(RenderingType strategy, @NotNull List<ImageItem> imageItems, int totalPages, List<String> titles) {
         this.strategy = strategy;
         this.imageItems = imageItems;
         this.pages = totalPages;
@@ -34,7 +34,7 @@ public class RenderResult {
         return imageItems.get(0).getImageBytes();
     }
 
-    public PlantUmlRenderer.Strategy getStrategy() {
+    public RenderingType getStrategy() {
         return strategy;
     }
 
@@ -48,7 +48,7 @@ public class RenderResult {
     }
 
     public boolean hasError() {
-        if (strategy == PlantUmlRenderer.Strategy.NORMAL) {
+        if (strategy == RenderingType.NORMAL) {
             for (ImageItem imageItem : imageItems) {
                 String description = imageItem.getDescription();
                 if (description == null || description.isEmpty() || "(Error)".equals(description)) {

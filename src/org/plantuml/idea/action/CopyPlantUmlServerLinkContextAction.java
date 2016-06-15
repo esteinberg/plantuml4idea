@@ -10,8 +10,8 @@ import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.rendering.ImageItem;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.toolwindow.PlantUmlLabel;
 
 import javax.swing.*;
@@ -32,7 +32,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
         if (data != null) {
             ImageItem imageWithData = data.getImageWithData();
             String source;
-            if (imageWithData.getRenderingType() == PlantUmlRenderer.RenderingType.PARTIAL) {
+            if (imageWithData.getRenderingType() == RenderingType.PARTIAL) {
                 source = imageWithData.getPageSource();
             } else {
                 RenderRequest renderRequest = data.getRenderRequest();

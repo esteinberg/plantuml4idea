@@ -65,7 +65,7 @@ public class AboutDialog extends JDialog {
         RenderRequest renderRequest = new RenderRequest(null, PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
         RenderResult result = PlantUmlRenderer.render(renderRequest, null);
         try {
-            final ImageItem imageItem = new ImageItem(null, null, null, 0, "", result.getFirstDiagramBytes(), null, PlantUmlRenderer.RenderingType.NORMAL);
+            final ImageItem imageItem = new ImageItem(null, null, null, 0, "", result.getFirstDiagramBytes(), null, RenderingType.NORMAL);
             if (imageItem.getImage() != null) {
                 testDot.setup(imageItem, 100, renderRequest);
             }
