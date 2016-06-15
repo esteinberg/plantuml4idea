@@ -47,7 +47,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private final LazyApplicationPoolExecutor lazyExecutor;
 
-    private SelectPageAction selectPageAction;
     private Project project;
     private AtomicInteger sequence = new AtomicInteger();
     public boolean renderUrlLinks;
@@ -80,11 +79,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         scrollPane = new JBScrollPane(imagesPanel);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        imagesPanel.add(new Usage("Usage:\n"));
+        
         add(scrollPane, BorderLayout.CENTER);
 
         addScrollBarListeners(imagesPanel);
-
-        selectPageAction = (SelectPageAction) ActionManager.getInstance().getAction("PlantUML.SelectPage");
     }
 
     @NotNull

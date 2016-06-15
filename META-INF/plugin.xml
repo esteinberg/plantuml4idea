@@ -14,6 +14,8 @@
                <li>Toggle button for disabling automatic rendering</li>
                <li>ALT+D shortcut for manual rendering or reloading of the images</li>
                <li>Page titles fixed for partial rendering</li>
+               <li>Usage manual</li>
+               <li>About dialog reworked</li>
             </ul>
             <p>2.1.0</p>
             <ul>
