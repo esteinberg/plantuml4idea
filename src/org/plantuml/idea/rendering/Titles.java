@@ -24,7 +24,7 @@ public class Titles {
         if (titles.size() > i) {
             return titles.get(i);
         }
-        logger.warn("no title, for page " + i + ", titles=" + this);
+        logger.debug("no title, for page ", i, ", titles=", this);
         return null;
     }
 
