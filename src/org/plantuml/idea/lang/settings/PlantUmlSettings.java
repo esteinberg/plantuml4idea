@@ -28,6 +28,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean renderUrlLinks = false;
     private String renderDelay = String.valueOf(RENDER_DELAY_DEFAULT_VALUE);
     private String cacheSize = String.valueOf(CACHE_SIZE_DEFAULT_VALUE);
+    private boolean autoRender = true;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -89,6 +90,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         this.renderDelay = String.valueOf(Math.max(0, Utils.asInt(renderDelay, RENDER_DELAY_DEFAULT_VALUE)));
     }
 
+    public void setAutoRender(boolean autoRender) {
+        this.autoRender = autoRender;
+    }
+
+    public boolean isAutoRender() {
+        return autoRender;
+    }
     @Nullable
     @Override
     public PlantUmlSettings getState() {

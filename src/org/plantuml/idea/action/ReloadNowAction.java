@@ -8,11 +8,7 @@ import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
-/**
- * @author Eugene Steinberg
- */
-public class RenderNowAction extends DumbAwareAction {
-
+public class ReloadNowAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {

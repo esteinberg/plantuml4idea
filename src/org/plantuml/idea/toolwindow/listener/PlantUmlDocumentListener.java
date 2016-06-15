@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.util.UIUtils;
@@ -16,6 +17,11 @@ import static com.intellij.codeInsight.completion.CompletionInitializationContex
 public class PlantUmlDocumentListener implements DocumentListener {
     private static Logger logger = Logger.getInstance(PlantUmlDocumentListener.class);
     public FileDocumentManager instance = FileDocumentManager.getInstance();
+    private PlantUmlSettings settings;
+
+    public PlantUmlDocumentListener() {
+        settings = PlantUmlSettings.getInstance();
+    }
 
     @Override
     public void beforeDocumentChange(DocumentEvent event) {
@@ -30,12 +36,13 @@ public class PlantUmlDocumentListener implements DocumentListener {
         if (logger.isDebugEnabled()) {
             logger.debug("document changed ", event.getSource());
         }
-
-        //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
-        if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-            Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());
-            for (Editor editor : editors) {
-                UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+        if (settings.isAutoRender()) {
+            //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
+            if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
+                Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());
+                for (Editor editor : editors) {
+                    UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+                }
             }
         }
     }

@@ -6,12 +6,18 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlRenderingFileEditorManagerListener implements FileEditorManagerListener {
     private static Logger logger = Logger.getInstance(PlantUmlRenderingFileEditorManagerListener.class);
+    private PlantUmlSettings settings;
+
+    public PlantUmlRenderingFileEditorManagerListener() {
+        settings = PlantUmlSettings.getInstance();
+    }
 
     @Override
     public void fileOpened(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
@@ -35,6 +41,8 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
         if (logger.isDebugEnabled()) {
             logger.debug("selection changed ", event);
         }
-        UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
+        if (settings.isAutoRender()) {
+            UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
+        }
     }
 }
