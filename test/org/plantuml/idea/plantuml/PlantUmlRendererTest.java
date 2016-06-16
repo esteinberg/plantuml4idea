@@ -9,6 +9,8 @@ import org.plantuml.idea.rendering.RenderResult;
 
 import java.io.File;
 
+import static org.plantuml.idea.rendering.PlantUmlRenderer.NEW_PAGE_PATTERN;
+
 public class PlantUmlRendererTest {
     @Test
     public void render() throws Exception {
@@ -32,7 +34,7 @@ public class PlantUmlRendererTest {
 
     @Test
     public void splitNewPage() throws Exception {
-        String[] strings = PlantUmlRenderer.splitByNewPage("@startuml\n" +
+        String[] strings = NEW_PAGE_PATTERN.split("@startuml\n" +
                 "xx1\n" +
                 " newpage \n" +
                 "xx3\n" +

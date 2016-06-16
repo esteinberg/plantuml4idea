@@ -25,7 +25,7 @@ import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_PARTIAL_R
 public class PlantUmlRenderer {
     private static final Logger logger = Logger.getInstance(PlantUmlRenderer.class);
 
-    private static final Pattern NEW_PAGE_PATTERN = Pattern.compile("\\n\\s*@?(?i)(newpage)(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
+    public static final Pattern NEW_PAGE_PATTERN = Pattern.compile("\\n\\s*@?(?i)(newpage)(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
 
     private static final PlantUmlPartialRenderer PARTIAL_RENDERER = new PlantUmlPartialRenderer();
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
