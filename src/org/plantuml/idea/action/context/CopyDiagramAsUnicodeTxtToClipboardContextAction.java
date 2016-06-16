@@ -1,4 +1,4 @@
-package org.plantuml.idea.action;
+package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;

@@ -1,6 +1,7 @@
-package org.plantuml.idea.action;
+package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
+import org.plantuml.idea.action.ExternalOpenDiagramAction;
 import org.plantuml.idea.plantuml.PlantUml;
 
 /**
