@@ -24,8 +24,7 @@
     execute REFRESH
     return
 ---------------------------------------------------------
-?file switched
-    set selected page
+set selected page
 ---------------------------------------------------------
 =get cached item
     return displayed item?
@@ -38,9 +37,6 @@
             +try to find equal source, or return newest
             -null
 ---------------------------------------------------------
-?no cached item
-    set persisted selected page
----------------------------------------------------------
 ?not cached
 |cached & source changed
 |cached & selected page image missing
@@ -49,3 +45,5 @@
 ?not displayed selected page
     display selected page
 =item already displayed, nothing needed
+    ?manual update
+        update status label

@@ -13,12 +13,12 @@ import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 
-public class ReloadNowAction extends DumbAwareAction {
-    public static final Icon refreshAutoDisabled = IconLoader.getIcon("/images/forceRefresh.png");
+public class UpdateDiagramAction extends DumbAwareAction {
+    public static final Icon UpdateAutoDisabled = IconLoader.getIcon("/images/forceUpdate.png");
 
     private PlantUmlSettings settings;
 
-    public ReloadNowAction() {
+    public UpdateDiagramAction() {
         settings = PlantUmlSettings.getInstance();
     }
 
@@ -28,7 +28,7 @@ public class ReloadNowAction extends DumbAwareAction {
         if (project != null) {
             PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (plantUmlToolWindow != null) {
-                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
+                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.MANUAL_UPDATE);
             }
         }
     }
@@ -37,11 +37,11 @@ public class ReloadNowAction extends DumbAwareAction {
     public void update(AnActionEvent e) {
         super.update(e);
         if (settings.isAutoRender()) {
-            e.getPresentation().setIcon(AllIcons.Actions.Refresh);
-            e.getPresentation().setDescription("Reload PlantUml Diagram");
+            e.getPresentation().setIcon(AllIcons.Javaee.UpdateRunningApplication);
+            e.getPresentation().setDescription("Update PlantUml Diagram - changes only");
         } else {
-            e.getPresentation().setIcon(refreshAutoDisabled);
-            e.getPresentation().setDescription("Reload PlantUml Diagram (Automatic Rendering disabled)");
+            e.getPresentation().setIcon(UpdateAutoDisabled);
+            e.getPresentation().setDescription("Update PlantUml Diagram - changes only (Automatic Rendering disabled)");
         }
     }
 }

@@ -32,7 +32,7 @@ public abstract class RenderCommand implements Runnable {
         REFRESH,
         /* no function*/
         CARET,
-        /* no function*/
+        MANUAL_UPDATE, /* no function*/
         SOURCE_PAGE_ZOOM
     }
 

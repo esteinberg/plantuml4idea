@@ -197,25 +197,18 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     String sourceFilePath = UIUtils.getSelectedFile(project).getPath();
 
 
+                    selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                    logger.debug("setting selected page from storage ", selectedPage);
+
                     if (reason == RenderCommand.Reason.REFRESH) {
                         logger.debug("executing command, reason=", reason);
                         final File selectedDir = UIUtils.getSelectedDir(project);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay));
                         return;
                     }
-
-                    if (reason == RenderCommand.Reason.FILE_SWITCHED) {
-                        selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
-                        logger.debug("file switched, setting selected page ", selectedPage);
-                    }
                     
                     RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
 
-                    if (cachedItem == null && reason != RenderCommand.Reason.FILE_SWITCHED) {
-                        selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
-                        logger.debug("setting selected page from storage ", selectedPage);
-                    }
-                   
                     if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(project);
@@ -225,6 +218,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         displayExistingDiagram(cachedItem);
                     } else {
                         logger.debug("render not required, item already displayed ", cachedItem);
+                        if (reason == RenderCommand.Reason.MANUAL_UPDATE) {
+                            executionStatusLabel.state(ExecutionStatusLabel.State.DONE, "cached");
+                        }
                     }
                 }
             }
