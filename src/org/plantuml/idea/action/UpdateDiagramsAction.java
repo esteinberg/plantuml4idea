@@ -13,12 +13,12 @@ import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 
-public class UpdateDiagramAction extends DumbAwareAction {
+public class UpdateDiagramsAction extends DumbAwareAction {
     public static final Icon UpdateAutoDisabled = IconLoader.getIcon("/images/forceUpdate.png");
 
     private PlantUmlSettings settings;
 
-    public UpdateDiagramAction() {
+    public UpdateDiagramsAction() {
         settings = PlantUmlSettings.getInstance();
     }
 
