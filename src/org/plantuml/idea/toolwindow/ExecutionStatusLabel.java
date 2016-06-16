@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderResult;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ import java.awt.*;
 
 public class ExecutionStatusLabel extends DumbAwareAction implements CustomComponentAction {
     private JLabel label;
+    private JLabel pages;
     private volatile State state;
     private volatile String message = "---";
     public static String DESCRIPTION;
@@ -24,7 +26,9 @@ public class ExecutionStatusLabel extends DumbAwareAction implements CustomCompo
             for (State value : values) {
                 sb.append("\n").append(value.description);
             }
-            DESCRIPTION = "Last execution time, page counts\n\nColors:" + sb.toString();
+            DESCRIPTION = "Last execution time,\n" +
+                    "[rendered, changed, not changed page count]" +
+                    "\n\nColors:" + sb.toString();
         }
     }
 
@@ -41,13 +45,19 @@ public class ExecutionStatusLabel extends DumbAwareAction implements CustomCompo
     @Override
     public JComponent createCustomComponent(Presentation presentation) {
         final JPanel panel = new JPanel();
-        this.label = new JLabel("---");
-        Font font = label.getFont();
-        Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
-        label.setFont(boldFont);
+        this.label = createLabel();
         panel.setToolTipText(DESCRIPTION);
         panel.add(this.label);
         return panel;
+    }
+
+    @NotNull
+    public JLabel createLabel() {
+        JLabel jLabel = new JLabel("---");
+        Font font = jLabel.getFont();
+        Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
+        jLabel.setFont(boldFont);
+        return jLabel;
     }
 
     public void state(State b) {
@@ -62,10 +72,10 @@ public class ExecutionStatusLabel extends DumbAwareAction implements CustomCompo
         int cached = result.getCached();
         
         this.state = state;
-        this.message = String.valueOf(total) + "ms "
-                + rendered + " rendered "
-                + updatedTitles + " changed "
-                + cached + " unchanged";
+        this.message = String.valueOf(total) + "ms ["
+                + rendered + ","
+                + updatedTitles + ","
+                + cached + "]";
         updateOnEDT();
     }
 
