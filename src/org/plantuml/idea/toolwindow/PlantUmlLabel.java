@@ -6,7 +6,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.action.*;
+import org.plantuml.idea.action.context.*;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 
@@ -18,6 +18,26 @@ import java.io.IOException;
 import java.net.URI;
 
 public class PlantUmlLabel extends JLabel {
+    private static final AnAction[] AN_ACTIONS = {
+            new CopyDiagramToClipboardContextAction(),
+            Separator.getInstance(),
+            new CopyDiagramAsTxtToClipboardContextAction(),
+            new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
+            Separator.getInstance(),
+            new ExternalOpenDiagramAsPNGAction(),
+            new ExternalOpenDiagramAsSVGAction(),
+            Separator.getInstance(),
+            new CopyPlantUmlServerLinkContextAction()
+    };
+    private static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
+
+        @NotNull
+        @Override
+        public AnAction[] getChildren(@Nullable AnActionEvent e) {
+            return AN_ACTIONS;
+        }
+    });
+    
     private static Logger logger = Logger.getInstance(PlantUmlLabel.class);
     private RenderRequest renderRequest;
     private ImageItem imageWithData;
@@ -73,32 +93,13 @@ public class PlantUmlLabel extends JLabel {
             scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
         }
 
-        ImageIcon imageIcon = new ImageIcon(scaledImage);
-        label.setIcon(imageIcon);
+        label.setIcon(new ImageIcon(scaledImage));
         label.setPreferredSize(new Dimension(newWidth, newHeight));
         label.addMouseListener(new PopupHandler() {
 
             @Override
             public void invokePopup(Component comp, int x, int y) {
-                ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
-
-                    @NotNull
-                    @Override
-                    public AnAction[] getChildren(@Nullable AnActionEvent e) {
-                        return new AnAction[]{
-                                new CopyDiagramToClipboardContextAction(),
-                                Separator.getInstance(),
-                                new CopyDiagramAsTxtToClipboardContextAction(),
-                                new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
-                                Separator.getInstance(),
-                                new ExternalOpenDiagramAsPNGAction(),
-                                new ExternalOpenDiagramAsSVGAction(),
-                                Separator.getInstance(),
-                                new CopyPlantUmlServerLinkContextAction()
-                        };
-                    }
-                }).getComponent().show(comp, x, y);
-
+                ACTION_POPUP_MENU.getComponent().show(comp, x, y);
             }
         });
 
