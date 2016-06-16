@@ -147,6 +147,14 @@ public class ImageItem {
         return urls;
     }
 
+    protected boolean hasError() {
+        String description = getDescription();
+        if (description == null || description.isEmpty() || "(Error)".equals(description)) {
+            return true;
+        }
+        return false;
+    }
+
     public class UrlData {
         private final URI uri;
         private final Rectangle clickArea;

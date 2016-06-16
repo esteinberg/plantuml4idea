@@ -54,12 +54,12 @@ public class RenderResult {
     public boolean hasError() {
         if (strategy == RenderingType.NORMAL) {
             for (ImageItem imageItem : imageItems) {
-                String description = imageItem.getDescription();
-                if (description == null || description.isEmpty() || "(Error)".equals(description)) {
-                    return true;
-                }
+                if (imageItem.hasError()) return true;
             }
-        }
+        } else {
+            //PartialRenderingException hack
+            return imageItems.size() == 1 && imageItems.get(0).hasError();
+        } 
         return false;
     }
 
@@ -105,13 +105,6 @@ public class RenderResult {
 
     public int getCached() {
         return cached;
-    }
-
-    public void add(ImageItem imageItem, boolean titleChanged) {
-        imageItems.add(imageItem);
-        if (titleChanged) {
-            updatedTitles++;
-        }
     }
 
     @NotNull

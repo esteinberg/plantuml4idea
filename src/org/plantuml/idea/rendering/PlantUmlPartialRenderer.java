@@ -2,11 +2,14 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
-import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
-import org.apache.commons.lang.NotImplementedException;
+import net.sourceforge.plantuml.*;
+import net.sourceforge.plantuml.core.UmlSource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collections;
 
 import static org.plantuml.idea.rendering.PlantUmlRenderer.getTitles;
 import static org.plantuml.idea.rendering.PlantUmlRenderer.zoomDiagram;
@@ -17,14 +20,36 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
     @NotNull
     public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, long start, String[] sourceSplit) {
-        FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
+        try {
+            FileFormatOption formatOption = new FileFormatOption(renderRequest.getFormat().getFormat());
 
-        RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, sourceSplit.length);
+            RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, sourceSplit.length);
             for (int page = 0; page < sourceSplit.length; page++) {
                 processPage(renderRequest, cachedItem, sourceSplit[page], formatOption, renderResult, page);
             }
 
-        logger.debug("partial rendering done ", System.currentTimeMillis() - start, "ms");
+            logger.debug("partial rendering done ", System.currentTimeMillis() - start, "ms");
+            return renderResult;
+        } catch (PartialRenderingException e) {
+            logger.debug(e);
+            return renderError(renderRequest, e);
+        }
+    }
+
+    @NotNull
+    protected RenderResult renderError(RenderRequest renderRequest, PartialRenderingException e) {
+        RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, 1);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            UmlSource source = new UmlSource(Collections.<CharSequence2>singletonList(new CharSequence2Impl("", new LineLocationImpl(null, null))), false);
+            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), 0, null);
+            PSystemError pSystemError = new PSystemError(source, singleError, null);
+            pSystemError.exportDiagram(os, 0, new FileFormatOption(FileFormat.PNG));
+        } catch (IOException e1) {
+            logger.warn(e1);
+            throw e;
+        }
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null));
         return renderResult;
     }
 
@@ -68,7 +93,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private String getTitle(SourceStringReader reader) {
         Titles titles = getTitles(1, reader.getBlocks());
         if (titles.size() > 1) {
-            throw new NotImplementedException("partial rendering not supported with @newpage in included file, and it won't be");
+            throw new PartialRenderingException();
         }
         return titles.get(0);
     }
@@ -82,7 +107,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         Titles titles = pages.second;
 
         if (totalPages > 1) {
-            throw new NotImplementedException("partial rendering not supported with @newpage in included file, and it won't be");
+            throw new PartialRenderingException();
         }
         if (titles.size() > 1) {
             logger.warn("too many titles " + titles + ", partialSource=" + partialSource);
