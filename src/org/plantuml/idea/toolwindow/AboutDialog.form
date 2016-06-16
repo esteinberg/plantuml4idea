@@ -7,7 +7,7 @@
     </constraints>
     <properties>
       <minimumSize width="-1" height="-1"/>
-      <preferredSize width="900" height="600"/>
+      <preferredSize width="900" height="650"/>
       <requestFocusEnabled value="true"/>
     </properties>
     <border type="none"/>

@@ -15,6 +15,11 @@ public class Usage extends JTextArea {
                     + "- Cursor on top of @startuml allows to use following intentions:\n"
                     + "  - disable syntax check\n"
                     + "  - enable partial rendering - renders each page on it's own, useful for big sequence diagram files\n"
+                    + "- Performance tips:\n"
+                    + "  - do not put @newpage into included files (it prohibits incremental rendering)\n"
+                    + "  - try to enable partial rendering\n"
+                    + "  - disable syntax checking\n"
+                    + "  - disable automatic rendering\n"
                     + "";
 
     public Usage() {
