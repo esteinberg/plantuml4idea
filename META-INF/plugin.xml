@@ -77,7 +77,7 @@
         <group id="PlantUML.Toolbar" description="PlantUML Toolbar">
             <action id="PlantUML.UpdateDiagram" description="Update PlantUml Diagram"
                     class="org.plantuml.idea.action.UpdateDiagramAction"
-                    icon="/actions/updateRunningApplication.png" text="Update PlantUml Diagram - changes only">
+                    icon="/javaee/updateRunningApplication.png" text="Update PlantUml Diagram - changes only">
                 <keyboard-shortcut keymap="$default" first-keystroke="alt D"/>
             </action>
             <action id="PlantUML.ReloadDiagram" description="Reload PlantUml Diagram"
