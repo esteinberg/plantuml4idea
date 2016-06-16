@@ -1,6 +1,7 @@
 package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -111,5 +112,10 @@ public class RenderResult {
         if (titleChanged) {
             updatedTitles++;
         }
+    }
+
+    @NotNull
+    public ImageItem[] getImageItemsAsArray() {
+        return getImageItems().toArray(new ImageItem[getImageItems().size()]);
     }
 }
