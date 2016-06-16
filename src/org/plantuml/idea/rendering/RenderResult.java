@@ -86,14 +86,9 @@ public class RenderResult {
 
     public void addCachedImage(ImageItem imageItem) {
         imageItems.add(imageItem);
-        if (imageItem.hasImage()) {
-            cached++;
-        }
+        cached++;
     }
 
-    public void add(ImageItem item) {
-        imageItems.add(item);
-    }
 
     public ImageItem getImageItem(int i) {
         return imageItems.size() > i ? imageItems.get(i) : null;

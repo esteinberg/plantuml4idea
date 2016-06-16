@@ -64,8 +64,8 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
         this.state = state;
         this.message = String.valueOf(total) + "ms "
                 + rendered + " rendered "
-                + updatedTitles + " invalidated "
-                + cached + " cached";
+                + updatedTitles + " changed "
+                + cached + " unchanged";
         updateOnEDT();
     }
 
