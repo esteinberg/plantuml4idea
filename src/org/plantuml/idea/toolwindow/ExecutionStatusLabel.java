@@ -11,7 +11,7 @@ import org.plantuml.idea.rendering.RenderResult;
 import javax.swing.*;
 import java.awt.*;
 
-public class ExucutionTimeLabel extends DumbAwareAction implements CustomComponentAction {
+public class ExecutionStatusLabel extends DumbAwareAction implements CustomComponentAction {
     private JLabel label;
     private volatile State state;
     private volatile String message = "---";
@@ -24,7 +24,7 @@ public class ExucutionTimeLabel extends DumbAwareAction implements CustomCompone
             for (State value : values) {
                 sb.append("\n").append(value.description);
             }
-            DESCRIPTION = "Last execution time.\n\nColors:" + sb.toString();
+            DESCRIPTION = "Last execution time, page counts\n\nColors:" + sb.toString();
         }
     }
 

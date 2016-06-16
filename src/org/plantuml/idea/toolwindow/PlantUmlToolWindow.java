@@ -50,7 +50,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private Project project;
     private AtomicInteger sequence = new AtomicInteger();
     public boolean renderUrlLinks;
-    public ExucutionTimeLabel executionTimeLabel;
+    public ExecutionStatusLabel executionStatusLabel;
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
 
     public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
@@ -60,7 +60,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
 
         setupUI();
-        lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionTimeLabel);
+        lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusLabel);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
@@ -100,8 +100,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 }
             }
         }
-        executionTimeLabel = new ExucutionTimeLabel();
-        newGroup.add(executionTimeLabel);
+        executionStatusLabel = new ExecutionStatusLabel();
+        newGroup.add(executionStatusLabel);
         return newGroup;
     }
 
@@ -232,7 +232,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
-        executionTimeLabel.state(ExucutionTimeLabel.State.DONE, "cached");
+        executionStatusLabel.state(ExecutionStatusLabel.State.DONE, "cached");
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
         displayDiagram(last);
@@ -243,12 +243,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, @Nullable final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
         int version = sequence.incrementAndGet();
-        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionTimeLabel);
+        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusLabel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExucutionTimeLabel label) {
+        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusLabel label) {
             super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 

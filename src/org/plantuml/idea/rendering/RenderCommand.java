@@ -5,7 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
-import org.plantuml.idea.toolwindow.ExucutionTimeLabel;
+import org.plantuml.idea.toolwindow.ExecutionStatusLabel;
 
 import java.io.File;
 import java.util.Map;
@@ -24,7 +24,7 @@ public abstract class RenderCommand implements Runnable {
     protected int version;
     protected boolean renderUrlLinks;
     protected LazyApplicationPoolExecutor.Delay delay;
-    protected ExucutionTimeLabel label;
+    protected ExecutionStatusLabel label;
 
     public enum Reason {
         INCLUDES,
@@ -36,7 +36,7 @@ public abstract class RenderCommand implements Runnable {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExucutionTimeLabel label) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusLabel label) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
@@ -58,7 +58,7 @@ public abstract class RenderCommand implements Runnable {
                 return;
             }
             long start = System.currentTimeMillis();
-            label.state(ExucutionTimeLabel.State.EXECUTING);
+            label.state(ExecutionStatusLabel.State.EXECUTING);
 
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
@@ -82,13 +82,13 @@ public abstract class RenderCommand implements Runnable {
                 logger.debug("no images rendered");
             }
             long total = System.currentTimeMillis() - start;
-            label.state(ExucutionTimeLabel.State.DONE, total, result);
+            label.state(ExecutionStatusLabel.State.DONE, total, result);
         } catch (RenderingCancelledException e) {
             e.printStackTrace();
             logger.info("command interrupted", e);
-            label.state(ExucutionTimeLabel.State.CANCELLED);
+            label.state(ExecutionStatusLabel.State.CANCELLED);
         } catch (Throwable e) {
-            label.state(ExucutionTimeLabel.State.ERROR);
+            label.state(ExecutionStatusLabel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
     }
