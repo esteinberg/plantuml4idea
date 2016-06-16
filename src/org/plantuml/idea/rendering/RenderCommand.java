@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
@@ -87,6 +88,9 @@ public abstract class RenderCommand implements Runnable {
             e.printStackTrace();
             logger.info("command interrupted", e);
             label.state(ExecutionStatusLabel.State.CANCELLED);
+        } catch (NotImplementedException e) {
+            label.state(ExecutionStatusLabel.State.ERROR);
+            logger.error(e);
         } catch (Throwable e) {
             label.state(ExecutionStatusLabel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
