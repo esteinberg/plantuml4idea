@@ -37,7 +37,7 @@ public class UIUtils {
     }
 
     public static String getSelectedSourceWithCaret(Project myProject) {
-        String source = getSelectedSource(myProject);
+        String source = "";
 
         Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
         if (selectedTextEditor != null) {
