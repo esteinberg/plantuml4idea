@@ -12,6 +12,7 @@
             <p>2.2.0</p>
             <ul>
                <li>Toggle button for disabling automatic rendering</li>
+               <li>When auto-rendering is disabled, reload button will be red</li>
                <li>ALT+D shortcut for manual rendering or reloading of the images</li>
                <li>Page titles fixed for partial rendering</li>
                <li>Usage manual</li>
@@ -73,7 +74,7 @@
 
     <actions>
         <group id="PlantUML.Toolbar" description="PlantUML Toolbar">
-            <action id="PlantUML.ReloadNow" description="Reload now"
+            <action id="PlantUML.ReloadNow" description="Reload PlantUml Diagram"
                     class="org.plantuml.idea.action.ReloadNowAction"
                     icon="/actions/refresh.png" text="Reload PlantUml Diagram"
             >
