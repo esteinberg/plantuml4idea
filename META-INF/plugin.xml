@@ -75,14 +75,14 @@
 
     <actions>
         <group id="PlantUML.Toolbar" description="PlantUML Toolbar">
-            <action id="PlantUML.UpdateDiagram" description="Update PlantUml Diagram"
-                    class="org.plantuml.idea.action.UpdateDiagramAction"
-                    icon="/javaee/updateRunningApplication.png" text="Update PlantUml Diagram - changes only">
+            <action id="PlantUML.Update" description="Update PlantUml Diagrams"
+                    class="org.plantuml.idea.action.UpdateDiagramsAction"
+                    icon="/javaee/updateRunningApplication.png" text="Update PlantUml Diagrams - changes only">
                 <keyboard-shortcut keymap="$default" first-keystroke="alt D"/>
             </action>
-            <action id="PlantUML.ReloadDiagram" description="Reload PlantUml Diagram"
+            <action id="PlantUML.Reload" description="Reload PlantUml Diagrams"
                     class="org.plantuml.idea.action.ReloadNowAction"
-                    icon="/actions/refresh.png" text="Reload PlantUml Diagram">
+                    icon="/actions/refresh.png" text="Reload PlantUml Diagrams">
                 <keyboard-shortcut keymap="$default" first-keystroke="alt F"/>
             </action>
 
