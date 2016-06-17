@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.2.0</version>
+    <version>2.2.1</version>
     <vendor>Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="129.000"/>
@@ -9,7 +9,7 @@
 
     <change-notes>
         <![CDATA[
-            <p>2.2.0</p>
+            <p>2.2</p>
             <ul>
                <li>Toggle button for disabling automatic rendering</li>
                <li>When auto-rendering is disabled, update and reload button will be red</li>
@@ -18,15 +18,16 @@
                <li>Page titles fixed for partial rendering</li>
                <li>Usage manual</li>
                <li>About dialog reworked</li>
+               <li>IJ 12 compatibility fix</li>
             </ul>
-            <p>2.1.0</p>
+            <p>2.1</p>
             <ul>
                <li>Scrolling fixed for 2016.2</li>
                <li>Remembering selected page per file</li>
                <li>New right click action: Generate PlantUML Server link to clipboard</li>
                <li>Page titles in the dropdown page selector</li>
             </ul>
-            <p>2.0.0</p>
+            <p>2.0</p>
             <ul>
                <li>PlantUml library upgrade to 8042</li>
                <li>Images can be copied to clipboard as ASCII Art</li>
@@ -37,23 +38,6 @@
                <li>Added incremental rendering - only changed pages will be rendered</li>
                <li>Added partial rendering mode - useful in large files - the document will be splitted by (@)newpage and each piece will be rendered by itself.</li>
                <li>Added intentions to disable syntax check, and enable partial rendering - available on the start tag (@startuml,...)</li>
-            </ul>
-            <p>1.9.0</p>
-            <ul>
-               <li>PlantUml library upgrade to 8036</li>
-            </ul>
-            <p>1.8.1</p>
-            <ul>
-                <li>PlantUml library upgrade to 8027</li>
-                <li>Support for "url of" (Thanks to Andrew Korolev)</li>
-                <li>Reload of a diagram on change in included files</li>
-            </ul>
-            <p>1.8</p>
-            <ul>
-                <li>PlantUml library upgrade to 8026</li>
-                <li>Compatible with IntelliJ 12</li>
-                <li>Reverse Arrow intention (only for PlantUML file types) - place caret on an arrow; Alt+Enter...</li>
-                <li>Enabled block and line comment actions (only for PlantUML file types)</li>
             </ul>
        ]]>
     </change-notes>
