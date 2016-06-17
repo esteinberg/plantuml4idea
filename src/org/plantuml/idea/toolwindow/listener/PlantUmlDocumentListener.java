@@ -18,9 +18,11 @@ public class PlantUmlDocumentListener implements DocumentListener {
     private static Logger logger = Logger.getInstance(PlantUmlDocumentListener.class);
     public FileDocumentManager instance = FileDocumentManager.getInstance();
     private PlantUmlSettings settings;
+    private EditorFactory editorFactory;
 
     public PlantUmlDocumentListener() {
         settings = PlantUmlSettings.getInstance();
+        editorFactory = EditorFactory.getInstance();
     }
 
     @Override
@@ -39,7 +41,7 @@ public class PlantUmlDocumentListener implements DocumentListener {
         if (settings.isAutoRender()) {
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
-                Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument());
+                Editor[] editors = editorFactory.getEditors(event.getDocument());
                 for (Editor editor : editors) {
                     UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
                 }

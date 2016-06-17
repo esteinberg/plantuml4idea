@@ -36,10 +36,10 @@ public class UIUtils {
         return ImageIO.read(input);
     }
 
-    public static String getSelectedSourceWithCaret(Project myProject) {
+    public static String getSelectedSourceWithCaret(FileEditorManager instance) {
         String source = "";
 
-        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        Editor selectedTextEditor = instance.getSelectedTextEditor();
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             int offset = selectedTextEditor.getCaretModel().getOffset();
@@ -48,9 +48,9 @@ public class UIUtils {
         return source;
     }
 
-    public static String getSelectedSource(Project myProject) {
+    public static String getSelectedSource(FileEditorManager instance) {
         String source = "";
-        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+        Editor selectedTextEditor = instance.getSelectedTextEditor();
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             source = document.getText();
@@ -60,24 +60,24 @@ public class UIUtils {
 
 
     @Nullable
-    public static VirtualFile getSelectedFile(Project myProject) {
-        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+    public static VirtualFile getSelectedFile(FileEditorManager instance, FileDocumentManager fileDocumentManager) {
+        Editor selectedTextEditor = instance.getSelectedTextEditor();
         VirtualFile file = null;
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
-            file = FileDocumentManager.getInstance().getFile(document);
+            file = fileDocumentManager.getFile(document);
         }
         return file;
     }
 
     @Nullable
-    public static File getSelectedDir(Project myProject) {
-        Editor selectedTextEditor = FileEditorManager.getInstance(myProject).getSelectedTextEditor();
+    public static File getSelectedDir(FileEditorManager instance, FileDocumentManager fileDocumentManager) {
+        Editor selectedTextEditor = instance.getSelectedTextEditor();
         File baseDir = null;
         if (selectedTextEditor != null) {
 
             final Document document = selectedTextEditor.getDocument();
-            final VirtualFile file = FileDocumentManager.getInstance().getFile(document);
+            final VirtualFile file = fileDocumentManager.getFile(document);
             baseDir = getParent(file);
         }
         return baseDir;

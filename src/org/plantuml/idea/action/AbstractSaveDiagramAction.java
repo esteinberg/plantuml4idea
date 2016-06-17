@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -79,7 +81,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 String fileNameTemplate = base + "-%03d." + extension;
 
-                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
+                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
                         UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom());
 
@@ -95,7 +97,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     protected abstract String getSource(Project project);
 
     private String getDefaultFileName(Project myProject) {
-        VirtualFile selectedFile = UIUtils.getSelectedFile(myProject);
+        VirtualFile selectedFile = UIUtils.getSelectedFile(FileEditorManager.getInstance(myProject), FileDocumentManager.getInstance());
         return selectedFile == null ? FILENAME : selectedFile.getNameWithoutExtension();
     }
 }

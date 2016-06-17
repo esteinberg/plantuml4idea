@@ -5,6 +5,8 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -52,6 +54,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     public boolean renderUrlLinks;
     public ExecutionStatusLabel executionStatusLabel;
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
+    private FileEditorManager fileEditorManager;
+    private FileDocumentManager fileDocumentManager;
 
     public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -62,6 +66,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         renderCache = new RenderCache(settings.getCacheSizeAsInt());
         selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
+        fileEditorManager = FileEditorManager.getInstance(project);
+        fileDocumentManager = FileDocumentManager.getInstance();
 
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusLabel);
@@ -158,11 +164,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void run() {
                 if (isProjectValid(project)) {
-                    final String source = UIUtils.getSelectedSourceWithCaret(project);
+                    final String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
 
                     if ("".equals(source)) { //is included file or some crap?
                         logger.debug("empty source");
-                        VirtualFile selectedFile = UIUtils.getSelectedFile(project);
+                        VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager);
                         RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file?
 
 //                        if (last != null && reason == RenderCommand.Reason.FILE_SWITCHED) {
@@ -177,10 +183,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                         if (last != null && last.isIncludedFile(selectedFile)) {
                             logger.debug("include file selected");
-                            if (last.isIncludedFileChanged(selectedFile)) {
+                            if (last.isIncludedFileChanged(selectedFile, fileDocumentManager)) {
                                 logger.debug("includes changed, executing command");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
-                            } else if (last.renderRequired(project, selectedPage, zoom)) {
+                            } else if (last.renderRequired(selectedPage, zoom, fileEditorManager, fileDocumentManager)) {
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {
@@ -195,7 +201,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         return;
                     }
 
-                    String sourceFilePath = UIUtils.getSelectedFile(project).getPath();
+                    String sourceFilePath = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager).getPath();
 
 
                     selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
@@ -203,16 +209,16 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                     if (reason == RenderCommand.Reason.REFRESH) {
                         logger.debug("executing command, reason=", reason);
-                        final File selectedDir = UIUtils.getSelectedDir(project);
+                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, zoom, null, delay));
                         return;
                     }
-                    
-                    RenderCacheItem cachedItem = renderCache.getCachedItem(project, sourceFilePath, source, selectedPage, zoom);
 
-                    if (cachedItem == null || cachedItem.renderRequired(project, source, selectedPage)) {
+                    RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileEditorManager, fileDocumentManager);
+
+                    if (cachedItem == null || cachedItem.renderRequired(source, selectedPage, fileEditorManager, fileDocumentManager)) {
                         logger.debug("render required");
-                        final File selectedDir = UIUtils.getSelectedDir(project);
+                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
                     } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
                         logger.debug("render not required, displaying cached item ", cachedItem);

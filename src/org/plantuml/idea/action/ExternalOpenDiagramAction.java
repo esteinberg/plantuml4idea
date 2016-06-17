@@ -2,6 +2,8 @@ package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +38,7 @@ public class ExternalOpenDiagramAction extends DumbAwareAction {
 
             file.deleteOnExit();
 
-            PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(e.getProject()),
+            PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
                     imageFormat, file.getAbsolutePath(), file.getName().replace(".", "-%03d."),
                     UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom());
 
@@ -47,6 +49,6 @@ public class ExternalOpenDiagramAction extends DumbAwareAction {
     }
 
     private String getSource(Project project) {
-        return UIUtils.getSelectedSourceWithCaret(project);
+        return UIUtils.getSelectedSourceWithCaret(FileEditorManager.getInstance(project));
     }
 }

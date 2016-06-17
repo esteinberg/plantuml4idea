@@ -3,7 +3,6 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -58,17 +57,17 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean renderRequired(@NotNull Project project, int page, int zoom) {
+    public boolean renderRequired(int page, int zoom, FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
         if (imageMissing(page)) {
             return true;
         }
         if (zoom != this.zoom) {
             return true;
         }
-        return includedFilesChanged(project);
+        return includedFilesChanged(fileEditorManager, fileDocumentManager);
     }
 
-    public boolean renderRequired(@NotNull Project project, String source, int page) {
+    public boolean renderRequired(String source, int page, FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
         if (!this.source.equals(source)) {
             return true;
         }
@@ -76,7 +75,7 @@ public class RenderCacheItem {
             return true;
         }
 
-        return includedFilesChanged(project);
+        return includedFilesChanged(fileEditorManager, fileDocumentManager);
     }
 
     private boolean imageMissing(int page) {
@@ -115,11 +114,10 @@ public class RenderCacheItem {
         return imageItems;
     }
 
-    public boolean isIncludedFileChanged(@NotNull VirtualFile file) {
+    public boolean isIncludedFileChanged(@NotNull VirtualFile file, FileDocumentManager fileDocumentManager) {
         File key = new File(file.getPath());
         Long aLong = includedFiles.get(key);
         if (aLong != null) {
-            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
             boolean changed = RenderCache.isChanged(fileDocumentManager, key, aLong, fileDocumentManager.getDocument(file));
             if (changed) {
                 return true;
@@ -128,11 +126,10 @@ public class RenderCacheItem {
         return false;
     }
 
-    private boolean includedFilesChanged(@NotNull Project project) {
+    private boolean includedFilesChanged(FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
         boolean result = false;
-        Editor selectedTextEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+        Editor selectedTextEditor = fileEditorManager.getSelectedTextEditor();
         if (selectedTextEditor != null) {
-            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
             VirtualFile file = fileDocumentManager.getFile(selectedTextEditor.getDocument());
             if (file != null) {
                 String path = file.getPath();

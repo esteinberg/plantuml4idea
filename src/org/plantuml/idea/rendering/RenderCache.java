@@ -2,7 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 
 import java.io.File;
 import java.util.ArrayDeque;
@@ -27,7 +27,7 @@ public class RenderCache {
         }
     }
 
-    public RenderCacheItem getCachedItem(Project project, String sourceFilePath, String source, int selectedPage, int zoom) {
+    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, int zoom, FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
         RenderCacheItem cacheItem = null;
         boolean checkCurrentItemSourceEquals = true;
         Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
@@ -35,7 +35,7 @@ public class RenderCache {
         //error not cached in ArrayDeque
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
-                && !displayedItem.renderRequired(project, source, selectedPage)) {
+                && !displayedItem.renderRequired(source, selectedPage, fileEditorManager, fileDocumentManager)) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }
