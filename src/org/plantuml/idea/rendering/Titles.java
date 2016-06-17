@@ -1,15 +1,14 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.logger;
 
 public class Titles {
-    private static final Logger log = LoggerFactory.getLogger(Titles.class);
+    protected static final Logger logger = Logger.getInstance(Titles.class);
+    
     private final List<String> titles;
 
     public Titles(List<String> titles) {

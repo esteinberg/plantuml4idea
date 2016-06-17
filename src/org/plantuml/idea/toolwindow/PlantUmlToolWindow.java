@@ -57,15 +57,16 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
+
         PlantUmlSettings settings = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
+        renderCache = new RenderCache(settings.getCacheSizeAsInt());
+        selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
+        plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
 
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusLabel);
-        plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
-        renderCache = new RenderCache(settings.getCacheSizeAsInt());
-        selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
     }
 
     private void setupUI() {
