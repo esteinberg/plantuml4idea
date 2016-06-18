@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 
-public class PlantUmlLabel extends JLabel {
+public class PlantUmlImageLabel extends JLabel {
     private static final AnAction[] AN_ACTIONS = {
             new CopyDiagramToClipboardContextAction(),
             Separator.getInstance(),
@@ -37,15 +37,15 @@ public class PlantUmlLabel extends JLabel {
             return AN_ACTIONS;
         }
     });
-    
-    private static Logger logger = Logger.getInstance(PlantUmlLabel.class);
+
+    private static Logger logger = Logger.getInstance(PlantUmlImageLabel.class);
     private RenderRequest renderRequest;
     private ImageItem imageWithData;
 
-    public PlantUmlLabel() {
+    public PlantUmlImageLabel() {
     }
 
-    public PlantUmlLabel(ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public PlantUmlImageLabel(ImageItem imageWithData, int i, RenderRequest renderRequest) {
         this.imageWithData = imageWithData;
         setup(this.imageWithData, i, renderRequest);
     }
@@ -61,7 +61,7 @@ public class PlantUmlLabel extends JLabel {
     public void setup(@NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
-        if (imageWithData.getImage() != null) {
+        if (imageWithData.hasImage()) {
             setDiagram(imageWithData, this, 100);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");

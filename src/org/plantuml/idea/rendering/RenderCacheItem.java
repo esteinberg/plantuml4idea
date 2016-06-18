@@ -178,6 +178,7 @@ public class RenderCacheItem {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("version", version)
+                .append("source", source)
                 .append("renderRequest", renderRequest)
                 .append("sourceFilePath", sourceFilePath)
                 .append("baseDir", baseDir)

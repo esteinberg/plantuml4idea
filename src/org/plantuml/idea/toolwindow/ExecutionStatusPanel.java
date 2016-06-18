@@ -12,9 +12,9 @@ import org.plantuml.idea.rendering.RenderResult;
 import javax.swing.*;
 import java.awt.*;
 
-public class ExecutionStatusLabel extends DumbAwareAction implements CustomComponentAction {
+public class ExecutionStatusPanel extends DumbAwareAction implements CustomComponentAction {
     private JLabel label;
-    private JLabel pages;
+    private volatile int version;
     private volatile State state;
     private volatile String message = "---";
     public static String DESCRIPTION;
@@ -60,45 +60,68 @@ public class ExecutionStatusLabel extends DumbAwareAction implements CustomCompo
         return jLabel;
     }
 
-    public void state(State b) {
-        state = b;
-
-        updateOnEDT();
+    public synchronized void update(State state) {
+        this.state = state;
+        updateLabelLater();
     }
 
-    public void state(State state, long total, RenderResult result) {
+    public synchronized void update(int version, State state) {
+        if (this.version <= version) {
+            updateState(version, state, message);
+            updateLabelLater();
+        } 
+    }
+
+    public synchronized void update(int version, State state, long total, RenderResult result) {
+        if (this.version <= version) {
+            updateState(version, state, total, result);
+            updateLabelLater();
+        }
+    }
+
+
+    public synchronized void updateNow(Integer version, State state, long total, RenderResult result) {
+        if (this.version <= version) {
+            updateState(version, state, total, result);
+            state.update(label, message);
+        }
+    }
+
+
+    public synchronized void updateNow(Integer version, State state, String message) {
+        if (this.version <= version) {
+            updateState(version, state, message);
+            state.update(label, message);
+        }
+    }
+
+    protected void updateState(int version, State state, long total, RenderResult result) {
         int rendered = result.getRendered();
         int updatedTitles = result.getUpdatedTitles();
         int cached = result.getCached();
-        
-        this.state = state;
-        this.message = String.valueOf(total) + "ms ["
+        String message = String.valueOf(total) + "ms ["
                 + rendered + ","
                 + updatedTitles + ","
                 + cached + "]";
-        updateOnEDT();
+        updateState(version, state, message);
     }
 
-    public void state(State state, String message) {
-        this.state = state;
+
+    private void updateState(Integer version, State state, String message) {
+        this.version = version;
         this.message = message;
-
-        updateOnEDT();
+        this.state = state;
     }
 
-    private void updateOnEDT() {
+    private void updateLabelLater() {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                updateLabel();
+                if (state != null) {
+                    state.update(label, message);
+                }
             }
         });
-    }
-
-    private void updateLabel() {
-        if (state != null) {
-            state.update(label, message);
-        }
     }
 
 
@@ -117,9 +140,11 @@ public class ExecutionStatusLabel extends DumbAwareAction implements CustomCompo
             this.description = description;
         }
 
-        public void update(JLabel comp, String total) {
-            comp.setText(total);
+        public void update(JLabel comp, String message) {
+            ApplicationManager.getApplication().assertIsDispatchThread();
+            comp.setText(message);
             comp.setForeground(this.color);
         }
     }
+
 }

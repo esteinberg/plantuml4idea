@@ -5,7 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
-import org.plantuml.idea.toolwindow.ExecutionStatusLabel;
+import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 
 import java.io.File;
 import java.util.Map;
@@ -24,19 +24,18 @@ public abstract class RenderCommand implements Runnable {
     protected int version;
     protected boolean renderUrlLinks;
     protected LazyApplicationPoolExecutor.Delay delay;
-    protected ExecutionStatusLabel label;
+    protected ExecutionStatusPanel label;
 
     public enum Reason {
         INCLUDES,
         FILE_SWITCHED,
         REFRESH,
-        /* no function*/
         CARET,
         MANUAL_UPDATE, /* no function*/
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusLabel label) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
@@ -58,7 +57,7 @@ public abstract class RenderCommand implements Runnable {
                 return;
             }
             long start = System.currentTimeMillis();
-            label.state(ExecutionStatusLabel.State.EXECUTING);
+            label.update(version, ExecutionStatusPanel.State.EXECUTING);
 
             final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
             logger.debug("includedFiles=", includedFiles);
@@ -67,37 +66,36 @@ public abstract class RenderCommand implements Runnable {
             final RenderResult result = PlantUmlRenderer.render(renderRequest, cachedItem);
 
             final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, result.getImageItemsAsArray(), version);
-            
-            if (hasImages(newItem.getImageItems())) {
+            final long total = System.currentTimeMillis() - start;
+
+            if (!Thread.currentThread().isInterrupted() && hasImages(newItem.getImageItems())) {
 
                 ApplicationManager.getApplication().invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
-                        postRenderOnEDT(newItem);
+                        postRenderOnEDT(newItem, total, result);
                     }
                 });
 
             } else {
                 logger.debug("no images rendered");
+                label.update(version, ExecutionStatusPanel.State.DONE, total, result);
             }
-            long total = System.currentTimeMillis() - start;
-            label.state(ExecutionStatusLabel.State.DONE, total, result);
         } catch (RenderingCancelledException e) {
-            e.printStackTrace();
             logger.info("command interrupted", e);
-            label.state(ExecutionStatusLabel.State.CANCELLED);
+            label.update(version, ExecutionStatusPanel.State.CANCELLED);
         } catch (Throwable e) {
-            label.state(ExecutionStatusLabel.State.ERROR);
+            label.update(version, ExecutionStatusPanel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
     }
 
-    protected abstract void postRenderOnEDT(RenderCacheItem newItem);
+    protected abstract void postRenderOnEDT(RenderCacheItem newItem, long total, RenderResult result);
 
-    private boolean hasImages(ImageItem[] imagesWithUrlData) {
-        for (ImageItem imageItem : imagesWithUrlData) {
-            if (imageItem != null) {
+    private boolean hasImages(ImageItem[] imageItems) {
+        for (ImageItem imageItem : imageItems) {
+            if (imageItem != null && imageItem.hasImage()) {
                 return true;
             }
         }

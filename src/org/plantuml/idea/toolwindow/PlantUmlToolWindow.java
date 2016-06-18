@@ -52,7 +52,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private Project project;
     private AtomicInteger sequence = new AtomicInteger();
     public boolean renderUrlLinks;
-    public ExecutionStatusLabel executionStatusLabel;
+    public ExecutionStatusPanel executionStatusPanel;
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
     private FileEditorManager fileEditorManager;
     private FileDocumentManager fileDocumentManager;
@@ -70,7 +70,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         fileDocumentManager = FileDocumentManager.getInstance();
 
         setupUI();
-        lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusLabel);
+        lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusPanel);
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
     }
@@ -107,8 +107,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 }
             }
         }
-        executionStatusLabel = new ExecutionStatusLabel();
-        newGroup.add(executionStatusLabel);
+        executionStatusPanel = new ExecutionStatusPanel();
+        newGroup.add(executionStatusPanel);
         return newGroup;
     }
 
@@ -225,8 +225,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         displayExistingDiagram(cachedItem);
                     } else {
                         logger.debug("render not required, item already displayed ", cachedItem);
-                        if (reason == RenderCommand.Reason.MANUAL_UPDATE) {
-                            executionStatusLabel.state(ExecutionStatusLabel.State.DONE, "cached");
+                        if (reason != RenderCommand.Reason.CARET) {
+                            cachedItem.setVersion(sequence.incrementAndGet());
+                            lazyExecutor.cancel();
+                            executionStatusPanel.updateNow(cachedItem.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
                         }
                     }
                 }
@@ -235,7 +237,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
-        executionStatusLabel.state(ExecutionStatusLabel.State.DONE, "cached");
+        executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
         displayDiagram(last);
@@ -246,17 +248,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, @Nullable final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
         int version = sequence.incrementAndGet();
-        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusLabel);
+        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusLabel label) {
+        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
             super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
-        public void postRenderOnEDT(RenderCacheItem newItem) {
+        public void postRenderOnEDT(RenderCacheItem newItem, long total, RenderResult result) {
             if (reason == Reason.REFRESH) {
                 if (cachedItem != null) {
                     renderCache.removeFromCache(cachedItem);
@@ -266,14 +268,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 renderCache.addToCache(newItem);
             }
             logger.debug("displaying item ", newItem);
-            displayDiagram(newItem);
+
+            if (displayDiagram(newItem)) {
+                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, total, result);
+            } 
         }
     }
 
-    public void displayDiagram(RenderCacheItem cacheItem) {
+    public boolean displayDiagram(RenderCacheItem cacheItem) {
         if (renderCache.isOlderRequest(cacheItem)) { //ctrl+z with cached image vs older request in progress
             logger.debug("skipping displaying older result", cacheItem);
-            return;
+            return false;
         }
         renderCache.setDisplayedItem(cacheItem);
 
@@ -303,13 +308,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
         imagesPanel.revalidate();
         imagesPanel.repaint();
+        return true;
     }
 
     public void displayImage(RenderCacheItem cacheItem, int i, ImageItem imageWithData) {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + i + ", cacheItem=" + cacheItem);
         }
-        PlantUmlLabel label = new PlantUmlLabel(imageWithData, i, cacheItem.getRenderRequest());
+        PlantUmlImageLabel label = new PlantUmlImageLabel(imageWithData, i, cacheItem.getRenderRequest());
         addScrollBarListeners(label);
 
         if (i != 0) {

@@ -45,5 +45,5 @@ set selected page
 ?not displayed selected page
     display selected page
 =item already displayed, nothing needed
-    ?manual update
-        update status label
+    ?not carrot update?
+        update version, stop rendering, update status

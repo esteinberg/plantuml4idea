@@ -23,7 +23,7 @@ public class AboutDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JEditorPane aboutEditorPane;
-    private PlantUmlLabel testDot;
+    private PlantUmlImageLabel testDot;
     private Usage usage;
 
     public AboutDialog() {

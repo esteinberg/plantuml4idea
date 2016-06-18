@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.PlantUmlLabel;
+import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 
 import javax.swing.*;
 
@@ -28,7 +28,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        PlantUmlLabel data = (PlantUmlLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         if (data != null) {
             ImageItem imageWithData = data.getImageWithData();
             String source;
