@@ -76,15 +76,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void run() {
                 renderCache.clear();
-                if (!toolWindow.isVisible()) {
-                    ApplicationManager.getApplication().invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderCache.setDisplayedItem(null);
-                            imagesPanel.removeAll();
-                            imagesPanel.add(new JLabel("Low memory detected, cache and images cleared"));
-                        }
-                    });
+                if (renderCache.getDisplayedItem() != null && !toolWindow.isVisible()) {
+                    renderCache.setDisplayedItem(null);
+                    imagesPanel.removeAll();
+                    imagesPanel.add(new JLabel("Low memory detected, cache and images cleared. Go to PlantUML plugin settings and set lower cache size, or increase IDE heap size (-Xmx)."));
+                    imagesPanel.revalidate();
+                    imagesPanel.repaint();
                 }
             }
         }, this);
