@@ -106,4 +106,8 @@ public class RenderCache {
         }
         return false;
     }
+
+    public void clear() {
+        cacheItems.clear();
+    }
 }

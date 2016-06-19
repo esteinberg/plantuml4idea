@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.LowMemoryWatcher;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
@@ -57,7 +58,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private FileEditorManager fileEditorManager;
     private FileDocumentManager fileDocumentManager;
 
-    public PlantUmlToolWindow(Project project, ToolWindow toolWindow) {
+    public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
@@ -71,6 +72,23 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusPanel);
+        LowMemoryWatcher.register(new Runnable() {
+            @Override
+            public void run() {
+                renderCache.clear();
+                if (!toolWindow.isVisible()) {
+                    ApplicationManager.getApplication().invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            renderCache.setDisplayedItem(null);
+                            imagesPanel.removeAll();
+                            imagesPanel.add(new JLabel("Low memory detected, cache and images cleared"));
+                        }
+                    });
+                }
+            }
+        }, this);
+        
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
     }
