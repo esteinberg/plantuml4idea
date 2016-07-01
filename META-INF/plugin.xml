@@ -11,7 +11,8 @@
         <![CDATA[
             <p>2.3</p>
             <ul>
-               <li>Path to Graphviz dot executable was ignored</li>
+                <li>Path to Graphviz dot executable was ignored</li>
+                <li>PlantUml library upgrade to 8043</li>
             </ul>
             <p>2.2</p>
             <ul>
