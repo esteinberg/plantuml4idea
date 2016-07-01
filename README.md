@@ -24,7 +24,7 @@ Contributors:
 
 # Tips
 
-* Don't forget that @startuml tag is required.
+* PlantUML code must be inside @startuml and @enduml tags to be rendered.
 * To be able to generate many diagram types, you must have [Graphviz](http://plantuml.sourceforge.net/graphvizdot.html)
  installed on your machine. About screen tests your installation.
 * Image cache size can be tuned in the settings, if you have not enough heap.
