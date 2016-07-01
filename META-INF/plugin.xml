@@ -13,6 +13,7 @@
             <ul>
                 <li>Path to Graphviz dot executable was ignored</li>
                 <li>PlantUml library upgrade to 8043</li>
+                <li>Added a low memory watcher for cache clearing</li>
             </ul>
             <p>2.2</p>
             <ul>
