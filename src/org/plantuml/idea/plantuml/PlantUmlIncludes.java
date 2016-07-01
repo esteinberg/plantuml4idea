@@ -11,6 +11,7 @@ import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +40,8 @@ public class PlantUmlIncludes {
             }
         } catch (IOException e) {
             logger.error(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
+        } finally {
+            PlantUmlSettings.getInstance().applyPlantumlOptions();
         }
         return Collections.emptyMap();
     }

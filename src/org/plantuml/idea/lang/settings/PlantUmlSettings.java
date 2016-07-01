@@ -120,17 +120,21 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public void applyState() {
-        if (String.valueOf(dotExecutable).isEmpty()) {
-            GraphvizUtils.setDotExecutable(null);
-        } else {
-            GraphvizUtils.setDotExecutable(dotExecutable);
-        }
+        applyPlantumlOptions();
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (toolWindow != null) {
                 toolWindow.applyNewSettings(this);
             }
+        }
+    }
+
+    public void applyPlantumlOptions() {
+        if (String.valueOf(dotExecutable).isEmpty()) {
+            GraphvizUtils.setDotExecutable(null);
+        } else {
+            GraphvizUtils.setDotExecutable(dotExecutable);
         }
     }
 
