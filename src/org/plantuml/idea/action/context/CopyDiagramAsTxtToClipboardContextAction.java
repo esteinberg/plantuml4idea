@@ -24,7 +24,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
     private static final DataFlavor FLAVOR = DataFlavor.stringFlavor;
 
     public CopyDiagramAsTxtToClipboardContextAction() {
-        super("Copy diagram(s) to clipboard as ASII", "Copy diagram(s) to clipboard as ASII", AllIcons.FileTypes.Text);
+        super("Copy diagram(s) to clipboard as ASCII", "Copy diagram(s) to clipboard as ASCII", AllIcons.FileTypes.Text);
     }
 
     public CopyDiagramAsTxtToClipboardContextAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
@@ -39,7 +39,10 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
             RenderResult render = PlantUmlRenderer.render(new RenderRequest(renderRequest, getFormat()), null);
 
             try {
-                CopyPasteManager.getInstance().setContents(new TextTransferable(new String(render.getFirstDiagramBytes(), CharsetToolkit.UTF8)));
+                byte[] firstDiagramBytes = render.getFirstDiagramBytes();
+                if (firstDiagramBytes != null) {
+                    CopyPasteManager.getInstance().setContents(new TextTransferable(new String(firstDiagramBytes, CharsetToolkit.UTF8)));
+                }
             } catch (UnsupportedEncodingException e1) {
             }
         }

@@ -17,7 +17,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URI;
@@ -44,6 +43,7 @@ public class ImageItem {
     private final String pageSource;
     @NotNull
     private final String documentSource;
+    private byte[] imageBytes;
 
     public ImageItem(@NotNull ImageItem item, @NotNull String documentSource, @Nullable String title) {
         this.page = item.page;
@@ -72,7 +72,8 @@ public class ImageItem {
         this.description = description;
         this.renderingType = renderingType;
         this.title = title;
-        if (imageBytes != null) {
+        this.imageBytes = imageBytes;
+        if (this.imageBytes != null) {
             try {
                 this.image = UIUtils.getBufferedImage(imageBytes);
             } catch (Exception e) {
@@ -91,6 +92,7 @@ public class ImageItem {
         this.documentSource = item.documentSource;
         this.image = item.image;
         this.urls = item.urls;
+        this.imageBytes = item.imageBytes;
         this.renderingType = item.renderingType;
         this.title = item.title;
     }
@@ -130,11 +132,7 @@ public class ImageItem {
     }
 
     public byte[] getImageBytes() {
-        if (image != null) {
-            DataBufferByte dataBuffer = (DataBufferByte) image.getRaster().getDataBuffer();
-            return dataBuffer.getData();
-        }
-        return null;
+        return imageBytes;
     }
 
     @Nullable

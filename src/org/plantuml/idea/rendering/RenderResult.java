@@ -33,7 +33,7 @@ public class RenderResult {
 
     public byte[] getFirstDiagramBytes() {
         if (imageItems.size() == 0) {
-            return new byte[0];
+            return null;
         }
         return imageItems.get(0).getImageBytes();
     }

@@ -7,7 +7,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 public class CopyDiagramAsUnicodeTxtToClipboardContextAction extends CopyDiagramAsTxtToClipboardContextAction {
 
     public CopyDiagramAsUnicodeTxtToClipboardContextAction() {
-        super("Copy diagram(s) to clipboard as Unicode ASII", "Copy diagram(s) to clipboard as Unicode ASII", AllIcons.FileTypes.Text);
+        super("Copy diagram(s) to clipboard as Unicode ASCII", "Copy diagram(s) to clipboard as Unicode ASCII", AllIcons.FileTypes.Text);
     }
 
     @Override
