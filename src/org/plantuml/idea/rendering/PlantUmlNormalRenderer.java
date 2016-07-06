@@ -115,6 +115,8 @@ public class PlantUmlNormalRenderer {
 
             logger.debug("RenderResult totalPages=", totalPages);
             return renderResult;
+        } catch (UnsupportedOperationException e) {
+            throw e;
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
@@ -190,6 +192,8 @@ public class PlantUmlNormalRenderer {
         String description = null;
         try {
             description = reader.generateImage(imageStream, page, formatOption);
+        } catch (UnsupportedOperationException e) {
+            throw e;
         } catch (Exception e) {
             throw new RenderingCancelledException(e);
         }

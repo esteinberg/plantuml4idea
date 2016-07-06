@@ -42,7 +42,9 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
                 byte[] firstDiagramBytes = render.getFirstDiagramBytes();
                 if (firstDiagramBytes != null) {
                     CopyPasteManager.getInstance().setContents(new TextTransferable(new String(firstDiagramBytes, CharsetToolkit.UTF8)));
-                }
+                } else {
+                    throw new IllegalStateException("Nothing rendered.");
+                } 
             } catch (UnsupportedEncodingException e1) {
             }
         }
