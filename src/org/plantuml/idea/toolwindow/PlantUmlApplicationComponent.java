@@ -5,7 +5,9 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorEventMulticaster;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.InstallationError;
 import org.plantuml.idea.toolwindow.listener.PlantUmlCaretListener;
 import org.plantuml.idea.toolwindow.listener.PlantUmlDocumentListener;
 
@@ -14,7 +16,12 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
     private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
 
     public PlantUmlApplicationComponent() {
-    }
+		try {
+			Class<GraphvizUtils> graphvizUtilsClass = GraphvizUtils.class;
+		} catch (NoClassDefFoundError e) {
+			throw new InstallationError("Reinstall the plugin. Make sure to install 'plantuml4idea.zip', not the extracted 'plantuml4idea.jar'.", e);
+		}
+	}
 
     @Override
     public void initComponent() {
@@ -35,4 +42,5 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
     public String getComponentName() {
         return "PlantUmlApplicationComponent";
     }
+
 }
