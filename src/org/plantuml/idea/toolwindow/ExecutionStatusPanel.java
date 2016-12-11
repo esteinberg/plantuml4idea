@@ -142,8 +142,10 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
         public void update(JLabel comp, String message) {
             ApplicationManager.getApplication().assertIsDispatchThread();
-            comp.setText(message);
-            comp.setForeground(this.color);
+            if (comp != null) { //strange NPE
+                comp.setText(message);
+                comp.setForeground(this.color);
+            }
         }
     }
 
