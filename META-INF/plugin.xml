@@ -12,6 +12,7 @@
             <p>2.5</p>
             <ul>
               <li>Disabled asserts in PlantUml - they were causing slow rendering</li>
+              <li>PlantUml library upgrade to 8053</li>
             </ul>
             <p>2.4</p>
             <ul>
