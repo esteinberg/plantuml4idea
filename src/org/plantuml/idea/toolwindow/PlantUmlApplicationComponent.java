@@ -16,6 +16,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
     private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
 
     public PlantUmlApplicationComponent() {
+		PlantUmlApplicationComponent.class.getClassLoader().setDefaultAssertionStatus(false);
 		try {
 			Class<GraphvizUtils> graphvizUtilsClass = GraphvizUtils.class;
 		} catch (NoClassDefFoundError e) {
@@ -23,7 +24,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
 		}
 	}
 
-    @Override
+	@Override
     public void initComponent() {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.addDocumentListener(plantUmlDocumentListener);
