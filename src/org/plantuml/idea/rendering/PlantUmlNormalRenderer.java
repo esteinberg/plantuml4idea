@@ -29,14 +29,15 @@ public class PlantUmlNormalRenderer {
      * Renders source code and saves diagram images to files according to provided naming scheme
      * and image format.
      *
-     * @param source         source code to be rendered
-     * @param baseDir        base dir to set for "include" functionality
-     * @param format         image format
-     * @param fileName       fileName to use with first file
-     * @param fileNameFormat file naming scheme for further files
+     * @param source               source code to be rendered
+     * @param baseDir              base dir to set for "include" functionality
+     * @param format               image format
+     * @param fileName             fileName to use with first file
+     * @param fileNameFormat       file naming scheme for further files
+     * @param requestedPageNumber  -1 for all pages   
      * @throws IOException in case of rendering or saving fails
      */
-    public void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String fileName, String fileNameFormat, int zoom)
+    public void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String fileName, String fileNameFormat, int zoom, int requestedPageNumber)
             throws IOException {
         FileOutputStream outputStream = null;
         try {
@@ -46,19 +47,28 @@ public class PlantUmlNormalRenderer {
             PlantUmlIncludes.commitIncludes(source, baseDir);
             SourceStringReader reader = new SourceStringReader(source);
 
-            List<BlockUml> blocks = reader.getBlocks();
-            int imageСounter = 0;
-
             zoomDiagram(reader, zoom);
 
-            for (BlockUml block : blocks) {
-                Diagram diagram = block.getDiagram();
-                int pages = diagram.getNbImages();
-                for (int page = 0; page < pages; ++page) {
-                    String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
-                    outputStream = new FileOutputStream(fName);
-                    reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
-                    outputStream.close();
+            if (requestedPageNumber >= 0) {
+                outputStream = new FileOutputStream(fileName);
+                reader.generateImage(outputStream, requestedPageNumber, new FileFormatOption(format.getFormat()));
+                outputStream.close();
+            } else {
+                List<BlockUml> blocks = reader.getBlocks();
+                int imageСounter = 0;
+
+                for (BlockUml block : blocks) {
+                    Diagram diagram = block.getDiagram();
+                    int pages = diagram.getNbImages();
+                    for (int page = 0; page < pages; ++page) {
+                        String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
+                        outputStream = new FileOutputStream(fName);
+                        try {
+                            reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
+                        } finally {
+                            outputStream.close();
+                        }
+                    }
                 }
             }
         } finally {

@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +25,7 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        JLabel data = (JLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         ImageIcon icon = (ImageIcon) data.getIcon();
         final Image image = icon.getImage();
         CopyPasteManager.getInstance().setContents(new Transferable() {
