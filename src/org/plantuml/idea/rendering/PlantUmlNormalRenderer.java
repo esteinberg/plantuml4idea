@@ -2,8 +2,10 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
+import com.intellij.util.ObjectUtils;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.core.DiagramDescription;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -189,9 +191,9 @@ public class PlantUmlNormalRenderer {
 
         ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
 
-        String description = null;
+        DiagramDescription diagramDescription;
         try {
-            description = reader.generateImage(imageStream, page, formatOption);
+            diagramDescription = reader.generateImage(imageStream, 5, formatOption);
         } catch (UnsupportedOperationException e) {
             throw e;
         } catch (Exception e) {
@@ -206,7 +208,9 @@ public class PlantUmlNormalRenderer {
         }
 
 
-        if (description.contains("entities")) {
+        ObjectUtils.assertNotNull(diagramDescription);
+        String description = diagramDescription.getDescription();
+        if (description != null && description.contains("entities")) {
             description = "ok";
         }
 
