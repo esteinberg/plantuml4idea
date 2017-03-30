@@ -29,8 +29,6 @@ public class Usage extends JTextArea {
     public Usage(String prefix) {
         setOpaque(false);
         setText(prefix + TEXT);
-        setFont(getFont().deriveFont(14f)); // will only change size to 12pt
         setEditable(false);
-
     }
 }
