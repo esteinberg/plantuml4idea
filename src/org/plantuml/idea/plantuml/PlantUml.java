@@ -49,7 +49,8 @@ public class PlantUml {
 
         public abstract FileFormat getFormat();
     }
-    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt";
+
+    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt|math|latex";
     private static Pattern sourcePattern =
             Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
 
