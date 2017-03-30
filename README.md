@@ -12,8 +12,8 @@ Contributors:
  * [Ivan Mamontov](https://github.com/IvanMamontov)
  * [Henady Zakalusky](https://github.com/hza)
  * [Max Gorbunov](https://github.com/6zow)
- * [Vojtěch Krása] (https://github.com/krasa)
- * [Andrew Korolev] (https://github.com/koroandr)
+ * [Vojtěch Krása](https://github.com/krasa)
+ * [Andrew Korolev](https://github.com/koroandr)
 
 # Features
 
