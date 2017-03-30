@@ -33,7 +33,7 @@ Contributors:
 
 * debug logs can be enabled by adding '#org.plantuml' to [Help | Debug Log Settings] 
 
-##There are following branches:
+## There are following branches:
 
 ### master
 * Current production branch
