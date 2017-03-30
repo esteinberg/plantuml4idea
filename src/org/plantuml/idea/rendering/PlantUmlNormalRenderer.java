@@ -193,7 +193,7 @@ public class PlantUmlNormalRenderer {
 
         DiagramDescription diagramDescription;
         try {
-            diagramDescription = reader.generateImage(imageStream, 5, formatOption);
+            diagramDescription = reader.generateImage(imageStream, page, formatOption);
         } catch (UnsupportedOperationException e) {
             throw e;
         } catch (Exception e) {
