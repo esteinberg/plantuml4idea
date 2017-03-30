@@ -13,6 +13,7 @@
             <ul>
               <li>NPE fix for AndroidStudio</li>
               <li>PlantUml library upgrade to v2017.08</li>
+              <li>Added support for *.plantuml file extension</li>
             </ul>
             <p>2.5</p>
             <ul>
