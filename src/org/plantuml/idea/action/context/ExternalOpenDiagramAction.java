@@ -9,7 +9,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 import org.plantuml.idea.util.UIUtils;
@@ -56,8 +55,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 
 	protected int getPage(AnActionEvent e) {
 		PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-		ImageItem imageWithData = data.getImageWithData();
-		return imageWithData.getPage();
+		return data.getPage();
 	}
 
     private String getSource(Project project) {

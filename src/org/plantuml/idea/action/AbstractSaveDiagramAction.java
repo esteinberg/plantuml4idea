@@ -13,10 +13,12 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.util.UIUtils;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -39,6 +41,13 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
 
         homeDir = LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home"));
+    }
+
+    public AbstractSaveDiagramAction() {
+    }
+
+    public AbstractSaveDiagramAction(@Nullable String text, @Nullable String description, @Nullable Icon icon) {
+        super(text, description, icon);
     }
 
     @Override
@@ -83,7 +92,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
-                    UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom(), -1);
+                    UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom(), getPageNumber(e));
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";
@@ -92,6 +101,10 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 Messages.showErrorDialog(message, title);
             }
         }
+    }
+
+    protected int getPageNumber(AnActionEvent e) {
+        return -1;
     }
 
     protected abstract String getSource(Project project);

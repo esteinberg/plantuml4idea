@@ -12,7 +12,7 @@
             <p>2.7</p>
             <ul>
               <li>Fixed opening in an external editor for multiple-page diagrams</li>
-              <li>Fixed edge case for Copy Diagram As Txt actions</li>
+              <li>Fixed edge cases for Copy and Save diagram actions</li>
             </ul>
             <p>2.6</p>
             <ul>

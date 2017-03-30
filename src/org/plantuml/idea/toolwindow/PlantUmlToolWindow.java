@@ -326,14 +326,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return true;
     }
 
-    public void displayImage(RenderCacheItem cacheItem, int i, ImageItem imageWithData) {
+    public void displayImage(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {
         if (imageWithData == null) {
-            throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + i + ", cacheItem=" + cacheItem);
+            throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
-        PlantUmlImageLabel label = new PlantUmlImageLabel(imageWithData, i, cacheItem.getRenderRequest());
+        PlantUmlImageLabel label = new PlantUmlImageLabel(imageWithData, pageNumber, cacheItem.getRenderRequest());
         addScrollBarListeners(label);
 
-        if (i != 0) {
+        if (pageNumber != 0 && imagesPanel.getComponentCount() > 0) {
             imagesPanel.add(separator());
         }
         imagesPanel.add(label);

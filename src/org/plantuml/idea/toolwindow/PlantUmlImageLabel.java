@@ -19,6 +19,7 @@ import java.net.URI;
 
 public class PlantUmlImageLabel extends JLabel {
     private static final AnAction[] AN_ACTIONS = {
+        new SaveDiagramToFileContextAction(),
             new CopyDiagramToClipboardContextAction(),
             Separator.getInstance(),
             new CopyDiagramAsTxtToClipboardContextAction(),
@@ -52,6 +53,10 @@ public class PlantUmlImageLabel extends JLabel {
 
     public ImageItem getImageWithData() {
         return imageWithData;
+    }
+
+    public int getPage() {
+        return imageWithData.getPage();
     }
 
     public RenderRequest getRenderRequest() {
