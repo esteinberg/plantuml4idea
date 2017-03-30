@@ -11,6 +11,7 @@
         <![CDATA[
             <p>2.6</p>
             <ul>
+              <li>NPE fix for AndroidStudio</li>
               <li>PlantUml library upgrade to v2017.08</li>
             </ul>
             <p>2.5</p>
