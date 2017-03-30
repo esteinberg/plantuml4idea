@@ -32,11 +32,14 @@ public class RenderResult {
 
 
     public byte[] getFirstDiagramBytes() {
-        if (imageItems.size() == 0) {
-            return null;
-        }
-        return imageItems.get(0).getImageBytes();
-    }
+		for (ImageItem imageItem : imageItems) {
+			if (PlantUmlNormalRenderer.TITLE_ONLY.equals(imageItem.getDescription())) {
+				continue;
+			}
+			return imageItem.getImageBytes();
+		}
+		return null;
+	}
 
     public RenderingType getStrategy() {
         return strategy;
