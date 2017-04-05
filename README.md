@@ -30,7 +30,7 @@ Contributors:
 * Image cache size can be tuned in the settings, if you have not enough heap.
 
 # Developer notes
-
+* [How to setup the project](https://cloud.githubusercontent.com/assets/1160875/24718610/f66fd85a-1a36-11e7-8180-59100603a740.gif)
 * debug logs can be enabled by adding '#org.plantuml' to [Help | Debug Log Settings] 
 
 ## There are following branches:
