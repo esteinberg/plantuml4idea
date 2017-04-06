@@ -37,7 +37,6 @@ Contributors:
 
 ### master
 * Current production branch
-* No setup needed, checkout and run.
 
 ### 1.x
 * deprecated branch, to be deleted
