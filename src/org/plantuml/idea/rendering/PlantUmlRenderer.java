@@ -164,7 +164,7 @@ public class PlantUmlRenderer {
 
     protected static void addTitle(List<String> titles, Display display) {
         if (display.size() > 0) {
-            titles.add(display.asStringWithHiddenNewLine());
+            titles.add(display.toString());
         } else {
             titles.add(null);
         }
