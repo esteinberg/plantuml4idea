@@ -1,0 +1,40 @@
+plugins {
+  id "org.jetbrains.intellij" version "0.2.9"
+}
+
+apply plugin: 'java'
+
+compileJava.options.encoding = 'UTF-8'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+dependencies {
+    compile files('lib/plantuml.1.2017.12.jar') 
+    testCompile 'junit:junit:4.12'
+}
+
+// non-standad layout was used, hence this override
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+        resources {
+            srcDirs = ['testData']
+        }
+    }
+}
+// non-standad layout was used, hence this override
+processResources {
+    into('META-INF') {
+		from('META-INF') 
+	}
+}

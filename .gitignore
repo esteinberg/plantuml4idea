@@ -10,3 +10,9 @@ out
 .DS_Store
 target/
 plantuml4idea.zip
+
+# Gradle specific ignores
+.gradle
+/build/
+gradle-app.setting
+.gradletasknamecache
