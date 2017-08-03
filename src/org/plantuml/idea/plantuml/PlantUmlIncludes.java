@@ -1,27 +1,24 @@
 package org.plantuml.idea.plantuml;
 
-import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
-
-import java.io.File;
-import java.io.StringReader;
-import java.util.*;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.rendering.RenderingCancelledException;
-
+import com.intellij.openapi.application.TransactionGuard;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.util.ThrowableRunnable;
-import com.intellij.util.ui.UIUtil;
-
 import net.sourceforge.plantuml.BlockUmlBuilder;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.rendering.RenderingCancelledException;
+
+import java.io.File;
+import java.io.StringReader;
+import java.util.*;
+
+import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
 
 public class PlantUmlIncludes {
 
@@ -41,10 +38,10 @@ public class PlantUmlIncludes {
                 }
                 return fileLongHashMap;
             }
-		} catch (InterruptedException e) {
-			throw new RenderingCancelledException(e);
-		} catch (Throwable e) {
-			throw new RuntimeException(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
+        } catch (InterruptedException e) {
+            throw new RenderingCancelledException(e);
+        } catch (Throwable e) {
+            throw new RuntimeException(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
         } finally {
             PlantUmlSettings.getInstance().applyPlantumlOptions();
         }
@@ -52,16 +49,25 @@ public class PlantUmlIncludes {
     }
 
 	private static void saveModifiedFiles(final Set<File> files) throws Throwable {
-		UIUtil.invokeAndWaitIfNeeded(new ThrowableRunnable() {
-            @Override
-			public void run() throws Throwable {
-                FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
-                Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
-                for (Document unsavedDocument : unsavedDocuments) {
-                    fileDocumentManager.saveDocument(unsavedDocument);
+        try {
+            TransactionGuard.getInstance().submitTransactionAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+                    Set<Document> unsavedDocuments = getUnsavedDocuments(files, fileDocumentManager);
+                    for (Document unsavedDocument : unsavedDocuments) {
+                        fileDocumentManager.saveDocument(unsavedDocument);
+                    }
                 }
+            });
+        } catch (Throwable e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InterruptedException) {
+                throw new RenderingCancelledException((InterruptedException) cause);
             }
-        });
+            throw e;
+        }
+        ;
     }
 
     @NotNull
