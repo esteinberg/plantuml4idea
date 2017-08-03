@@ -98,11 +98,11 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             String beforeInclude = StringUtils.substringBefore(source, "!include");
             int includeLineNumber = StringUtils.splitPreserveAllTokens(beforeInclude, "\n").length;
             //todo hack because plantuml returns line number from source with inlined includes
-            if (syntaxResult.getErrorLinePosition() < includeLineNumber) {
+            if (syntaxResult.getLineLocation().getPosition() < includeLineNumber) {
                 ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
-                        syntaxResult.getErrors(),
-                        syntaxResult.getSuggest(),
-                        syntaxResult.getErrorLinePosition()
+                    syntaxResult.getErrors(),
+                    syntaxResult.getSuggest(),
+                    syntaxResult.getLineLocation().getPosition()
                 );
                 result.add(errorSourceAnnotation);
             }
