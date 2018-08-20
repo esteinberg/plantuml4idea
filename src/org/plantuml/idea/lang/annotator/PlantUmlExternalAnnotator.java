@@ -101,7 +101,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             if (syntaxResult.getLineLocation().getPosition() < includeLineNumber) {
                 ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
                     syntaxResult.getErrors(),
-                    syntaxResult.getSuggest(),
+                    null,     // syntaxResult.getSuggest(),   missing since version 1.2018.7
                     syntaxResult.getLineLocation().getPosition()
                 );
                 result.add(errorSourceAnnotation);

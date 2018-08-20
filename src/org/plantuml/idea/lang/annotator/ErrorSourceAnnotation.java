@@ -13,6 +13,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ErrorSourceAnnotation implements SourceAnnotation {
 
     private List<String> cleanupSuggestions(Collection<String> suggest) {
         if (suggest == null)
-            return new LinkedList<String>();
+            return Collections.emptyList();
         LinkedList<String> suggestions = new LinkedList<String>(suggest);
         suggestions.remove("Did you mean:");
         return suggestions;

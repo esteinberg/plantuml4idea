@@ -16,7 +16,7 @@ import org.plantuml.idea.util.Utils;
  * @author Max Gorbunov
  * @author Eugene Steinberg
  */
-@State(name = "PlantUmlSettings", storages = {@Storage(file = StoragePathMacros.APP_CONFIG + "/plantuml.cfg")})
+@State(name = "PlantUmlSettings", storages = {@Storage(file ="plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
 
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;

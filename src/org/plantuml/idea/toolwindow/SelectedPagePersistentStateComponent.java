@@ -11,7 +11,7 @@ import org.plantuml.idea.rendering.RenderCacheItem;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-@State(name = "PlantUmlSelectedPages", storages = {@Storage(file = StoragePathMacros.APP_CONFIG + "/plantuml-selectedPages.xml")})
+@State(name = "PlantUmlSelectedPages", storages = {@Storage(file ="plantuml-selectedPages.xml")})
 public class SelectedPagePersistentStateComponent implements PersistentStateComponent<SelectedPagePersistentStateComponent.SelectedPages> {
 
     public static final int MAX_ENTRIES = 50;
