@@ -1,5 +1,7 @@
 package org.plantuml.idea.util;
 
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -31,6 +33,10 @@ import java.io.IOException;
 public class UIUtils {
     private static Logger logger = Logger.getInstance(UIUtils.class);
 
+    public static final NotificationGroup NOTIFICATION = new NotificationGroup("PlantUML integration plugin",
+            NotificationDisplayType.BALLOON, true);
+
+    
     public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
         return ImageIO.read(input);
@@ -144,4 +150,12 @@ public class UIUtils {
     }
 
 
+    public static boolean hasAnyImage(Project project) {
+        PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(project);
+        boolean hasAnyImage = false;
+        if (plantUmlToolWindow != null) {
+            hasAnyImage = plantUmlToolWindow.getNumPages() > 0;
+        }
+        return hasAnyImage;
+    }
 }

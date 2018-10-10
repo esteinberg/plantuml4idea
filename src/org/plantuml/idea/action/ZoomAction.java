@@ -1,7 +1,9 @@
 package org.plantuml.idea.action;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
@@ -22,6 +24,15 @@ public abstract class ZoomAction extends DumbAwareAction {
     protected void setZoom(Project project, int zoom) {
         PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
         plantUML.setZoom(zoom);
+    }
+
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
+        }
     }
 
 }

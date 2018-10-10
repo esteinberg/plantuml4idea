@@ -1,5 +1,6 @@
 package org.plantuml.idea.action;
 
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
@@ -8,19 +9,25 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.RenderCacheItem;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+
+import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
 
 /**
  * @author Eugene Steinberg
@@ -52,22 +59,32 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+
+        String selectedSource = getSource(e.getProject());
+
+        if (StringUtils.isBlank(selectedSource)) {
+            Notifications.Bus.notify(NOTIFICATION.createNotification("No PlantUML source code", MessageType.WARNING));
+            return;
+        }
+        
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
 
         VirtualFile baseDir = lastDir;
 
         if (baseDir == null) {
-            if (e.getProject() == null) {
+            if (project == null) {
                 baseDir = homeDir;
             } else {
-                baseDir = e.getProject().getBaseDir();
+                baseDir = project.getBaseDir();
             }
         }
+
 
         String defaultFileName = getDefaultFileName(e.getProject());
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
-                fsd, e.getProject()).save(baseDir, defaultFileName);
+                fsd, project).save(baseDir, defaultFileName);
 
         if (wrapper != null) {
             try {
@@ -86,13 +103,13 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 } catch (Exception ex) {
                     throw new IOException("Extension '" + extension + "' is not supported");
                 }
-                String selectedSource = getSource(e.getProject());
+
 
                 String fileNameTemplate = base + "-%03d." + extension;
 
-                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
+                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
-                    UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom(), getPageNumber(e));
+                        UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";
@@ -107,10 +124,28 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         return -1;
     }
 
-    protected abstract String getSource(Project project);
 
     private String getDefaultFileName(Project myProject) {
         VirtualFile selectedFile = UIUtils.getSelectedFile(FileEditorManager.getInstance(myProject), FileDocumentManager.getInstance());
         return selectedFile == null ? FILENAME : selectedFile.getNameWithoutExtension();
+    }
+
+    protected String getSource(Project project) {
+        String selectedSource = null;
+        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+        if (displayedItem != null) {
+            selectedSource = displayedItem.getSource();
+        }
+
+        return selectedSource;
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
+        }
     }
 }

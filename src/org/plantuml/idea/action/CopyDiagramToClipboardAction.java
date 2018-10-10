@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
@@ -54,14 +55,11 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
+    public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
-            if (toolWindow != null) {
-                e.getPresentation().setEnabled(toolWindow.getImagesPanel().getComponentCount() == 1);
-            }
+            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
         }
     }
+
 }
