@@ -51,7 +51,7 @@ public class PlantUmlNormalRenderer {
 
             if (requestedPageNumber >= 0) {
                 outputStream = new FileOutputStream(fileName);
-                reader.generateImage(outputStream, requestedPageNumber, new FileFormatOption(format.getFormat()));
+                reader.outputImage(outputStream, requestedPageNumber, new FileFormatOption(format.getFormat()));
                 outputStream.close();
             } else {
                 List<BlockUml> blocks = reader.getBlocks();
@@ -64,7 +64,7 @@ public class PlantUmlNormalRenderer {
                         String fName = imageСounter == 0 ? fileName : String.format(fileNameFormat, imageСounter);
                         outputStream = new FileOutputStream(fName);
                         try {
-                            reader.generateImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
+                            reader.outputImage(outputStream, imageСounter++, new FileFormatOption(format.getFormat()));
                         } finally {
                             outputStream.close();
                         }
@@ -230,7 +230,7 @@ public class PlantUmlNormalRenderer {
     protected byte[] generateSvg(SourceStringReader reader, int i) throws IOException {
         long start = System.currentTimeMillis();
         ByteArrayOutputStream svgStream = new ByteArrayOutputStream();
-        reader.generateImage(svgStream, i, SVG);
+        reader.outputImage(svgStream, i, SVG);
         byte[] svgBytes = svgStream.toByteArray();
         logger.debug("generated ", SVG.getFileFormat(), " for page ", i, " in ", System.currentTimeMillis() - start, "ms");
         return svgBytes;
