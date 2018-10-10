@@ -12,6 +12,7 @@
             <p>2.12</p>
             <ul>
               <li>PlantUml library upgrade to v1.2018.11</li>
+              <li>Fixed diagram saving</li>
             </ul>
             <p>2.11</p>
             <ul>
