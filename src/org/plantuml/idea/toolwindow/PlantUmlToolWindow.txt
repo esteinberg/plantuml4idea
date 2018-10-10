@@ -6,6 +6,9 @@
         ?displayed item exist 
         &refresh requested
             +execute REFRESH
+        ?displayed item exist 
+        &zoom requested
+            +execute zoom
         ?displayed item exist
         &selected included file 
             ?included file changed
