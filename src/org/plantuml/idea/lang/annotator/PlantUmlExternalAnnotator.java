@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +17,7 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.UIUtils;
+import org.plantuml.idea.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,6 +36,7 @@ import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_DISABLE_S
  */
 public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAnnotationResult> {
     private static final Logger logger = Logger.getInstance(PlantUmlExternalAnnotator.class);
+
     @Nullable
     @Override
     public PsiFile collectInformation(@NotNull PsiFile file) {
@@ -93,7 +94,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         long start = currentTimeMillis();
         SyntaxResult syntaxResult = checkSyntax(file, source);
         logger.debug("syntax checked in ", currentTimeMillis() - start, "ms");
-        
+
         if (syntaxResult.isError()) {
             String beforeInclude = StringUtils.substringBefore(source, "!include");
             int includeLineNumber = StringUtils.splitPreserveAllTokens(beforeInclude, "\n").length;
@@ -111,17 +112,13 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     }
 
     private SyntaxResult checkSyntax(PsiFile file, String source) {
-
-        try {
             File baseDir = UIUtils.getParent(file.getVirtualFile());
             if (baseDir != null) {
-                FileSystem.getInstance().setCurrentDir(baseDir);
+                Utils.setPlantUmlDir(baseDir);
+
                 PlantUmlIncludes.commitIncludes(source, baseDir);
             }
             return SyntaxChecker.checkSyntaxFair(source);
-        } finally {
-            FileSystem.getInstance().reset();
-        }
     }
 
     private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {

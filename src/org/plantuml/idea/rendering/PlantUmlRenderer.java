@@ -13,6 +13,7 @@ import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,10 +53,9 @@ public class PlantUmlRenderer {
      * to provided values
      */
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-        try {
             File baseDir = renderRequest.getBaseDir();
             if (baseDir != null) {
-                FileSystem.getInstance().setCurrentDir(baseDir);
+                Utils.setPlantUmlDir(baseDir);
             }
             long start = System.currentTimeMillis();
 
@@ -73,9 +73,6 @@ public class PlantUmlRenderer {
                 renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
             }
             return renderResult;
-        } finally {
-            FileSystem.getInstance().reset();
-        }
     }
 
     public static Pair<Integer, Titles> zoomDiagram(SourceStringReader reader, int zoom) {

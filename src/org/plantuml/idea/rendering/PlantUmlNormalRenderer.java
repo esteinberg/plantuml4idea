@@ -3,13 +3,17 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import com.intellij.util.ObjectUtils;
-import net.sourceforge.plantuml.*;
+import net.sourceforge.plantuml.BlockUml;
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
+import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
+import org.plantuml.idea.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,7 +46,7 @@ public class PlantUmlNormalRenderer {
         FileOutputStream outputStream = null;
         try {
             if (baseDir != null) {
-                FileSystem.getInstance().setCurrentDir(baseDir);
+                Utils.setPlantUmlDir(baseDir);
             }
             PlantUmlIncludes.commitIncludes(source, baseDir);
             SourceStringReader reader = new SourceStringReader(source);
@@ -72,7 +76,6 @@ public class PlantUmlNormalRenderer {
                 }
             }
         } finally {
-            FileSystem.getInstance().reset();
             if (outputStream != null) {
                 outputStream.close();
             }
