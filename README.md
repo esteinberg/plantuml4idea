@@ -44,5 +44,5 @@ Contributors:
 ### grammar
 * Contains new experimental syntax support
 * Grammar classes can be generated using tools/grammar-gen.sh
-* This script can run automatically when you run the plugin using "Plugin" Run/Debug confuguration. Just add the script
+* This script can run automatically when you run the plugin using "Plugin" Run/Debug configuration. Just add the script
 above as an external tool and make it run before the "Make" step.
