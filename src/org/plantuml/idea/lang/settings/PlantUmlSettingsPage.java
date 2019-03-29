@@ -26,6 +26,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextField renderDelay;
     private JTextField cacheSize;
     private JCheckBox renderUrlLinks;
+    private JCheckBox usePreferentiallyGRAPHIZ_DOT;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -94,6 +95,7 @@ public class PlantUmlSettingsPage implements Configurable {
         cacheSize.setText(data.getCacheSize());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         renderUrlLinks.setSelected(data.isRenderUrlLinks());
+        usePreferentiallyGRAPHIZ_DOT.setSelected(data.isNeverOverrideGRAPHIZ_DOT());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -102,6 +104,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setCacheSize(cacheSize.getText());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setRenderUrlLinks(renderUrlLinks.isSelected());
+        data.setNeverOverrideGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -113,6 +116,7 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
+        if (usePreferentiallyGRAPHIZ_DOT.isSelected() != data.isNeverOverrideGRAPHIZ_DOT()) return true;
         return false;
     }
 }
