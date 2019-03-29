@@ -4,6 +4,10 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
+import com.intellij.util.ImageLoader;
+import com.intellij.util.ui.ImageUtil;
+import com.intellij.util.ui.JBImageIcon;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.context.*;
@@ -19,7 +23,7 @@ import java.net.URI;
 
 public class PlantUmlImageLabel extends JLabel {
     private static final AnAction[] AN_ACTIONS = {
-        new SaveDiagramToFileContextAction(),
+            new SaveDiagramToFileContextAction(),
             new CopyDiagramToClipboardContextAction(),
             Separator.getInstance(),
             new CopyDiagramAsTxtToClipboardContextAction(),
@@ -67,7 +71,7 @@ public class PlantUmlImageLabel extends JLabel {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.hasImage()) {
-            setDiagram(imageWithData, this, 100);
+            setDiagram(imageWithData, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
@@ -78,28 +82,17 @@ public class PlantUmlImageLabel extends JLabel {
      * Scales the image and sets it to label
      *
      * @param imageItem source image and url data
-     * @param label            destination label
-     * @param zoom             zoom factor
+     * @param label     destination label
      */
-    private static void setDiagram(@NotNull final ImageItem imageItem, final JLabel label, int zoom) {
+    private static void setDiagram(@NotNull final ImageItem imageItem, final JLabel label) {
         Image image = imageItem.getImage();
-        int newWidth;
-        int newHeight;
         Image scaledImage;
 
+        JBUI.ScaleContext ctx = JBUI.ScaleContext.create(label);
+        scaledImage = ImageUtil.ensureHiDPI(image, ctx);
+        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
-        if (zoom == 100) { // default zoom, no scaling
-            newWidth = image.getWidth(label);
-            newHeight = image.getHeight(label);
-            scaledImage = image;
-        } else {
-            newWidth = Math.round(image.getWidth(label) * zoom / 100.0f);
-            newHeight = Math.round(image.getHeight(label) * zoom / 100.0f);
-            scaledImage = image.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
-        }
-
-        label.setIcon(new ImageIcon(scaledImage));
-        label.setPreferredSize(new Dimension(newWidth, newHeight));
+        label.setIcon(new JBImageIcon(scaledImage));
         label.addMouseListener(new PopupHandler() {
 
             @Override
@@ -136,4 +129,6 @@ public class PlantUmlImageLabel extends JLabel {
             label.add(button);
         }
     }
+
+
 }
