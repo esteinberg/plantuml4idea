@@ -14,6 +14,7 @@
               <li>PlantUml library upgrade to v1.2019.3</li>
               <li>Fixed image scaling in Windows 10</li>
               <li>Added MindMap support</li>
+              <li>Added Gantt support</li>
             <p>2.12</p>
             <ul>
               <li>PlantUml library upgrade to v1.2018.11</li>
