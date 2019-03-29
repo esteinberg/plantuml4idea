@@ -50,7 +50,7 @@ public class PlantUml {
         public abstract FileFormat getFormat();
     }
 
-    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt|math|latex";
+    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt|math|latex|mindmap";
     private static Pattern sourcePattern =
             Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
 
@@ -104,8 +104,12 @@ public class PlantUml {
             Pattern.compile("^\\s*\\*\\s", Pattern.MULTILINE);
 
     private static String stripComments(String source) {
-        Matcher matcher = sourceCommentPattern.matcher(source);
-        return matcher.replaceAll("");
+        if (source.contains("@startmindmap")) { //TODO something smarter
+            return source;
+        } else {
+            Matcher matcher = sourceCommentPattern.matcher(source);
+            return matcher.replaceAll("");
+        } 
     }
 
 }
