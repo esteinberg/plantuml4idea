@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
+import com.intellij.util.ui.JBUI;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
@@ -103,7 +104,7 @@ public class PlantUmlRenderer {
             UmlDiagram umlDiagram = (UmlDiagram) diagram;
             Scale scale = umlDiagram.getScale();
             if (scale == null) {
-                umlDiagram.setScale(new ScaleSimple(zoom / 100f));
+                umlDiagram.setScale(new ScaleSimple(getSystemScale() * zoom / 100f));
             }
         } else if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
@@ -112,11 +113,15 @@ public class PlantUmlRenderer {
                     DescriptionDiagram descriptionDiagram = (DescriptionDiagram) page;
                     Scale scale = descriptionDiagram.getScale();
                     if (scale == null) {
-                        descriptionDiagram.setScale(new ScaleSimple(zoom / 100f));
+                        descriptionDiagram.setScale(new ScaleSimple(getSystemScale() * zoom / 100f));
                     }
                 }
             }
         }
+    }
+
+    private static double getSystemScale() {
+        return JBUI.ScaleContext.create().getScale(JBUI.ScaleType.SYS_SCALE);
     }
 
     @NotNull

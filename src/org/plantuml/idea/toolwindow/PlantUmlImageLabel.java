@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
-import com.intellij.util.ImageLoader;
 import com.intellij.util.ui.ImageUtil;
 import com.intellij.util.ui.JBImageIcon;
 import com.intellij.util.ui.JBUI;
@@ -90,7 +89,7 @@ public class PlantUmlImageLabel extends JLabel {
 
         JBUI.ScaleContext ctx = JBUI.ScaleContext.create(label);
         scaledImage = ImageUtil.ensureHiDPI(image, ctx);
-        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
+//        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
         label.setIcon(new JBImageIcon(scaledImage));
         label.addMouseListener(new PopupHandler() {
