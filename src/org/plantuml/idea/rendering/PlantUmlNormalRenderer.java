@@ -149,7 +149,8 @@ public class PlantUmlNormalRenderer {
         boolean shouldRender = pageRequested && (obsolete || !cachedItem.hasImage(i));
 
         if (shouldRender) {
-            renderResult.addRenderedImage(generateImageItem(renderRequest, documentSource, sourceSplit[i], reader, formatOption, i, i, RenderingType.NORMAL, titles.get(i)));
+            ImageItem imageItem = generateImageItem(renderRequest, documentSource, sourceSplit[i], reader, formatOption, i, i, RenderingType.NORMAL, titles.get(i));
+            renderResult.addRenderedImage(imageItem);
         } else if (obsolete) {
             logger.debug("page ", i, "  title only");
             renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), documentSource, sourceSplit[i], i, TITLE_ONLY, null, null, RenderingType.NORMAL, titles.get(i)));
@@ -162,10 +163,12 @@ public class PlantUmlNormalRenderer {
     private void normalRendering(RenderRequest renderRequest, String[] sourceSplit, String documentSource, SourceStringReader reader, Titles titles, RenderResult renderResult, FileFormatOption formatOption, boolean containsIncludedNewPage, int i, boolean pageRequested) throws IOException {
         String pageSource = pageSource(sourceSplit, containsIncludedNewPage, i);
         if (pageRequested) {
-            renderResult.addRenderedImage(generateImageItem(renderRequest, documentSource, pageSource, reader, formatOption, i, i, RenderingType.NORMAL, titles.get(i)));
+            ImageItem imageItem = generateImageItem(renderRequest, documentSource, pageSource, reader, formatOption, i, i, RenderingType.NORMAL, titles.get(i));
+            renderResult.addRenderedImage(imageItem);
         } else {
             logger.debug("page ", i, "  title only");
-            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, i, TITLE_ONLY, null, null, RenderingType.NORMAL, titles.get(i)));
+            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, i, TITLE_ONLY, null, null, RenderingType.NORMAL, titles.get(i));
+            renderResult.addUpdatedTitle(imageItem);
         }
     }
 

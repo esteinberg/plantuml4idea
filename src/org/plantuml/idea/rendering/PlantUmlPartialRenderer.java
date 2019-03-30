@@ -117,7 +117,8 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             logger.warn("too many titles " + titles + ", partialSource=" + partialSource);
         }
         try {
-            return new ImageItem(page, generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0)));
+            ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0));
+            return new ImageItem(page, item);
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
