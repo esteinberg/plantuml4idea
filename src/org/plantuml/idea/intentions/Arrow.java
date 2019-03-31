@@ -40,15 +40,15 @@ public class Arrow {
 
     private boolean isArrowCharAtCaret() {
         char currentChar = chars[caretOffset];
-        return isNotWhitespace(currentChar);
+        return isArrowChar(currentChar);
     }
 
     private boolean processPosition(int position) {
         char currentChar = chars[position];
-        boolean currentIsNotWhitespace = isNotWhitespace(currentChar);
+        boolean currentIsArrowChar = isArrowChar(currentChar);
 
-        boolean continueTraversing = currentIsNotWhitespace; //continue traversing when caret is in middle
-        if (currentIsNotWhitespace && isOnEdge(position)) {
+        boolean continueTraversing = currentIsArrowChar; //continue traversing when caret is in middle
+        if (currentIsArrowChar && isOnEdge(position)) {
             continueTraversing = savePosition(position);
         }
         if (isArrowBody(currentChar)) {
@@ -56,6 +56,7 @@ public class Arrow {
         }
         return continueTraversing;
     }
+
 
     private boolean savePosition(int position) {
         boolean continueTraversing;
@@ -77,10 +78,19 @@ public class Arrow {
     private boolean isOnEdge(int currentPosition) {
         char charRight = chars.length > currentPosition + 1 ? chars[currentPosition + 1] : ' ';
         char charLeft = currentPosition - 1 >= 0 ? chars[currentPosition - 1] : ' ';
-        return isWhitespace(charLeft) || isWhitespace(charRight);
+        return isWhitespace(charLeft) || isWhitespace(charRight) || isLetterOrDigitExceptArrowChars(charLeft) || isLetterOrDigitExceptArrowChars(charRight);
+    }
+
+    private boolean isLetterOrDigitExceptArrowChars(char c) {
+        return Character.isLetterOrDigit(c) && c != 'o' && c != 'x';
     }
 
 
+    private boolean isArrowChar(char c) {
+        return c == 'o' || c == 'x' || (isNotWhitespace(c) && !Character.isLetterOrDigit(c));
+    }
+    
+    
     private boolean isNotWhitespace(char currentChar) {
         return currentChar != ' ';
     }

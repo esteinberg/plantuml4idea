@@ -72,6 +72,21 @@ public class ArrowTest {
         assertThat(" <><>><as> ").isNotValidArrow();
     }
 
+    @Test
+    public void arrowFinding2() throws Exception {
+        assertThat("Alice-->Bob").withCaretOnPosition(4).isNotValidArrow();
+        assertThat("Alice-->Bob").withCaretOnPosition(5).hasEndpointsOn(5, 7);
+        assertThat("Alice-->Bob").withCaretOnPosition(6).hasEndpointsOn(5, 7);
+        assertThat("Alice-->Bob").withCaretOnPosition(7).hasEndpointsOn(5, 7);
+        assertThat("Alice-->Bob").withCaretOnPosition(8).hasEndpointsOn(5, 7);
+        assertThat("Alice-->Bob").withCaretOnPosition(9).isNotValidArrow();
+
+        assertThat("Alice->oBob").withCaretOnPosition(5).hasEndpointsOn(5, 7);
+        assertThat("Alice->oBob").withCaretOnPosition(6).hasEndpointsOn(5, 7);
+        assertThat("Alice->xBob").withCaretOnPosition(7).hasEndpointsOn(5, 7);
+        assertThat("Alice->xBob").withCaretOnPosition(8).hasEndpointsOn(5, 7);
+    }
+
     private AssertStep assertThat(String s) {
         return new AssertStep(s);
     }

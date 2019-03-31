@@ -1,9 +1,9 @@
 ' "Reverse arrow" "true"
 <caret>@startuml<caret>
 
-Alice <caret>->    Bob: foo
-Alice -<caret>->   Bob: foo
-Alice ---<caret>>  Bob: foo
+Alice<caret>->Bob: foo
+Alice-<caret>->Bob: foo
+Alice---<caret>>Bob: foo
 <caret>
           <caret>
 Alice -<caret>-    Bob: foo

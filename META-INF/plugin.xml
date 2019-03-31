@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.14.0</version>
+    <version>2.14.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="182"/>
@@ -12,6 +12,7 @@
             <p>2.14</p>
             <ul>
               <li>Automatic Code Completion Popup</li>
+              <li>Fixed reverse arrow intention</li>
             </ul>
             <p>2.13</p>
             <ul>
