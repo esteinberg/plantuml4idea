@@ -33,6 +33,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String renderDelay = String.valueOf(RENDER_DELAY_DEFAULT_VALUE);
     private String cacheSize = String.valueOf(CACHE_SIZE_DEFAULT_VALUE);
     private boolean autoRender = true;
+    private boolean autoComplete = true;
     private boolean usePreferentiallyGRAPHIZ_DOT = false;
 
     public static PlantUmlSettings getInstance() {
@@ -101,6 +102,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public boolean isAutoRender() {
         return autoRender;
+    }
+
+    public boolean isAutoComplete() {
+        return autoComplete;
+    }
+
+    public void setAutoComplete(boolean autoComplete) {
+        this.autoComplete = autoComplete;
     }
 
     @Nullable

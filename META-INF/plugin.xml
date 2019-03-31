@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.13.3</version>
+    <version>2.14.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="182"/>
@@ -9,6 +9,10 @@
 
     <change-notes>
         <![CDATA[
+            <p>2.14</p>
+            <ul>
+              <li>Automatic Code Completion Popup</li>
+            </ul>
             <p>2.13</p>
             <ul>
               <li>PlantUml library upgrade to v1.2019.3</li>
@@ -156,7 +160,7 @@
             <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
                     icon="/graph/actualZoom.png" text="Actual Zoom"/>
             <separator/>
-            
+
             <action id="PlantUML.PrevPage" description="Prev Page" class="org.plantuml.idea.action.PrevPageAction"
                     icon="/actions/back.png" text="Previous Page"/>
             <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
@@ -165,6 +169,10 @@
             <separator/>
 
             <group id="PlantUML.Settings" icon="/general/settings.png" popup="true">
+                <action id="PlantUML.AutoPoup"
+                        class="org.plantuml.idea.action.AutoPopupToggleAction"
+                        text="Automatic Code Completion Popup"
+                        description="'Settings | Editor | General | Code Completion | Show suggestions as you type' must also be enabled"/>
                 <action id="PlantUML.AutoRender"
                         class="org.plantuml.idea.action.AutoRenderToggleAction"
                         text="Automatically Render"/>
@@ -211,5 +219,9 @@
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>
         <applicationService serviceImplementation="org.plantuml.idea.toolwindow.SelectedPagePersistentStateComponent"/>
+
+        <completion.contributor language="PUML"
+                                implementationClass="org.plantuml.idea.lang.PlantUmlCompletionContributor"/>
+
     </extensions>
 </idea-plugin>
