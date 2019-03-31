@@ -121,7 +121,11 @@ public class PlantUmlRenderer {
     }
 
     private static double getSystemScale() {
-        return JBUI.ScaleContext.create().getScale(JBUI.ScaleType.SYS_SCALE);
+        try {
+            return JBUI.ScaleContext.create().getScale(JBUI.ScaleType.SYS_SCALE);  //TODO API change 2019/03/05
+        } catch (Throwable e) {
+            return 1;
+        }
     }
 
     @NotNull
