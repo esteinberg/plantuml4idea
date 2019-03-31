@@ -103,8 +103,9 @@ public class PlantUmlRenderer {
         if (diagram instanceof UmlDiagram) {
             UmlDiagram umlDiagram = (UmlDiagram) diagram;
             Scale scale = umlDiagram.getScale();
-            if (scale == null) {
-                umlDiagram.setScale(new ScaleSimple(getSystemScale() * zoom / 100f));
+
+            if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
+                umlDiagram.setScale(calculateScale(zoom, scale));
             }
         } else if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
@@ -112,12 +113,26 @@ public class PlantUmlRenderer {
                 if (page instanceof DescriptionDiagram) {
                     DescriptionDiagram descriptionDiagram = (DescriptionDiagram) page;
                     Scale scale = descriptionDiagram.getScale();
-                    if (scale == null) {
-                        descriptionDiagram.setScale(new ScaleSimple(getSystemScale() * zoom / 100f));
+
+                    if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
+                        descriptionDiagram.setScale(calculateScale(zoom, scale));
                     }
                 }
             }
         }
+    }
+
+    @NotNull
+    private static ScaleSimple calculateScale(int zoom, Scale scale) {
+        return new ScaleSimple(getPlantUmlScale(scale) * getSystemScale() * zoom / 100f);
+    }
+
+    private static double getPlantUmlScale(Scale scale) {
+        double plantUmlScale = 1.0;
+        if (scale instanceof ScaleSimple) {
+            plantUmlScale = scale.getScale(1, 1);
+        }
+        return plantUmlScale;
     }
 
     private static double getSystemScale() {

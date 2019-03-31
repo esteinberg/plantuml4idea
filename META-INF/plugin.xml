@@ -19,6 +19,7 @@
               <li>Added option to use GRAPHVIZ_DOT environment variable preferentially</li>
               <li>Grouped file templates</li>
               <li>Restoring scroll position after an error</li>
+              <li>Zooming even when scale is defined in the code</li>
             </ul>
             <p>2.12</p>
             <ul>
