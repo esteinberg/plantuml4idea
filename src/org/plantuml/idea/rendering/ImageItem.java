@@ -39,23 +39,16 @@ public class ImageItem {
     private final UrlData[] urls;
     @Nullable
     private final String title;
+    /**
+     * could have been in RenderResult, since it is currently the same for all pages
+     */
+    @Nullable
+    private final String filename;
     @Nullable
     private final String pageSource;
     @NotNull
     private final String documentSource;
     private byte[] imageBytes;
-
-    public ImageItem(@NotNull ImageItem item, @NotNull String documentSource, @Nullable String title) {
-        this.page = item.page;
-        this.description = item.description;
-        this.pageSource = item.pageSource;
-        this.image = item.image;
-        this.urls = item.urls;
-        this.renderingType = item.renderingType;
-
-        this.documentSource = documentSource;
-        this.title = title;
-    }
 
     public ImageItem(@NotNull File baseDir,
                      @NotNull String documentSource,
@@ -65,13 +58,15 @@ public class ImageItem {
                      @Nullable byte[] imageBytes,
                      @Nullable byte[] svgBytes,
                      @NotNull RenderingType renderingType,
-                     @Nullable String title) {
+                     @Nullable String title,
+                     String filename) {
         this.pageSource = pageSource;
         this.documentSource = documentSource;
         this.page = page;
         this.description = description;
         this.renderingType = renderingType;
         this.title = title;
+        this.filename = filename;
         this.imageBytes = imageBytes;
         if (this.imageBytes != null) {
             try {
@@ -95,6 +90,7 @@ public class ImageItem {
         this.imageBytes = item.imageBytes;
         this.renderingType = item.renderingType;
         this.title = item.title;
+        this.filename = item.filename;
     }
 
     @Nullable
@@ -116,6 +112,11 @@ public class ImageItem {
     @NotNull
     public String getDocumentSource() {
         return documentSource;
+    }
+
+    @Nullable
+    public String getFilename() {
+        return filename;
     }
 
     @Nullable

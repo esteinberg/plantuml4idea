@@ -14,6 +14,7 @@
               <li>Automatic Code Completion Popup</li>
               <li>Fixed reverse arrow intention</li>
               <li>Added settings for encoding and PlantUML config (global include)</li>
+              <li>Using the filename from "@startuml name" when exporting</li>
             </ul>
             <p>2.13</p>
             <ul>

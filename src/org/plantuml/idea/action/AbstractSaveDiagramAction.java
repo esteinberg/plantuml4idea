@@ -9,15 +9,20 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.intellij.util.PathUtilRt;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.PlantUmlRenderer;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
@@ -67,7 +72,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             Notifications.Bus.notify(NOTIFICATION.createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
-        
+
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
 
         VirtualFile baseDir = lastDir;
@@ -76,12 +81,12 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             if (project == null) {
                 baseDir = homeDir;
             } else {
-                baseDir = project.getBaseDir();
+                baseDir = ProjectUtil.guessProjectDir(project);
             }
         }
 
 
-        String defaultFileName = getDefaultFileName(e.getProject());
+        String defaultFileName = getDefaultFileName(e, e.getProject());
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
                 fsd, project).save(baseDir, defaultFileName);
@@ -125,9 +130,34 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     }
 
 
-    private String getDefaultFileName(Project myProject) {
-        VirtualFile selectedFile = UIUtils.getSelectedFile(FileEditorManager.getInstance(myProject), FileDocumentManager.getInstance());
-        return selectedFile == null ? FILENAME : selectedFile.getNameWithoutExtension();
+    private String getDefaultFileName(AnActionEvent e, Project myProject) {
+        String filename = null;
+
+        try {
+            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(myProject);
+            if (plantUmlToolWindow != null) {
+                RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+                int selectedPage = plantUmlToolWindow.getSelectedPage();
+                ImageItem imageItem = displayedItem.getImageItem(selectedPage < 0 ? 0 : selectedPage);
+                if (imageItem != null) {
+                    filename = imageItem.getFilename();
+                }
+                if (filename == null) {
+                    String sourceFilePath = displayedItem.getSourceFilePath();
+                    filename = FileUtilRt.getNameWithoutExtension(PathUtilRt.getFileName(sourceFilePath));
+                }
+            }
+            if (filename != null) {
+                filename = FileUtil.sanitizeFileName(filename);
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+
+        if (filename == null) {
+            filename = FILENAME;
+        }
+        return filename;
     }
 
     protected String getSource(Project project) {

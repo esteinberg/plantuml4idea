@@ -1,7 +1,6 @@
 package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.Pair;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.UmlSource;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +53,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             logger.warn(e1);
             throw e;
         }
-        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null));
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
         return renderResult;
     }
 
@@ -88,7 +87,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
         SourceStringReader reader = newSourceStringReader(partialSource);
         String title = getTitle(reader);
-        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title);
+        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
         logger.debug("updateTitle " + (System.currentTimeMillis() - start));
 
@@ -96,7 +95,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     }
 
     private String getTitle(SourceStringReader reader) {
-        Titles titles = getTitles(1, reader.getBlocks());
+        DiagramInfo.Titles titles = getTitles(1, reader.getBlocks());
         if (titles.size() > 1) {
             throw new PartialRenderingException();
         }
@@ -107,9 +106,9 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private ImageItem renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = newSourceStringReader(partialSource);
-        Pair<Integer, Titles> pages = zoomDiagram(reader, renderRequest.getZoom());
-        Integer totalPages = pages.first;
-        Titles titles = pages.second;
+        DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
+        Integer totalPages = info.getTotalPages();
+        DiagramInfo.Titles titles = info.getTitles();
 
         if (totalPages > 1) {
             throw new PartialRenderingException();
@@ -118,7 +117,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             logger.warn("too many titles " + titles + ", partialSource=" + partialSource);
         }
         try {
-            ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0));
+            ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0), info.getFilename());
             return new ImageItem(page, item);
         } catch (RenderingCancelledException e) {
             throw e;

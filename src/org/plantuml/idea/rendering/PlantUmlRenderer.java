@@ -1,7 +1,6 @@
 package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.util.Pair;
 import com.intellij.util.ui.JBUI;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
@@ -76,11 +75,16 @@ public class PlantUmlRenderer {
             return renderResult;
     }
 
-    public static Pair<Integer, Titles> zoomDiagram(SourceStringReader reader, int zoom) {
+    public static DiagramInfo zoomDiagram(SourceStringReader reader, int zoom) {
         logger.debug("zooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
+        String fileOrDirname = null;
 
+        if (blocks.size() > 1) {
+            logger.error("more than 1 block"); //TODO
+        }
+        
         for (int i = 0; i < blocks.size(); i++) {
             BlockUml block = blocks.get(i);
 
@@ -92,11 +96,13 @@ public class PlantUmlRenderer {
             start = System.currentTimeMillis();
             zoomDiagram(diagram, zoom);
             logger.debug("zoom diagram done in  ", System.currentTimeMillis() - start, " ms");
-
+            fileOrDirname = block.getFileOrDirname();
             totalPages = totalPages + diagram.getNbImages();
+
+            break;
         }
-        Titles titles = getTitles(totalPages, blocks);
-        return new Pair<Integer, Titles>(totalPages, titles);
+        DiagramInfo.Titles titles = getTitles(totalPages, blocks);
+        return new DiagramInfo(totalPages, titles, fileOrDirname);
     }
 
     private static void zoomDiagram(Diagram diagram, int zoom) {
@@ -144,7 +150,7 @@ public class PlantUmlRenderer {
     }
 
     @NotNull
-    protected static Titles getTitles(int totalPages, List<BlockUml> blocks) {
+    protected static DiagramInfo.Titles getTitles(int totalPages, List<BlockUml> blocks) {
         List<String> titles = new ArrayList<String>(totalPages);
         for (BlockUml block : blocks) {
             Diagram diagram = block.getDiagram();
@@ -178,8 +184,9 @@ public class PlantUmlRenderer {
                     addTitle(titles, title.getDisplay());
                 }
             }
+            break;
         }
-        return new Titles(titles);
+        return new DiagramInfo.Titles(titles);
     }
 
 
