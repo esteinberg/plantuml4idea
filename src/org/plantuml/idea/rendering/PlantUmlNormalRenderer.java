@@ -61,6 +61,7 @@ public class PlantUmlNormalRenderer {
                 List<BlockUml> blocks = reader.getBlocks();
                 int imageСounter = 0;
 
+                VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
                 for (BlockUml block : blocks) {
                     Diagram diagram = block.getDiagram();
                     int pages = diagram.getNbImages();
@@ -72,6 +73,7 @@ public class PlantUmlNormalRenderer {
                         } finally {
                             outputStream.close();
                         }
+                        vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, fName));
                     }
                 }
             }
