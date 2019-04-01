@@ -58,8 +58,14 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
+            PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(e.getProject());
+            if (umlToolWindow != null) {
+                int selectedPage = umlToolWindow.getSelectedPage();
+                e.getPresentation().setEnabled(umlToolWindow.getNumPages() == 1 || (umlToolWindow.getNumPages() > 1 && selectedPage != -1));
+            } else {
+                e.getPresentation().setEnabled(false);
+
+            }
         }
     }
-
 }
