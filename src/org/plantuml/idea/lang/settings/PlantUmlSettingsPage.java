@@ -7,6 +7,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox renderUrlLinks;
     private JCheckBox usePreferentiallyGRAPHIZ_DOT;
     private JTextField encoding;
-    private JTextArea config;
+    private JBTextArea config;
     private JTextArea configExample;
 
     public PlantUmlSettingsPage() {
