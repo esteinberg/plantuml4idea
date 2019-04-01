@@ -140,7 +140,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="8c4cb" class="com.intellij.ui.components.JBTextArea" binding="config">
+          <component id="8c4cb" class="javax.swing.JTextArea" binding="config">
             <constraints/>
             <properties>
               <text value=""/>
