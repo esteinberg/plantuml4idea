@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.*;
 
-import static com.intellij.openapi.vfs.CharsetToolkit.UTF8;
-
 public class PlantUmlIncludes {
 
     private static final Logger logger = Logger.getInstance(PlantUmlIncludes.class);
@@ -28,7 +26,7 @@ public class PlantUmlIncludes {
         try {
             if (baseDir != null) {
                 HashMap<File, Long> fileLongHashMap = new HashMap<File, Long>();
-                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), UTF8, new Defines(), new StringReader(source), baseDir, null);
+                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), PlantUmlSettings.getInstance().getEncoding(), Defines.createEmpty(), new StringReader(source), baseDir, null);
                 Set<File> includedFiles = FileWithSuffix.convert(blockUmlBuilder.getIncludedFiles());
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);

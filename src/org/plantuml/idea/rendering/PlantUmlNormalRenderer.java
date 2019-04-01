@@ -49,7 +49,7 @@ public class PlantUmlNormalRenderer {
                 Utils.setPlantUmlDir(baseDir);
             }
             PlantUmlIncludes.commitIncludes(source, baseDir);
-            SourceStringReader reader = new SourceStringReader(source);
+            SourceStringReader reader = Utils.newSourceStringReader(source);
 
             zoomDiagram(reader, zoom);
 
@@ -86,8 +86,8 @@ public class PlantUmlNormalRenderer {
     protected RenderResult doRender(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit) {
         String documentSource = renderRequest.getSource();
         try {
-            // image generation.
-            SourceStringReader reader = new SourceStringReader(documentSource);
+            // image generation.                     
+            SourceStringReader reader = Utils.newSourceStringReader(documentSource);
 
             Pair<Integer, Titles> pages = zoomDiagram(reader, renderRequest.getZoom());
             Integer totalPages = pages.first;

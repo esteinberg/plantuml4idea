@@ -14,6 +14,7 @@ import java.util.List;
 
 import static org.plantuml.idea.rendering.PlantUmlRenderer.getTitles;
 import static org.plantuml.idea.rendering.PlantUmlRenderer.zoomDiagram;
+import static org.plantuml.idea.util.Utils.newSourceStringReader;
 
 public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private static final Logger logger = Logger.getInstance(PlantUmlPartialRenderer.class);
@@ -85,7 +86,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         long start = System.currentTimeMillis();
         logger.debug("updating title, page ", page);
 
-        SourceStringReader reader = new SourceStringReader(partialSource);
+        SourceStringReader reader = newSourceStringReader(partialSource);
         String title = getTitle(reader);
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title);
 
@@ -105,7 +106,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
     private ImageItem renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
-        SourceStringReader reader = new SourceStringReader(partialSource);
+        SourceStringReader reader = newSourceStringReader(partialSource);
         Pair<Integer, Titles> pages = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = pages.first;
         Titles titles = pages.second;

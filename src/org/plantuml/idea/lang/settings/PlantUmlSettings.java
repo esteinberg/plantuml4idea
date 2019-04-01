@@ -16,6 +16,10 @@ import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Max Gorbunov
  * @author Eugene Steinberg
@@ -35,6 +39,8 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean autoRender = true;
     private boolean autoComplete = true;
     private boolean usePreferentiallyGRAPHIZ_DOT = false;
+    private String encoding = "UTF-8";
+    private String config = "";
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -160,11 +166,35 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         }
     }
 
-    public boolean isNeverOverrideGRAPHIZ_DOT() {
+    public boolean isUsePreferentiallyGRAPHIZ_DOT() {
         return usePreferentiallyGRAPHIZ_DOT;
     }
 
-    public void setNeverOverrideGRAPHIZ_DOT(final boolean neverOverrideGRAPHIZ_dot) {
-        this.usePreferentiallyGRAPHIZ_DOT = neverOverrideGRAPHIZ_dot;
+    public void setUsePreferentiallyGRAPHIZ_DOT(boolean usePreferentiallyGRAPHIZ_DOT) {
+        this.usePreferentiallyGRAPHIZ_DOT = usePreferentiallyGRAPHIZ_DOT;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(final String encoding) {
+        this.encoding = encoding;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public void setConfig(final String config) {
+        this.config = config;
+    }
+
+    public List<String> getConfigAsList() {
+        if (config == null) {
+            return Collections.emptyList();
+        }
+        String[] split = config.split("\n");
+        return Arrays.asList(split);
     }
 }
