@@ -9,7 +9,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 public class ExternalOpenDiagramAsPNGAction extends ExternalOpenDiagramAction {
 
     public ExternalOpenDiagramAsPNGAction() {
-        super("Open in external editor as PNG image", AllIcons.Actions.Export, PlantUml.ImageFormat.PNG);
+        super("Open in external editor as PNG image", AllIcons.ToolbarDecorator.Export, PlantUml.ImageFormat.PNG);
     }
 
 }
