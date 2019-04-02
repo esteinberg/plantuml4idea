@@ -20,6 +20,8 @@ public enum LanguagePatternHolder {
     public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern(LanguageDescriptor.INSTANCE.preproc, "[@|!]");
+    public final Pattern lineCommentPattern = Pattern.compile("(?<=\n)('.*)(?=\n)");
+    public final Pattern blockCommentPattern = Pattern.compile("/'(.|\\n)*'/");
 
     private Pattern createPattern(Collection<String> tokens, final String patternPrefix) {
         Collection<String> tokensAsWords = Collections2.transform(tokens, new Function<String, String>() {
