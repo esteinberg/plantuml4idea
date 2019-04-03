@@ -21,6 +21,7 @@ Contributors:
 * Supports multiple sources per file
 * Supports pagination and zoom
 * Can copy diagram to clipboard or export as PNG, EPS or SVG, ASCII Art
+* Caching and incremental rendering 
 
 # Tips
 
