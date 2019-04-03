@@ -30,7 +30,7 @@ Contributors:
  installed on your machine. About screen tests your installation.
 
 # Developer notes
-* [How to setup the project](https://cloud.githubusercontent.com/assets/1160875/24718610/f66fd85a-1a36-11e7-8180-59100603a740.gif)
+* Project setup: [gif](https://user-images.githubusercontent.com/1160875/55478653-7dbb2300-561c-11e9-8a58-66f5a66b5dc1.gif) [mp4](https://mega.nz/#!66oTUIgA!ckkAdLZNHtXjIwyoSlN6BwA-vEWh_034vTRqtWZr9AM)
 * debug logs can be enabled by adding '#org.plantuml' to [Help | Debug Log Settings] 
 
 ## There are following branches:
