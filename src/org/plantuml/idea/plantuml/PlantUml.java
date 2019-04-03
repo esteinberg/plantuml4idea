@@ -54,25 +54,6 @@ public class PlantUml {
     private static Pattern sourcePattern =
             Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
 
-    /**
-     * Extracts all
-     *
-     * @param text
-     * @return
-     */
-    public static Map<Integer, String> extractSources(String text) {
-        LinkedHashMap<Integer, String> result = new LinkedHashMap<Integer, String>();
-
-        if (text.contains(UMLSTART)) {
-
-            Matcher matcher = sourcePattern.matcher(text);
-
-            while (matcher.find()) {
-                result.put(matcher.start(), matcher.group());
-            }
-        }
-        return result;
-    }
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset
@@ -100,6 +81,20 @@ public class PlantUml {
         return source;
     }
 
+    public static Map<Integer, String> extractSources(String text) {
+        LinkedHashMap<Integer, String> result = new LinkedHashMap<Integer, String>();
+
+        if (text.contains(UMLSTART)) {
+
+            Matcher matcher = sourcePattern.matcher(text);
+
+            while (matcher.find()) {
+                result.put(matcher.start(), matcher.group());
+            }
+        }
+        return result;
+    }
+
     private static Pattern sourceCommentPattern =
             Pattern.compile("^\\s*\\*\\s", Pattern.MULTILINE);
 
@@ -110,7 +105,7 @@ public class PlantUml {
         } else {
             Matcher matcher = sourceCommentPattern.matcher(source);
             return matcher.replaceAll("");
-        } 
+        }
     }
 
 }
