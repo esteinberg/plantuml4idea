@@ -191,7 +191,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public List<String> getConfigAsList() {
-        if (config == null) {
+        if (StringUtils.isBlank(config)) {
             return Collections.emptyList();
         }
         String[] split = config.split("\n");
