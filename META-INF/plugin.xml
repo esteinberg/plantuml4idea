@@ -11,7 +11,7 @@
         <![CDATA[
             <p>2.14</p>
             <ul>
-              <li>Automatic Code Completion Popup</li>
+              <li>Automatic code completion popup</li>
               <li>Fixed reverse arrow intention</li>
               <li>Added settings for encoding and PlantUML config (global include)</li>
               <li>Using the filename from "@startuml name" when exporting</li>
