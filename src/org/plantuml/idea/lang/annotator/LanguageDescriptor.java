@@ -52,8 +52,8 @@ public enum LanguageDescriptor {
     ));
 
     public final List<String> keywords = Collections.unmodifiableList(Arrays.asList(
-            "as",
-            "also",
+//            "as",
+//            "also",
             "autonumber",
             "caption",
             "title",
@@ -73,8 +73,8 @@ public enum LanguageDescriptor {
             "group",
             "left",
             "right",
-            "of",
-            "on",
+//            "of",
+//            "on",
             "link",
             "over",
             "end",
@@ -106,7 +106,7 @@ public enum LanguageDescriptor {
             "rotate",
             "ref",
             "return",
-            "is",
+//            "is",
             "repeat",
             "start",
             "stop",
