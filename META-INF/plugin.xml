@@ -15,6 +15,8 @@
               <li>Fixed reverse arrow intention</li>
               <li>Added settings for encoding and PlantUML config (global include)</li>
               <li>Using the filename from "@startuml name" when exporting</li>
+              <li>Added highlighting of comments</li>
+              <li>Updated highlighting of tags and keywords</li>
             </ul>
             <p>2.13</p>
             <ul>

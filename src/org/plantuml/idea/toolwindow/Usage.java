@@ -23,7 +23,7 @@ public class Usage extends JTextArea {
                     + " - tune cache size in settings, make sure you have enough heap memory (enable Memory Indicator)\n"
                     + "\n- Other supported PlantUML features:\n"
                     + " - @startuml <filename> - changes default filename when saving/exporting\n"
-                    + " - Settings | PlantUML config - useful for 'skinparam' command\n"
+                    + " - Settings | PlantUML config - useful for global 'skinparam' command\n"
                     + "";
 
     public Usage() {
