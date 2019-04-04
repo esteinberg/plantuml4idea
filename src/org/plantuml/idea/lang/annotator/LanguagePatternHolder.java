@@ -20,14 +20,12 @@ public enum LanguagePatternHolder {
     public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern(LanguageDescriptor.INSTANCE.preproc, "[@|!]");
+    public final Pattern lineCommentPattern = Pattern.compile("(?<=\n)('.*)(?=\n)");
+    public final Pattern startBlockComment = Pattern.compile("/'");
+    public final Pattern endBlockComment = Pattern.compile("'/");
 
     private Pattern createPattern(Collection<String> tokens, final String patternPrefix) {
-        Collection<String> tokensAsWords = Collections2.transform(tokens, new Function<String, String>() {
-            @Override
-            public String apply(String s) {
-                return "\\b" + s + "\\b";
-            }
-        });
+        Collection<String> tokensAsWords = Collections2.transform(tokens, s -> "\\b" + s + "\\b");
         return Pattern.compile("(" + patternPrefix + PipeJoiner.join(tokensAsWords) + ")");
     }
 }

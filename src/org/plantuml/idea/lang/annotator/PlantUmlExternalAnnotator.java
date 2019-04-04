@@ -77,10 +77,14 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                         LanguagePatternHolder.INSTANCE.preprocPattern,
                         DefaultLanguageHighlighterColors.METADATA));
 
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.lineCommentPattern,
+                        DefaultLanguageHighlighterColors.LINE_COMMENT));
+
+                sourceAnnotationResult.addAll(annotateBlockComments(source));
+
                 result.add(sourceAnnotationResult);
             }
-
-
         }
         return result;
     }
@@ -101,9 +105,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             //todo hack because plantuml returns line number from source with inlined includes
             if (syntaxResult.getLineLocation().getPosition() < includeLineNumber) {
                 ErrorSourceAnnotation errorSourceAnnotation = new ErrorSourceAnnotation(
-                    syntaxResult.getErrors(),
-                    null,     // syntaxResult.getSuggest(),   missing since version 1.2018.7
-                    syntaxResult.getLineLocation().getPosition()
+                        syntaxResult.getErrors(),
+                        null,     // syntaxResult.getSuggest(),   missing since version 1.2018.7
+                        syntaxResult.getLineLocation().getPosition()
                 );
                 result.add(errorSourceAnnotation);
             }
@@ -111,14 +115,35 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         return result;
     }
 
-    private SyntaxResult checkSyntax(PsiFile file, String source) {
-            File baseDir = UIUtils.getParent(file.getVirtualFile());
-            if (baseDir != null) {
-                Utils.setPlantUmlDir(baseDir);
+    private Collection<SourceAnnotation> annotateBlockComments(String source) {
+        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
 
-                PlantUmlIncludes.commitIncludes(source, baseDir);
+        Matcher matcher = LanguagePatternHolder.INSTANCE.startBlockComment.matcher(source);
+        Matcher endMatcher = null;
+
+        int start = 0;
+        while (matcher.find(start)) {
+            start = matcher.start();
+
+            if (endMatcher == null) {
+                endMatcher = LanguagePatternHolder.INSTANCE.endBlockComment.matcher(source);
             }
-            return SyntaxChecker.checkSyntaxFair(source);
+            if (endMatcher.find(start)) {
+                result.add(new SyntaxHighlightAnnotation(matcher.start(), endMatcher.end(), DefaultLanguageHighlighterColors.BLOCK_COMMENT));
+                start = endMatcher.end();
+            }
+        }
+        return result;
+    }
+
+    private SyntaxResult checkSyntax(PsiFile file, String source) {
+        File baseDir = UIUtils.getParent(file.getVirtualFile());
+        if (baseDir != null) {
+            Utils.setPlantUmlDir(baseDir);
+
+            PlantUmlIncludes.commitIncludes(source, baseDir);
+        }
+        return SyntaxChecker.checkSyntaxFair(source);
     }
 
     private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {
