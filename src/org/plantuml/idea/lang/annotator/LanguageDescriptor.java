@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * {@link net.sourceforge.plantuml.syntax.LanguageDescriptor}
+ * 
  * Author: Eugene Steinberg
  * Date: 9/27/14
  */
@@ -13,30 +15,40 @@ public enum LanguageDescriptor {
 
     public static final String IDEA_PARTIAL_RENDER = "idea.partialRender";
     public static final String IDEA_DISABLE_SYNTAX_CHECK = "idea.disableSyntaxCheck";
+
+    public static final String TAGS = "uml|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs";
+    
     public final List<String> types = Collections.unmodifiableList(Arrays.asList(
-            "abstract",
             "actor",
-            "agent",
-            "artifact",
-            "boundary",
-            "card",
-            "class",
-            "cloud",
-            "component",
-            "control",
-            "database",
-            "entity",
-            "enum",
-            "folder",
-            "frame",
-            "interface",
-            "node",
-            "object",
             "participant",
-            "rect",
+            "usecase",
+            "class",
+            "interface",
+            "abstract",
+            "enum",
+            "component",
             "state",
+            "object",
+            "artifact",
+            "folder",
+            "rectangle",
+            "node",
+            "frame",
+            "cloud",
+            "database",
             "storage",
-            "usecase"
+            "agent",
+            "stack",
+            "boundary",
+            "control",
+            "entity",
+            "card",
+            "file",
+            "package",
+            "queue",
+            "archimate",
+            "diamond"
+
     ));
 
     public final List<String> keywords = Collections.unmodifiableList(Arrays.asList(
@@ -102,7 +114,11 @@ public enum LanguageDescriptor {
             "endwhile",
             "fork",
             "again",
-            "kill"
+            "kill",
+            "order",
+            "allow_mixing",
+            "allowmixing",
+            "mainframe"
     ));
 
     public final List<String> pluginSettingsPattern = Collections.unmodifiableList(Arrays.asList(
@@ -111,18 +127,22 @@ public enum LanguageDescriptor {
     ));
 
 
+
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
-            "startuml",
-            "startditaa",
-            "startdot",
-            "enduml",
-            "include",
-            "define",
-            "undef",
-            "ifdef",
-            "endif",
-            "ifndef"
+            "!exit",
+            "!include",
+            "!pragma",
+            "!define",
+            "!undef",
+            "!if",
+            "!ifdef",
+            "!endif",
+            "!ifndef",
+            "!else",
+            "!definelong",
+            "!enddefinelong"
     ));
+
 
 
 }

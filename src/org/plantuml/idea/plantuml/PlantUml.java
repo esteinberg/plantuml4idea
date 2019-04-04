@@ -1,6 +1,7 @@
 package org.plantuml.idea.plantuml;
 
 import net.sourceforge.plantuml.FileFormat;
+import org.plantuml.idea.lang.annotator.LanguagePatternHolder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,10 +51,6 @@ public class PlantUml {
         public abstract FileFormat getFormat();
     }
 
-    public static final String SOURCE_TYPE_PATTERN = "uml|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs";
-    private static Pattern sourcePattern =
-            Pattern.compile("(?:(@start(?:" + SOURCE_TYPE_PATTERN + ")(?s).*?(?:@end(?:" + SOURCE_TYPE_PATTERN + ")|$))(?s).*?)+");
-
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset
@@ -86,7 +83,7 @@ public class PlantUml {
 
         if (text.contains(UMLSTART)) {
 
-            Matcher matcher = sourcePattern.matcher(text);
+            Matcher matcher = LanguagePatternHolder.INSTANCE.sourcePattern.matcher(text);
 
             while (matcher.find()) {
                 result.put(matcher.start(), matcher.group());

@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.METADATA;
 import static java.lang.System.currentTimeMillis;
 import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_DISABLE_SYNTAX_CHECK;
 
@@ -77,6 +78,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                         LanguagePatternHolder.INSTANCE.preprocPattern,
                         DefaultLanguageHighlighterColors.METADATA));
 
+                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
+                        LanguagePatternHolder.INSTANCE.tagsPattern,
+                        METADATA));
+                
                 sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
                         LanguagePatternHolder.INSTANCE.lineCommentPattern,
                         DefaultLanguageHighlighterColors.LINE_COMMENT));
