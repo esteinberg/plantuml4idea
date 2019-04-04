@@ -82,7 +82,8 @@ public class PlantUmlRenderer {
         String fileOrDirname = null;
 
         if (blocks.size() > 1) {
-            logger.error("more than 1 block"); //TODO
+//            logger.error("more than 1 block"); //TODO
+            //happens when the source is incorrectly extracted and contains multiple diagrams
         }
         
         for (int i = 0; i < blocks.size(); i++) {
