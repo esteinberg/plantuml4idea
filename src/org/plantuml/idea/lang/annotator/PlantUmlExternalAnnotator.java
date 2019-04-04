@@ -81,9 +81,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                         LanguagePatternHolder.INSTANCE.lineCommentPattern,
                         DefaultLanguageHighlighterColors.LINE_COMMENT));
 
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.blockCommentPattern,
-                        DefaultLanguageHighlighterColors.BLOCK_COMMENT));
+                sourceAnnotationResult.addAll(annotateBlockComments(source));
 
                 result.add(sourceAnnotationResult);
             }
@@ -112,6 +110,27 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                         syntaxResult.getLineLocation().getPosition()
                 );
                 result.add(errorSourceAnnotation);
+            }
+        }
+        return result;
+    }
+
+    private Collection<SourceAnnotation> annotateBlockComments(String source) {
+        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+
+        Matcher matcher = LanguagePatternHolder.INSTANCE.startBlockComment.matcher(source);
+        Matcher endMatcher = null;
+
+        int start = 0;
+        while (matcher.find(start)) {
+            start = matcher.start();
+
+            if (endMatcher == null) {
+                endMatcher = LanguagePatternHolder.INSTANCE.endBlockComment.matcher(source);
+            }
+            if (endMatcher.find(start)) {
+                result.add(new SyntaxHighlightAnnotation(matcher.start(), endMatcher.end(), DefaultLanguageHighlighterColors.BLOCK_COMMENT));
+                start = endMatcher.end();
             }
         }
         return result;

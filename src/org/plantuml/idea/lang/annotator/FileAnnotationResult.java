@@ -11,10 +11,14 @@ import java.util.Collection;
  * Date: 9/30/14
  */
 public class FileAnnotationResult {
-    private Collection<SourceAnnotationResult> sourceAnnotationResults = new ArrayList<SourceAnnotationResult>();
+    private final Collection<SourceAnnotationResult> sourceAnnotationResults = new ArrayList<SourceAnnotationResult>();
 
     public boolean add(SourceAnnotationResult sourceAnnotationResult) {
         return sourceAnnotationResults.add(sourceAnnotationResult);
+    }
+
+    public Collection<SourceAnnotationResult> getSourceAnnotationResults() {
+        return sourceAnnotationResults;
     }
 
     public void annotate(AnnotationHolder holder, Document document) {

@@ -13,7 +13,7 @@ import java.util.Collection;
 public class SourceAnnotationResult {
     private int sourceOffset;
 
-    private Collection<SourceAnnotation> annotations = new ArrayList<SourceAnnotation>();
+    private final Collection<SourceAnnotation> annotations = new ArrayList<SourceAnnotation>();
 
     public SourceAnnotationResult(int sourceOffset) {
         this.sourceOffset = sourceOffset;
@@ -29,4 +29,7 @@ public class SourceAnnotationResult {
         }
     }
 
+    public Collection<SourceAnnotation> getAnnotations() {
+        return annotations;
+    }
 }

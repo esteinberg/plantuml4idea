@@ -22,11 +22,4 @@ public class LanguagePatternHolderTest {
 
         assertTrue(matcher.find());
     }
-
-    @Test
-    public void testBlockCommentPattern() {
-        Matcher matcher = LanguagePatternHolder.INSTANCE.blockCommentPattern.matcher(TEXT);
-
-        assertTrue(matcher.find());
-    }
 }
