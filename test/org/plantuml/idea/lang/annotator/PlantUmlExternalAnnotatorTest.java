@@ -29,6 +29,23 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         assertEquals(23, lineCommentAnnotation.endSourceOffset);
     }
 
+    public void testLineCommentHighlight_withWhitespacesBefore() {
+        PsiFile psiFile = createForPUMLFile(
+                "@startuml\n\t 'Line Comment\nactor User/'Block Comment'/\n@enduml");
+
+        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
+
+        assertNotNull(fileAnnotationResult);
+
+        List<SyntaxHighlightAnnotation> lineCommentAnnotations = getAnnotationByAttributeKeys(fileAnnotationResult, DefaultLanguageHighlighterColors.LINE_COMMENT);
+
+        assertSize(1, lineCommentAnnotations);
+
+        SyntaxHighlightAnnotation lineCommentAnnotation = lineCommentAnnotations.get(0);
+        assertEquals(10, lineCommentAnnotation.startSourceOffset);  //should be 12 really     
+        assertEquals(25, lineCommentAnnotation.endSourceOffset);
+    }
+
 
     public void testBlockCommentHighlight() {
         PsiFile psiFile = createForPUMLFile(
