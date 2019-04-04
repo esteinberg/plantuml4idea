@@ -13,7 +13,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
     private PlantUmlExternalAnnotator plantUmlExternalAnnotator = new PlantUmlExternalAnnotator();
 
     public void testLineCommentHighlight() {
-        PsiFile psiFile = configureByAsciiDoc(
+        PsiFile psiFile = createForPUMLFile(
                 "@startuml\n'Line Comment\nactor User/'Block Comment'/\n@enduml");
 
         FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
@@ -31,7 +31,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
 
 
     public void testBlockCommentHighlight() {
-        PsiFile psiFile = configureByAsciiDoc(
+        PsiFile psiFile = createForPUMLFile(
                 "@startuml\n/'Block Comment'/\nactor User/'Second Block Comment'/\n@enduml");
 
         FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
@@ -51,7 +51,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         assertEquals(62, secondBlockCommentAnnotation.endSourceOffset);
     }
 
-    private PsiFile configureByAsciiDoc(String text) {
+    private PsiFile createForPUMLFile(String text) {
         return myFixture.configureByText("PUML", text);
     }
 
