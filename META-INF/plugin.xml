@@ -18,6 +18,7 @@
               <li>Added highlighting of comments</li>
               <li>Updated highlighting of tags and keywords</li>
               <li>Fixed copy to clipboard</li>
+              <li>reStructuredText files support</li>
             </ul>
             <p>2.13</p>
             <ul>

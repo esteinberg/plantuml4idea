@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -128,7 +129,7 @@ public class RenderCacheItem {
 
     private boolean includedFilesChanged(FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
         boolean result = false;
-        Editor selectedTextEditor = fileEditorManager.getSelectedTextEditor();
+        Editor selectedTextEditor = UIUtils.getSelectedTextEditor(fileEditorManager);
         if (selectedTextEditor != null) {
             VirtualFile file = fileDocumentManager.getFile(selectedTextEditor.getDocument());
             if (file != null) {

@@ -5,8 +5,7 @@ import com.intellij.notification.NotificationGroup;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
@@ -36,7 +35,7 @@ public class UIUtils {
     public static final NotificationGroup NOTIFICATION = new NotificationGroup("PlantUML integration plugin",
             NotificationDisplayType.BALLOON, true);
 
-    
+
     public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
         return ImageIO.read(input);
@@ -45,7 +44,8 @@ public class UIUtils {
     public static String getSelectedSourceWithCaret(FileEditorManager instance) {
         String source = "";
 
-        Editor selectedTextEditor = instance.getSelectedTextEditor();
+        Editor selectedTextEditor = getSelectedTextEditor(instance);
+
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             int offset = selectedTextEditor.getCaretModel().getOffset();
@@ -54,9 +54,33 @@ public class UIUtils {
         return source;
     }
 
+    /**
+     * FileEditorManager#getSelectedTextEditor is not good enough, returns null for *.rst in PyCharm (TextEditorWithPreview)
+     */
+    @Nullable
+    public static Editor getSelectedTextEditor(FileEditorManager instance) {
+        Editor selectedTextEditor = instance.getSelectedTextEditor();
+
+        if (selectedTextEditor == null) {
+            FileEditor selectedEditor = instance.getSelectedEditor();
+            if (selectedEditor != null) {
+                FileEditorLocation location = selectedEditor.getCurrentLocation();
+                if (location instanceof TextEditorLocation) {
+                    TextEditorLocation currentLocation = (TextEditorLocation) location;
+                    FileEditor fileEditor = currentLocation.getEditor();
+                    if (fileEditor instanceof TextEditor) {
+                        TextEditor textEditor = (TextEditor) fileEditor;
+                        selectedTextEditor = textEditor.getEditor();
+                    }
+                }
+            }
+        }
+        return selectedTextEditor;
+    }
+
     public static String getSelectedSource(FileEditorManager instance) {
         String source = "";
-        Editor selectedTextEditor = instance.getSelectedTextEditor();
+        Editor selectedTextEditor = getSelectedTextEditor(instance);
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             source = document.getText();
@@ -67,7 +91,7 @@ public class UIUtils {
 
     @Nullable
     public static VirtualFile getSelectedFile(FileEditorManager instance, FileDocumentManager fileDocumentManager) {
-        Editor selectedTextEditor = instance.getSelectedTextEditor();
+        Editor selectedTextEditor = getSelectedTextEditor(instance);
         VirtualFile file = null;
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
@@ -78,7 +102,7 @@ public class UIUtils {
 
     @Nullable
     public static File getSelectedDir(FileEditorManager instance, FileDocumentManager fileDocumentManager) {
-        Editor selectedTextEditor = instance.getSelectedTextEditor();
+        Editor selectedTextEditor = getSelectedTextEditor(instance);
         File baseDir = null;
         if (selectedTextEditor != null) {
 
