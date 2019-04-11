@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.14.1</version>
+    <version>2.14.2</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="182"/>
@@ -17,6 +17,7 @@
               <li>Using the filename from "@startuml name" when exporting</li>
               <li>Added highlighting of comments</li>
               <li>Updated highlighting of tags and keywords</li>
+              <li>Fixed copy to clipboard</li>
             </ul>
             <p>2.13</p>
             <ul>

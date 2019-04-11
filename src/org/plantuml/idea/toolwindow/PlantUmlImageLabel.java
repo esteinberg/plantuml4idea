@@ -45,6 +45,7 @@ public class PlantUmlImageLabel extends JLabel {
     private static Logger logger = Logger.getInstance(PlantUmlImageLabel.class);
     private RenderRequest renderRequest;
     private ImageItem imageWithData;
+    private Image originalImage;
 
     public PlantUmlImageLabel() {
     }
@@ -83,12 +84,12 @@ public class PlantUmlImageLabel extends JLabel {
      * @param imageItem source image and url data
      * @param label     destination label
      */
-    private static void setDiagram(@NotNull final ImageItem imageItem, final JLabel label) {
-        Image image = imageItem.getImage();
+    private void setDiagram(@NotNull final ImageItem imageItem, final JLabel label) {
+        originalImage = imageItem.getImage();
         Image scaledImage;
 
         JBUI.ScaleContext ctx = JBUI.ScaleContext.create(label);
-        scaledImage = ImageUtil.ensureHiDPI(image, ctx);
+        scaledImage = ImageUtil.ensureHiDPI(originalImage, ctx);
 //        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
         label.setIcon(new JBImageIcon(scaledImage));
@@ -129,5 +130,7 @@ public class PlantUmlImageLabel extends JLabel {
         }
     }
 
-
+    public Image getOriginalImage() {
+        return originalImage;
+    }
 }
