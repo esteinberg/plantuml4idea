@@ -42,7 +42,4 @@ public class Utils {
         return new SourceStringReader(Defines.createEmpty(), source, encoding, configAsList);
     }
 
-    public static SourceStringReader newSourceStringReader(String source) {
-        return newSourceStringReader(source, true);
-    }
 }

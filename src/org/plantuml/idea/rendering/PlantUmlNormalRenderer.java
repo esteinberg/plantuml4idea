@@ -51,7 +51,7 @@ public class PlantUmlNormalRenderer {
                 Utils.setPlantUmlDir(baseDir);
             }
             PlantUmlIncludes.commitIncludes(source, baseDir);
-            SourceStringReader reader = Utils.newSourceStringReader(source);
+            SourceStringReader reader = Utils.newSourceStringReader(source, true);
 
             zoomDiagram(reader, zoom);
 
