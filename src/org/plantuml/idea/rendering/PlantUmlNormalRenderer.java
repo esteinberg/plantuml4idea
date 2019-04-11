@@ -92,7 +92,7 @@ public class PlantUmlNormalRenderer {
         String documentSource = renderRequest.getSource();
         try {
             // image generation.                     
-            SourceStringReader reader = Utils.newSourceStringReader(documentSource);
+            SourceStringReader reader = Utils.newSourceStringReader(documentSource, renderRequest.isUseSettings());
 
             DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
             Integer totalPages = info.getTotalPages();

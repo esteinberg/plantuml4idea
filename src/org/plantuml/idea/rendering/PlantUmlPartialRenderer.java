@@ -85,7 +85,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         long start = System.currentTimeMillis();
         logger.debug("updating title, page ", page);
 
-        SourceStringReader reader = newSourceStringReader(partialSource);
+        SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings());
         String title = getTitle(reader);
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
@@ -105,7 +105,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
     private ImageItem renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
-        SourceStringReader reader = newSourceStringReader(partialSource);
+        SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings());
         DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = info.getTotalPages();
         DiagramInfo.Titles titles = info.getTitles();

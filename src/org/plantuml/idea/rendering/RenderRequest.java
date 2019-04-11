@@ -18,6 +18,7 @@ public class RenderRequest {
     private final Integer version;
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
+    protected boolean useSettings = true;
 
     public RenderRequest(@NotNull File baseDir,
                          @NotNull String source,
@@ -44,6 +45,7 @@ public class RenderRequest {
         this.format = format;
         this.page = renderRequest.page;
         this.zoom = renderRequest.zoom;
+        this.useSettings = renderRequest.useSettings;
         this.version = null;
     }
 
@@ -82,6 +84,13 @@ public class RenderRequest {
         return reason;
     }
 
+    public boolean isUseSettings() {
+        return useSettings;
+    }
+
+    public void setUseSettings(boolean useSettings) {
+        this.useSettings = useSettings;
+    }
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -92,6 +101,7 @@ public class RenderRequest {
                 .append("renderUrlLinks", renderUrlLinks)
                 .append("reason", reason)
                 .append("version", version)
+                .append("useSettings", useSettings)
                 .toString();
     }
 

@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 public class Utils {
     public static int asInt(String renderDelay, int defaultValue) {
@@ -25,8 +27,22 @@ public class Utils {
     }
 
     @NotNull
+    public static SourceStringReader newSourceStringReader(String source, boolean useSettings) {
+        List<String> configAsList;
+        String encoding;
+        if (useSettings) {
+            PlantUmlSettings settings = PlantUmlSettings.getInstance();
+            encoding = settings.getEncoding();
+            configAsList = settings.getConfigAsList();
+        } else {
+            encoding = "UTF-8";
+            configAsList = Collections.emptyList();
+        }
+
+        return new SourceStringReader(Defines.createEmpty(), source, encoding, configAsList);
+    }
+
     public static SourceStringReader newSourceStringReader(String source) {
-        PlantUmlSettings settings = PlantUmlSettings.getInstance();
-        return new SourceStringReader(Defines.createEmpty(), source, settings.getEncoding(), settings.getConfigAsList());
+        return newSourceStringReader(source, true);
     }
 }
