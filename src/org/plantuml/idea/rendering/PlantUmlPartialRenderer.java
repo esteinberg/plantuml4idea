@@ -41,10 +41,10 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, 1);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            LineLocationImpl lineLocation = new LineLocationImpl(null, null);
-            CharSequence2Impl o = new CharSequence2Impl("", lineLocation);
-            List<CharSequence2> source1 = Collections.<CharSequence2>singletonList(o);
-            UmlSource source = new UmlSource(source1, false);
+            LineLocationImpl lineLocation = new LineLocationImpl("", null);
+            StringLocated o = new StringLocated("", lineLocation);
+            List<StringLocated> data = Collections.singletonList(o);
+            UmlSource source = new UmlSource(data, false);
 
             ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), lineLocation);
             PSystemError pSystemError = new PSystemError(source, singleError, null);
