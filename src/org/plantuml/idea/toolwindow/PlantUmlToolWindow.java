@@ -279,9 +279,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
-        executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
+        executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
         displayDiagram(last);
     }
 
