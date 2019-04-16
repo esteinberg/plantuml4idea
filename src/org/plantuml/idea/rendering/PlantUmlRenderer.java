@@ -126,6 +126,13 @@ public class PlantUmlRenderer {
                     }
                 }
             }
+        } else if (diagram instanceof AbstractPSystem) { //gantt, salt wireframe - but has no effect
+            AbstractPSystem d = (AbstractPSystem) diagram;
+            Scale scale = d.getScale();
+
+            if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
+                d.setScale(calculateScale(zoom, scale));
+            }
         }
     }
 
