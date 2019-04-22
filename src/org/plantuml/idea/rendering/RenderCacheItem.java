@@ -1,14 +1,13 @@
 package org.plantuml.idea.rendering;
 
-import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -50,6 +49,7 @@ public class RenderCacheItem {
         }
     }
 
+
     public RenderRequest getRenderRequest() {
         return renderRequest;
     }
@@ -58,25 +58,24 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean renderRequired(int page, int zoom, FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
+    public boolean renderRequired(int page, int zoom) {
         if (imageMissing(page)) {
             return true;
         }
         if (zoom != this.zoom) {
             return true;
         }
-        return includedFilesChanged(fileEditorManager, fileDocumentManager);
+        return false;
     }
 
-    public boolean renderRequired(String source, int page, FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
+    public boolean renderRequired(String source, int page) {
         if (!this.source.equals(source)) {
             return true;
         }
         if (imageMissing(page)) {
             return true;
         }
-
-        return includedFilesChanged(fileEditorManager, fileDocumentManager);
+        return false;
     }
 
     private boolean imageMissing(int page) {
@@ -115,37 +114,30 @@ public class RenderCacheItem {
         return imageItems;
     }
 
-    public boolean isIncludedFileChanged(@NotNull VirtualFile file, FileDocumentManager fileDocumentManager) {
-        File key = new File(file.getPath());
-        Long aLong = includedFiles.get(key);
-        if (aLong != null) {
-            boolean changed = RenderCache.isChanged(fileDocumentManager, key, aLong, fileDocumentManager.getDocument(file));
-            if (changed) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean includedFilesChanged(FileEditorManager fileEditorManager, FileDocumentManager fileDocumentManager) {
+    public boolean includedFilesChanged(FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
         boolean result = false;
-        Editor selectedTextEditor = UIUtils.getSelectedTextEditor(fileEditorManager);
-        if (selectedTextEditor != null) {
-            VirtualFile file = fileDocumentManager.getFile(selectedTextEditor.getDocument());
-            if (file != null) {
-                String path = file.getPath();
-                if (includedFiles != null) {
-                    File key = new File(path);
-                    Long timestamp = includedFiles.get(key);
-                    if (timestamp != null && RenderCache.isChanged(fileDocumentManager, key, timestamp, selectedTextEditor.getDocument())) {
-                        result = true;
-                    }
+        if (includedFiles != null) {
+            for (Map.Entry<File, Long> fileLongEntry : includedFiles.entrySet()) {
+                File file = fileLongEntry.getKey();
+                Long timestamp = fileLongEntry.getValue();
+                VirtualFile virtualFile = virtualFileManager.findFileByUrl("file://" + file.getAbsolutePath());
+                Document document = null;
+                if (virtualFile != null) {
+                    document = fileDocumentManager.getDocument(virtualFile);
+                }
+                if (timestamp != null && isChanged(fileDocumentManager, file, timestamp, document)) {
+                    result = true;
+                    break;
                 }
             }
         }
         return result;
     }
 
+    private static boolean isChanged(FileDocumentManager fileDocumentManager, File file, Long timestamp, Document document) {
+        return timestamp < file.lastModified() || (document != null && fileDocumentManager.isDocumentUnsaved(document));
+    }
+           
     public boolean isIncludedFile(@Nullable VirtualFile file) {
         if (file == null) {
             return false;

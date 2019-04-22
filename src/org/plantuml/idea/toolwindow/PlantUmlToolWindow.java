@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.LowMemoryWatcher;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +55,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
     private FileEditorManager fileEditorManager;
     private FileDocumentManager fileDocumentManager;
-
+    private VirtualFileManager virtualFileManager;
+                                               
     private int lastValidVerticalScrollValue;
     private int lastValidHorizontalScrollValue;
 
@@ -69,7 +71,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
-
+        virtualFileManager = VirtualFileManager.getInstance();
+                      
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusPanel);
         LowMemoryWatcher.register(new Runnable() {
@@ -225,10 +228,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                         if (last != null && last.isIncludedFile(selectedFile)) {
                             logger.debug("include file selected");
-                            if (last.isIncludedFileChanged(selectedFile, fileDocumentManager)) {
+                            if (last.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
                                 logger.debug("includes changed, executing command");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
-                            } else if (last.renderRequired(selectedPage, zoom, fileEditorManager, fileDocumentManager)) {
+                            } else if (last.renderRequired(selectedPage, zoom)) {
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {
@@ -256,9 +259,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         return;
                     }
 
-                    RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileEditorManager, fileDocumentManager);
+                    RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, VirtualFileManager.getInstance());
 
-                    if (cachedItem == null || cachedItem.renderRequired(source, selectedPage, fileEditorManager, fileDocumentManager)) {
+                    if (cachedItem == null) {
+                        logger.debug("no cached item");
+                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
+                    } else if (cachedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
+                        logger.debug("includedFilesChanged");
+                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
+                    } else if (cachedItem.renderRequired(source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));

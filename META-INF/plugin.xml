@@ -12,6 +12,7 @@
             <p>2.15</p>
             <ul>
               <li>PlantUml library upgrade to v1.2019.5</li>
+              <li>Caching fixed</li>
             </ul>
             <p>2.14</p>
             <ul>
