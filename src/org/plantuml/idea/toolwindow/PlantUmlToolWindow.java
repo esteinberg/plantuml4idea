@@ -231,7 +231,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                             if (last.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
                                 logger.debug("includes changed, executing command");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
-                            } else if (last.renderRequired(selectedPage, zoom)) {
+                            } else if (last.imageMissingOrZoomChanged(selectedPage, zoom)) {
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, zoom, last, delay));
                             } else {
@@ -269,7 +269,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         logger.debug("includedFilesChanged");
                         final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));
-                    } else if (cachedItem.renderRequired(source, selectedPage)) {
+                    } else if (cachedItem.imageMissingOrSourceChanged(source, selectedPage)) {
                         logger.debug("render required");
                         final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedDir, selectedPage, zoom, cachedItem, delay));

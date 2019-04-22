@@ -34,7 +34,7 @@ public class RenderCache {
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
                 && !displayedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)
-                && !displayedItem.renderRequired(source, selectedPage)) {
+                && !displayedItem.imageMissingOrSourceChanged(source, selectedPage)) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }
