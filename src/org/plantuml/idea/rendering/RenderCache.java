@@ -27,8 +27,6 @@ public class RenderCache {
 
     public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, int zoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
         RenderCacheItem cacheItem = null;
-        boolean checkCurrentItemSourceEquals = true;
-        Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
 
         //error not cached in ArrayDeque
         if (displayedItem != null
@@ -48,19 +46,20 @@ public class RenderCache {
         }
 
 
+        Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
         while (iterator.hasNext()) {
             RenderCacheItem next = iterator.next();
             if (next.getSourceFilePath().equals(sourceFilePath) && next.getZoom() == zoom) {
                 if (cacheItem == null) {
                     cacheItem = next;
-                } else {
-                    if (checkCurrentItemSourceEquals && cacheItem.getSource().equals(source)) {
+                    if (cacheItem.getSource().equals(source)) {
                         break;
-                    } else if (next.getSource().equals(source)) {
+                    }
+                } else {
+                    if (next.getSource().equals(source)) {
                         cacheItem = next;
                         break;
                     }
-                    checkCurrentItemSourceEquals = false;
                 }
             }
         }
