@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 
 import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_PARTIAL_RENDER;
 
-public class PlantUmlRenderer {
-    private static final Logger logger = Logger.getInstance(PlantUmlRenderer.class);
+public class PlantUmlRendererUtil {
+    private static final Logger logger = Logger.getInstance(PlantUmlRendererUtil.class);
 
     public static final Pattern NEW_PAGE_PATTERN = Pattern.compile("\\n\\s*@?(?i)(newpage)(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
 

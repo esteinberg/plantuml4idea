@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.ImageItem;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
@@ -112,7 +112,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 String fileNameTemplate = base + "-%03d." + extension;
 
-                PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
+                PlantUmlRendererUtil.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
                         UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
 

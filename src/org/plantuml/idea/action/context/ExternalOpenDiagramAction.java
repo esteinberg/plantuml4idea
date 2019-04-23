@@ -9,7 +9,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 import org.plantuml.idea.util.UIUtils;
 
@@ -43,7 +43,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 			canonicalPath = file.getCanonicalPath();
 			file.deleteOnExit();
 
-            PlantUmlRenderer.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
+            PlantUmlRendererUtil.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
                     imageFormat, file.getAbsolutePath(), file.getName().replace(".", "-%03d."),
 				UIUtils.getPlantUmlToolWindow(e.getProject()).getZoom(), getPage(e));
 

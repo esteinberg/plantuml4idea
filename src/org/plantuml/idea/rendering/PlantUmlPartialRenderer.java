@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import static org.plantuml.idea.rendering.PlantUmlRenderer.getTitles;
-import static org.plantuml.idea.rendering.PlantUmlRenderer.zoomDiagram;
+import static org.plantuml.idea.rendering.PlantUmlRendererUtil.getTitles;
+import static org.plantuml.idea.rendering.PlantUmlRendererUtil.zoomDiagram;
 import static org.plantuml.idea.util.Utils.newSourceStringReader;
 
 public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {

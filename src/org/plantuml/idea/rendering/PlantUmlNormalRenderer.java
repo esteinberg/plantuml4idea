@@ -23,7 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import static org.plantuml.idea.rendering.PlantUmlRenderer.zoomDiagram;
+import static org.plantuml.idea.rendering.PlantUmlRendererUtil.zoomDiagram;
 
 
 public class PlantUmlNormalRenderer {

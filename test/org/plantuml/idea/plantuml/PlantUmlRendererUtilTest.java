@@ -2,19 +2,19 @@ package org.plantuml.idea.plantuml;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 
 import java.io.File;
 
-import static org.plantuml.idea.rendering.PlantUmlRenderer.NEW_PAGE_PATTERN;
+import static org.plantuml.idea.rendering.PlantUmlRendererUtil.NEW_PAGE_PATTERN;
 
-public class PlantUmlRendererTest {
+public class PlantUmlRendererUtilTest {
     @Test
     public void render() throws Exception {
-        RenderResult render = PlantUmlRenderer.render(new RenderRequest(new File(""), "@startuml\n" +
+        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(new File(""), "@startuml\n" +
                 "xxx->yyy\n" +
                 "@enduml", PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH), null);
         Assert.assertNotNull(render);
@@ -24,7 +24,7 @@ public class PlantUmlRendererTest {
 
     @Test
     public void renderBrokenImage() throws Exception {
-        RenderResult render = PlantUmlRenderer.render(new RenderRequest(new File(""), "@startuml\n" +
+        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(new File(""), "@startuml\n" +
                 "xxx\n" +
                 "@enduml", PlantUml.ImageFormat.PNG, 0, 0, null, false, RenderCommand.Reason.REFRESH), null);
         Assert.assertNotNull(render);

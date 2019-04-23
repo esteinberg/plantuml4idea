@@ -10,7 +10,7 @@ import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.PlantUmlRenderer;
+import org.plantuml.idea.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
@@ -36,7 +36,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
         PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         if (data != null) {
             RenderRequest renderRequest = data.getRenderRequest();
-            RenderResult render = PlantUmlRenderer.render(new RenderRequest(renderRequest, getFormat()), null);
+            RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(renderRequest, getFormat()), null);
 
             try {
                 byte[] firstDiagramBytes = render.getFirstDiagramBytes();
