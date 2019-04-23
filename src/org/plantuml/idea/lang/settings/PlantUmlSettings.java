@@ -24,7 +24,7 @@ import java.util.List;
  * @author Max Gorbunov
  * @author Eugene Steinberg
  */
-@State(name = "PlantUmlSettings", storages = {@Storage(file = "plantuml.cfg")})
+@State(name = "PlantUmlSettings", storages = {@Storage("plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
 
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
