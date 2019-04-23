@@ -235,6 +235,7 @@
 
         <completion.contributor language="PUML"
                                 implementationClass="org.plantuml.idea.lang.PlantUmlCompletionContributor"/>
-
+        <typedHandler implementation="org.plantuml.idea.lang.PlantUmlCompletionAutoPopupHandler"
+                      id="PlantUmlCompletionAutoPopupHandler"/>
     </extensions>
 </idea-plugin>

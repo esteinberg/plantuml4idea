@@ -10,7 +10,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.util.Utils;
 
 public class ReverseArrowIntention extends BaseIntentionAction {
 	public static final Logger logger = Logger.getInstance(ReverseArrowIntention.class);
@@ -32,7 +32,7 @@ public class ReverseArrowIntention extends BaseIntentionAction {
 
 	@Override
 	public boolean isAvailable(@NotNull Project project, final Editor editor, PsiFile file) {
-		if (!file.getFileType().equals(PlantUmlFileType.PLANTUML_FILE_TYPE))
+        if (!Utils.isPlantUmlFileType(file))
 			return false;
 		boolean available = false;
 		for (Caret caret : editor.getCaretModel().getAllCarets()) {

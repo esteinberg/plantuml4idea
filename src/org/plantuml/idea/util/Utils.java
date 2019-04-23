@@ -1,9 +1,13 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.lang.PlantIUmlFileType;
+import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
@@ -42,4 +46,8 @@ public class Utils {
         return new SourceStringReader(Defines.createEmpty(), source, encoding, configAsList);
     }
 
+    public static boolean isPlantUmlFileType(@NotNull PsiFile file) {
+        FileType fileType = file.getFileType();
+        return fileType.equals(PlantUmlFileType.PLANTUML_FILE_TYPE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
+    }
 }

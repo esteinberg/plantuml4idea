@@ -40,11 +40,14 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
         Document document = parameters.getEditor().getDocument();
         final int lineStartOffset = document.getLineStartOffset(document.getLineNumber(offset));
         String text = document.getText(TextRange.create(lineStartOffset, offset));
-        if (text.matches("\\s*!\\S*$")) {
+        if (text.matches("\\s*!\\w*$")) {
             for (String s : LanguageDescriptor.INSTANCE.preproc) {
                 result.addElement(LookupElementBuilder.create(s.substring(1)).withPresentableText(s).withCaseSensitivity(true).bold());
             }
         } else {
+            if (text.endsWith("!")) {
+                return;
+            }
             super.fillCompletionVariants(parameters, result);
             if (PlantUmlSettings.getInstance().isAutoComplete()) {
                 WordCompletionContributor.addWordCompletionVariants(result, parameters, Collections.emptySet());
