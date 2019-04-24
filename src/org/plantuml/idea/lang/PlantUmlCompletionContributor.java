@@ -71,6 +71,9 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
 
         @Override
         public void addCompletions(@NotNull CompletionParameters parameters, @NotNull ProcessingContext context, @NotNull CompletionResultSet result) {
+            if (parameters.getInvocationCount() == 0) {
+                return;
+            }
             for (String item : myItems) {
                 result.addElement(LookupElementBuilder.create(item).withCaseSensitivity(true).withItemTextItalic(true));
             }
