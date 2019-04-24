@@ -16,7 +16,7 @@ public class PlantUmlCompletionAutoPopupHandler extends TypedHandlerDelegate {
     @Override
     public TypedHandlerDelegate.Result checkAutoPopup(char charTyped, @NotNull final Project project, @NotNull final Editor editor, @NotNull final PsiFile file) {
         if (Utils.isPlantUmlFileType(file)) {
-            if (charTyped == '!') {
+            if (charTyped == '!' || charTyped == '@') {
                 AutoPopupController.getInstance(project).scheduleAutoPopup(editor);
                 return Result.STOP;
             }

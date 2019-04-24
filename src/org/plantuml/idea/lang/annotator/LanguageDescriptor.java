@@ -50,6 +50,29 @@ public enum LanguageDescriptor {
             "diamond"
 
     ));
+    public final List<String> tags = Collections.unmodifiableList(Arrays.asList(
+            "@startuml",
+            "@startdot",
+            "@startjcckit",
+            "@startditaa",
+            "@startsalt",
+            "@startmath",
+            "@startlatex",
+            "@startmindmap",
+            "@startgantt",
+            "@startwbs",
+            "@enduml",
+            "@enddot",
+            "@endjcckit",
+            "@endditaa",
+            "@endsalt",
+            "@endmath",
+            "@endlatex",
+            "@endmindmap",
+            "@endgantt",
+            "@endwbs"
+
+    ));
 
     public final List<String> keywordsWithoutHighlight = Collections.unmodifiableList(Arrays.asList(
             "as",
