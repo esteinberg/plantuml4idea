@@ -80,7 +80,7 @@
           <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="(included in every file after @startuml)"/>
+          <text value="(equivalent of cmd param '-config config.txt')"/>
         </properties>
       </component>
       <component id="d98e0" class="javax.swing.JCheckBox" binding="renderUrlLinks">
@@ -153,6 +153,14 @@
           <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
         </constraints>
       </vspacer>
+      <component id="2e0bc" class="javax.swing.JLabel">
+        <constraints>
+          <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="9" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="(included in every file after @startuml)"/>
+        </properties>
+      </component>
     </children>
   </grid>
 </form>

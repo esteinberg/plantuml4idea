@@ -5,7 +5,7 @@ import javax.swing.*;
 public class ConfigExample extends JTextArea {
     public static final String TEXT =
             "Example:\n" +
-                    "!include config.skinparam\nskinparam monochrome true\nBob --> Alice: Authentication Response";
+                    "!include config.skinparam\nskinparam monochrome true";
 
     public ConfigExample() {
         this("");
