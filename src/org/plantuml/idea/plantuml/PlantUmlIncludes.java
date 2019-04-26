@@ -36,6 +36,8 @@ public class PlantUmlIncludes {
                 }
                 return fileLongHashMap;
             }
+        } catch (RenderingCancelledException e) {
+            throw e;
         } catch (InterruptedException e) {
             throw new RenderingCancelledException(e);
         } catch (Throwable e) {
