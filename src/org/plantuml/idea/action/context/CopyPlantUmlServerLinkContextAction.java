@@ -42,7 +42,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
             try {
                 Transcoder defaultTranscoder = TranscoderUtil.getDefaultTranscoder();
                 String encoded = defaultTranscoder.encode(source);
-                CopyPasteManager.getInstance().setContents(new TextTransferable("http://plantuml.com/plantuml/uml/" + encoded));
+                CopyPasteManager.getInstance().setContents(new TextTransferable("http://www.plantuml.com/plantuml/uml/" + encoded));
             } catch (Exception e1) {
                 throw new RuntimeException(e1);
             }
