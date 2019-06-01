@@ -38,14 +38,14 @@ public class PlantUmlRendererUtil {
      * @param source         source code to be rendered
      * @param baseDir        base dir to set for "include" functionality
      * @param format         image format
-     * @param fileName       fileName to use with first file
+     * @param path       path to use with first file
      * @param fileNameFormat file naming scheme for further files
      * @param pageNumber     -1 for all pages   
      * @throws IOException in case of rendering or saving fails
      */
-    public static void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String fileName, String fileNameFormat, int zoom, int pageNumber)
+    public static void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int pageNumber)
             throws IOException {
-        NORMAL_RENDERER.renderAndSave(source, baseDir, format, fileName, fileNameFormat, zoom, pageNumber);
+        NORMAL_RENDERER.renderAndSave(source, baseDir, format, path, fileNameFormat, zoom, pageNumber);
     }
 
     /**

@@ -93,7 +93,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         if (wrapper != null) {
             try {
-                VirtualFile virtualFile = wrapper.getVirtualFile(true);
+                VirtualFile virtualFile = wrapper.getVirtualFile(false);
                 if (virtualFile != null) {
                     lastDir = virtualFile.getParent();
                     logger.info("lastDir set to " + lastDir);
