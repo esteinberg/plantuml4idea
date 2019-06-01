@@ -12,8 +12,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
@@ -93,12 +95,14 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         if (wrapper != null) {
             try {
-                VirtualFile virtualFile = wrapper.getVirtualFile(false);
-                if (virtualFile != null) {
-                    lastDir = virtualFile.getParent();
+                File file = wrapper.getFile();
+
+                File parentDir = file.getParentFile();
+                if (parentDir != null && parentDir.exists()) {
+                    lastDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(parentDir);
                     logger.info("lastDir set to " + lastDir);
                 }
-                File file = wrapper.getFile();
+                                
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String base = tokens[0];
                 String extension;
@@ -165,6 +169,10 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         if (filename == null) {
             filename = FILENAME;
+        }
+
+        if (SystemInfo.isMac && Registry.is("ide.mac.native.save.dialog")) {
+            filename += ".png";
         }
         return filename;
     }
