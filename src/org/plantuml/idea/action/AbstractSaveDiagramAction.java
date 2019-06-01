@@ -101,7 +101,16 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 File file = wrapper.getFile();
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String base = tokens[0];
-                String extension = tokens.length < 2 ? "png" : tokens[1];
+                String extension;
+
+                if (tokens.length < 2) {
+                    extension = "png";
+                    file = new File(base + ".png");
+                } else {
+                    extension = tokens[1];
+                }
+
+
                 PlantUml.ImageFormat imageFormat;
                 try {
                     imageFormat = PlantUml.ImageFormat.valueOf(extension.toUpperCase());
