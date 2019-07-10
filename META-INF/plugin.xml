@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.18.0</version>
+    <version>2.18.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="182"/>
@@ -12,6 +12,7 @@
             <p>2.18</p>
             <ul>
               <li>PlantUml library upgrade to v1.2019.7</li>
+              <li>Fixed icons for IntelliJ 2019.2</li>
             </ul>
             <p>2.17</p>
             <ul>
@@ -157,44 +158,44 @@
         <group id="PlantUML.Toolbar" description="PlantUML Toolbar">
             <action id="PlantUML.Update" description="Update PlantUml Diagrams"
                     class="org.plantuml.idea.action.UpdateDiagramsAction"
-                    icon="/javaee/updateRunningApplication.png" text="Update PlantUml Diagrams - changes only">
+                    icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift F"/>
             </action>
             <action id="PlantUML.Reload" description="Reload PlantUml Diagrams"
                     class="org.plantuml.idea.action.ReloadNowAction"
-                    icon="/actions/refresh.png" text="Reload PlantUml Diagrams">
+                    icon="AllIcons.Actions.Refresh" text="Reload PlantUml Diagrams">
                 <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift G"/>
             </action>
 
             <separator/>
             <action id="PlantUML.CopyToClipboard" description="Copy Current Diagram to Clipboard"
                     class="org.plantuml.idea.action.CopyDiagramToClipboardAction"
-                    icon="/actions/copy.png" text="Copy Current Diagram to Clipboard"
+                    icon="AllIcons.Actions.Copy" text="Copy Current Diagram to Clipboard"
             />
             <action id="PlantUML.SaveToFile" description="Save Current Diagram Only"
                     class="org.plantuml.idea.action.SaveDiagramToFileAction"
-                    icon="/actions/menu-saveall.png" text="Save Current Diagram Only"/>
+                    icon="AllIcons.Actions.Menu_saveall" text="Save Current Diagram Only"/>
             <action id="PlantUML.SaveAllToFile" description="Save All Diagrams"
                     class="org.plantuml.idea.action.SaveAllDiagramToFileAction"
-                    icon="/actions/export.png" text="Save All Diagrams in Current File"/>
+                    icon="AllIcons.ToolbarDecorator.Export" text="Save All Diagrams in Current File"/>
             <separator/>
 
             <action id="PlantUML.ZoomIn" description="Zoom In" class="org.plantuml.idea.action.ZoomInAction"
-                    icon="/graph/zoomIn.png" text="Zoom In"/>
+                    icon="AllIcons.Graph.ZoomIn" text="Zoom In"/>
             <action id="PlantUML.ZoomOut" description="Zoom In" class="org.plantuml.idea.action.ZoomOutAction"
-                    icon="/graph/zoomOut.png" text="Zoom Out"/>
+                    icon="AllIcons.Graph.ZoomOut" text="Zoom Out"/>
             <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
-                    icon="/graph/actualZoom.png" text="Actual Zoom"/>
+                    icon="AllIcons.Graph.ActualZoom" text="Actual Zoom"/>
             <separator/>
 
             <action id="PlantUML.PrevPage" description="Prev Page" class="org.plantuml.idea.action.PrevPageAction"
-                    icon="/actions/back.png" text="Previous Page"/>
+                    icon="AllIcons.Actions.Back" text="Previous Page"/>
             <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
-                    icon="/actions/forward.png" text="Next Page"/>
+                    icon="AllIcons.Actions.Forward" text="Next Page"/>
 
             <separator/>
 
-            <group id="PlantUML.Settings" icon="/general/settings.png" popup="true">
+            <group id="PlantUML.Settings" icon="AllIcons.General.Settings" popup="true">
                 <action id="PlantUML.AutoPoup"
                         class="org.plantuml.idea.action.AutoPopupToggleAction"
                         text="Automatic Code Completion Popup"
@@ -210,7 +211,7 @@
             </group>
 
             <separator/>
-            <action id="PlantUML.About" description="About" icon="/actions/help.png"
+            <action id="PlantUML.About" description="About" icon="AllIcons.Actions.Help"
                     class="org.plantuml.idea.action.AboutAction" text="About"/>
         </group>
 
