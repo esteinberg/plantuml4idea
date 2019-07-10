@@ -3,6 +3,8 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.UmlSource;
+import net.sourceforge.plantuml.error.PSystemError;
+import net.sourceforge.plantuml.error.PSystemErrorV2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +49,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             UmlSource source = new UmlSource(data, false);
 
             ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), lineLocation);
-            PSystemError pSystemError = new PSystemError(source, singleError, null);
+            PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
             pSystemError.exportDiagram(os, 0, new FileFormatOption(FileFormat.PNG));
         } catch (IOException e1) {
             logger.warn(e1);
