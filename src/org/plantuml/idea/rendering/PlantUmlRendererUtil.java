@@ -6,7 +6,6 @@ import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
-import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
 import net.sourceforge.plantuml.error.PSystemError;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
@@ -108,18 +107,11 @@ public class PlantUmlRendererUtil {
     }
 
     private static void zoomDiagram(Diagram diagram, int zoom) {
-        if (diagram instanceof UmlDiagram) {
-            UmlDiagram umlDiagram = (UmlDiagram) diagram;
-            Scale scale = umlDiagram.getScale();
-
-            if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
-                umlDiagram.setScale(calculateScale(zoom, scale));
-            }
-        } else if (diagram instanceof NewpagedDiagram) {
+        if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
             for (Diagram page : newpagedDiagram.getDiagrams()) {
-                if (page instanceof DescriptionDiagram) {
-                    DescriptionDiagram descriptionDiagram = (DescriptionDiagram) page;
+                if (page instanceof AbstractPSystem) {
+                    AbstractPSystem descriptionDiagram = (AbstractPSystem) page;
                     Scale scale = descriptionDiagram.getScale();
 
                     if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
