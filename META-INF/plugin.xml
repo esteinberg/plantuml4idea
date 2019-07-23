@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.19.0</version>
+    <version>2.19.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="182"/>
@@ -13,6 +13,7 @@
             <ul>
               <li>PlantUml library upgrade to v1.2019.8</li>
               <li>Zooming fix</li>
+              <li>"IllegalStateException: Timeout4 TIMEOUT" while zooming fixed</li>
             </ul>
             <p>2.18</p>
             <ul>

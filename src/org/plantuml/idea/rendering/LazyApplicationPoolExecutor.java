@@ -66,7 +66,8 @@ public class LazyApplicationPoolExecutor {
         if (future == null || future.isDone()) {
             scheduleNext(null);
         } else if (command.reason == RenderCommand.Reason.REFRESH) {
-            future.cancel(true);
+            // TODO  https://forum.plantuml.net/9921/detecting-stacktrace-illegalstateexception-timeout4-timeout
+//            future.cancel(true);   
         }
     }
 
