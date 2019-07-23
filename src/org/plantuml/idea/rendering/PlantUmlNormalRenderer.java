@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static org.plantuml.idea.rendering.PlantUmlRendererUtil.checkCancel;
 import static org.plantuml.idea.rendering.PlantUmlRendererUtil.zoomDiagram;
 
 
@@ -191,11 +192,6 @@ public class PlantUmlNormalRenderer {
         return cachedItem != null && pagesCount != cachedItem.getImageItems().length;
     }
 
-    protected void checkCancel() {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new RenderingCancelledException();
-        }
-    }
 
     @NotNull
     protected ImageItem generateImageItem(RenderRequest renderRequest,

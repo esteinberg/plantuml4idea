@@ -207,7 +207,7 @@ public class PlantUmlRendererUtil {
         }
     }
 
-    private static void checkCancel() {
+    public static void checkCancel() {
         if (Thread.currentThread().isInterrupted()) {
             throw new RenderingCancelledException();
         }
