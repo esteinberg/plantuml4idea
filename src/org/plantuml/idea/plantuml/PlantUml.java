@@ -96,13 +96,20 @@ public class PlantUml {
             Pattern.compile("^\\s*\\*\\s", Pattern.MULTILINE);
 
     private static String stripComments(String source) {
-        if (source.contains("@startmindmap")
-                || source.contains("@startwbs")) { //TODO something smarter
-            return source;
-        } else {
+        if (isCommented(source)) {
             Matcher matcher = sourceCommentPattern.matcher(source);
             return matcher.replaceAll("");
+        } else {
+            return source;
         }
+    }
+
+    private static Pattern sourceCommentPattern2 =
+            Pattern.compile("^\\s*\\*\\s*@end", Pattern.MULTILINE);
+
+    private static boolean isCommented(String source) {
+        Matcher matcher = sourceCommentPattern2.matcher(source);
+        return matcher.find();
     }
 
 }

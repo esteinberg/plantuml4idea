@@ -53,10 +53,10 @@ public class PlantUmlTest extends TestCase {
         String source = "/**\n" +
                 "* @startuml\n" +
                 "* Bob -> Alice: hello\n" +
-                "*/";
+                "* @enduml";
         String expected = "@startuml\n" +
                 "Bob -> Alice: hello\n" +
-                "*/";
+                "@enduml";
         assertEquals(expected, PlantUml.extractSource(source, source.length() / 2));
 
         source = "/*\n" +
