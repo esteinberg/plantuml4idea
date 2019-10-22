@@ -191,7 +191,7 @@
                     icon="AllIcons.Actions.Menu_saveall" text="Save Current Diagram Only"/>
             <action id="PlantUML.SaveAllToFile" description="Save All Diagrams"
                     class="org.plantuml.idea.action.SaveAllDiagramToFileAction"
-                    icon="AllIcons.ToolbarDecorator.Export" text="Save All Diagrams in Current File"/>
+                    icon="AllIcons.ToolbarDecorator.Export" text="Save All Diagrams"/>
             <separator/>
 
             <action id="PlantUML.ZoomIn" description="Zoom In" class="org.plantuml.idea.action.ZoomInAction"
