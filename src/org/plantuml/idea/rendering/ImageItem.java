@@ -50,7 +50,7 @@ public class ImageItem {
     private final String documentSource;
     private byte[] imageBytes;
 
-    public ImageItem(@NotNull File baseDir,
+    public ImageItem(@Nullable File baseDir,
                      @NotNull String documentSource,
                      @Nullable String pageSource,
                      int page,
@@ -59,7 +59,7 @@ public class ImageItem {
                      @Nullable byte[] svgBytes,
                      @NotNull RenderingType renderingType,
                      @Nullable String title,
-                     String filename) {
+                     @Nullable String filename) {
         this.pageSource = pageSource;
         this.documentSource = documentSource;
         this.page = page;

@@ -147,6 +147,8 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             Utils.setPlantUmlDir(baseDir);
 
             PlantUmlIncludes.commitIncludes(source, baseDir);
+        } else {
+            Utils.resetPlantUmlDir();
         }
         return SyntaxChecker.checkSyntaxFair(source);
     }

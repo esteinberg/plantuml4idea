@@ -38,9 +38,9 @@ public class PlantUmlRendererUtil {
      * @param source         source code to be rendered
      * @param baseDir        base dir to set for "include" functionality
      * @param format         image format
-     * @param path       path to use with first file
+     * @param path           path to use with first file
      * @param fileNameFormat file naming scheme for further files
-     * @param pageNumber     -1 for all pages   
+     * @param pageNumber     -1 for all pages
      * @throws IOException in case of rendering or saving fails
      */
     public static void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int pageNumber)
@@ -53,26 +53,28 @@ public class PlantUmlRendererUtil {
      * to provided values
      */
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-            File baseDir = renderRequest.getBaseDir();
-            if (baseDir != null) {
-                Utils.setPlantUmlDir(baseDir);
-            }
-            long start = System.currentTimeMillis();
+        File baseDir = renderRequest.getBaseDir();
+        if (baseDir != null) {
+            Utils.setPlantUmlDir(baseDir);
+        } else {
+            Utils.resetPlantUmlDir();
+        }
+        long start = System.currentTimeMillis();
 
-            String source = renderRequest.getSource();
-            String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
-            logger.debug("split done ", System.currentTimeMillis() - start, "ms");
+        String source = renderRequest.getSource();
+        String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
+        logger.debug("split done ", System.currentTimeMillis() - start, "ms");
 
-            boolean partialRender = sourceSplit[0].contains(IDEA_PARTIAL_RENDER);
-            logger.debug("partialRender ", partialRender);
+        boolean partialRender = sourceSplit[0].contains(IDEA_PARTIAL_RENDER);
+        logger.debug("partialRender ", partialRender);
 
-            RenderResult renderResult;
-            if (partialRender) {
-                renderResult = PARTIAL_RENDERER.partialRender(renderRequest, cachedItem, start, sourceSplit);
-            } else {
-                renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
-            }
-            return renderResult;
+        RenderResult renderResult;
+        if (partialRender) {
+            renderResult = PARTIAL_RENDERER.partialRender(renderRequest, cachedItem, start, sourceSplit);
+        } else {
+            renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
+        }
+        return renderResult;
     }
 
     public static DiagramInfo zoomDiagram(SourceStringReader reader, int zoom) {
@@ -85,7 +87,7 @@ public class PlantUmlRendererUtil {
 //            logger.error("more than 1 block"); //TODO
             //happens when the source is incorrectly extracted and contains multiple diagrams
         }
-        
+
         for (int i = 0; i < blocks.size(); i++) {
             BlockUml block = blocks.get(i);
 

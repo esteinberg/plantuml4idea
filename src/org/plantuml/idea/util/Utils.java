@@ -30,6 +30,11 @@ public class Utils {
         System.setProperty("plantuml.include.path", baseDir.getAbsolutePath());
     }
 
+    public static void resetPlantUmlDir() {
+        FileSystem.getInstance().reset();
+        System.clearProperty("plantuml.include.path");
+    }
+
     @NotNull
     public static SourceStringReader newSourceStringReader(String source, boolean useSettings) {
         List<String> configAsList;
@@ -50,4 +55,5 @@ public class Utils {
         FileType fileType = file.getFileType();
         return fileType.equals(PlantUmlFileType.PLANTUML_FILE_TYPE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
     }
+
 }

@@ -50,7 +50,11 @@ public class PlantUmlNormalRenderer {
         try {
             if (baseDir != null) {
                 Utils.setPlantUmlDir(baseDir);
+            } else {
+                Utils.resetPlantUmlDir();
             }
+
+
             PlantUmlIncludes.commitIncludes(source, baseDir);
             SourceStringReader reader = Utils.newSourceStringReader(source, true);
 

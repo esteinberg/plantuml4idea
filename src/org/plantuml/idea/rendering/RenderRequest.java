@@ -2,12 +2,13 @@ package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 
 import java.io.File;
 
 public class RenderRequest {
-    @NotNull
+    @Nullable
     private final File baseDir;
     @NotNull
     private final String source;
@@ -20,7 +21,7 @@ public class RenderRequest {
     private RenderCommand.Reason reason;
     protected boolean useSettings = true;
 
-    public RenderRequest(@NotNull File baseDir,
+    public RenderRequest(@Nullable File baseDir,
                          @NotNull String source,
                          @NotNull PlantUml.ImageFormat format,
                          int page,
@@ -49,7 +50,7 @@ public class RenderRequest {
         this.version = null;
     }
 
-    @NotNull
+    @Nullable
     public File getBaseDir() {
         return baseDir;
     }
