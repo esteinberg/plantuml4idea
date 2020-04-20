@@ -19,6 +19,7 @@ import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.PathUtilRt;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +103,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                     lastDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(parentDir);
                     logger.info("lastDir set to " + lastDir);
                 }
-                                
+
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String base = tokens[0];
                 String extension;
@@ -113,7 +114,13 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 } else {
                     extension = tokens[1];
                 }
-
+                for (int i = 0; i < extensions.length; i++) {
+                    String s = extensions[i];
+                    if (s.equals(extension)) {
+                        ArrayUtil.swap(extensions, 0, i);
+                        break;
+                    }
+                }
 
                 PlantUml.ImageFormat imageFormat;
                 try {

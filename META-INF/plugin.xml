@@ -13,6 +13,7 @@
             <ul>
               <li>PlantUml library upgrade to v1.2020.7</li>
               <li>Render URL links fix</li>
+              <li>Remember file extension in export dialog</li>
             </ul>    
             <p>2.23</p>
             <ul>
