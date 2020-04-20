@@ -2,21 +2,24 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
+import com.intellij.ui.scale.ScaleContext;
+import com.intellij.ui.scale.ScaleType;
 import com.intellij.util.ui.ImageUtil;
 import com.intellij.util.ui.JBImageIcon;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.context.*;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
 
@@ -88,7 +91,7 @@ public class PlantUmlImageLabel extends JLabel {
         originalImage = imageItem.getImage();
         Image scaledImage;
 
-        JBUI.ScaleContext ctx = JBUI.ScaleContext.create(label);
+        ScaleContext ctx = ScaleContext.create(label);
         scaledImage = ImageUtil.ensureHiDPI(originalImage, ctx);
 //        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
@@ -104,28 +107,43 @@ public class PlantUmlImageLabel extends JLabel {
         //Removing all children from image label and creating transparent buttons for each item with url
 
         label.removeAll();
+        boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
 
         for (ImageItem.UrlData url : imageItem.getUrls()) {
             final URI uri = url.getUri();
-            JButton button = new JButton();
-            button.setContentAreaFilled(false);
-            button.setBorder(null);
-            button.setLocation(url.getClickArea().getLocation());
-            button.setSize(url.getClickArea().getSize());
+            JLabel button = new JLabel();
+            if (showUrlLinksBorder) {
+                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
+            }
+            Rectangle area = url.getClickArea();
+
+            int tolerance = 5;
+            double scale = ctx.getScale(ScaleType.SYS_SCALE);
+            int x = (int) ((double) area.x / scale);
+            int y = (int) (area.y / scale);
+            int width = (int) ((area.width) / scale) + tolerance;
+            int height = (int) ((area.height) / scale) + tolerance;
+
+            area = new Rectangle(x, y, width, height);
+
+            button.setLocation(area.getLocation());
+            button.setSize(area.getSize());
 
             button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             //When user clicks on item, url is opened in default system browser
-            button.addActionListener(new ActionListener() {
+            button.addMouseListener(new MouseAdapter() {
                 @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+                public void mouseClicked(MouseEvent e) {
                     try {
                         Desktop.getDesktop().browse(uri);
-                    } catch (IOException e) {
-                        logger.warn(e);
+                    } catch (IOException ex) {
+                        logger.warn(ex);
                     }
                 }
             });
+
+
             label.add(button);
         }
     }

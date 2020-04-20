@@ -30,6 +30,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextField encoding;
     private JTextArea config;
     private JTextArea configExample;
+    private JCheckBox showUrlLinksBorder;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -97,41 +98,44 @@ public class PlantUmlSettingsPage implements Configurable {
     }
 
     public void setData(PlantUmlSettings data) {
-        textFieldDotExecutable.setText(data.getDotExecutable());
         renderDelay.setText(data.getRenderDelay());
         cacheSize.setText(data.getCacheSize());
-        usePreferentiallyGRAPHIZ_DOT.setSelected(data.isUsePreferentiallyGRAPHIZ_DOT());
+        encoding.setText(data.getEncoding());
         renderUrlLinks.setSelected(data.isRenderUrlLinks());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
-        encoding.setText(data.getEncoding());
+        textFieldDotExecutable.setText(data.getDotExecutable());
+        usePreferentiallyGRAPHIZ_DOT.setSelected(data.isUsePreferentiallyGRAPHIZ_DOT());
         config.setText(data.getConfig());
+        showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
     }
 
     public void getData(PlantUmlSettings data) {
-        data.setDotExecutable(textFieldDotExecutable.getText());
         data.setRenderDelay(renderDelay.getText());
         data.setCacheSize(cacheSize.getText());
-        data.setUsePreferentiallyGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
+        data.setEncoding(encoding.getText());
         data.setRenderUrlLinks(renderUrlLinks.isSelected());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
-        data.setEncoding(encoding.getText());
+        data.setDotExecutable(textFieldDotExecutable.getText());
+        data.setUsePreferentiallyGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
         data.setConfig(config.getText());
+        data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
-        if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
-            return true;
         if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
             return true;
         if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
             return true;
-        if (usePreferentiallyGRAPHIZ_DOT.isSelected() != data.isUsePreferentiallyGRAPHIZ_DOT()) return true;
-        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
-        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (encoding.getText() != null ? !encoding.getText().equals(data.getEncoding()) : data.getEncoding() != null)
             return true;
+        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
+        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
+        if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
+            return true;
+        if (usePreferentiallyGRAPHIZ_DOT.isSelected() != data.isUsePreferentiallyGRAPHIZ_DOT()) return true;
         if (config.getText() != null ? !config.getText().equals(data.getConfig()) : data.getConfig() != null)
             return true;
+        if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         return false;
     }
 }

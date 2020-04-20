@@ -1,17 +1,21 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.23.0</version>
+    <version>2.24.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
-    <idea-version since-build="182.2371.4"/>
+    <idea-version since-build="193"/>
 
     <description>PlantUML diagramming tool integration</description>
 
     <change-notes>
         <![CDATA[        
+            <p>2.24</p>
+            <ul>
+              <li>Render URL links fix</li>
+            </ul>    
             <p>2.23</p>
             <ul>
-              <li>PlantUml library upgrade to a new beta</li>
+              <li>PlantUml library upgrade to a new beta - to fix !include</li>
             </ul>   
             <p>2.22</p>
             <ul>
@@ -162,6 +166,7 @@
        ]]>
     </change-notes>
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true">com.intellij.platform.images</depends>
 
     <application-components>
         <!-- Add your application components here -->

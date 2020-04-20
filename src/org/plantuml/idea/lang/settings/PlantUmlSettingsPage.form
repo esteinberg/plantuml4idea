@@ -85,10 +85,10 @@
       </component>
       <component id="d98e0" class="javax.swing.JCheckBox" binding="renderUrlLinks">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Render URL links (takes a lot of time)"/>
+          <text value="Render URL links"/>
         </properties>
       </component>
       <component id="d8ade" class="javax.swing.JCheckBox" binding="plantUMLErrorAnnotationExperimentalCheckBox" default-binding="true">
@@ -159,6 +159,14 @@
         </constraints>
         <properties>
           <text value="(included in every file after @startuml)"/>
+        </properties>
+      </component>
+      <component id="db7be" class="javax.swing.JCheckBox" binding="showUrlLinksBorder">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Show URL links border"/>
         </properties>
       </component>
     </children>

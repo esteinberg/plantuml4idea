@@ -3,7 +3,6 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -33,8 +32,8 @@ public class ImageItem {
     private final String description;
     @NotNull
     private final RenderingType renderingType;
-    @Nullable 
-    private final BufferedImage image;
+    @Nullable
+    private BufferedImage image;
     @NotNull
     private final UrlData[] urls;
     @Nullable
@@ -68,15 +67,6 @@ public class ImageItem {
         this.title = title;
         this.filename = filename;
         this.imageBytes = imageBytes;
-        if (this.imageBytes != null) {
-            try {
-                this.image = UIUtils.getBufferedImage(imageBytes);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            this.image = null;
-        } 
         this.urls = this.parseUrls(svgBytes, baseDir);
     }
 
@@ -107,6 +97,10 @@ public class ImageItem {
     @Nullable
     public BufferedImage getImage() {
         return image;
+    }
+
+    public void setImage(@Nullable BufferedImage image) {
+        this.image = image;
     }
 
     @NotNull
@@ -211,6 +205,14 @@ public class ImageItem {
         }
     }
 
+    /**
+     * <a href="ddd" target="_top" title="ddd" xlink:actuate="onRequest" xlink:href="ddd" xlink:show="new"
+     * xlink:title="ddd" xlink:type="simple">
+     * <text fill="#0000FF" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs"
+     * text-decoration="underline" textLength="21" x="1235.5" y="3587.8857">ddd
+     * </text>
+     * </a>
+     */
     private List<UrlData> createUrl(Node linkNode, File baseDir) throws URISyntaxException {
         List<UrlData> urls = new ArrayList<UrlData>();
 
@@ -218,13 +220,18 @@ public class ImageItem {
 
         for (int i = 0; i < linkNode.getChildNodes().getLength(); i++) {
             Node child = linkNode.getChildNodes().item(i);
-            if (child.getNodeName().equals("rect")) {
+            if (child.getNodeName().equals("text")) {
                 NamedNodeMap nodeAttributes = child.getAttributes();
+                int x = (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue());
+                int y = (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue());
+                int textLength = (int) Float.parseFloat(nodeAttributes.getNamedItem("textLength").getNodeValue());
+                int height = (int) Float.parseFloat(nodeAttributes.getNamedItem("font-size").getNodeValue());
+
                 Rectangle rect = new Rectangle(
-                        (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue()),
-                        (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue()),
-                        (int) Float.parseFloat(nodeAttributes.getNamedItem("width").getNodeValue()),
-                        (int) Float.parseFloat(nodeAttributes.getNamedItem("height").getNodeValue())
+                        x,
+                        y - height,
+                        textLength,
+                        height
                 );
 
                 urls.add(new UrlData(url, rect));

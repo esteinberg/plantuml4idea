@@ -8,6 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.LowMemoryWatcher;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.listener.PlantUmlAncestorListener;
 import org.plantuml.idea.util.UIUtils;
@@ -91,6 +93,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
+
+        applyNewSettings(PlantUmlSettings.getInstance());
     }
 
     private void setupUI() {
@@ -359,8 +363,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             }
         }
 
-
+        for (Component component : imagesPanel.getComponents()) {
+            if (component instanceof Disposable) {
+                Disposer.dispose((Disposable) component);
+            }
+        }
         imagesPanel.removeAll();
+
         if (requestedPage == -1) {
             logger.debug("displaying images ", requestedPage);
             for (int i = 0; i < imagesWithData.length; i++) {
@@ -394,13 +403,18 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
-        PlantUmlImageLabel label = new PlantUmlImageLabel(imageWithData, pageNumber, cacheItem.getRenderRequest());
-        addScrollBarListeners(label);
+        JComponent component;
+        if (cacheItem.getRenderRequest().getFormat() == PlantUml.ImageFormat.SVG) {
+            component = new PlantUmlImagePanelSvg(imageWithData, pageNumber, cacheItem.getRenderRequest());
+        } else {
+            component = new PlantUmlImageLabel(imageWithData, pageNumber, cacheItem.getRenderRequest());
+        }
+        addScrollBarListeners(component);
 
         if (pageNumber != 0 && imagesPanel.getComponentCount() > 0) {
             imagesPanel.add(separator());
         }
-        imagesPanel.add(label);
+        imagesPanel.add(component);
     }
 
 

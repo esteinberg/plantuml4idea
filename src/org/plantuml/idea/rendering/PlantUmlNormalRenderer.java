@@ -118,6 +118,7 @@ public class PlantUmlNormalRenderer {
 
             boolean containsIncludedNewPage = sourceSplit.length != totalPages;
 
+
             logger.debug("splitByNewPage.length=", sourceSplit.length, ", totalPages=", totalPages, ", cachedPages=", cachedItem != null ? cachedItem.getImageItems().length : null);
             boolean incrementalRendering =
                     cachedItem != null
@@ -221,11 +222,14 @@ public class PlantUmlNormalRenderer {
         } catch (Exception e) {
             throw new RenderingCancelledException(e);
         }
+        byte[] bytes = imageStream.toByteArray();
 
         logger.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms");
 
         byte[] svgBytes = new byte[0];
-        if (renderRequest.isRenderUrlLinks()) {
+        if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
+            svgBytes = bytes;
+        } else if (renderRequest.isRenderUrlLinks()) {
             svgBytes = generateSvg(reader, page);
         }
 
@@ -236,7 +240,7 @@ public class PlantUmlNormalRenderer {
             description = "ok";
         }
 
-        return new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, page, description, imageStream.toByteArray(), svgBytes, renderingType, title, filename);
+        return new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, page, description, bytes, svgBytes, renderingType, title, filename);
     }
 
     protected byte[] generateSvg(SourceStringReader reader, int i) throws IOException {

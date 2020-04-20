@@ -41,6 +41,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean usePreferentiallyGRAPHIZ_DOT = false;
     private String encoding = "UTF-8";
     private String config = "";
+    private boolean showUrlLinksBorder;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -196,5 +197,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         }
         String[] split = config.split("\n");
         return Arrays.asList(split);
+    }
+
+    public boolean isShowUrlLinksBorder() {
+        return showUrlLinksBorder;
+    }
+
+    public void setShowUrlLinksBorder(final boolean showUrlLinksBorder) {
+        this.showUrlLinksBorder = showUrlLinksBorder;
     }
 }
