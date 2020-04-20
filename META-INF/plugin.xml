@@ -11,6 +11,7 @@
         <![CDATA[        
             <p>2.24</p>
             <ul>
+              <li>PlantUml library upgrade to v1.2020.7</li>
               <li>Render URL links fix</li>
             </ul>    
             <p>2.23</p>
