@@ -4,6 +4,7 @@ import com.intellij.ide.actions.CreateFileFromTemplateAction;
 import com.intellij.ide.actions.CreateFileFromTemplateDialog;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.NonEmptyInputValidator;
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantUmlFileType;
@@ -23,17 +24,18 @@ public class CreatePlantUMLFileAction extends CreateFileFromTemplateAction imple
     protected void buildDialog(Project project, PsiDirectory directory, CreateFileFromTemplateDialog.Builder builder) {
         builder
                 .setTitle("New PlantUML File")
-                .addKind("Sequence", PlantUmlFileType.PLANTUML_ICON, "UML Sequence.puml")
-                .addKind("Use Case", PlantUmlFileType.PLANTUML_ICON, "UML Use Case.puml")
-                .addKind("Class", PlantUmlFileType.PLANTUML_ICON, "UML Class.puml")
-                .addKind("Activity", PlantUmlFileType.PLANTUML_ICON, "UML Activity.puml")
-                .addKind("Component", PlantUmlFileType.PLANTUML_ICON, "UML Component.puml")
-                .addKind("State", PlantUmlFileType.PLANTUML_ICON, "UML State.puml")
-                .addKind("Object", PlantUmlFileType.PLANTUML_ICON, "UML Object.puml")
-                .addKind("Gantt", PlantUmlFileType.PLANTUML_ICON, "UML Gantt.puml")
-                .addKind("MindMap", PlantUmlFileType.PLANTUML_ICON, "UML MindMap.puml")
-                .addKind("Wireframe", PlantUmlFileType.PLANTUML_ICON, "Salt Wireframe.puml")
-                .addKind("Work Breakdown Structure", PlantUmlFileType.PLANTUML_ICON, "Work Breakdown Structure.puml")
+                .addKind("Sequence", PlantUmlFileType.PLANTUML_ICON, "UML Sequence")
+                .addKind("Use Case", PlantUmlFileType.PLANTUML_ICON, "UML Use Case")
+                .addKind("Class", PlantUmlFileType.PLANTUML_ICON, "UML Class")
+                .addKind("Activity", PlantUmlFileType.PLANTUML_ICON, "UML Activity")
+                .addKind("Component", PlantUmlFileType.PLANTUML_ICON, "UML Component")
+                .addKind("State", PlantUmlFileType.PLANTUML_ICON, "UML State")
+                .addKind("Object", PlantUmlFileType.PLANTUML_ICON, "UML Object")
+                .addKind("Gantt", PlantUmlFileType.PLANTUML_ICON, "UML Gantt")
+                .addKind("MindMap", PlantUmlFileType.PLANTUML_ICON, "UML MindMap")
+                .addKind("Wireframe", PlantUmlFileType.PLANTUML_ICON, "Salt Wireframe")
+                .addKind("Work Breakdown Structure", PlantUmlFileType.PLANTUML_ICON, "Work Breakdown Structure")
+                .setValidator(new NonEmptyInputValidator())
         ;
     }
 
