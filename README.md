@@ -26,8 +26,8 @@ Contributors:
 # Tips
 
 * PlantUML code must be inside @startuml and @enduml tags to be rendered.
-* To be able to generate many diagram types, you must have [Graphviz](http://plantuml.sourceforge.net/graphvizdot.html)
- installed on your machine. About screen tests your installation.
+* To be able to generate many diagram types, you must have [Graphviz](https://www.graphviz.org/download/)
+ installed on your machine. For Windows, use [Development version](https://ci.appveyor.com/project/ellson/graphviz-pl238), not Stable 2.38 - that one is very old. About screen tests your installation.
 
 # Developer notes
 * Project setup: [gif](https://user-images.githubusercontent.com/1160875/55478653-7dbb2300-561c-11e9-8a58-66f5a66b5dc1.gif) [mp4](https://mega.nz/#!66oTUIgA!ckkAdLZNHtXjIwyoSlN6BwA-vEWh_034vTRqtWZr9AM)
