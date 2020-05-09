@@ -58,7 +58,7 @@ public class Utils {
             List<File> o = (List<File>) include_path.get(null);
             o.clear();
             o.addAll(FileSystem.getPath("plantuml.include.path", true));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.debug(e);
         }
     }
