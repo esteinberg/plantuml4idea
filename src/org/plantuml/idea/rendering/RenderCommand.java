@@ -7,13 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
-import org.plantuml.idea.toolwindow.PlantUmlImagePanelSvg;
-import org.plantuml.idea.util.UIUtils;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +70,7 @@ public abstract class RenderCommand implements Runnable {
             final RenderRequest renderRequest = new RenderRequest(baseDir, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
             final RenderResult result = PlantUmlRendererUtil.render(renderRequest, cachedItem);
 
-            initImages(renderRequest, result);
+            initImages(result);
 
             final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, result.getImageItemsAsArray(), version);
             final long total = System.currentTimeMillis() - start;
@@ -103,22 +98,10 @@ public abstract class RenderCommand implements Runnable {
         }
     }
 
-    private void initImages(RenderRequest renderRequest, RenderResult result) throws IOException {
-        PlantUml.ImageFormat format = renderRequest.getFormat();
+    private void initImages(RenderResult result) {
         List<ImageItem> imageItems = result.getImageItems();
         for (ImageItem imageItem : imageItems) {
-            if (imageItem.getImageBytes() != null) {
-                if (format == PlantUml.ImageFormat.PNG) {
-                    try {
-                        imageItem.setImage(UIUtils.getBufferedImage(imageItem.getImageBytes()));
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else if (format == PlantUml.ImageFormat.SVG) {  //could be done parallelly
-                    BufferedImage bufferedImage = PlantUmlImagePanelSvg.loadWithoutCache(null, new ByteArrayInputStream(imageItem.getImageBytes()), 1.0f, null);
-                    imageItem.setImage(bufferedImage);
-                }
-            }
+            imageItem.initImage();
         }
     }
 

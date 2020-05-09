@@ -10,7 +10,6 @@ import com.intellij.ui.components.JBLayeredPane;
 import com.intellij.ui.components.Magnificator;
 import com.intellij.util.ImageLoader;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.util.XMLResourceDescriptor;
 import org.intellij.images.editor.ImageDocument;
@@ -188,18 +187,18 @@ public class PlantUmlImagePanelSvg extends JPanel implements Disposable {
         return originalImage;
     }
 
-    public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) throws IOException {
+    public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) {
         try {
             MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
             if (docSize != null) {
                 docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
             }
             return transcoder.getImage();
-        } catch (TranscoderException ex) {
+        } catch (Exception ex) {
             if (docSize != null) {
                 docSize.setSize(0, 0);
             }
-            throw new IOException(ex);
+            throw new RuntimeException(ex);
         }
     }
 

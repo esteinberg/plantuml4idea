@@ -407,7 +407,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (cacheItem.getRenderRequest().getFormat() == PlantUml.ImageFormat.SVG) {
             component = new PlantUmlImagePanelSvg(imageWithData, pageNumber, cacheItem.getRenderRequest());
         } else {
-            component = new PlantUmlImageLabel(imageWithData, pageNumber, cacheItem.getRenderRequest());
+            component = new PlantUmlImageLabel(imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest());
         }
         addScrollBarListeners(component);
 

@@ -53,9 +53,9 @@ public class PlantUmlImageLabel extends JLabel {
     public PlantUmlImageLabel() {
     }
 
-    public PlantUmlImageLabel(ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public PlantUmlImageLabel(JPanel parent, ImageItem imageWithData, int i, RenderRequest renderRequest) {
         this.imageWithData = imageWithData;
-        setup(this.imageWithData, i, renderRequest);
+        setup(parent, this.imageWithData, i, renderRequest);
     }
 
     public ImageItem getImageWithData() {
@@ -70,28 +70,22 @@ public class PlantUmlImageLabel extends JLabel {
         return renderRequest;
     }
 
-    public void setup(@NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public void setup(JPanel parent, @NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.hasImage()) {
-            setDiagram(imageWithData, this);
+            setDiagram(parent, imageWithData, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
         this.renderRequest = renderRequest;
     }
 
-    /**
-     * Scales the image and sets it to label
-     *
-     * @param imageItem source image and url data
-     * @param label     destination label
-     */
-    private void setDiagram(@NotNull final ImageItem imageItem, final JLabel label) {
+    private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, final JLabel label) {
         originalImage = imageItem.getImage();
         Image scaledImage;
 
-        ScaleContext ctx = ScaleContext.create(label);
+        ScaleContext ctx = ScaleContext.create(parent);
         scaledImage = ImageUtil.ensureHiDPI(originalImage, ctx);
 //        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 

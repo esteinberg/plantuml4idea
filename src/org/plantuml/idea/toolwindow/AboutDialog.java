@@ -88,7 +88,7 @@ public class AboutDialog extends JDialog {
         try {
             final ImageItem imageItem = result.getImageItem(0);
             if (imageItem != null) {
-                testDot.setup(imageItem, 100, renderRequest);
+                testDot.setup(contentPane, imageItem, 100, renderRequest);
                 testDot.setOpaque(false);
             }
         } catch (Exception e) {

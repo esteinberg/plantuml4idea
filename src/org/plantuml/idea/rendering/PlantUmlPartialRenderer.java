@@ -55,7 +55,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             logger.warn(e1);
             throw e;
         }
-        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
         return renderResult;
     }
 
@@ -89,7 +89,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings());
         String title = getTitle(reader);
-        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
+        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
         logger.debug("updateTitle " + (System.currentTimeMillis() - start));
 
@@ -120,7 +120,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         }
         try {
             ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0), info.getFilename());
-            return new ImageItem(page, item);
+            return new ImageItem(page, item, renderRequest.getFormat());
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {

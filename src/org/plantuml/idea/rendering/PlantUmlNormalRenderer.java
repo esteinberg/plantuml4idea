@@ -164,7 +164,7 @@ public class PlantUmlNormalRenderer {
             renderResult.addRenderedImage(imageItem);
         } else if (obsolete) {
             logger.debug("page ", i, "  title only");
-            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), documentSource, sourceSplit[i], i, TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename()));
+            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[i], i, TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename()));
         } else {
             logger.debug("page ", i, " cached");
             renderResult.addCachedImage(cachedItem.getImageItem(i));
@@ -178,7 +178,7 @@ public class PlantUmlNormalRenderer {
             renderResult.addRenderedImage(imageItem);
         } else {
             logger.debug("page ", i, "  title only");
-            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, i, TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename());
+            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, i, TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename());
             renderResult.addUpdatedTitle(imageItem);
         }
     }
@@ -240,7 +240,7 @@ public class PlantUmlNormalRenderer {
             description = "ok";
         }
 
-        return new ImageItem(renderRequest.getBaseDir(), documentSource, pageSource, page, description, bytes, svgBytes, renderingType, title, filename);
+        return new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, description, bytes, svgBytes, renderingType, title, filename);
     }
 
     protected byte[] generateSvg(SourceStringReader reader, int i) throws IOException {

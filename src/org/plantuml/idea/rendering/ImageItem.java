@@ -3,6 +3,9 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.toolwindow.PlantUmlImagePanelSvg;
+import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -43,6 +46,8 @@ public class ImageItem {
      */
     @Nullable
     private final String filename;
+    @NotNull
+    private final PlantUml.ImageFormat format;
     @Nullable
     private final String pageSource;
     @NotNull
@@ -50,6 +55,7 @@ public class ImageItem {
     private byte[] imageBytes;
 
     public ImageItem(@Nullable File baseDir,
+                     @NotNull PlantUml.ImageFormat format,
                      @NotNull String documentSource,
                      @Nullable String pageSource,
                      int page,
@@ -59,6 +65,7 @@ public class ImageItem {
                      @NotNull RenderingType renderingType,
                      @Nullable String title,
                      @Nullable String filename) {
+        this.format = format;
         this.pageSource = pageSource;
         this.documentSource = documentSource;
         this.page = page;
@@ -70,7 +77,7 @@ public class ImageItem {
         this.urls = this.parseUrls(svgBytes, baseDir);
     }
 
-    public ImageItem(int page, ImageItem item) {
+    public ImageItem(int page, ImageItem item, @NotNull PlantUml.ImageFormat format) {
         this.page = page;
         this.description = item.description;
         this.pageSource = item.pageSource;
@@ -81,6 +88,7 @@ public class ImageItem {
         this.renderingType = item.renderingType;
         this.title = item.title;
         this.filename = item.filename;
+        this.format = format;
     }
 
     @Nullable
@@ -96,6 +104,9 @@ public class ImageItem {
 
     @Nullable
     public BufferedImage getImage() {
+        if (image == null && imageBytes != null) {
+            initImage();
+        }
         return image;
     }
 
@@ -123,6 +134,9 @@ public class ImageItem {
     }
 
     public boolean hasImage() {
+        if (image == null && imageBytes != null) {
+            initImage();
+        }
         return image != null;
     }
 
@@ -146,6 +160,21 @@ public class ImageItem {
             return true;
         }
         return false;
+    }
+
+    void initImage() {
+        if (getImageBytes() != null) {
+            if (format == PlantUml.ImageFormat.PNG) {
+                try {
+                    setImage(UIUtils.getBufferedImage(getImageBytes()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else if (format == PlantUml.ImageFormat.SVG) {  //could be done parallelly
+                BufferedImage bufferedImage = PlantUmlImagePanelSvg.loadWithoutCache(null, new ByteArrayInputStream(getImageBytes()), 1.0f, null);
+                setImage(bufferedImage);
+            }
+        }
     }
 
     public class UrlData {
