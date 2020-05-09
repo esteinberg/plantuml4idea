@@ -24,11 +24,11 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             StringBuilder sb = new StringBuilder();
             State[] values = State.values();
             for (State value : values) {
-                sb.append("\n").append(value.description);
+                sb.append("<br>").append(value.description);
             }
-            DESCRIPTION = "Last execution time\n" +
+            DESCRIPTION = "<html>Last execution time<br>" +
                     "[rendered, changed, not changed page count]" +
-                    "\n\nColors:" + sb.toString();
+                    "<br><br>Colors:" + sb.toString() + "</html>";
         }
     }
 
