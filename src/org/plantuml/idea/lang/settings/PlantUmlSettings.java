@@ -4,6 +4,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @State(name = "PlantUmlSettings", storages = {@Storage("plantuml.cfg")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
+    private static final Logger LOG = Logger.getInstance(PlantUmlSettings.class);
 
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
@@ -42,6 +44,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String encoding = "UTF-8";
     private String config = "";
     private boolean showUrlLinksBorder;
+    private String plantuml_limit_size;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -165,6 +168,15 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
                 GraphvizUtils.setDotExecutable(dotExecutable);
             }
         }
+
+        if (StringUtils.isNotBlank(plantuml_limit_size)) {
+            try {
+                Integer.parseInt(plantuml_limit_size);
+                System.setProperty("PLANTUML_LIMIT_SIZE", plantuml_limit_size);
+            } catch (NumberFormatException e) {
+                LOG.error("invalid PLANTUML_LIMIT_SIZE", e);
+            }
+        }
     }
 
     public boolean isUsePreferentiallyGRAPHIZ_DOT() {
@@ -205,5 +217,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setShowUrlLinksBorder(final boolean showUrlLinksBorder) {
         this.showUrlLinksBorder = showUrlLinksBorder;
+    }
+
+    public String getPLANTUML_LIMIT_SIZE() {
+        return plantuml_limit_size;
+    }
+
+    public void setPLANTUML_LIMIT_SIZE(final String plantuml_limit_size) {
+        this.plantuml_limit_size = plantuml_limit_size;
     }
 }

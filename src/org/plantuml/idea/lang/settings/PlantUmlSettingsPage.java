@@ -31,6 +31,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextArea config;
     private JTextArea configExample;
     private JCheckBox showUrlLinksBorder;
+    private JTextField PLANTUML_LIMIT_SIZE;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -107,6 +108,7 @@ public class PlantUmlSettingsPage implements Configurable {
         usePreferentiallyGRAPHIZ_DOT.setSelected(data.isUsePreferentiallyGRAPHIZ_DOT());
         config.setText(data.getConfig());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
+        PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -119,6 +121,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setUsePreferentiallyGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
         data.setConfig(config.getText());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
+        data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -136,6 +139,8 @@ public class PlantUmlSettingsPage implements Configurable {
         if (config.getText() != null ? !config.getText().equals(data.getConfig()) : data.getConfig() != null)
             return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
+        if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
+            return true;
         return false;
     }
 }
