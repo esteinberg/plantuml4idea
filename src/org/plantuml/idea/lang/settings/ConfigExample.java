@@ -4,7 +4,7 @@ import javax.swing.*;
 
 public class ConfigExample extends JTextArea {
     public static final String TEXT =
-            "Example:\n" +
+            "- example:\n" +
                     "!include config.skinparam\nskinparam monochrome true";
 
     public ConfigExample() {

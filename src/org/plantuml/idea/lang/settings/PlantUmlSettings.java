@@ -45,6 +45,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String config = "";
     private boolean showUrlLinksBorder;
     private String plantuml_limit_size;
+    private String includedPaths;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
@@ -225,5 +226,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setPLANTUML_LIMIT_SIZE(final String plantuml_limit_size) {
         this.plantuml_limit_size = plantuml_limit_size;
+    }
+
+    public String getIncludedPaths() {
+        return includedPaths;
+    }
+
+    public void setIncludedPaths(final String includedPaths) {
+        this.includedPaths = includedPaths;
     }
 }

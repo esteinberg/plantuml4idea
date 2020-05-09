@@ -1,20 +1,26 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.preproc.ImportedFiles;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
 public class Utils {
+    private static final Logger LOG = Logger.getInstance(Utils.class);
+
     public static int asInt(String renderDelay, int defaultValue) {
         int i = defaultValue;
         //noinspection EmptyCatchBlock
@@ -27,7 +33,34 @@ public class Utils {
 
     public static void setPlantUmlDir(@NotNull File baseDir) {
         FileSystem.getInstance().setCurrentDir(baseDir);
-        System.setProperty("plantuml.include.path", baseDir.getAbsolutePath());
+
+        String includedPaths = PlantUmlSettings.getInstance().getIncludedPaths();
+        String separator = System.getProperty("path.separator");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseDir.getAbsolutePath());
+
+        if (StringUtils.isNotBlank(includedPaths)) {
+            String[] split = includedPaths.split("\n");
+            for (String s : split) {
+                if (StringUtils.isNotBlank(s)) {
+                    sb.append(separator);
+                    sb.append(s);
+                }
+            }
+        }
+
+        System.setProperty("plantuml.include.path", sb.toString());
+
+        try {
+            Field include_path = ImportedFiles.class.getDeclaredField("INCLUDE_PATH");
+            include_path.setAccessible(true);
+            List<File> o = (List<File>) include_path.get(null);
+            o.clear();
+            o.addAll(FileSystem.getPath("plantuml.include.path", true));
+        } catch (Exception e) {
+            LOG.debug(e);
+        }
     }
 
     public static void resetPlantUmlDir() {
