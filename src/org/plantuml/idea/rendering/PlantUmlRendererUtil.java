@@ -1,7 +1,8 @@
 package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.util.ui.JBUI;
+import com.intellij.ui.scale.ScaleContext;
+import com.intellij.ui.scale.ScaleType;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
@@ -146,7 +147,7 @@ public class PlantUmlRendererUtil {
 
     private static double getSystemScale() {
         try {
-            return JBUI.ScaleContext.create().getScale(JBUI.ScaleType.SYS_SCALE);  //TODO API change 2019/03/05
+            return ScaleContext.create().getScale(ScaleType.SYS_SCALE);
         } catch (Throwable e) {
             return 1;
         }
