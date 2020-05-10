@@ -1,8 +1,6 @@
 package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.ui.scale.ScaleContext;
-import com.intellij.ui.scale.ScaleType;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
@@ -134,7 +132,7 @@ public class PlantUmlRendererUtil {
 
     @NotNull
     private static ScaleSimple calculateScale(int zoom, Scale scale) {
-        return new ScaleSimple(getPlantUmlScale(scale) * getSystemScale() * zoom / 100f);
+        return new ScaleSimple(getPlantUmlScale(scale) * zoom / 100f);
     }
 
     private static double getPlantUmlScale(Scale scale) {
@@ -143,14 +141,6 @@ public class PlantUmlRendererUtil {
             plantUmlScale = scale.getScale(1, 1);
         }
         return plantUmlScale;
-    }
-
-    private static double getSystemScale() {
-        try {
-            return ScaleContext.create().getScale(ScaleType.SYS_SCALE);
-        } catch (Throwable e) {
-            return 1;
-        }
     }
 
     @NotNull

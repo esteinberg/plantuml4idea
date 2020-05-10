@@ -134,7 +134,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 PlantUmlRendererUtil.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
-                        UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
+                        UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPageNumber(e));
 
             } catch (IOException e1) {
                 String title = "Error writing diagram";
