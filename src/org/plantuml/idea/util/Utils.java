@@ -6,7 +6,6 @@ import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
-import net.sourceforge.plantuml.preproc.ImportedFiles;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantIUmlFileType;
@@ -14,7 +13,6 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,16 +49,6 @@ public class Utils {
         }
 
         System.setProperty("plantuml.include.path", sb.toString());
-
-        try {
-            Field include_path = ImportedFiles.class.getDeclaredField("INCLUDE_PATH");
-            include_path.setAccessible(true);
-            List<File> o = (List<File>) include_path.get(null);
-            o.clear();
-            o.addAll(FileSystem.getPath("plantuml.include.path", true));
-        } catch (Throwable e) {
-            LOG.debug(e);
-        }
     }
 
     public static void resetPlantUmlDir() {
