@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
  */
 public class PlantUml {
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
-    public static final String UMLSTART = "@start";
 
 
     public enum ImageFormat {
@@ -81,12 +80,25 @@ public class PlantUml {
     public static Map<Integer, String> extractSources(String text) {
         LinkedHashMap<Integer, String> result = new LinkedHashMap<Integer, String>();
 
-        if (text.contains(UMLSTART)) {
+        if (text.contains("@start")) {
 
             Matcher matcher = LanguagePatternHolder.INSTANCE.sourcePattern.matcher(text);
 
             while (matcher.find()) {
                 result.put(matcher.start(), matcher.group());
+            }
+        }
+
+        if (text.contains("``` plantuml")) {
+            Matcher matcher = LanguagePatternHolder.INSTANCE.sourcePatternMarkdown.matcher(text);
+
+            while (matcher.find()) {
+                String group = matcher.group();
+                group = group.substring("``` plantuml".length(), group.length() - 3);
+                if (!group.trim().startsWith("@startuml")) {
+                    group = "@startuml\n" + group + "\n@enduml";
+                }
+                result.put(matcher.start(), group);
             }
         }
         return result;
