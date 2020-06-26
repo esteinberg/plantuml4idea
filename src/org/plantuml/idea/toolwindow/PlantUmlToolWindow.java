@@ -300,7 +300,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         last.setVersion(sequence.incrementAndGet());
         last.setRequestedPage(selectedPage);
         executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
-        displayDiagram(last);
+        displayDiagram(last, false);
     }
 
 
@@ -330,14 +330,57 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             }
             logger.debug("displaying item ", newItem);
 
-            if (displayDiagram(newItem)) {
-                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, total, result);
+            if (renderCache.getDisplayedItem() != null
+                    && !renderCache.getDisplayedItem().getRenderResult().hasError()
+                    && newItem.getRenderResult().hasError()
+                    && PlantUmlSettings.getInstance().isDoNotDisplayErrors()) {
+                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.ERROR, total, result, new Runnable() {
+
+                    private RenderCacheItem oldDiagram;
+
+                    @Override
+                    public void run() {
+                        final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
+
+                        if (oldDiagram != null && displayedItem != oldDiagram) {
+                            displayDiagram(oldDiagram, true);
+                            SwingUtilities.invokeLater(() -> oldDiagram = null);
+                        } else if (displayedItem != newItem) {
+                            displayDiagram(newItem, true);
+                            SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
+
+                        }
+                    }
+                });
+            } else if (displayDiagram(newItem, false)) {
+                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, total, result, new Runnable() {
+
+                    private RenderCacheItem oldDiagram;
+                    private boolean hasError = newItem.getRenderResult().hasError();
+
+                    @Override
+                    public void run() {
+                        if (hasError) {
+                            final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
+                            if (oldDiagram != null && displayedItem != oldDiagram) {
+                                displayDiagram(oldDiagram, true);
+                                SwingUtilities.invokeLater(() -> oldDiagram = null);
+                            } else {
+                                RenderCacheItem renderCacheItem = renderCache.getLast();
+                                if (renderCacheItem != null && displayedItem != renderCacheItem) {
+                                    displayDiagram(renderCacheItem, true);
+                                    SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
+                                }
+                            }
+                        }
+                    }
+                });
             }
         }
     }
 
-    public boolean displayDiagram(RenderCacheItem cacheItem) {
-        if (renderCache.isOlderRequest(cacheItem)) { //ctrl+z with cached image vs older request in progress
+    public boolean displayDiagram(RenderCacheItem cacheItem, boolean force) {
+        if (!force && renderCache.isOlderRequest(cacheItem)) { //ctrl+z with cached image vs older request in progress
             logger.debug("skipping displaying older result", cacheItem);
             return false;
         }

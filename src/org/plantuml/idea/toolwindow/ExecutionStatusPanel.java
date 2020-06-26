@@ -11,6 +11,9 @@ import org.plantuml.idea.rendering.RenderResult;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 
 public class ExecutionStatusPanel extends DumbAwareAction implements CustomComponentAction {
     private JLabel label;
@@ -18,6 +21,8 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
     private volatile State state;
     private volatile String message = "---";
     public static String DESCRIPTION;
+    private MyMouseAdapter myMouseAdapter;
+    private Runnable runnable;
 
     {
         {
@@ -39,7 +44,6 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
-
     }
 
     @Override
@@ -57,6 +61,8 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
         Font font = jLabel.getFont();
         Font boldFont = new Font(font.getFontName(), Font.BOLD, font.getSize());
         jLabel.setFont(boldFont);
+        myMouseAdapter = new MyMouseAdapter();
+        jLabel.addMouseListener(myMouseAdapter);
         return jLabel;
     }
 
@@ -67,35 +73,33 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
     public synchronized void update(int version, State state) {
         if (this.version <= version) {
-            updateState(version, state, message);
+            updateState(version, state, message, runnable);
             updateLabelLater();
-        } 
+        }
     }
 
     public synchronized void update(int version, State state, long total, RenderResult result) {
         if (this.version <= version) {
-            updateState(version, state, total, result);
+            updateState(version, state, total, result, null);
             updateLabelLater();
         }
     }
 
-
-    public synchronized void updateNow(Integer version, State state, long total, RenderResult result) {
+    public void updateNow(Integer version, State state, long total, RenderResult result, Runnable r) {
         if (this.version <= version) {
-            updateState(version, state, total, result);
-            state.update(label, message);
+            updateState(version, state, total, result, r);
+            state.update(label, myMouseAdapter, message, this.runnable);
         }
     }
-
 
     public synchronized void updateNow(Integer version, State state, String message) {
         if (this.version <= version) {
-            updateState(version, state, message);
-            state.update(label, message);
+            updateState(version, state, message, null);
+            state.update(label, myMouseAdapter, message, null);
         }
     }
 
-    protected void updateState(int version, State state, long total, RenderResult result) {
+    protected void updateState(int version, State state, long total, RenderResult result, Runnable r) {
         int rendered = result.getRendered();
         int updatedTitles = result.getUpdatedTitles();
         int cached = result.getCached();
@@ -103,14 +107,15 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
                 + rendered + ","
                 + updatedTitles + ","
                 + cached + "]";
-        updateState(version, state, message);
+        updateState(version, state, message, r);
     }
 
 
-    private void updateState(Integer version, State state, String message) {
+    private void updateState(Integer version, State state, String message, Runnable r) {
         this.version = version;
         this.message = message;
         this.state = state;
+        this.runnable = r;
     }
 
     private void updateLabelLater() {
@@ -118,12 +123,11 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             @Override
             public void run() {
                 if (state != null) {
-                    state.update(label, message);
+                    state.update(label, myMouseAdapter, message, runnable);
                 }
             }
         });
     }
-
 
     public enum State {
         WAITING(JBColor.GRAY, "Delay waiting - gray"),
@@ -140,13 +144,34 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             this.description = description;
         }
 
-        public void update(JLabel comp, String message) {
+        public void update(JLabel comp, MyMouseAdapter myMouseAdapter, String message, Runnable r) {
             ApplicationManager.getApplication().assertIsDispatchThread();
             if (comp != null) { //strange NPE
                 comp.setText(message);
                 comp.setForeground(this.color);
             }
+            if (myMouseAdapter != null) {
+                myMouseAdapter.setRunnable(r);
+            }
         }
     }
 
+    private static class MyMouseAdapter extends MouseAdapter {
+        private Runnable runnable;
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (runnable != null) {
+                runnable.run();
+            }
+        }
+
+        public void setRunnable(Runnable runnable) {
+            this.runnable = runnable;
+        }
+
+        public Runnable getRunnable() {
+            return runnable;
+        }
+    }
 }

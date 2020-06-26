@@ -47,7 +47,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     @Nullable
     @Override
     public FileAnnotationResult doAnnotate(PsiFile file) {
-        FileAnnotationResult result = new FileAnnotationResult();
+         FileAnnotationResult result = new FileAnnotationResult();
 
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
             String text = file.getFirstChild().getText();

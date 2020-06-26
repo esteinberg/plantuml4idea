@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
@@ -111,5 +112,13 @@ public class RenderCache {
 
     public void clear() {
         cacheItems.clear();
+    }
+
+    public RenderCacheItem getLast() {
+        try {
+            return cacheItems.getLast();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 }

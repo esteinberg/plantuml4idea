@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>2.26.0</version>
+    <version>2.26.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="193"/>
@@ -11,6 +11,8 @@
         <![CDATA[        
             <p>2.26</p>
             <ul>
+              <li>New option to not display errors</li>
+              <li>Left click on the status label toggles between an error and a last non-error diagram</li>
               <li>Markdown support</li>
             </ul>
             <p>2.25</p>
@@ -247,6 +249,12 @@
                 <action id="PlantUML.AutoHideToolWindowToggle"
                         class="org.plantuml.idea.action.AutoHideToolWindowToggleAction"
                         text="Automatically Show/Hide Tool Window"/>
+                <action id="PlantUML.DoNotDisplayErrorsToggle"
+                        class="org.plantuml.idea.action.DoNotDisplayErrorsToggleAction"
+                        text="Do not Display Error Images"
+                        description="Click on the status label to display the error, click again to return to the last image."
+                />
+                <separator/>
                 <action id="PlantUML.ShowSettings" class="org.plantuml.idea.action.ShowSettingsAction"
                         text="Open Settings"/>
             </group>

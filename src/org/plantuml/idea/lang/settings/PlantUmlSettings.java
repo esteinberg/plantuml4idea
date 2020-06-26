@@ -46,10 +46,12 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean showUrlLinksBorder;
     private String plantuml_limit_size;
     private String includedPaths;
+    private boolean doNotDisplayErrors = false;
 
     public static PlantUmlSettings getInstance() {
         return ServiceManager.getService(PlantUmlSettings.class);
     }
+
 
     public boolean isRenderUrlLinks() {
         return renderUrlLinks;
@@ -234,5 +236,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setIncludedPaths(final String includedPaths) {
         this.includedPaths = includedPaths;
+    }
+
+    public boolean isDoNotDisplayErrors() {
+        return doNotDisplayErrors;
+    }
+
+    public void setDoNotDisplayErrors(boolean doNotDisplayErrors) {
+        this.doNotDisplayErrors = doNotDisplayErrors;
     }
 }
