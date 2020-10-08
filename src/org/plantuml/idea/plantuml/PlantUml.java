@@ -45,6 +45,18 @@ public class PlantUml {
             public FileFormat getFormat() {
                 return FileFormat.EPS;
             }
+        },
+        TEX {
+            @Override
+            public FileFormat getFormat() {
+                return FileFormat.LATEX;
+            }
+        },
+        TIKZ {
+            @Override
+            public FileFormat getFormat() {
+                return FileFormat.LATEX_NO_PREAMBLE;
+            }
         };
 
         public abstract FileFormat getFormat();
