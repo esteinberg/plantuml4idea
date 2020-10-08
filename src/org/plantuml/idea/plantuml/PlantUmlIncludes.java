@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import net.sourceforge.plantuml.BlockUmlBuilder;
 import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
+import net.sourceforge.plantuml.security.SFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
@@ -26,7 +27,7 @@ public class PlantUmlIncludes {
         try {
             if (baseDir != null) {
                 HashMap<File, Long> fileLongHashMap = new HashMap<File, Long>();
-                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), PlantUmlSettings.getInstance().getEncoding(), Defines.createEmpty(), new StringReader(source), baseDir, null);
+                BlockUmlBuilder blockUmlBuilder = new BlockUmlBuilder(Collections.<String>emptyList(), PlantUmlSettings.getInstance().getEncoding(), Defines.createEmpty(), new StringReader(source), new SFile(baseDir.toURI()), null);
                 Set<File> includedFiles = FileWithSuffix.convert(blockUmlBuilder.getIncludedFiles());
                 if (!includedFiles.isEmpty()) {
                     saveModifiedFiles(includedFiles);
