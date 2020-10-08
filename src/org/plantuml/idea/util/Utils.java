@@ -6,6 +6,7 @@ import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.security.SFile;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantIUmlFileType;
@@ -30,7 +31,7 @@ public class Utils {
     }
 
     public static void setPlantUmlDir(@NotNull File baseDir) {
-        FileSystem.getInstance().setCurrentDir(baseDir);
+        FileSystem.getInstance().setCurrentDir(new SFile(baseDir.toURI()));
 
         String includedPaths = PlantUmlSettings.getInstance().getIncludedPaths();
         String separator = System.getProperty("path.separator");
