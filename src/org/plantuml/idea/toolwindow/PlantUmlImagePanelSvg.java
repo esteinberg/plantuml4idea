@@ -47,7 +47,7 @@ public class PlantUmlImagePanelSvg extends JPanel implements Disposable {
             new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
             Separator.getInstance(),
             new CopyDiagramAsLatexToClipboardContextAction(),
-            new CopyDiagramAsLatexStandaloneToClipboardContextAction(),
+            new CopyDiagramAsTikzCodeToClipboardContextAction(),
             Separator.getInstance(),
             new ExternalOpenDiagramAsPNGAction(),
             new ExternalOpenDiagramAsSVGAction(),

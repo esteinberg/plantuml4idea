@@ -46,13 +46,13 @@ public class PlantUml {
                 return FileFormat.EPS;
             }
         },
-        LATEX {
+        TEX {
             @Override
             public FileFormat getFormat() {
                 return FileFormat.LATEX;
             }
         },
-        LATEX_STANDALONE {
+        TIKZ {
             @Override
             public FileFormat getFormat() {
                 return FileFormat.LATEX_NO_PREAMBLE;

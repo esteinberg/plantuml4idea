@@ -32,7 +32,7 @@ public class PlantUmlImageLabel extends JLabel {
             new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
             Separator.getInstance(),
             new CopyDiagramAsLatexToClipboardContextAction(),
-            new CopyDiagramAsLatexStandaloneToClipboardContextAction(),
+            new CopyDiagramAsTikzCodeToClipboardContextAction(),
             Separator.getInstance(),
             new ExternalOpenDiagramAsPNGAction(),
             new ExternalOpenDiagramAsSVGAction(),

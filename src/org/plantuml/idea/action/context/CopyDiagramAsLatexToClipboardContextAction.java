@@ -13,7 +13,7 @@ public class CopyDiagramAsLatexToClipboardContextAction extends CopyDiagramAsTxt
     @Override
     @NotNull
     protected PlantUml.ImageFormat getFormat() {
-        return PlantUml.ImageFormat.LATEX;
+        return PlantUml.ImageFormat.TEX;
     }
 
 }
