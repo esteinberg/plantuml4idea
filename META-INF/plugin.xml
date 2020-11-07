@@ -13,6 +13,7 @@
             <ul>
              <li>PlantUml library upgrade to v1.2020.19</li>
              <li>Fixed %filename() and %dirpath()</li>
+             <li>Latex support (#265)</li>
             </ul>
             <p>2.26</p>
             <ul>
