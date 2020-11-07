@@ -11,13 +11,16 @@ import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.plantuml.idea.lang.annotator.LanguageDescriptor.IDEA_PARTIAL_RENDER;
@@ -35,6 +38,7 @@ public class PlantUmlRendererUtil {
      * and image format.
      *
      * @param source         source code to be rendered
+     * @param sourceFile
      * @param baseDir        base dir to set for "include" functionality
      * @param format         image format
      * @param path           path to use with first file
@@ -42,9 +46,11 @@ public class PlantUmlRendererUtil {
      * @param pageNumber     -1 for all pages
      * @throws IOException in case of rendering or saving fails
      */
-    public static void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int pageNumber)
+    public static void renderAndSave(String source, File sourceFile, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int pageNumber)
             throws IOException {
-        NORMAL_RENDERER.renderAndSave(source, baseDir, format, path, fileNameFormat, zoom, pageNumber);
+        prepareEnvironment(baseDir, source);
+
+        NORMAL_RENDERER.renderAndSave(source, sourceFile, format, path, fileNameFormat, zoom, pageNumber);
     }
 
     /**
@@ -52,13 +58,8 @@ public class PlantUmlRendererUtil {
      * to provided values
      */
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-        File baseDir = renderRequest.getBaseDir();
-        if (baseDir != null) {
-            Utils.setPlantUmlDir(baseDir);
-        } else {
-            Utils.resetPlantUmlDir();
-        }
         long start = System.currentTimeMillis();
+        final Map<File, Long> includedFiles = prepareEnvironment(renderRequest.getBaseDir(), renderRequest.getSource());
 
         String source = renderRequest.getSource();
         String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
@@ -73,7 +74,22 @@ public class PlantUmlRendererUtil {
         } else {
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
+
+        renderResult.setIncludedFiles(includedFiles);
         return renderResult;
+    }
+
+    @NotNull
+    public static Map<File, Long> prepareEnvironment(File baseDir, String source) {
+        if (baseDir != null) {
+            Utils.setPlantUmlDir(baseDir);
+        } else {
+            Utils.resetPlantUmlDir();
+        }
+
+        final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
+        PlantUmlSettings.getInstance().applyPlantumlOptions();
+        return includedFiles;
     }
 
     public static DiagramInfo zoomDiagram(SourceStringReader reader, int zoom) {

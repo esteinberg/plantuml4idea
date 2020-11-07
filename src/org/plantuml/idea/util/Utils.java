@@ -14,7 +14,7 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import java.io.File;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
@@ -58,7 +58,7 @@ public class Utils {
     }
 
     @NotNull
-    public static SourceStringReader newSourceStringReader(String source, boolean useSettings) {
+    public static SourceStringReader newSourceStringReader(String source, boolean useSettings, File file) {
         List<String> configAsList;
         String encoding;
         if (useSettings) {
@@ -67,10 +67,17 @@ public class Utils {
             configAsList = settings.getConfigAsList();
         } else {
             encoding = "UTF-8";
-            configAsList = Collections.emptyList();
+            configAsList = new ArrayList<>();
+
         }
 
-        return new SourceStringReader(Defines.createEmpty(), source, encoding, configAsList);
+        Defines defines;
+        if (file != null) {
+            defines = Defines.createWithFileName(file);
+        } else {
+            defines = Defines.createEmpty();
+        }
+        return new SourceStringReader(defines, source, encoding, configAsList);
     }
 
     public static boolean isPlantUmlFileType(@NotNull PsiFile file) {

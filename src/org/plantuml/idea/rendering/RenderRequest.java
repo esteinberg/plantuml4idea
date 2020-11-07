@@ -8,6 +8,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 import java.io.File;
 
 public class RenderRequest {
+    private final String sourceFilePath;
     @Nullable
     private final File baseDir;
     @NotNull
@@ -21,7 +22,8 @@ public class RenderRequest {
     private RenderCommand.Reason reason;
     protected boolean useSettings = true;
 
-    public RenderRequest(@Nullable File baseDir,
+    public RenderRequest(String sourceFilePath,
+                         @Nullable File baseDir,
                          @NotNull String source,
                          @NotNull PlantUml.ImageFormat format,
                          int page,
@@ -29,6 +31,7 @@ public class RenderRequest {
                          Integer version,
                          boolean renderUrlLinks,
                          RenderCommand.Reason reason) {
+        this.sourceFilePath = sourceFilePath;
         this.baseDir = baseDir;
         this.source = source;
         this.format = format;
@@ -41,6 +44,7 @@ public class RenderRequest {
 
     public RenderRequest(@NotNull RenderRequest renderRequest,
                          @NotNull PlantUml.ImageFormat format) {
+        this.sourceFilePath = renderRequest.sourceFilePath;
         this.baseDir = renderRequest.baseDir;
         this.source = renderRequest.source;
         this.format = format;
@@ -58,6 +62,14 @@ public class RenderRequest {
     @NotNull
     public String getSource() {
         return source;
+    }
+
+    public String getSourceFilePath() {
+        return sourceFilePath;
+    }
+
+    public File getSourceFile() {
+        return new File(sourceFilePath);
     }
 
     @NotNull
@@ -95,6 +107,7 @@ public class RenderRequest {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .append("sourceFilePath", sourceFilePath)
                 .append("baseDir", baseDir)
                 .append("format", format)
                 .append("page", page)

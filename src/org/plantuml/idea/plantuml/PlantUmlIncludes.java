@@ -43,8 +43,6 @@ public class PlantUmlIncludes {
             throw new RenderingCancelledException(e);
         } catch (Throwable e) {
             throw new RuntimeException(source + "; baseDir=" + baseDir.getAbsolutePath(), e);
-        } finally {
-            PlantUmlSettings.getInstance().applyPlantumlOptions();
         }
         return Collections.emptyMap();
     }

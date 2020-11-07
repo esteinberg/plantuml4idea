@@ -3,10 +3,10 @@ package org.plantuml.idea.action.context;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.PlantUmlRendererUtil;
@@ -34,18 +34,22 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
-        String selectedSource = getSource(e.getProject());
+        Project project = e.getProject();
+        String selectedSource = getSource(project);
+        VirtualFile sourceVFile = UIUtils.getSelectedSourceFile(project);
+        File selectedDir = UIUtils.getParent(sourceVFile);
+        File sourceFile = sourceVFile != null ? new File(sourceVFile.getPath()) : null;
 
-		String canonicalPath = null;
-		try {
+        String canonicalPath = null;
+        try {
 
             File file = File.createTempFile("diagram-", "." + imageFormat.toString().toLowerCase());
-			canonicalPath = file.getCanonicalPath();
-			file.deleteOnExit();
+            canonicalPath = file.getCanonicalPath();
+            file.deleteOnExit();
 
-            PlantUmlRendererUtil.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(e.getProject()), FileDocumentManager.getInstance()),
+            PlantUmlRendererUtil.renderAndSave(selectedSource, sourceFile, selectedDir,
                     imageFormat, file.getAbsolutePath(), file.getName().replace(".", "-%03d."),
-                    UIUtils.getPlantUmlToolWindow(e.getProject()).getScaledZoom(), getPage(e));
+                    UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPage(e));
 
             Desktop.getDesktop().open(file);
         } catch (IOException ex) {
@@ -53,10 +57,10 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 		}
 	}
 
-	protected int getPage(AnActionEvent e) {
-		PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-		return data.getPage();
-	}
+    protected int getPage(AnActionEvent e) {
+        PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        return data.getPage();
+    }
 
     private String getSource(Project project) {
         return UIUtils.getSelectedSourceWithCaret(FileEditorManager.getInstance(project));

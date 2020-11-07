@@ -17,8 +17,8 @@ import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -208,10 +208,10 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public List<String> getConfigAsList() {
         if (StringUtils.isBlank(config)) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
         String[] split = config.split("\n");
-        return Arrays.asList(split);
+        return new ArrayList<>(Arrays.asList(split));
     }
 
     public boolean isShowUrlLinksBorder() {

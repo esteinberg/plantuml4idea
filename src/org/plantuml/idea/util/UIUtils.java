@@ -54,6 +54,17 @@ public class UIUtils {
         return source;
     }
 
+    public static VirtualFile getSelectedSourceFile(Project project) {
+        FileEditorManager instance = FileEditorManager.getInstance(project);
+        Editor selectedTextEditor = getSelectedTextEditor(instance);
+        if (selectedTextEditor != null) {
+            final Document document = selectedTextEditor.getDocument();
+            return FileDocumentManager.getInstance().getFile(document);
+        }
+        return null;
+    }
+
+
     /**
      * FileEditorManager#getSelectedTextEditor is not good enough, returns null for *.rst in PyCharm (TextEditorWithPreview)
      */
@@ -182,4 +193,6 @@ public class UIUtils {
         }
         return hasAnyImage;
     }
+
+
 }

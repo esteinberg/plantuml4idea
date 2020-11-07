@@ -5,12 +5,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 
 public abstract class RenderCommand implements Runnable {
@@ -62,17 +60,15 @@ public abstract class RenderCommand implements Runnable {
             long start = System.currentTimeMillis();
             label.update(version, ExecutionStatusPanel.State.EXECUTING);
 
-            final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
-            logger.debug("includedFiles=", includedFiles);
 
             PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
 
-            final RenderRequest renderRequest = new RenderRequest(baseDir, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, baseDir, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
             final RenderResult result = PlantUmlRendererUtil.render(renderRequest, cachedItem);
 
             initImages(result);
 
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, includedFiles, result, result.getImageItemsAsArray(), version);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, result.getIncludedFiles(), result, result.getImageItemsAsArray(), version);
             final long total = System.currentTimeMillis() - start;
 
             if (!Thread.currentThread().isInterrupted() && hasImages(newItem.getImageItems())) {

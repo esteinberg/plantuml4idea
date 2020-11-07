@@ -82,7 +82,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest(new File(""), PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest("", new File(""), PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlRendererUtil.render(renderRequest, null);
         try {

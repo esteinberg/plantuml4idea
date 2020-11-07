@@ -3,9 +3,11 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -19,6 +21,7 @@ public class RenderResult {
     private int rendered;
     private int updatedTitles;
     private int cached;
+    private Map<File, Long> includedFiles;
 
     public RenderResult(RenderingType strategy, int totalPages) {
         this.strategy = strategy;
@@ -26,20 +29,27 @@ public class RenderResult {
             this.imageItems = Collections.emptyList();
         } else {
             this.imageItems = new ArrayList<ImageItem>(totalPages);
-        } 
+        }
         this.pages = totalPages;
     }
 
+    public Map<File, Long> getIncludedFiles() {
+        return includedFiles;
+    }
+
+    public void setIncludedFiles(Map<File, Long> includedFiles) {
+        this.includedFiles = includedFiles;
+    }
 
     public byte[] getFirstDiagramBytes() {
-		for (ImageItem imageItem : imageItems) {
-			if (PlantUmlNormalRenderer.TITLE_ONLY.equals(imageItem.getDescription())) {
-				continue;
-			}
-			return imageItem.getImageBytes();
-		}
-		return null;
-	}
+        for (ImageItem imageItem : imageItems) {
+            if (PlantUmlNormalRenderer.TITLE_ONLY.equals(imageItem.getDescription())) {
+                continue;
+            }
+            return imageItem.getImageBytes();
+        }
+        return null;
+    }
 
     public RenderingType getStrategy() {
         return strategy;

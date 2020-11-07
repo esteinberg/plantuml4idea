@@ -69,7 +69,8 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
 
-        String selectedSource = getSource(e.getProject());
+        String selectedSource = getDisplayedSource(project);
+        File sourceFile = getDisplayedSourceFile(project);
 
         if (StringUtils.isBlank(selectedSource)) {
             Notifications.Bus.notify(NOTIFICATION.createNotification("No PlantUML source code", MessageType.WARNING));
@@ -89,7 +90,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
 
 
-        String defaultFileName = getDefaultFileName(e, e.getProject());
+        String defaultFileName = getDefaultFileName(e, project);
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
                 fsd, project).save(baseDir, defaultFileName);
@@ -132,7 +133,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 String fileNameTemplate = base + "-%03d." + extension;
 
-                PlantUmlRendererUtil.renderAndSave(selectedSource, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
+                PlantUmlRendererUtil.renderAndSave(selectedSource, sourceFile, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
                         imageFormat, file.getAbsolutePath(), fileNameTemplate,
                         UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPageNumber(e));
 
@@ -144,6 +145,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             }
         }
     }
+
 
     protected int getPageNumber(AnActionEvent e) {
         return -1;
@@ -184,7 +186,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         return filename;
     }
 
-    protected String getSource(Project project) {
+    protected String getDisplayedSource(Project project) {
         String selectedSource = null;
         PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
         RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
@@ -193,6 +195,17 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
 
         return selectedSource;
+    }
+
+    private File getDisplayedSourceFile(Project project) {
+        File file = null;
+        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+        if (displayedItem != null) {
+            file = new File(displayedItem.getSourceFilePath());
+        }
+
+        return file;
     }
 
     @Override

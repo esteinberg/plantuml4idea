@@ -10,7 +10,7 @@ import org.plantuml.idea.util.UIUtils;
 public class SaveAllDiagramToFileAction extends AbstractSaveDiagramAction {
 
     @Override
-    protected String getSource(Project project) {
+    protected String getDisplayedSource(Project project) {
         return UIUtils.getSelectedSource(FileEditorManager.getInstance(project));
     }
 }

@@ -14,7 +14,6 @@ import net.sourceforge.plantuml.core.DiagramDescription;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -36,27 +35,20 @@ public class PlantUmlNormalRenderer {
      * Renders source code and saves diagram images to files according to provided naming scheme
      * and image format.
      *
-     * @param source               source code to be rendered
-     * @param baseDir              base dir to set for "include" functionality
-     * @param format               image format
-     * @param path                 path to use with first file
-     * @param fileNameFormat       file naming scheme for further files
-     * @param requestedPageNumber  -1 for all pages   
+     * @param source              source code to be rendered
+     * @param sourceFile
+     * @param format              image format
+     * @param path                path to use with first file
+     * @param fileNameFormat      file naming scheme for further files
+     * @param requestedPageNumber -1 for all pages
      * @throws IOException in case of rendering or saving fails
      */
-    public void renderAndSave(String source, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int requestedPageNumber)
+    protected void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int requestedPageNumber)
             throws IOException {
         FileOutputStream outputStream = null;
         try {
-            if (baseDir != null) {
-                Utils.setPlantUmlDir(baseDir);
-            } else {
-                Utils.resetPlantUmlDir();
-            }
 
-
-            PlantUmlIncludes.commitIncludes(source, baseDir);
-            SourceStringReader reader = Utils.newSourceStringReader(source, true);
+            SourceStringReader reader = Utils.newSourceStringReader(source, true, sourceFile);
 
             zoomDiagram(reader, zoom);
 
@@ -98,7 +90,7 @@ public class PlantUmlNormalRenderer {
         String documentSource = renderRequest.getSource();
         try {
             // image generation.                     
-            SourceStringReader reader = Utils.newSourceStringReader(documentSource, renderRequest.isUseSettings());
+            SourceStringReader reader = Utils.newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
 
             DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
             Integer totalPages = info.getTotalPages();

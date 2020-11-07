@@ -14,7 +14,7 @@ import static org.plantuml.idea.rendering.PlantUmlRendererUtil.NEW_PAGE_PATTERN;
 public class PlantUmlRendererUtilTest {
     @Test
     public void render() throws Exception {
-        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(new File(""), "@startuml\n" +
+        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest("sourceFilePath", new File(""), "@startuml\n" +
                 "xxx->yyy\n" +
                 "@enduml", PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH), null);
         Assert.assertNotNull(render);
@@ -24,7 +24,7 @@ public class PlantUmlRendererUtilTest {
 
     @Test
     public void renderBrokenImage() throws Exception {
-        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(new File(""), "@startuml\n" +
+        RenderResult render = PlantUmlRendererUtil.render(new RenderRequest("sourceFilePath", new File(""), "@startuml\n" +
                 "xxx\n" +
                 "@enduml", PlantUml.ImageFormat.PNG, 0, 0, null, false, RenderCommand.Reason.REFRESH), null);
         Assert.assertNotNull(render);
