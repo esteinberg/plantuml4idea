@@ -12,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.plantuml.PlantUmlIncludes;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
@@ -28,6 +30,19 @@ public class Utils {
         } catch (NumberFormatException e) {
         }
         return i;
+    }
+
+    @NotNull
+    public static Map<File, Long> prepareEnvironment(File baseDir, String source) {
+        if (baseDir != null) {
+            setPlantUmlDir(baseDir);
+        } else {
+            resetPlantUmlDir();
+        }
+
+        final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
+        PlantUmlSettings.getInstance().applyPlantumlOptions();
+        return includedFiles;
     }
 
     public static void setPlantUmlDir(@NotNull File baseDir) {
@@ -56,6 +71,7 @@ public class Utils {
         FileSystem.getInstance().reset();
         System.clearProperty("plantuml.include.path");
     }
+
 
     @NotNull
     public static SourceStringReader newSourceStringReader(String source, boolean useSettings, File file) {

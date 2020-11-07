@@ -11,9 +11,7 @@ import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.plantuml.PlantUmlIncludes;
 import org.plantuml.idea.util.Utils;
 
 import java.io.File;
@@ -48,7 +46,7 @@ public class PlantUmlRendererUtil {
      */
     public static void renderAndSave(String source, File sourceFile, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String fileNameFormat, int zoom, int pageNumber)
             throws IOException {
-        prepareEnvironment(baseDir, source);
+        Utils.prepareEnvironment(baseDir, source);
 
         NORMAL_RENDERER.renderAndSave(source, sourceFile, format, path, fileNameFormat, zoom, pageNumber);
     }
@@ -59,7 +57,7 @@ public class PlantUmlRendererUtil {
      */
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
         long start = System.currentTimeMillis();
-        final Map<File, Long> includedFiles = prepareEnvironment(renderRequest.getBaseDir(), renderRequest.getSource());
+        final Map<File, Long> includedFiles = Utils.prepareEnvironment(renderRequest.getBaseDir(), renderRequest.getSource());
 
         String source = renderRequest.getSource();
         String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
@@ -77,19 +75,6 @@ public class PlantUmlRendererUtil {
 
         renderResult.setIncludedFiles(includedFiles);
         return renderResult;
-    }
-
-    @NotNull
-    public static Map<File, Long> prepareEnvironment(File baseDir, String source) {
-        if (baseDir != null) {
-            Utils.setPlantUmlDir(baseDir);
-        } else {
-            Utils.resetPlantUmlDir();
-        }
-
-        final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
-        PlantUmlSettings.getInstance().applyPlantumlOptions();
-        return includedFiles;
     }
 
     public static DiagramInfo zoomDiagram(SourceStringReader reader, int zoom) {
