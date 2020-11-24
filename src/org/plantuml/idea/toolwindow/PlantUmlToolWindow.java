@@ -164,7 +164,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setZoom(Math.max(getScaledZoom() - e.getWheelRotation() * 10, 1));
+                    setZoom(Math.max(zoom - e.getWheelRotation() * 10, 1));
                 } else {
                     e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
