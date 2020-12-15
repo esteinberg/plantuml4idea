@@ -303,6 +303,7 @@
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
         <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
+        <applicationService serviceImplementation="org.plantuml.idea.lang.settings.CfgSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>
         <applicationService serviceImplementation="org.plantuml.idea.toolwindow.SelectedPagePersistentStateComponent"/>

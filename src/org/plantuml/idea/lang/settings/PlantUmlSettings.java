@@ -25,7 +25,7 @@ import java.util.List;
  * @author Max Gorbunov
  * @author Eugene Steinberg
  */
-@State(name = "PlantUmlSettings", storages = {@Storage("plantuml.cfg")})
+@State(name = "PlantUmlSettingsNew", storages = {@Storage("plantuml.xml")})
 public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettings> {
     private static final Logger LOG = Logger.getInstance(PlantUmlSettings.class);
 
@@ -47,9 +47,18 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String plantuml_limit_size;
     private String includedPaths;
     private boolean doNotDisplayErrors = false;
+    private boolean migratedCfg = false;
 
     public static PlantUmlSettings getInstance() {
-        return ServiceManager.getService(PlantUmlSettings.class);
+        PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);
+        if (!service.migratedCfg) {
+            CfgSettings cfg = CfgSettings.getInstance();
+            XmlSerializerUtil.copyBean(cfg.settings, service);
+            service.applyState();
+            cfg.loadState(new PlantUmlSettings());
+            service.migratedCfg = true;
+        }
+        return service;
     }
 
 
