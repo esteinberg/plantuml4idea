@@ -73,6 +73,7 @@ public class AddPartialRenderOptionIntention extends BaseIntentionAction {
             boolean start = line.contains("@startuml")
                     || line.contains("startuml")
                     || line.contains("@startditaa")
+                    || line.contains("@startjson")
                     || line.contains("@startdot");
 
             if (!validateOnly && start) {
