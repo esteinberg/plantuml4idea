@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 @State(name = "PlantUmlSettings", storages = {@Storage("plantuml.cfg")})
 public class CfgSettings implements PersistentStateComponent<PlantUmlSettings> {
 
-    PlantUmlSettings settings = new PlantUmlSettings();
+    PlantUmlSettings settings = null;
 
     public static CfgSettings getInstance() {
         return ServiceManager.getService(CfgSettings.class);

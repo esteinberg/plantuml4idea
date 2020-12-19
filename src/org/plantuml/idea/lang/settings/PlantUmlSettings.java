@@ -47,20 +47,22 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String plantuml_limit_size;
     private String includedPaths;
     private boolean doNotDisplayErrors = false;
-    private boolean migratedCfg = false;
+
+    private static boolean migratedCfg = false;
 
     public static PlantUmlSettings getInstance() {
         PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);
-        if (!service.migratedCfg) {
+        if (!migratedCfg) {
             CfgSettings cfg = CfgSettings.getInstance();
-            XmlSerializerUtil.copyBean(cfg.settings, service);
-            service.applyState();
-            cfg.loadState(new PlantUmlSettings());
-            service.migratedCfg = true;
+            if (cfg.settings != null) {
+                XmlSerializerUtil.copyBean(cfg.settings, service);
+                service.applyState();
+                cfg.settings = null;
+            }
+            migratedCfg = true;
         }
         return service;
     }
-
 
     public boolean isRenderUrlLinks() {
         return renderUrlLinks;
