@@ -36,13 +36,12 @@ public class Classloaders {
 
     public static ClassLoader getBundled() {
         if (bundled == null) {
-            File pluginHome = getPluginHome();
 
-            ArrayList<File> jarFiles = new ArrayList<>();
-            File[] jars = pluginHome.listFiles((dir, name) -> !name.equals("plantuml4idea.jar"));
+            List<File> jarFiles = new ArrayList<>();
+            File[] jars = getPluginHome().listFiles((dir, name) -> !name.equals("plantuml4idea.jar"));
             if (jars != null) {
                 if (!isUnitTest() && jars.length < 2) {
-                    throw new RuntimeException("Invalid installation. Install the whole zip file! Should find at least 2 jars, but found only: " + Arrays.toString(jars));
+                    throw new RuntimeException("Invalid installation. Should find at least 2 jars, but found only: " + Arrays.toString(jars));
                 }
                 jarFiles.addAll(Arrays.asList(jars));
             }
@@ -70,6 +69,9 @@ public class Classloaders {
 
         List<File> jars = new ArrayList<>();
         try {
+            if (!new File(customPlantumlJarPath).exists()) {
+                throw new IllegalArgumentException("Custom PlantUML jar does not exist! path=" + customPlantumlJarPath);
+            }
             Classloaders.customPlantumlJarPath = customPlantumlJarPath;
             jars.add(new File(customPlantumlJarPath));
             jars.add(new File(getPluginHome(), "adapter.jar"));
@@ -113,12 +115,14 @@ public class Classloaders {
                 return pluginHome;
             }
 
+            LOG.warn(pluginHome.getAbsolutePath() + " does not exist!");
             pluginHome = new File(PathManager.getPreInstalledPluginsPath(), "plantuml4idea/lib/");
             if (pluginHome.exists()) {
                 return pluginHome;
             }
+            LOG.warn(pluginHome.getAbsolutePath() + " does not exist!");
         }
-        throw new RuntimeException("Plugin home not found");
+        throw new RuntimeException("Plugin home not found! Did you install the whole zip file?! (PathManager.getPluginsPath()=" + PathManager.getPluginsPath() + ")");
     }
 
     public static boolean isUnitTest() {

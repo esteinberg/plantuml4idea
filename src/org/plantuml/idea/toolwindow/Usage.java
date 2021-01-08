@@ -4,8 +4,8 @@ import javax.swing.*;
 
 public class Usage extends JTextArea {
     public static final String TEXT =
-            "- Open file, put the cursor inside of the PlantUML code to render it\n"
-                    + "- PlantUML code must be inside @startuml and @enduml tags to be rendered\n"
+            "- Open a file, put the cursor inside of the PlantUML code to render it\n"
+                    + "- PlantUML code must be inside of @startuml and @enduml tags to be rendered\n"
                     + "- To render other than sequence diagram types, install Graphviz (Development version, not 2.38) and set path to it\n\n"
 
                     + "- A new file can be created from template (File | New | PlantUML File)\n"
