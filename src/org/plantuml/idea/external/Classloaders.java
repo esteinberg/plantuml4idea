@@ -98,7 +98,7 @@ public class Classloaders {
         }
         try {
             LOG.info("Creating classloader for " + Arrays.toString(urls));
-            //parent loads bundled plantuml, it would conflict with default parent first classloader
+            //must be parent last, otherwise it would conflict with the plugin's classloader  - it always loads the bundled plantuml
             return new ParentLastURLClassLoader(Classloaders.class.getClassLoader(), urls);
         } catch (Exception e) {
             throw new RuntimeException(e);
