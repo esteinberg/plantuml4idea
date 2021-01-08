@@ -9,8 +9,8 @@ import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
@@ -36,7 +36,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
         PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         if (data != null) {
             RenderRequest renderRequest = data.getRenderRequest();
-            RenderResult render = PlantUmlRendererUtil.render(new RenderRequest(renderRequest, getFormat()), null);
+            RenderResult render = PlantUmlFacade.get().render(new RenderRequest(renderRequest, getFormat()), null);
 
             try {
                 byte[] firstDiagramBytes = render.getFirstDiagramBytes();
@@ -44,7 +44,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
                     CopyPasteManager.getInstance().setContents(new TextTransferable(new String(firstDiagramBytes, CharsetToolkit.UTF8)));
                 } else {
                     throw new IllegalStateException("Nothing rendered.");
-                } 
+                }
             } catch (UnsupportedEncodingException e1) {
             }
         }

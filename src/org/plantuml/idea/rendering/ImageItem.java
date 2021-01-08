@@ -3,8 +3,8 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.toolwindow.PlantUmlImagePanelSvg;
 import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -171,7 +171,7 @@ public class ImageItem {
                     throw new RuntimeException(e);
                 }
             } else if (format == PlantUml.ImageFormat.SVG) {  //could be done parallelly
-                BufferedImage bufferedImage = PlantUmlImagePanelSvg.loadWithoutCache(null, new ByteArrayInputStream(getImageBytes()), 1.0f, null);
+                BufferedImage bufferedImage = PlantUmlFacade.get().loadWithoutCache(null, new ByteArrayInputStream(getImageBytes()), 1.0f, null);
                 setImage(bufferedImage);
             }
         }

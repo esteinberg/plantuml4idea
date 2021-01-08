@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class DiagramInfo {
         return titles;
     }
 
-    String getTitle(int i) {
+    public String getTitle(int i) {
         return getTitles().get(i);
     }
 
@@ -59,6 +60,33 @@ public class DiagramInfo {
             return new ToStringBuilder(this)
                     .append("titles", titles)
                     .toString();
+        }
+
+        public String getTitleOrPageNumber(int imageСounter) {
+            if (titles.size() > imageСounter) {
+                String s = titles.get(imageСounter);
+                if (StringUtils.isBlank(s)) {
+                    return String.valueOf(imageСounter);
+                }
+                return substringBetween(s, "[", "]");
+            }
+            return String.valueOf(imageСounter);
+        }
+    }
+
+    public static String substringBetween(String str, String open, String close) {
+        if (str != null && open != null && close != null) {
+            int start = str.indexOf(open);
+            if (start != -1) {
+                int end = str.lastIndexOf(close);
+                if (start < end && end != -1) {
+                    return str.substring(start + open.length(), end);
+                }
+            }
+
+            return str;
+        } else {
+            return str;
         }
     }
 }

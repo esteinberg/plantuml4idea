@@ -1,5 +1,6 @@
 package org.plantuml.idea.lang.settings;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -10,15 +11,20 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.Classloaders;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URI;
 
 /**
  * @author Max Gorbunov
  */
 public class PlantUmlSettingsPage implements Configurable {
+    private static final Logger LOG = Logger.getInstance(PlantUmlSettingsPage.class);
+
     private JPanel panel;
     private JTextField textFieldDotExecutable;
     private JCheckBox plantUMLErrorAnnotationExperimentalCheckBox;
@@ -33,6 +39,15 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox showUrlLinksBorder;
     private JTextField PLANTUML_LIMIT_SIZE;
     private JTextArea includePaths;
+    private JTextField customPlantumlJar;
+    private JButton browseCustomPlantumlJar;
+    private JLabel plantumlJarLabel;
+    private JRadioButton bundledPlantUMLRadioButton;
+    private JCheckBox switchToBundledAfterUpdate;
+    private JRadioButton customPlantUMLRadioButton;
+    private JLabel version;
+    private JButton web;
+    private JCheckBox usePageTitles;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -41,6 +56,39 @@ public class PlantUmlSettingsPage implements Configurable {
                 browseForFile(textFieldDotExecutable);
             }
         });
+        browseCustomPlantumlJar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                browseForjar(customPlantumlJar);
+            }
+        });
+        web.setVisible(Desktop.isDesktopSupported());
+        web.addActionListener(e -> {
+            try {
+                Desktop.getDesktop().browse(new URI("https://plantuml.com/news"));
+            } catch (Exception ee) {
+                throw new RuntimeException(ee);
+            }
+        });
+
+        try {
+            version.setText("v" + Classloaders.getAdapter(Classloaders.getBundled()).version());
+        } catch (Throwable throwable) {
+            LOG.error(throwable);
+        }
+    }
+
+    private void browseForjar(@NotNull final JTextField target) {
+        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        descriptor.setTitle("Select path to plantuml.jar");
+        String text = target.getText();
+        final VirtualFile toSelect = text == null || text.isEmpty() ? null
+                : LocalFileSystem.getInstance().findFileByPath(text);
+
+        VirtualFile virtualFile = FileChooser.chooseFile(descriptor, null, toSelect);
+        if (virtualFile != null) {
+            target.setText(virtualFile.getPath());
+        }
     }
 
     private void browseForFile(@NotNull final JTextField target) {
@@ -76,19 +124,33 @@ public class PlantUmlSettingsPage implements Configurable {
 
     @Override
     public boolean isModified() {
-        return isModified(PlantUmlSettings.getInstance());
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+
+        if (bundledPlantUMLRadioButton.isSelected() != settings.isUseBundled()) {
+            return true;
+        }
+
+        return isModified(settings);
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        PlantUmlSettings instance = PlantUmlSettings.getInstance();
-        getData(instance);
-        instance.applyState();
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+        getData(settings);
+
+        settings.setUseBundled(bundledPlantUMLRadioButton.isSelected());
+
+        settings.applyState();
     }
 
     @Override
     public void reset() {
-        setData(PlantUmlSettings.getInstance());
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+
+        setData(settings);
+
+        bundledPlantUMLRadioButton.setSelected(settings.isUseBundled());
+        customPlantUMLRadioButton.setSelected(!settings.isUseBundled());
     }
 
     @Override
@@ -111,6 +173,9 @@ public class PlantUmlSettingsPage implements Configurable {
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         includePaths.setText(data.getIncludedPaths());
+        switchToBundledAfterUpdate.setSelected(data.isSwitchToBundledAfterUpdate());
+        customPlantumlJar.setText(data.getCustomPlantumlJarPath());
+        usePageTitles.setSelected(data.isUsePageTitles());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -125,6 +190,9 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setIncludedPaths(includePaths.getText());
+        data.setSwitchToBundledAfterUpdate(switchToBundledAfterUpdate.isSelected());
+        data.setCustomPlantumlJarPath(customPlantumlJar.getText());
+        data.setUsePageTitles(usePageTitles.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -146,6 +214,10 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (includePaths.getText() != null ? !includePaths.getText().equals(data.getIncludedPaths()) : data.getIncludedPaths() != null)
             return true;
+        if (switchToBundledAfterUpdate.isSelected() != data.isSwitchToBundledAfterUpdate()) return true;
+        if (customPlantumlJar.getText() != null ? !customPlantumlJar.getText().equals(data.getCustomPlantumlJarPath()) : data.getCustomPlantumlJarPath() != null)
+            return true;
+        if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         return false;
     }
 }

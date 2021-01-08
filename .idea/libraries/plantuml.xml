@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="plantuml">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/plantuml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/plantuml" recursive="false" />
+  </library>
+</component>

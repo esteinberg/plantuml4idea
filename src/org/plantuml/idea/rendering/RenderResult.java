@@ -15,6 +15,8 @@ import java.util.Map;
  */
 public class RenderResult {
 
+    public static final String TITLE_ONLY = "TITLE ONLY";
+
     private RenderingType strategy;
     private final List<ImageItem> imageItems;
     private final int pages;
@@ -43,7 +45,7 @@ public class RenderResult {
 
     public byte[] getFirstDiagramBytes() {
         for (ImageItem imageItem : imageItems) {
-            if (PlantUmlNormalRenderer.TITLE_ONLY.equals(imageItem.getDescription())) {
+            if (TITLE_ONLY.equals(imageItem.getDescription())) {
                 continue;
             }
             return imageItem.getImageBytes();
@@ -72,7 +74,7 @@ public class RenderResult {
         } else {
             //PartialRenderingException hack
             return imageItems.size() == 1 && imageItems.get(0).hasError();
-        } 
+        }
         return false;
     }
 

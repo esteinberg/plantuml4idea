@@ -1,6 +1,5 @@
 package org.plantuml.idea.plantuml;
 
-import net.sourceforge.plantuml.FileFormat;
 import org.plantuml.idea.lang.annotator.LanguagePatternHolder;
 
 import java.util.LinkedHashMap;
@@ -16,50 +15,15 @@ public class PlantUml {
 
 
     public enum ImageFormat {
-        PNG {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.PNG;
-            }
-        },
-        SVG {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.SVG;
-            }
-        },
-        UTXT {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.UTXT;
-            }
-        },
-        ATXT {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.ATXT;
-            }
-        },
-        EPS {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.EPS;
-            }
-        },
-        TEX {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.LATEX;
-            }
-        },
-        TIKZ {
-            @Override
-            public FileFormat getFormat() {
-                return FileFormat.LATEX_NO_PREAMBLE;
-            }
-        };
+        PNG,
+        SVG,
+        UTXT,
+        ATXT,
+        EPS,
+        TEX,
+        TIKZ,
+        ;
 
-        public abstract FileFormat getFormat();
     }
 
 

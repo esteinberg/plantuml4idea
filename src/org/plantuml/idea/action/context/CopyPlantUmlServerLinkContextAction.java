@@ -6,9 +6,8 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.ui.TextTransferable;
-import net.sourceforge.plantuml.code.Transcoder;
-import net.sourceforge.plantuml.code.TranscoderUtil;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingType;
@@ -40,8 +39,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
             }
 
             try {
-                Transcoder defaultTranscoder = TranscoderUtil.getDefaultTranscoder();
-                String encoded = defaultTranscoder.encode(source);
+                String encoded = PlantUmlFacade.get().encode(source);
                 CopyPasteManager.getInstance().setContents(new TextTransferable("http://www.plantuml.com/plantuml/uml/" + encoded));
             } catch (Exception e1) {
                 throw new RuntimeException(e1);

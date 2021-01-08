@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 
@@ -64,11 +65,11 @@ public abstract class RenderCommand implements Runnable {
             PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
 
             final RenderRequest renderRequest = new RenderRequest(sourceFilePath, baseDir, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
-            final RenderResult result = PlantUmlRendererUtil.render(renderRequest, cachedItem);
+            final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
 
             initImages(result);
 
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, sourceFilePath, source, baseDir, zoom, page, result.getIncludedFiles(), result, result.getImageItemsAsArray(), version);
+            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
             final long total = System.currentTimeMillis() - start;
 
             if (!Thread.currentThread().isInterrupted() && hasImages(newItem.getImageItems())) {

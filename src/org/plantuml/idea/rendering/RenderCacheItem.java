@@ -15,38 +15,26 @@ import java.util.Map;
 
 public class RenderCacheItem {
 
-
-    private Integer version;
-    private final String sourceFilePath;
-    /**
-     * source is also cached in imagesWithData
-     */
-    private final String source;
-    private final File baseDir;
-    private final int zoom;
-    private final Map<File, Long> includedFiles;
     private final RenderRequest renderRequest;
-    private final String[] titles;
     private final RenderResult renderResult;
-    private final ImageItem[] imageItems;
+    private final String[] titles;
+
+    private ImageItem[] imageItems;
+    private Integer version;
     private int requestedPage;
 
-    public RenderCacheItem(@NotNull RenderRequest renderRequest, String sourceFilePath, String source, File baseDir, int zoom, int requestedPage, Map<File, Long> includedFiles, RenderResult renderResult, ImageItem[] imageItems, Integer version) {
-        this.sourceFilePath = sourceFilePath;
-        this.source = source;
-        this.baseDir = baseDir;
-        this.zoom = zoom;
-        this.requestedPage = requestedPage;
-        this.includedFiles = includedFiles;
-        this.renderResult = renderResult;
-        this.imageItems = imageItems;
-        this.version = version;
+    public RenderCacheItem(@NotNull RenderRequest renderRequest, RenderResult renderResult, int requestedPage, int version) {
         this.renderRequest = renderRequest;
+        this.renderResult = renderResult;
+
+        imageItems = renderResult.getImageItemsAsArray();
         this.titles = new String[imageItems.length];
         for (int i = 0; i < imageItems.length; i++) {
             ImageItem imageItem = imageItems[i];
             titles[i] = imageItem != null ? imageItem.getTitle() : null;
         }
+        this.requestedPage = requestedPage;
+        this.version = version;
     }
 
 
@@ -62,7 +50,7 @@ public class RenderCacheItem {
         if (imageMissing(page)) {
             return true;
         }
-        if (zoom != this.zoom) {
+        if (zoom != renderRequest.getZoom()) {
             return true;
         }
         return false;
@@ -72,7 +60,7 @@ public class RenderCacheItem {
         if (imageMissing(page)) {
             return true;
         }
-        if (!this.source.equals(source)) {
+        if (!renderRequest.getSource().equals(source)) {
             return true;
         }
         return false;
@@ -95,15 +83,15 @@ public class RenderCacheItem {
 
 
     public String getSourceFilePath() {
-        return sourceFilePath;
+        return renderRequest.getSourceFilePath();
     }
 
     public String getSource() {
-        return source;
+        return renderRequest.getSource();
     }
 
     public File getBaseDir() {
-        return baseDir;
+        return renderRequest.getBaseDir();
     }
 
     public RenderResult getRenderResult() {
@@ -116,8 +104,9 @@ public class RenderCacheItem {
 
     public boolean includedFilesChanged(FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
         boolean result = false;
+        Map<File, Long> includedFiles = renderResult.getIncludedFiles();
         if (includedFiles != null) {
-            for (Map.Entry<File, Long> fileLongEntry : includedFiles.entrySet()) {
+            for (Map.Entry<File, Long> fileLongEntry : renderResult.getIncludedFiles().entrySet()) {
                 File file = fileLongEntry.getKey();
                 Long timestamp = fileLongEntry.getValue();
                 VirtualFile virtualFile = virtualFileManager.findFileByUrl("file://" + file.getAbsolutePath());
@@ -137,13 +126,13 @@ public class RenderCacheItem {
     private static boolean isChanged(FileDocumentManager fileDocumentManager, File file, Long timestamp, Document document) {
         return timestamp < file.lastModified() || (document != null && fileDocumentManager.isDocumentUnsaved(document));
     }
-           
+
     public boolean isIncludedFile(@Nullable VirtualFile file) {
         if (file == null) {
             return false;
         }
         File key = new File(file.getPath());
-        Long aLong = includedFiles.get(key);
+        Long aLong = renderResult.getIncludedFiles().get(key);
         return aLong != null;
     }
 
@@ -156,11 +145,11 @@ public class RenderCacheItem {
     }
 
     public int getZoom() {
-        return zoom;
+        return renderRequest.getZoom();
     }
 
     public int getRequestedPage() {
-        return requestedPage;
+        return renderRequest.getPage();
     }
 
     public void setRequestedPage(int requestedPage) {
@@ -171,13 +160,8 @@ public class RenderCacheItem {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("version", version)
-                .append("source", source)
                 .append("renderRequest", renderRequest)
-                .append("sourceFilePath", sourceFilePath)
-                .append("baseDir", baseDir)
-                .append("zoom", zoom)
                 .append("page", requestedPage)
-                .append("includedFiles", includedFiles)
                 .append("imageResult", renderResult)
                 .append("imagesWithData", Arrays.toString(imageItems))
                 .toString();

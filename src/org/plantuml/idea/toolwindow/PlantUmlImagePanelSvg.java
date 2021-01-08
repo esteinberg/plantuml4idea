@@ -8,10 +8,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBLayeredPane;
 import com.intellij.ui.components.Magnificator;
-import com.intellij.util.ImageLoader;
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.util.XMLResourceDescriptor;
 import org.intellij.images.editor.ImageDocument;
 import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +16,6 @@ import org.plantuml.idea.action.context.*;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
-import org.w3c.dom.Document;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -30,10 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * TODO CopyDiagramToClipboardContextAction not working
@@ -190,39 +182,6 @@ public class PlantUmlImagePanelSvg extends JPanel implements Disposable {
         return originalImage;
     }
 
-    public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) {
-        try {
-            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
-            if (docSize != null) {
-                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
-            }
-            return transcoder.getImage();
-        } catch (Exception ex) {
-            if (docSize != null) {
-                docSize.setSize(0, 0);
-            }
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @NotNull
-    private static TranscoderInput createTranscodeInput(@Nullable URL url, @NotNull InputStream stream) throws IOException {
-        TranscoderInput myTranscoderInput;
-        String uri = null;
-        try {
-            if (url != null && "jar".equals(url.getProtocol())) {
-                // workaround for BATIK-1217
-                url = new URL(url.getPath());
-            }
-            uri = url != null ? url.toURI().toString() : null;
-        } catch (URISyntaxException ignore) {
-        }
-
-        Document document = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName()).createDocument(uri, stream);
-//          patchColors(url, document);
-        myTranscoderInput = new TranscoderInput(document);
-        return myTranscoderInput;
-    }
 
     @Override
     public void dispose() {

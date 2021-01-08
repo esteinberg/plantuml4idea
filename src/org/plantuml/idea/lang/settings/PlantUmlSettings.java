@@ -1,5 +1,6 @@
 package org.plantuml.idea.lang.settings;
 
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
@@ -7,19 +8,24 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+
+import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
 
 /**
  * @author Max Gorbunov
@@ -49,6 +55,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean doNotDisplayErrors = false;
 
     private static boolean migratedCfg = false;
+    private String customPlantumlJarPath;
+
+    private boolean switchToBundledAfterUpdate = true;
+    private boolean useBundled = true;
+    private String lastBundledVersion;
+    private boolean usePageTitles = true;
+
 
     public static PlantUmlSettings getInstance() {
         PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);
@@ -62,6 +75,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
             migratedCfg = true;
         }
         return service;
+    }
+
+    public String getLastBundledVersion() {
+        return lastBundledVersion;
+    }
+
+    public void setLastBundledVersion(String lastBundledVersion) {
+        this.lastBundledVersion = lastBundledVersion;
     }
 
     public boolean isRenderUrlLinks() {
@@ -145,6 +166,19 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     @Override
     public void loadState(PlantUmlSettings state) {
         XmlSerializerUtil.copyBean(state, this);
+
+        try {
+            PlantUmlFacade bundled = PlantUmlFacade.getBundled();
+            String version = bundled.version();
+            if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion !=null && !Objects.equals(lastBundledVersion, version)) {
+                useBundled = true;
+                SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
+            }
+            lastBundledVersion = version;
+        } catch (Throwable e) {
+            LOG.error(e);
+        }
+
         applyState();
     }
 
@@ -159,36 +193,10 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     }
 
     public void applyState() {
-        applyPlantumlOptions();
-
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             PlantUmlToolWindow toolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (toolWindow != null) {
                 toolWindow.applyNewSettings(this);
-            }
-        }
-    }
-
-    public void applyPlantumlOptions() {
-        boolean blank = StringUtils.isBlank(System.getProperty("GRAPHVIZ_DOT"));
-        boolean blank1 = StringUtils.isBlank(System.getenv("GRAPHVIZ_DOT"));
-        boolean propertyNotSet = blank && blank1;
-        boolean propertySet = !blank || !blank1;
-
-        if (propertyNotSet || (propertySet && !usePreferentiallyGRAPHIZ_DOT)) {
-            if (String.valueOf(dotExecutable).isEmpty()) {
-                GraphvizUtils.setDotExecutable(null);
-            } else {
-                GraphvizUtils.setDotExecutable(dotExecutable);
-            }
-        }
-
-        if (StringUtils.isNotBlank(plantuml_limit_size)) {
-            try {
-                Integer.parseInt(plantuml_limit_size);
-                System.setProperty("PLANTUML_LIMIT_SIZE", plantuml_limit_size);
-            } catch (NumberFormatException e) {
-                LOG.error("invalid PLANTUML_LIMIT_SIZE", e);
             }
         }
     }
@@ -255,5 +263,37 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setDoNotDisplayErrors(boolean doNotDisplayErrors) {
         this.doNotDisplayErrors = doNotDisplayErrors;
+    }
+
+    public String getCustomPlantumlJarPath() {
+        return customPlantumlJarPath;
+    }
+
+    public void setCustomPlantumlJarPath(final String customPlantumlJarPath) {
+        this.customPlantumlJarPath = customPlantumlJarPath;
+    }
+
+    public boolean isSwitchToBundledAfterUpdate() {
+        return switchToBundledAfterUpdate;
+    }
+
+    public void setSwitchToBundledAfterUpdate(final boolean switchToBundledAfterUpdate) {
+        this.switchToBundledAfterUpdate = switchToBundledAfterUpdate;
+    }
+
+    public boolean isUseBundled() {
+        return useBundled;
+    }
+
+    public void setUseBundled(boolean useBundled) {
+        this.useBundled = useBundled;
+    }
+
+    public boolean isUsePageTitles() {
+        return usePageTitles;
+    }
+
+    public void setUsePageTitles(final boolean usePageTitles) {
+        this.usePageTitles = usePageTitles;
     }
 }
