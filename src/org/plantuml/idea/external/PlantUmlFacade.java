@@ -19,11 +19,11 @@ import java.util.Collection;
 
 public interface PlantUmlFacade {
     static PlantUmlFacade get() {
-        return Classloaders.getAdapter();
+        return Classloaders.getFacade();
     }
 
     static PlantUmlFacade getBundled() {
-        return Classloaders.getAdapter(Classloaders.getBundled());
+        return Classloaders.getFacade(Classloaders.getBundled());
     }
 
     @Nullable

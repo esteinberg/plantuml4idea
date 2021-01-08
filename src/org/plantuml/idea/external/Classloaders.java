@@ -41,12 +41,12 @@ public class Classloaders {
             ArrayList<File> jarFiles = new ArrayList<>();
             File[] jars = pluginHome.listFiles((dir, name) -> !name.equals("plantuml4idea.jar"));
             if (jars != null) {
-                if (!isDev() && jars.length < 2) {
+                if (!isUnitTest() && jars.length < 2) {
                     throw new RuntimeException("Invalid installation. Install the whole zip file! Should find at least 2 jars, but found only: " + Arrays.toString(jars));
                 }
                 jarFiles.addAll(Arrays.asList(jars));
             }
-            if (isDev()) {
+            if (isUnitTest()) {
                 File file = new File("lib/plantuml");
                 if (!file.exists()) {
                     throw new RuntimeException(file.getAbsolutePath());
@@ -105,30 +105,33 @@ public class Classloaders {
 
     @NotNull
     private static File getPluginHome() {
-        File pluginHome = null;
-        if (isDev()) {
-            pluginHome = new File("lib/");
+        if (isUnitTest()) {
+            return new File("lib/");
         } else {
-            pluginHome = new File(PathManager.getPluginsPath(), "plantuml4idea/lib/");
-            File preInstalled = new File(PathManager.getPreInstalledPluginsPath(), "plantuml4idea/lib/");
-            if (!pluginHome.exists() && preInstalled.exists()) {
-                pluginHome = preInstalled;
+            File pluginHome = new File(PathManager.getPluginsPath(), "plantuml4idea/lib/");
+            if (pluginHome.exists()) {
+                return pluginHome;
+            }
+
+            pluginHome = new File(PathManager.getPreInstalledPluginsPath(), "plantuml4idea/lib/");
+            if (pluginHome.exists()) {
+                return pluginHome;
             }
         }
-        return pluginHome;
+        throw new RuntimeException("Plugin home not found");
     }
 
-    private static boolean isDev() {
+    public static boolean isUnitTest() {
         return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
 
     @NotNull
-    static PlantUmlFacade getAdapter() {
-        return getAdapter(getClassloader());
+    static PlantUmlFacade getFacade() {
+        return getFacade(getClassloader());
     }
 
     @NotNull
-    public static PlantUmlFacade getAdapter(ClassLoader classloader) {
+    static PlantUmlFacade getFacade(ClassLoader classloader) {
         try {
             return (PlantUmlFacade) Class.forName("org.plantuml.idea.adapter.FacadeImpl", true, classloader).getConstructor().newInstance();
         } catch (Throwable e) {
@@ -136,11 +139,4 @@ public class Classloaders {
         }
     }
 
-    static PlantUmlFacade getPlantUmlRendererUtil() {
-        return getAdapter();
-    }
-
-    static PlantUmlFacade getAnnotator() {
-        return getAdapter();
-    }
 }

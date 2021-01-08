@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
@@ -64,6 +65,9 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
 
     public static PlantUmlSettings getInstance() {
+        if (Classloaders.isUnitTest()) {
+            return new PlantUmlSettings();
+        }
         PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);
         if (!migratedCfg) {
             CfgSettings cfg = CfgSettings.getInstance();

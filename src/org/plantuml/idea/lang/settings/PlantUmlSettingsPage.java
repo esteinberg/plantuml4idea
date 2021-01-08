@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.external.Classloaders;
+import org.plantuml.idea.external.PlantUmlFacade;
 
 import javax.swing.*;
 import java.awt.*;
@@ -72,7 +72,7 @@ public class PlantUmlSettingsPage implements Configurable {
         });
 
         try {
-            version.setText("v" + Classloaders.getAdapter(Classloaders.getBundled()).version());
+            version.setText("v" + PlantUmlFacade.getBundled().version());
         } catch (Throwable throwable) {
             LOG.error(throwable);
         }

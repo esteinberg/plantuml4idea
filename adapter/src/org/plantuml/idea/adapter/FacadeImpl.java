@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.Collection;
 
 /**
- * @see Classloaders#getAdapter(java.lang.ClassLoader)
+ * @see Classloaders#getFacade(java.lang.ClassLoader)
  */
 public class FacadeImpl implements PlantUmlFacade {
     private static final Logger LOG = Logger.getInstance(FacadeImpl.class);
