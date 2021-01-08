@@ -47,7 +47,8 @@ public enum LanguageDescriptor {
             "package",
             "queue",
             "archimate",
-            "diamond"
+            "diamond" ,
+            "detach"
 
     ));
     public final List<String> tags = Collections.unmodifiableList(Arrays.asList(
@@ -146,7 +147,29 @@ public enum LanguageDescriptor {
             "order",
             "allow_mixing",
             "allowmixing",
-            "mainframe"
+            "mainframe" ,
+            "across",
+            "stereotype",
+            "split",
+            "style",
+            "sprite",		
+            "circle",
+            "empty",
+            "members",
+            "description",
+            "true",
+            "false",
+            "normal",
+            "italic",
+            "bold",
+            "plain",
+            "color",
+            "dotted",
+            "dashed",
+            "bold",
+            "map"
+            
+            
     ));
 
     public final List<String> pluginSettingsPattern = Collections.unmodifiableList(Arrays.asList(
@@ -168,7 +191,20 @@ public enum LanguageDescriptor {
             "!ifndef",
             "!else",
             "!definelong",
-            "!enddefinelong"
+            "!enddefinelong" ,
+            "!function",
+            "!procedure",
+            "!endfunction",
+            "!endprocedure",
+            "!unquoted",
+            "!return",
+            "!startsub",
+            "!endsub",
+            "!assert",
+            "!log",
+            "!local",
+            "!dump_memory",
+            "!import"
     ));
 
 
