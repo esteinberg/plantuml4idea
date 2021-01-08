@@ -13,6 +13,7 @@
             <ul>
              <li>Option to use an external PlantUML jar</li>
              <li>Option to name diagram files based on their title instead of page number (enabled by default)</li>
+             <li>Moved settings under "Languages and Frameworks".</li>
             </ul>
             <p>2.29</p>
             <ul>
@@ -312,7 +313,7 @@
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
-        <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage"/>
+        <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage" groupId="language"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
         <applicationService serviceImplementation="org.plantuml.idea.lang.settings.CfgSettings"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
