@@ -43,7 +43,7 @@ public class PlantUmlDocumentListener implements DocumentListener {
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
                 Editor[] editors = editorFactory.getEditors(event.getDocument());
                 for (Editor editor : editors) {
-                    UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_PRE_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+                    UIUtils.renderPlantUmlToolWindowLater(editor.getProject(), LazyApplicationPoolExecutor.Delay.RESET_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
                 }
             }
         }

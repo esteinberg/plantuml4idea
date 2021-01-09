@@ -26,7 +26,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         toolWindow.getContentManager().addContent(content);
         
         if (PlantUmlSettings.getInstance().isAutoRender()) {
-            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
+            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
         }
     }
 

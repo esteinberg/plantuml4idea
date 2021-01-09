@@ -27,7 +27,7 @@ public class PlantUmlAncestorListener implements AncestorListener {
     public void ancestorAdded(AncestorEvent ancestorEvent) {
         logger.debug("ancestorAdded ", project.getName());
         if (settings.isAutoRender()) {
-            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
+            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
         }
     }
 

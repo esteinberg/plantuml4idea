@@ -42,7 +42,7 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
             logger.debug("selection changed ", event);
         }
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.FILE_SWITCHED);
+            UIUtils.renderPlantUmlToolWindowLater(event.getManager().getProject(), LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
         }
     }
 }

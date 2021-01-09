@@ -25,7 +25,7 @@ public class PlantUmlCaretListener implements CaretListener {
         }
         logger.debug("caretPositionChanged");
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.CARET);
+            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
         }
     }
 
@@ -36,7 +36,7 @@ public class PlantUmlCaretListener implements CaretListener {
         }
         logger.debug("caretAdded");
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.CARET);
+            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
         }
     }
 

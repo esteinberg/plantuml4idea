@@ -495,7 +495,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setZoom(int zoom) {
         this.zoom = zoom;
-        renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+        renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
     }
 
     public void setSelectedPage(int selectedPage) {
@@ -503,7 +503,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             logger.debug("page ", selectedPage, " selected");
             this.selectedPage = selectedPage;
             selectedPagePersistentStateComponent.setPage(selectedPage, renderCache.getDisplayedItem());
-            renderLater(LazyApplicationPoolExecutor.Delay.POST_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+            renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }
     }
 

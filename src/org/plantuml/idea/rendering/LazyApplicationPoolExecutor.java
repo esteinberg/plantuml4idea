@@ -54,7 +54,7 @@ public class LazyApplicationPoolExecutor {
         logger.debug("#execute ", command, " delay=", delay);
         nextCommand = command;
 
-        if (delay == Delay.RESET_PRE_DELAY) {
+        if (delay == Delay.RESET_DELAY) {
             setStartAfter();
         } else if (delay == Delay.NOW) {
             startAfterNanos = 0;
@@ -140,8 +140,8 @@ public class LazyApplicationPoolExecutor {
     }
 
     public enum Delay {
-        RESET_PRE_DELAY,
+        RESET_DELAY,
         NOW,
-        POST_DELAY;
+        MAYBE_WITH_DELAY;
     }
 }

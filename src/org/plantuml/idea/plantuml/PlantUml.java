@@ -77,6 +77,7 @@ public class PlantUml {
                 result.put(matcher.start(), group);
             }
         }
+
         return result;
     }
 
