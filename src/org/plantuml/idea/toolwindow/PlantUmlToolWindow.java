@@ -242,8 +242,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                         return;
                     }
 
-                    if (cachedItem == null) {
-                        cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, fileManager);
+                    RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, fileManager);
+                    if (betterItem != null) {
+                        cachedItem = betterItem;
                     }
 
                     if (cachedItem == null) {
