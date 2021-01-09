@@ -57,7 +57,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
     private FileEditorManager fileEditorManager;
     private FileDocumentManager fileDocumentManager;
-    private VirtualFileManager virtualFileManager;
+    private VirtualFileManager fileManager;
 
     private int lastValidVerticalScrollValue;
     private int lastValidHorizontalScrollValue;
@@ -73,7 +73,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
-        virtualFileManager = VirtualFileManager.getInstance();
+        fileManager = VirtualFileManager.getInstance();
 
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusPanel);
@@ -243,13 +243,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     }
 
                     if (cachedItem == null) {
-                        cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, VirtualFileManager.getInstance());
+                        cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, fileManager);
                     }
 
                     if (cachedItem == null) {
                         logger.debug("no cached item");
                         lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedPage, scaledZoom, null, delay));
-                    } else if (cachedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
+                    } else if (cachedItem.includedFilesChanged(fileDocumentManager, fileManager)) {
                         logger.debug("includedFilesChanged");
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
                     } else if (cachedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, zoom)) {
