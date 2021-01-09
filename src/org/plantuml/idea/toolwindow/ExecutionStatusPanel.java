@@ -131,7 +131,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
     public enum State {
         WAITING(JBColor.GRAY, "Delay waiting - gray"),
-        EXECUTING(JBColor.GREEN, "Executing - green"),
+        EXECUTING(new JBColor(Color.green.darker(), new Color(98, 150, 85)), "Executing - green"),
         CANCELLED(JBColor.PINK, "Cancelled - pink"),
         ERROR(JBColor.RED, "Error - red"),
         DONE(JBColor.BLACK, "Done - black/white");

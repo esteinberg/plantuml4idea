@@ -247,12 +247,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                             }
 
                             if (last.imageMissingOrZoomChanged(selectedPage, scaledZoom)) {     //should not happen, but just to be sure
-                                logger.debug("render required");
+                                logger.debug("imageMissingOrZoomChanged - render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
                                 return;
                             }
-                            if (!renderCache.isDisplayed(last, selectedPage)) {
-                                logger.debug("empty source, not include file, displaying cached item ", last);
+                            if (!renderCache.isDisplayed(last, selectedPage)) { //should not happen, but just to be sure
+                                logger.debug("empty source, not include file, different page, displaying cached item ", last);
                                 displayExistingDiagram(last);
                                 return;
                             } else {
@@ -282,7 +282,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     if (cachedItem == null) {
                         logger.debug("no cached item");
                         final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, cachedItem, delay));
+                        lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, cachedItem, delay));
                     } else if (cachedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
                         logger.debug("includedFilesChanged");
                         final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
