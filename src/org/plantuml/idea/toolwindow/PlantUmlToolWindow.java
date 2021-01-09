@@ -204,7 +204,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
-
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
         logger.debug("renderLater ", project.getName(), " ", delay);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
@@ -224,26 +223,41 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 //                            logger.debug("file switched, setting selected page ",selectedPage);
 //                        }
 
-                        if (last != null && reason == RenderCommand.Reason.REFRESH) {
-                            logger.debug("empty source, executing command, reason=", reason);
-                            lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
-                        } else if (last != null && reason == RenderCommand.Reason.SOURCE_PAGE_ZOOM) {
-                            logger.debug("empty source, executing command, reason=", reason);
-                            lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
-                        } else if (last != null && last.isIncludedFile(selectedFile)) {
-                            logger.debug("include file selected");
-                            if (last.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
-                                logger.debug("includes changed, executing command");
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
-                            } else if (last.imageMissingOrZoomChanged(selectedPage, scaledZoom)) {
+                        if (last != null) {
+                            if (reason == RenderCommand.Reason.REFRESH) {
+                                logger.debug("empty source, executing command, reason=", reason);
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
+                                return;
+                            }
+                            if (reason == RenderCommand.Reason.SOURCE_PAGE_ZOOM) {
+                                logger.debug("empty source, executing command, reason=", reason);
+                                lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
+                                return;
+                            }
+
+                            if (last.isIncludedFile(selectedFile)) {
+                                logger.debug("include file selected");
+                                if (last.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
+                                    logger.debug("includes changed, executing command");
+                                    lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
+                                    return;
+                                } else {
+                                    logger.debug("include file, not changed");
+                                }
+                            }
+
+                            if (last.imageMissingOrZoomChanged(selectedPage, scaledZoom)) {     //should not happen, but just to be sure
                                 logger.debug("render required");
                                 lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
-                            } else {
-                                logger.debug("include file, not changed");
+                                return;
                             }
-                        } else if (last != null && !renderCache.isDisplayed(last, selectedPage)) {
-                            logger.debug("empty source, not include file, displaying cached item ", last);
-                            displayExistingDiagram(last);
+                            if (!renderCache.isDisplayed(last, selectedPage)) {
+                                logger.debug("empty source, not include file, displaying cached item ", last);
+                                displayExistingDiagram(last);
+                                return;
+                            } else {
+                                logger.debug("nothing needed");
+                            }
                         } else {
                             logger.debug("nothing needed");
                         }
