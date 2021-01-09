@@ -3,6 +3,7 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 
@@ -99,14 +100,7 @@ public class RenderRequest {
     }
 
     public File getBaseDir() {
-        File file = new File(sourceFilePath);
-        if (file.exists()) {
-            File parentFile = file.getParentFile();
-            if (parentFile != null && parentFile.isDirectory()) {
-                return parentFile.getAbsoluteFile();
-            }
-        }
-        return null;
+        return UIUtils.getParent(new File(sourceFilePath));
     }
 
     @Override

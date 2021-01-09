@@ -5,8 +5,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
@@ -131,7 +129,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 }
 
 
-                PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile, UIUtils.getSelectedDir(FileEditorManager.getInstance(project), FileDocumentManager.getInstance()),
+                PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                         imageFormat, file.getAbsolutePath(), pathPrefix,
                         UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPageNumber(e));
 

@@ -29,7 +29,7 @@ public interface PlantUmlFacade {
     @Nullable
     Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source);
 
-    void renderAndSave(String source, File sourceFile, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
+    void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
             throws IOException;
 
     RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem);

@@ -65,7 +65,6 @@ public class Utils {
 
     @NotNull
     public static Map<File, Long> prepareEnvironment(File baseDir, String source) {
-
         if (baseDir != null) {
             setPlantUmlDir(baseDir);
         } else {

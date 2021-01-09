@@ -38,7 +38,6 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
         PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         RenderRequest renderRequest = data.getRenderRequest();
         String selectedSource = renderRequest.getSource();
-        File selectedDir = renderRequest.getBaseDir();
         File sourceFile = renderRequest.getSourceFile();
 
         String canonicalPath = null;
@@ -48,7 +47,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
             canonicalPath = file.getCanonicalPath();
             file.deleteOnExit();
 
-            PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile, selectedDir,
+            PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                     imageFormat, file.getAbsolutePath(), null,
                     UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPage(e));
 

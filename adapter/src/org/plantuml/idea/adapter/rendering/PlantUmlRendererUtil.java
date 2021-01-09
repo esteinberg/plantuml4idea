@@ -17,6 +17,7 @@ import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +34,9 @@ public class PlantUmlRendererUtil {
     private static final PlantUmlPartialRenderer PARTIAL_RENDERER = new PlantUmlPartialRenderer();
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
 
-    public static void renderAndSave(String source, File sourceFile, @Nullable File baseDir, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
+    public static void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
             throws IOException {
-        Utils.prepareEnvironment(baseDir, source);
+        Utils.prepareEnvironment(UIUtils.getParent(sourceFile), source);
 
         NORMAL_RENDERER.renderAndSave(source, sourceFile, format, path, pathPrefix, zoom, pageNumber);
     }
