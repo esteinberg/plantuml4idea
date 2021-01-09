@@ -149,7 +149,7 @@ public class RenderCacheItem {
     }
 
     public int getRequestedPage() {
-        return renderRequest.getPage();
+        return requestedPage;
     }
 
     public void setRequestedPage(int requestedPage) {
