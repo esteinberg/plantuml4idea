@@ -17,7 +17,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
@@ -30,7 +29,6 @@ import javax.swing.*;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -210,87 +208,53 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void run() {
                 if (isProjectValid(project)) {
-                    final String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
+                    String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
+                    String sourceFilePath = null;
+                    RenderCacheItem cachedItem = null;
 
                     int scaledZoom = getScaledZoom();
                     if ("".equals(source)) { //is included file or some crap?
                         logger.debug("empty source");
-                        VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager);
-                        RenderCacheItem last = renderCache.getDisplayedItem(); //todo check all items for included file?
-
-//                        if (last != null && reason == RenderCommand.Reason.FILE_SWITCHED) {
-//                            selectedPage = selectedPagePersistentStateComponent.getPage(last.getSourceFilePath());
-//                            logger.debug("file switched, setting selected page ",selectedPage);
-//                        }
-
-                        if (last != null) {
-                            if (reason == RenderCommand.Reason.REFRESH) {
-                                logger.debug("empty source, executing command, reason=", reason);
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
-                                return;
-                            }
-                            if (reason == RenderCommand.Reason.SOURCE_PAGE_ZOOM) {
-                                logger.debug("empty source, executing command, reason=", reason);
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, null, delay));
-                                return;
-                            }
-
-                            if (last.isIncludedFile(selectedFile)) {
-                                logger.debug("include file selected");
-                                if (last.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
-                                    logger.debug("includes changed, executing command");
-                                    lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
-                                    return;
-                                } else {
-                                    logger.debug("include file, not changed");
-                                }
-                            }
-
-                            if (last.imageMissingOrZoomChanged(selectedPage, scaledZoom)) {     //should not happen, but just to be sure
-                                logger.debug("imageMissingOrZoomChanged - render required");
-                                lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, last.getSourceFilePath(), last.getSource(), last.getBaseDir(), selectedPage, scaledZoom, last, delay));
-                                return;
-                            }
-                            if (!renderCache.isDisplayed(last, selectedPage)) { //should not happen, but just to be sure
-                                logger.debug("empty source, not include file, different page, displaying cached item ", last);
-                                displayExistingDiagram(last);
-                                return;
-                            } else {
-                                logger.debug("nothing needed");
-                            }
-                        } else {
-                            logger.debug("nothing needed");
+                        cachedItem = renderCache.getDisplayedItem();
+                        if (cachedItem == null) {
+                            logger.debug("no DisplayedItem, empty source, reason=", reason);
+                            return;
                         }
-                        return;
+
+                        source = cachedItem.getSource();
+                        sourceFilePath = cachedItem.getSourceFilePath();
+                    } else {
+                        VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager);
+                        if (selectedFile != null) {
+                            sourceFilePath = selectedFile.getPath();
+                        } else {
+                            sourceFilePath = "DUMMY_NO_PATH";
+                        }
                     }
 
-                    String sourceFilePath = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager).getPath();
-
-
                     selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+
                     logger.debug("setting selected page from storage ", selectedPage);
 
                     if (reason == RenderCommand.Reason.REFRESH) {
                         logger.debug("executing command, reason=", reason);
-                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, null, delay));
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedPage, scaledZoom, null, delay));
                         return;
                     }
 
-                    RenderCacheItem cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, VirtualFileManager.getInstance());
+                    if (cachedItem == null) {
+                        cachedItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, VirtualFileManager.getInstance());
+                    }
 
                     if (cachedItem == null) {
                         logger.debug("no cached item");
-                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
-                        lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, cachedItem, delay));
+                        lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedPage, scaledZoom, null, delay));
                     } else if (cachedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)) {
                         logger.debug("includedFilesChanged");
-                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, cachedItem, delay));
-                    } else if (cachedItem.imageMissingOrSourceChanged(source, selectedPage)) {
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
+                    } else if (cachedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, zoom)) {
                         logger.debug("render required");
-                        final File selectedDir = UIUtils.getSelectedDir(fileEditorManager, fileDocumentManager);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedDir, selectedPage, scaledZoom, cachedItem, delay));
+                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
                     } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
                         logger.debug("render not required, displaying cached item ", cachedItem);
                         displayExistingDiagram(cachedItem);
@@ -316,21 +280,21 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
 
     @NotNull
-    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, @Nullable final File baseDir, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
-        logger.debug("#getCommand selectedFile='", selectedFile, "', baseDir=", baseDir, ", page=", page, ", zoom=", zoom);
+    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
+        logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", zoom=", zoom);
         int version = sequence.incrementAndGet();
 
-        return new MyRenderCommand(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
+        return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
-            super(reason, selectedFile, source, baseDir, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
+            super(reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
-        public void postRenderOnEDT(RenderCacheItem newItem, long total, RenderResult result) {
+        public void displayResultOnEDT(RenderCacheItem newItem, long total, RenderResult result) {
             if (reason == Reason.REFRESH) {
                 if (cachedItem != null) {
                     renderCache.removeFromCache(cachedItem);

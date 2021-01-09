@@ -46,18 +46,11 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean imageMissingOrZoomChanged(int page, int zoom) {
+    public boolean imageMissingOrSourceOrZoomChanged(String source, int page, int zoom) {
         if (imageMissing(page)) {
             return true;
         }
         if (zoom != renderRequest.getZoom()) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean imageMissingOrSourceChanged(String source, int page) {
-        if (imageMissing(page)) {
             return true;
         }
         if (!renderRequest.getSource().equals(source)) {

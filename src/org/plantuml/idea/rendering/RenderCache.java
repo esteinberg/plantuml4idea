@@ -33,7 +33,7 @@ public class RenderCache {
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
                 && !displayedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)
-                && !displayedItem.imageMissingOrSourceChanged(source, selectedPage)) {
+                && !displayedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, zoom)) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }

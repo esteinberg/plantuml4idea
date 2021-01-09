@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class PlantUmlPartialRendererTest {
     @Test
     public void renderError() throws Exception {
-        RenderResult renderResult = new PlantUmlPartialRenderer().renderError(new RenderRequest("sourceFilePath", new File(""), "", PlantUml.ImageFormat.PNG, 0, 0, 0, false, RenderCommand.Reason.MANUAL_UPDATE), new PartialRenderingException());
+        RenderResult renderResult = new PlantUmlPartialRenderer().renderError(new RenderRequest("sourceFilePath", "", PlantUml.ImageFormat.PNG, 0, 0, 0, false, RenderCommand.Reason.MANUAL_UPDATE), new PartialRenderingException());
         assertTrue(renderResult.hasError());
         assertNotNull(renderResult.getFirstDiagramBytes());
     }

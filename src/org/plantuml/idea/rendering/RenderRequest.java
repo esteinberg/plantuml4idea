@@ -2,15 +2,12 @@ package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
 
 import java.io.File;
 
 public class RenderRequest {
     private final String sourceFilePath;
-    @Nullable
-    private final File baseDir;
     @NotNull
     private final String source;
     @NotNull
@@ -23,7 +20,6 @@ public class RenderRequest {
     protected boolean useSettings = true;
 
     public RenderRequest(String sourceFilePath,
-                         @Nullable File baseDir,
                          @NotNull String source,
                          @NotNull PlantUml.ImageFormat format,
                          int page,
@@ -32,7 +28,6 @@ public class RenderRequest {
                          boolean renderUrlLinks,
                          RenderCommand.Reason reason) {
         this.sourceFilePath = sourceFilePath;
-        this.baseDir = baseDir;
         this.source = source;
         this.format = format;
         this.page = page;
@@ -45,18 +40,12 @@ public class RenderRequest {
     public RenderRequest(@NotNull RenderRequest renderRequest,
                          @NotNull PlantUml.ImageFormat format) {
         this.sourceFilePath = renderRequest.sourceFilePath;
-        this.baseDir = renderRequest.baseDir;
         this.source = renderRequest.source;
         this.format = format;
         this.page = renderRequest.page;
         this.zoom = renderRequest.zoom;
         this.useSettings = renderRequest.useSettings;
         this.version = null;
-    }
-
-    @Nullable
-    public File getBaseDir() {
-        return baseDir;
     }
 
     @NotNull
@@ -104,11 +93,26 @@ public class RenderRequest {
     public void setUseSettings(boolean useSettings) {
         this.useSettings = useSettings;
     }
+
+    public boolean requestedRefreshOrIncludesChanged() {
+        return reason == RenderCommand.Reason.REFRESH || reason == RenderCommand.Reason.INCLUDES;
+    }
+
+    public File getBaseDir() {
+        File file = new File(sourceFilePath);
+        if (file.exists()) {
+            File parentFile = file.getParentFile();
+            if (parentFile != null && parentFile.isDirectory()) {
+                return parentFile.getAbsoluteFile();
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("sourceFilePath", sourceFilePath)
-                .append("baseDir", baseDir)
                 .append("format", format)
                 .append("page", page)
                 .append("zoom", zoom)
@@ -117,10 +121,6 @@ public class RenderRequest {
                 .append("version", version)
                 .append("useSettings", useSettings)
                 .toString();
-    }
-
-    public boolean requestedRefreshOrIncludesChanged() {
-        return reason == RenderCommand.Reason.REFRESH || reason == RenderCommand.Reason.INCLUDES;
     }
 
 }

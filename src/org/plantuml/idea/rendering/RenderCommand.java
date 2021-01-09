@@ -3,12 +3,10 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 
-import java.io.File;
 import java.util.List;
 
 
@@ -18,8 +16,6 @@ public abstract class RenderCommand implements Runnable {
     protected Reason reason;
     protected String sourceFilePath;
     protected final String source;
-    @Nullable
-    protected final File baseDir;
     protected final int page;
     protected int zoom;
     protected RenderCacheItem cachedItem;
@@ -37,11 +33,10 @@ public abstract class RenderCommand implements Runnable {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, @Nullable File baseDir, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
-        this.baseDir = baseDir;
         this.page = page;
         this.zoom = zoom;
         this.cachedItem = cachedItem;
@@ -64,7 +59,7 @@ public abstract class RenderCommand implements Runnable {
 
             PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
 
-            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, baseDir, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
             final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
 
             initImages(result);
@@ -73,15 +68,7 @@ public abstract class RenderCommand implements Runnable {
             final long total = System.currentTimeMillis() - start;
 
             if (!Thread.currentThread().isInterrupted() && hasImages(newItem.getImageItems())) {
-
-                ApplicationManager.getApplication().invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        postRenderOnEDT(newItem, total, result);
-                    }
-                });
-
+                ApplicationManager.getApplication().invokeLater(() -> displayResultOnEDT(newItem, total, result));
             } else {
                 logger.debug("no images rendered");
                 label.update(version, ExecutionStatusPanel.State.DONE, total, result);
@@ -102,7 +89,7 @@ public abstract class RenderCommand implements Runnable {
         }
     }
 
-    protected abstract void postRenderOnEDT(RenderCacheItem newItem, long total, RenderResult result);
+    protected abstract void displayResultOnEDT(RenderCacheItem newItem, long total, RenderResult result);
 
     private boolean hasImages(ImageItem[] imageItems) {
         for (ImageItem imageItem : imageItems) {
@@ -119,7 +106,6 @@ public abstract class RenderCommand implements Runnable {
         return new ToStringBuilder(this)
                 .append("reason", reason)
                 .append("sourceFilePath", sourceFilePath)
-                .append("selectedDir", baseDir)
                 .append("page", page)
                 .append("zoom", zoom)
                 .append("cachedItem", cachedItem)

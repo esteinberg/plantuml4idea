@@ -18,7 +18,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -86,7 +85,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest("", new File(""), PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest("", PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, 100, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);
         try {
