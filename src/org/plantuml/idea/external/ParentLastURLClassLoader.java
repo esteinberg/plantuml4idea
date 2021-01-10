@@ -1,9 +1,15 @@
 package org.plantuml.idea.external;
 
+import com.intellij.notification.Notifications;
+import com.intellij.openapi.ui.MessageType;
+
+import javax.swing.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
 
 /**
  * A parent-last classloader that will try the child classloader first and then the parent. This takes a fair bit of
@@ -51,6 +57,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
      */
     private static class ChildURLClassLoader extends URLClassLoader {
         private FindClassClassLoader realParent;
+        boolean shownIncompatibleNotification;
 
         public ChildURLClassLoader(URL[] urls, FindClassClassLoader realParent) {
             super(urls, null);
@@ -75,7 +82,13 @@ public class ParentLastURLClassLoader extends ClassLoader {
             } catch (ClassNotFoundException e) {
                 for (String forbiddenParentPrefixes : neverLoadFromParentWithPrefix) {
                     if (name.startsWith(forbiddenParentPrefixes)) {
-                        throw new RuntimeException(
+                        if (!shownIncompatibleNotification) {
+                            shownIncompatibleNotification = true;
+                            SwingUtilities.invokeLater(() -> {
+                                Notifications.Bus.notify(NOTIFICATION.createNotification("Incompatible PlantUml Version!", MessageType.ERROR));
+                            });
+                        }
+                        throw new IncompatiblePlantUmlVersionException(
                                 name + " not found in child classloader, and cannot be loaded from parent", e);
                     }
                 }
@@ -84,6 +97,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
             }
         }
     }
+
 
     public ParentLastURLClassLoader(ClassLoader parent, URL... urls) {
         super(parent);
