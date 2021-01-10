@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
@@ -15,10 +16,9 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.METADATA;
 
@@ -39,7 +39,6 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
     @Override
     public FileAnnotationResult doAnnotate(PsiFile file) {
         FileAnnotationResult result = new FileAnnotationResult();
-
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
             String text = file.getFirstChild().getText();
 
@@ -53,31 +52,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                 String source = sourceData.getValue();
                 sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(file, source));
 
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.keywordsPattern,
-                        DefaultLanguageHighlighterColors.KEYWORD));
+                List<SourceAnnotation> blockComments = annotateBlockComments(source);
+                sourceAnnotationResult.addBlockComments(blockComments);
 
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.pluginSettingsPattern,
-                        DefaultLanguageHighlighterColors.KEYWORD));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.typesPattern,
-                        DefaultLanguageHighlighterColors.LABEL));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.preprocPattern,
-                        DefaultLanguageHighlighterColors.METADATA));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.tagsPattern,
-                        METADATA));
-
-                sourceAnnotationResult.addAll(annotateSyntaxHighlight(source,
-                        LanguagePatternHolder.INSTANCE.lineCommentPattern,
-                        DefaultLanguageHighlighterColors.LINE_COMMENT));
-
-                sourceAnnotationResult.addAll(annotateBlockComments(source));
+                annotateByLine(sourceAnnotationResult, source, blockComments);
 
                 result.add(sourceAnnotationResult);
             }
@@ -85,8 +63,42 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         return result;
     }
 
-    private Collection<SourceAnnotation> annotateBlockComments(String source) {
-        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+    public void annotateByLine(SourceAnnotationResult result, String source, List<SourceAnnotation> blockComments) {
+        Matcher keywords = LanguagePatternHolder.INSTANCE.keywordsPattern.matcher("");
+        Matcher pluginSettings = LanguagePatternHolder.INSTANCE.pluginSettingsPattern.matcher("");
+        Matcher types = LanguagePatternHolder.INSTANCE.typesPattern.matcher("");
+        Matcher preproc = LanguagePatternHolder.INSTANCE.preprocPattern.matcher("");
+        Matcher tags = LanguagePatternHolder.INSTANCE.tagsPattern.matcher("");
+        Matcher commentMatcher = LanguagePatternHolder.INSTANCE.lineCommentPattern.matcher("");
+
+
+        String[] strings = StringUtils.splitPreserveAllTokens(source, "\n");
+        int i = 0;
+        for (String line : strings) {
+            commentMatcher.reset(line);
+            if (commentMatcher.find()) {
+                result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(i + commentMatcher.start(), i + commentMatcher.end(), DefaultLanguageHighlighterColors.LINE_COMMENT));
+            } else {
+                annotate(result, line, i, DefaultLanguageHighlighterColors.KEYWORD, keywords);
+                annotate(result, line, i, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
+                annotate(result, line, i, DefaultLanguageHighlighterColors.LABEL, types);
+                annotate(result, line, i, DefaultLanguageHighlighterColors.METADATA, preproc);
+                annotate(result, line, i, METADATA, tags);
+            }
+
+            i += line.length() + 1;
+        }
+    }
+
+    private void annotate(SourceAnnotationResult result, String line, int i, TextAttributesKey textAttributesKey, Matcher matcher) {
+        matcher.reset(line);
+        while (matcher.find()) {
+            result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(i + matcher.start(), i + matcher.end(), textAttributesKey));
+        }
+    }
+
+    private List<SourceAnnotation> annotateBlockComments(String source) {
+        List<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
 
         Matcher matcher = LanguagePatternHolder.INSTANCE.startBlockComment.matcher(source);
         Matcher endMatcher = null;
@@ -101,17 +113,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
             if (endMatcher.find(start)) {
                 result.add(new SyntaxHighlightAnnotation(matcher.start(), endMatcher.end(), DefaultLanguageHighlighterColors.BLOCK_COMMENT));
                 start = endMatcher.end();
+            } else {
+                break;
             }
-        }
-        return result;
-    }
-
-
-    private Collection<SourceAnnotation> annotateSyntaxHighlight(String source, Pattern pattern, TextAttributesKey textAttributesKey) {
-        Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
-        Matcher matcher = pattern.matcher(source);
-        while (matcher.find()) {
-            result.add(new SyntaxHighlightAnnotation(matcher.start(), matcher.end(), textAttributesKey));
         }
         return result;
     }

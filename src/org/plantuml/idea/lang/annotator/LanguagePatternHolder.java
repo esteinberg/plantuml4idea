@@ -27,7 +27,7 @@ public enum LanguagePatternHolder {
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern2(LanguageDescriptor.INSTANCE.preproc, "");
     public final Pattern tagsPattern = Pattern.compile("@(start|end)(" + addWordStop(TAGS) + ")");
-    public final Pattern lineCommentPattern = Pattern.compile("(?<=\n)\\s*('.*)(?=\n)");
+    public final Pattern lineCommentPattern = Pattern.compile("^\\s*('.*)");
     public final Pattern startBlockComment = Pattern.compile("/'");
     public final Pattern endBlockComment = Pattern.compile("'/");
 

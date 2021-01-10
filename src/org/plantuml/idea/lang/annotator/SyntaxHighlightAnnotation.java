@@ -21,6 +21,14 @@ public class SyntaxHighlightAnnotation implements SourceAnnotation {
         this.textAttributesKey = textAttributesKey;
     }
 
+    public int getStartSourceOffset() {
+        return startSourceOffset;
+    }
+
+    public int getEndSourceOffset() {
+        return endSourceOffset;
+    }
+
     @Override
     public void annotate(AnnotationHolder holder, Document document, int sourceOffset) {
         TextRange fileRange = TextRange.create(startSourceOffset + sourceOffset, endSourceOffset + sourceOffset);
