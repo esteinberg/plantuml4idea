@@ -163,22 +163,19 @@ public class Utils {
                 LOG.warn(e);
             }
         }
-        LOG.debug("getIncludedFiles " ,(System.currentTimeMillis() - start) , "ms");
+        LOG.debug("getIncludedFiles ", (System.currentTimeMillis() - start), "ms");
         return includedFiles;
     }
 
     public static void saveAllDocuments() {
         try {
             long start = System.currentTimeMillis();
-            
-            ApplicationManager.getApplication().invokeAndWait(() -> {
-                FileDocumentManager instance = FileDocumentManager.getInstance();
-                com.intellij.openapi.editor.Document[] unsavedDocuments = instance.getUnsavedDocuments();
-                if (unsavedDocuments.length > 0) {
-                    instance.saveAllDocuments();
-                }
-            });
-            LOG.debug("saveAllDocuments ", (System.currentTimeMillis() - start) , "ms");
+            FileDocumentManager documentManager = FileDocumentManager.getInstance();
+            if (documentManager.getUnsavedDocuments().length > 0) {
+                ApplicationManager.getApplication().invokeAndWait(documentManager::saveAllDocuments);
+            }
+
+            LOG.debug("saveAllDocuments ", (System.currentTimeMillis() - start), "ms");
         } catch (Throwable e) {
             Throwable cause = e.getCause();
             if (cause instanceof InterruptedException) {
