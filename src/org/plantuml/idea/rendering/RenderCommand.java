@@ -60,9 +60,13 @@ public abstract class RenderCommand implements Runnable {
             PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
 
             final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            long s1 = System.currentTimeMillis();
             final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
+            logger.debug("render ", (System.currentTimeMillis() - s1), "ms");
 
+            long s2 = System.currentTimeMillis();
             initImages(result);
+            logger.debug("initImages ", (System.currentTimeMillis() - s2), "ms");
 
             final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
             final long total = System.currentTimeMillis() - start;

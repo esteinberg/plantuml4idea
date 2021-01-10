@@ -28,7 +28,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
 
     @NotNull
-    public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, long start, String[] sourceSplit) {
+    public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, String[] sourceSplit) {
         try {
             FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest));
 
@@ -37,7 +37,6 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
                 processPage(renderRequest, cachedItem, sourceSplit[page], formatOption, renderResult, page);
             }
 
-            logger.debug("partial rendering done ", System.currentTimeMillis() - start, "ms");
             return renderResult;
         } catch (PartialRenderingException e) {
             logger.debug(e);

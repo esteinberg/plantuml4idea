@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 
 import java.io.File;
@@ -49,13 +48,15 @@ public class PlantUmlRendererUtil {
         boolean partialRender = sourceSplit[0].contains(LanguageDescriptor.IDEA_PARTIAL_RENDER);
         logger.debug("partialRender ", partialRender);
 
+        start = System.currentTimeMillis();
         RenderResult renderResult;
         if (partialRender) {
-            renderResult = PARTIAL_RENDERER.partialRender(renderRequest, cachedItem, start, sourceSplit);
+            renderResult = PARTIAL_RENDERER.partialRender(renderRequest, cachedItem, sourceSplit);
         } else {
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
-
+        logger.debug("doRender ", System.currentTimeMillis() - start, "ms");
+            
         return renderResult;
     }
 
@@ -186,6 +187,7 @@ public class PlantUmlRendererUtil {
     }
 
     public static SourceStringReader newSourceStringReader(String source, boolean useSettings, File file) {
+        long start = System.currentTimeMillis();
         List<String> configAsList;
         String encoding;
         if (useSettings) {
@@ -204,7 +206,9 @@ public class PlantUmlRendererUtil {
         } else {
             defines = Defines.createEmpty();
         }
-        return new SourceStringReader(defines, source, encoding, configAsList);
+        SourceStringReader sourceStringReader = new SourceStringReader(defines, source, encoding, configAsList);
+        logger.debug("newSourceStringReader ", System.currentTimeMillis() - start, "ms");
+        return sourceStringReader;
     }
 
 

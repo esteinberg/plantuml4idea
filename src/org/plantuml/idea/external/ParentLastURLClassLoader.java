@@ -101,6 +101,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
 
     public ParentLastURLClassLoader(ClassLoader parent, URL... urls) {
         super(parent);
+        setDefaultAssertionStatus(false);
         childClassLoader = new ChildURLClassLoader(urls, new FindClassClassLoader(this.getParent()));
         childClassLoader.setDefaultAssertionStatus(false);    //for performance
     }

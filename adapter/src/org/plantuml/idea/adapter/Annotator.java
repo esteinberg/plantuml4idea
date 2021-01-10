@@ -1,6 +1,7 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
@@ -53,7 +54,8 @@ public class Annotator {
         if (baseDir != null) {
             Utils.setPlantUmlDir(baseDir);
 
-            Utils.saveAllDocuments();
+            VirtualFile virtualFile = file.getVirtualFile();
+            Utils.saveAllDocuments(virtualFile==null?null:virtualFile.getPath());
         } else {
             Utils.resetPlantUmlDir();
         }

@@ -3,6 +3,7 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.svg.MyTranscoder;
 import com.intellij.util.ImageLoader;
 import net.sourceforge.plantuml.BlockUml;
@@ -83,7 +84,7 @@ public class Utils {
             resetPlantUmlDir();
         }
 
-        saveAllDocuments();
+        saveAllDocuments(renderRequest.getSourceFilePath());
         applyPlantumlOptions(PlantUmlSettings.getInstance());
         LOG.debug("prepareEnvironment done ", System.currentTimeMillis() - start, "ms");
     }
@@ -167,11 +168,12 @@ public class Utils {
         return includedFiles;
     }
 
-    public static void saveAllDocuments() {
+    public static void saveAllDocuments(@Nullable String sourceFilePath) {
         try {
             long start = System.currentTimeMillis();
             FileDocumentManager documentManager = FileDocumentManager.getInstance();
-            if (documentManager.getUnsavedDocuments().length > 0) {
+            com.intellij.openapi.editor.Document[] unsavedDocuments = documentManager.getUnsavedDocuments();
+            if (unsavedDocuments.length > 0 && !onlyCurrentlyDisplayed(documentManager, unsavedDocuments, sourceFilePath)) {
                 ApplicationManager.getApplication().invokeAndWait(documentManager::saveAllDocuments);
             }
 
@@ -183,5 +185,17 @@ public class Utils {
             }
             throw e;
         }
+    }
+
+    private static boolean onlyCurrentlyDisplayed(FileDocumentManager documentManager, com.intellij.openapi.editor.Document[] unsavedDocuments, @Nullable String sourceFile) {
+        if (unsavedDocuments.length == 1 && sourceFile!=null) {
+            com.intellij.openapi.editor.Document unsavedDocument = unsavedDocuments[0];
+            VirtualFile file = documentManager.getFile(unsavedDocument);
+            if (file != null) {
+                return file.getPath().equals(sourceFile);
+            }
+        }
+        return false;
+        
     }
 }
