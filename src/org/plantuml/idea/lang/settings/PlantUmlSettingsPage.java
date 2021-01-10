@@ -79,7 +79,8 @@ public class PlantUmlSettingsPage implements Configurable {
     }
 
     private void browseForjar(@NotNull final JTextField target) {
-        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
+        final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, false, true, true, false, false);
+
         descriptor.setTitle("Select path to plantuml.jar");
         String text = target.getText();
         final VirtualFile toSelect = text == null || text.isEmpty() ? null
