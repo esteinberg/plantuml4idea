@@ -1,6 +1,7 @@
 package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.Pair;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.error.PSystemError;
@@ -8,12 +9,16 @@ import net.sourceforge.plantuml.error.PSystemErrorV2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
+import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.rendering.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
 
@@ -75,9 +80,13 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         boolean shouldRender = pageSelected && (obsolete || !cachedItem.hasImage(page));
 
         if (shouldRender) {
-            renderResult.addRenderedImage(renderImage(renderRequest, page, formatOption, partialSource));
+            Pair<ImageItem, Map<File, Long>> imageItemMapPair = renderImage(renderRequest, page, formatOption, partialSource);
+            renderResult.addRenderedImage(imageItemMapPair.first);
+            renderResult.addIncludedFiles(imageItemMapPair.second);
         } else if (obsolete) {
-            renderResult.addUpdatedTitle(updateTitle(renderRequest, page, partialSource));
+            Pair<ImageItem, Map<File, Long>> imageItemMapPair = updateTitle(renderRequest, page, partialSource);
+            renderResult.addUpdatedTitle(imageItemMapPair.first);
+            renderResult.addIncludedFiles(imageItemMapPair.second);
         } else {
             logger.debug("page ", page, " cached");
             renderResult.addCachedImage(cachedItem.getImageItem(page));
@@ -85,17 +94,19 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         logger.debug("processing of page ", page, " done in ", System.currentTimeMillis() - partialPageProcessingStart, "ms");
     }
 
-    private ImageItem updateTitle(RenderRequest renderRequest, int page, String partialSource) {
+    private Pair<ImageItem, Map<File, Long>> updateTitle(RenderRequest renderRequest, int page, String partialSource) {
         long start = System.currentTimeMillis();
         logger.debug("updating title, page ", page);
 
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
         String title = getTitle(reader);
+        Map<File, Long> includedFiles = Utils.getIncludedFiles(reader);
+        
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
         logger.debug("updateTitle " + (System.currentTimeMillis() - start));
 
-        return imageItem;
+        return new Pair(imageItem, includedFiles);
     }
 
     private String getTitle(SourceStringReader reader) {
@@ -107,13 +118,14 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     }
 
 
-    private ImageItem renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
+    private Pair<ImageItem, Map<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
         DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = info.getTotalPages();
         DiagramInfo.Titles titles = info.getTitles();
-
+        HashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);
+                        
         if (totalPages > 1) {
             throw new PartialRenderingException();
         }
@@ -122,7 +134,8 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         }
         try {
             ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0), info.getFilename());
-            return new ImageItem(page, item, renderRequest.getFormat());
+            ImageItem imageItem = new ImageItem(page, item, renderRequest.getFormat());
+            return new Pair<>(imageItem, includedFiles);
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {

@@ -53,7 +53,7 @@ public class Annotator {
         if (baseDir != null) {
             Utils.setPlantUmlDir(baseDir);
 
-            PlantUmlIncludes.commitIncludes(source, baseDir);
+            Utils.saveAllDocuments();
         } else {
             Utils.resetPlantUmlDir();
         }

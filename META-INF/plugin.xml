@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>3.0.1</version>
+    <version>3.1.0version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="202"/>
@@ -9,7 +9,11 @@
 
     <change-notes>
         <![CDATA[        
-            <p>3.00</p>
+            <p>3.1</p>
+            <ul>
+             <li>Performance optimization when !includeurl is used</li>
+            </ul> 
+            <p>3.0</p>
             <ul>
              <li>Option to use an external PlantUML jar</li>
              <li>PlantUml library upgrade to v1.2020.26</li>

@@ -11,19 +11,16 @@ import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
-import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class PlantUmlRendererUtil {
@@ -34,17 +31,17 @@ public class PlantUmlRendererUtil {
     private static final PlantUmlPartialRenderer PARTIAL_RENDERER = new PlantUmlPartialRenderer();
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
 
-    public static void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
+    public static void renderAndSave(RenderRequest renderRequest, String path, String pathPrefix)
             throws IOException {
-        Utils.prepareEnvironment(UIUtils.getParent(sourceFile), source);
+        Utils.prepareEnvironment(renderRequest);
 
-        NORMAL_RENDERER.renderAndSave(source, sourceFile, format, path, pathPrefix, zoom, pageNumber);
+        NORMAL_RENDERER.renderAndSave(renderRequest,  path, pathPrefix);
     }
 
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-        long start = System.currentTimeMillis();
-        final Map<File, Long> includedFiles = Utils.prepareEnvironment(renderRequest.getBaseDir(), renderRequest.getSource());
+         Utils.prepareEnvironment(renderRequest);
 
+        long start = System.currentTimeMillis();
         String source = renderRequest.getSource();
         String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
         logger.debug("split done ", System.currentTimeMillis() - start, "ms");
@@ -59,7 +56,6 @@ public class PlantUmlRendererUtil {
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
 
-        renderResult.setIncludedFiles(includedFiles);
         return renderResult;
     }
 

@@ -4,10 +4,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -41,6 +38,13 @@ public class RenderResult {
 
     public void setIncludedFiles(Map<File, Long> includedFiles) {
         this.includedFiles = includedFiles;
+    }
+
+    public void addIncludedFiles(Map<File, Long> map) {
+        if (includedFiles == null) {
+            includedFiles = new HashMap<>();
+        }
+        includedFiles.putAll(map);
     }
 
     public byte[] getFirstDiagramBytes() {
@@ -126,4 +130,6 @@ public class RenderResult {
     public ImageItem[] getImageItemsAsArray() {
         return getImageItems().toArray(new ImageItem[getImageItems().size()]);
     }
+
+
 }

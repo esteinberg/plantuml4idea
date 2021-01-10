@@ -1,12 +1,17 @@
 package org.plantuml.idea.adapter;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.ui.svg.MyTranscoder;
 import com.intellij.util.ImageLoader;
+import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileSystem;
+import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -16,15 +21,20 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.w3c.dom.Document;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
@@ -64,16 +74,18 @@ public class Utils {
     }
 
     @NotNull
-    public static Map<File, Long> prepareEnvironment(File baseDir, String source) {
+    public static void prepareEnvironment(RenderRequest renderRequest) {
+        long start = System.currentTimeMillis();
+        File baseDir = renderRequest.getBaseDir();
         if (baseDir != null) {
             setPlantUmlDir(baseDir);
         } else {
             resetPlantUmlDir();
         }
 
-        final Map<File, Long> includedFiles = PlantUmlIncludes.commitIncludes(source, baseDir);
+        saveAllDocuments();
         applyPlantumlOptions(PlantUmlSettings.getInstance());
-        return includedFiles;
+        LOG.debug("prepareEnvironment done ", System.currentTimeMillis() - start, "ms");
     }
 
     public static void setPlantUmlDir(@NotNull File baseDir) {
@@ -134,5 +146,45 @@ public class Utils {
     public static String encode(String source) throws IOException {
         Transcoder defaultTranscoder = TranscoderUtil.getDefaultTranscoder();
         return defaultTranscoder.encode(source);
+    }
+
+    @NotNull
+    public static HashMap<File, Long> getIncludedFiles(SourceStringReader reader) {
+        long start = System.currentTimeMillis();
+        HashMap<File, Long> includedFiles = new HashMap<>();
+        List<BlockUml> blocks = reader.getBlocks();
+        for (BlockUml block : blocks) {
+            try {
+                Set<File> convert = FileWithSuffix.convert(block.getIncluded());
+                for (File file : convert) {
+                    includedFiles.put(file, file.lastModified());
+                }
+            } catch (FileNotFoundException e) {
+                LOG.warn(e);
+            }
+        }
+        LOG.debug("getIncludedFiles " ,(System.currentTimeMillis() - start) , "ms");
+        return includedFiles;
+    }
+
+    public static void saveAllDocuments() {
+        try {
+            long start = System.currentTimeMillis();
+            
+            ApplicationManager.getApplication().invokeAndWait(() -> {
+                FileDocumentManager instance = FileDocumentManager.getInstance();
+                com.intellij.openapi.editor.Document[] unsavedDocuments = instance.getUnsavedDocuments();
+                if (unsavedDocuments.length > 0) {
+                    instance.saveAllDocuments();
+                }
+            });
+            LOG.debug("saveAllDocuments ", (System.currentTimeMillis() - start) , "ms");
+        } catch (Throwable e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof InterruptedException) {
+                throw new RenderingCancelledException((InterruptedException) cause);
+            }
+            throw e;
+        }
     }
 }

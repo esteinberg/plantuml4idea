@@ -14,6 +14,7 @@ import net.sourceforge.plantuml.core.DiagramDescription;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
+import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
@@ -35,22 +37,21 @@ public class PlantUmlNormalRenderer {
      * Renders source code and saves diagram images to files according to provided naming scheme
      * and image format.
      *
+     *
+     * @param renderRequest
      * @param source              source code to be rendered
-     * @param sourceFile
-     * @param format              image format
      * @param path                path to use with first file
-     * @param pathPrefix          file naming scheme for further files
-     * @param requestedPageNumber -1 for all pages
      * @throws IOException in case of rendering or saving fails
      */
-    public void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int requestedPageNumber)
+    public void renderAndSave(RenderRequest renderRequest, String path, String pathPrefix)
             throws IOException {
         FileOutputStream outputStream = null;
-        FileFormat pFormat = Format.from(format);
+        FileFormat pFormat = Format.from(renderRequest.getFormat());
         String fileSuffix = pFormat.getFileSuffix();
+        int requestedPageNumber = renderRequest.getPage();
+        int zoom = renderRequest.getZoom();
         try {
-
-            SourceStringReader reader = newSourceStringReader(source, true, sourceFile);
+            SourceStringReader reader = newSourceStringReader(renderRequest.getSource(), true, renderRequest.getSourceFile());
 
             zoomDiagram(reader, zoom);
 
@@ -151,9 +152,7 @@ public class PlantUmlNormalRenderer {
                     normalRendering(renderRequest, sourceSplit, documentSource, reader, info, renderResult, formatOption, containsIncludedNewPage, i, pageRequested);
                 }
             }
-
-
-            logger.debug("RenderResult totalPages=", totalPages);
+            renderResult.setIncludedFiles(Utils.getIncludedFiles(reader));
             return renderResult;
         } catch (UnsupportedOperationException e) {
             throw e;
