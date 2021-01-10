@@ -85,7 +85,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                         if (!shownIncompatibleNotification) {
                             shownIncompatibleNotification = true;
                             SwingUtilities.invokeLater(() -> {
-                                Notifications.Bus.notify(NOTIFICATION.createNotification("Incompatible PlantUml Version!", MessageType.ERROR));
+                                Notifications.Bus.notify(NOTIFICATION.createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
                             });
                         }
                         throw new IncompatiblePlantUmlVersionException(
