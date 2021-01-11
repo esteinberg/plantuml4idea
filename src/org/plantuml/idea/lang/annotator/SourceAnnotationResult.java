@@ -15,13 +15,13 @@ public class SourceAnnotationResult {
     private int sourceOffset;
 
     private final Collection<SourceAnnotation> annotations = new ArrayList<SourceAnnotation>();
-    private int[][] skip;
+    private List<SyntaxHighlightAnnotation> blockComments;
 
     public SourceAnnotationResult(int sourceOffset) {
         this.sourceOffset = sourceOffset;
     }
 
-    public void addAll(Collection<SourceAnnotation> sourceAnnotations) {
+    public void addAll(Collection<? extends SourceAnnotation> sourceAnnotations) {
         annotations.addAll(sourceAnnotations);
     }
 
@@ -42,26 +42,18 @@ public class SourceAnnotationResult {
     }
 
     private boolean inBlockComment(SyntaxHighlightAnnotation syntaxHighlightAnnotation) {
-        for (int i = 0, skipLength = skip.length; i < skipLength; i++) {
-            int[] range = skip[i];
+        for (int i = 0, blockCommentsSize = blockComments.size(); i < blockCommentsSize; i++) {
+            SyntaxHighlightAnnotation blockComment = blockComments.get(i);
             int startSourceOffset = syntaxHighlightAnnotation.startSourceOffset;
-            if (range[0] < startSourceOffset && startSourceOffset < range[1]) {
+            if (blockComment.getStartSourceOffset() < startSourceOffset && startSourceOffset < blockComment.getEndSourceOffset()) {
                 return true;
             }
         }
         return false;
     }
 
-    public void addBlockComments(List<SourceAnnotation> blockComments) {
-        skip = new int[blockComments.size()][2];
-        for (int i = 0, blockCommentsSize = blockComments.size(); i < blockCommentsSize; i++) {
-            SourceAnnotation blockComment = blockComments.get(i);
-            SyntaxHighlightAnnotation b = (SyntaxHighlightAnnotation) blockComment;
-            int startSourceOffset = b.getStartSourceOffset();
-            int endSourceOffset = b.getEndSourceOffset();
-            skip[i][0] = startSourceOffset;
-            skip[i][1] = endSourceOffset;
-        }
+    public void addBlockComments(List<SyntaxHighlightAnnotation> blockComments) {
+        this.blockComments = blockComments;
         addAll(blockComments);
     }
 }

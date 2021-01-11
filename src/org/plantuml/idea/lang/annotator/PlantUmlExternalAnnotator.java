@@ -52,10 +52,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                 String source = sourceData.getValue();
                 sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(file, source));
 
-                List<SourceAnnotation> blockComments = annotateBlockComments(source);
+                List<SyntaxHighlightAnnotation> blockComments = annotateBlockComments(source);
                 sourceAnnotationResult.addBlockComments(blockComments);
 
-                annotateByLine(sourceAnnotationResult, source, blockComments);
+                annotateByLine(sourceAnnotationResult, source);
 
                 result.add(sourceAnnotationResult);
             }
@@ -63,7 +63,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         return result;
     }
 
-    public void annotateByLine(SourceAnnotationResult result, String source, List<SourceAnnotation> blockComments) {
+    public void annotateByLine(SourceAnnotationResult result, String source) {
         Matcher keywords = LanguagePatternHolder.INSTANCE.keywordsPattern.matcher("");
         Matcher pluginSettings = LanguagePatternHolder.INSTANCE.pluginSettingsPattern.matcher("");
         Matcher types = LanguagePatternHolder.INSTANCE.typesPattern.matcher("");
@@ -97,8 +97,8 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
         }
     }
 
-    private List<SourceAnnotation> annotateBlockComments(String source) {
-        List<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
+    private List<SyntaxHighlightAnnotation> annotateBlockComments(String source) {
+        List<SyntaxHighlightAnnotation> result = new ArrayList<>();
 
         Matcher matcher = LanguagePatternHolder.INSTANCE.startBlockComment.matcher(source);
         Matcher endMatcher = null;
