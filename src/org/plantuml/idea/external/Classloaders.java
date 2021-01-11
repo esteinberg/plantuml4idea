@@ -3,7 +3,7 @@ package org.plantuml.idea.external;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Classloaders {
 
@@ -40,9 +41,7 @@ public class Classloaders {
             List<File> jarFiles = new ArrayList<>();
             File[] jars = getPluginHome().listFiles((dir, name) -> !name.equals("plantuml4idea.jar"));
             if (jars != null) {
-                if (!isUnitTest() && jars.length < 2) {
-                    throw new RuntimeException("Invalid installation. Should find at least 2 jars, but found only: " + Arrays.toString(jars));
-                }
+                validate(jars);
                 jarFiles.addAll(Arrays.asList(jars));
             }
             if (isUnitTest()) {
@@ -60,6 +59,16 @@ public class Classloaders {
             bundled = classLoader(jarFiles);
         }
         return bundled;
+    }
+
+    public static void validate(File[] jars) {
+        if (!isUnitTest() && jars.length < 2) {
+            throw new RuntimeException("Invalid installation. Should find at least 2 jars, but found: " + Arrays.toString(jars));
+        }
+        List<File> plantumls = Arrays.stream(jars).filter(file -> file.getName().startsWith("plantuml")).collect(Collectors.toList());
+        if (plantumls.size() != 1) {
+            LOG.error("Invalid installation. Should find only one plantuml jar, but found: " + plantumls);
+        }
     }
 
     public static ClassLoader getCustomClassloader(String customPlantumlJarPath) {
