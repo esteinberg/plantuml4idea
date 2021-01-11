@@ -1,4 +1,5 @@
 *.class
+lib/adapter.jar
 
 # Package Files #
 *.war
