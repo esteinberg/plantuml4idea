@@ -25,7 +25,7 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> implements Psi
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<PumlItem> properties = SimpleUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
+        final List<PumlItem> properties = PumlPsiUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
         List<ResolveResult> results = new ArrayList<>();
         for (PumlItem property : properties) {
             results.add(new PsiElementResolveResult(property));
@@ -44,7 +44,7 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> implements Psi
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<PumlItem> properties = SimpleUtil.findAll(project);
+        List<PumlItem> properties = PumlPsiUtil.findAll(project);
         List<LookupElement> variants = new ArrayList<>();
         for (final PumlItem property : properties) {
             if (property.getText() != null && property.getText().length() > 0) {
