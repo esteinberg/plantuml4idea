@@ -2,10 +2,13 @@ package org.plantuml.idea.lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
@@ -26,21 +29,40 @@ import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.METAD
  * Author: Eugene Steinberg
  * Date: 9/13/14
  */
-public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAnnotationResult> {
+public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExternalAnnotator.Info, FileAnnotationResult> {
     private static final Logger logger = Logger.getInstance(PlantUmlExternalAnnotator.class);
 
-    @Nullable
-    @Override
-    public PsiFile collectInformation(@NotNull PsiFile file) {
-        return file;
+    public static class Info {
+
+        private final String text;
+        private final VirtualFile virtualFile;
+
+        public Info(String text, VirtualFile virtualFile) {
+            this.text = text;
+            this.virtualFile = virtualFile;
+        }
+
+        public Info(PsiFile file) {
+            this(file.getText(), file.getVirtualFile());
+        }
     }
 
     @Nullable
     @Override
-    public FileAnnotationResult doAnnotate(PsiFile file) {
+    public Info collectInformation(@NotNull PsiFile file) {
+        return new Info(file.getText(), file.getVirtualFile());
+    }
+
+    @Nullable
+    @Override
+    public FileAnnotationResult doAnnotate(Info file) {
+        // Temporary solution to avoid execution under read action in dumb mode. Should be removed after IDEA-229905 will be fixed
+        Application application = ApplicationManager.getApplication();
+        if (application != null && application.isReadAccessAllowed() && !application.isUnitTestMode()) return null;
+
         FileAnnotationResult result = new FileAnnotationResult();
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
-            String text = file.getFirstChild().getText();
+            String text = file.text;
 
             Map<Integer, String> sources = PlantUml.extractSources(text);
 
@@ -50,7 +72,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PsiFile, FileAn
                 SourceAnnotationResult sourceAnnotationResult = new SourceAnnotationResult(sourceOffset);
 
                 String source = sourceData.getValue();
-                sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(file, source));
+                sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(source, file.virtualFile));
 
                 List<SyntaxHighlightAnnotation> blockComments = annotateBlockComments(source);
                 sourceAnnotationResult.addBlockComments(blockComments);

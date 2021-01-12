@@ -16,7 +16,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n'Line Comment\nactor User/'Block Comment'/\n@enduml");
 
-        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
+        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(new PlantUmlExternalAnnotator.Info(psiFile));
 
         assertNotNull(fileAnnotationResult);
 
@@ -33,7 +33,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n\t 'Line Comment\nactor User/'Block Comment'/\n@enduml");
 
-        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
+        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(new PlantUmlExternalAnnotator.Info(psiFile));
 
         assertNotNull(fileAnnotationResult);
 
@@ -51,7 +51,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n/'Block Comment'/\nactor User/'Second Block Comment'/\n@enduml");
 
-        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(psiFile);
+        FileAnnotationResult fileAnnotationResult = plantUmlExternalAnnotator.doAnnotate(new PlantUmlExternalAnnotator.Info(psiFile));
 
         assertNotNull(fileAnnotationResult);
 

@@ -332,5 +332,12 @@
                                 implementationClass="org.plantuml.idea.lang.PlantUmlCompletionContributor"/>
         <typedHandler implementation="org.plantuml.idea.lang.PlantUmlCompletionAutoPopupHandler"
                       id="PlantUmlCompletionAutoPopupHandler"/>
+
+        <psi.referenceContributor implementation="org.plantuml.idea.language.PumlReferenceContributor"/>
+        <lang.findUsagesProvider language="PUML"
+                                 implementationClass="org.plantuml.idea.language.SimpleFindUsagesProvider"/>
+        <gotoSymbolContributor implementation="org.plantuml.idea.language.SimpleChooseByNameContributor"/>
+        <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlWord"
+                                 implementationClass="org.plantuml.idea.language.PumlElementManipulator"/>
     </extensions>
 </idea-plugin>

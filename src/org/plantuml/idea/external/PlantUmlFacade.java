@@ -1,6 +1,6 @@
 package org.plantuml.idea.external;
 
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ImageLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,7 @@ public interface PlantUmlFacade {
     }
 
     @Nullable
-    Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source);
+    Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile);
 
     void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
             throws IOException;

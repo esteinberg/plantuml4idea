@@ -1,60 +1,58 @@
 package org.plantuml.idea.lang;
 
-import com.intellij.lang.ASTFactory;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
-import com.intellij.lexer.EmptyLexer;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PlainTextTokenTypes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.language.PumlLexerAdapter;
+import org.plantuml.idea.language.parser.PumlParser;
+import org.plantuml.idea.language.psi.PumlTypes;
 
 /**
  * @author Eugene Steinberg
  */
 public class PlantUmlParserDefinition implements ParserDefinition {
-    private static final IFileElementType PLANTUML_FILE_ELEMENT_TYPE = new IFileElementType(PlantUmlLanguage.INSTANCE) {
-        @Override
-        public ASTNode parseContents(ASTNode chameleon) {
-            final CharSequence chars = chameleon.getChars();
-            return ASTFactory.leaf(PlainTextTokenTypes.PLAIN_TEXT, chars);
-        }
-    };
+
+    public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
+    public static final TokenSet COMMENTS = TokenSet.create(PumlTypes.COMMENT);
+
+    public static final IFileElementType FILE = new IFileElementType(PlantUmlLanguage.INSTANCE);
 
     @Override
     @NotNull
     public Lexer createLexer(Project project) {
-        return new EmptyLexer();
+        return new PumlLexerAdapter();
     }
 
     @Override
     @NotNull
     public PsiParser createParser(Project project) {
-        throw new UnsupportedOperationException("Not supported");
+        return new PumlParser();
     }
 
     @Override
     public IFileElementType getFileNodeType() {
-        return PLANTUML_FILE_ELEMENT_TYPE;
+        return FILE;
     }
 
     @Override
     @NotNull
     public TokenSet getWhitespaceTokens() {
-        return TokenSet.EMPTY;
+        return WHITE_SPACES;
     }
 
     @Override
     @NotNull
     public TokenSet getCommentTokens() {
-        return TokenSet.EMPTY;
+        return COMMENTS;
     }
 
     @Override
@@ -63,10 +61,10 @@ public class PlantUmlParserDefinition implements ParserDefinition {
         return TokenSet.EMPTY;
     }
 
-    @Override
     @NotNull
+    @Override
     public PsiElement createElement(ASTNode node) {
-        return PsiUtilCore.NULL_PSI_ELEMENT;
+        return PumlTypes.Factory.createElement(node);
     }
 
     @Override

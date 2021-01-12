@@ -20,7 +20,7 @@ public class Utils {
 
     public static boolean isPlantUmlFileType(@NotNull PsiFile file) {
         FileType fileType = file.getFileType();
-        return fileType.equals(PlantUmlFileType.PLANTUML_FILE_TYPE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
+        return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
     }
 
 }

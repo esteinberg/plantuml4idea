@@ -9,7 +9,7 @@ import javax.swing.*;
 
 public class PlantUmlFileType extends LanguageFileType {
 
-    public static final PlantUmlFileType PLANTUML_FILE_TYPE = new PlantUmlFileType();
+    public static final PlantUmlFileType INSTANCE = new PlantUmlFileType();
 
     public static final String PLANTUML_EXT = "puml";
     public static final String PLANTUML_EXT_2 = "plantuml";

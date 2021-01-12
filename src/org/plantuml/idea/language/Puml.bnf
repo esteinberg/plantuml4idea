@@ -1,0 +1,27 @@
+{
+  parserClass="org.plantuml.idea.language.parser.PumlParser"
+//  parserUtilClass="org.plantuml.idea.language.parser.PumlParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Puml"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.plantuml.idea.language.psi"
+  psiImplPackage="org.plantuml.idea.language.psi.impl"
+
+  elementTypeHolderClass="org.plantuml.idea.language.psi.PumlTypes"
+  elementTypeClass="org.plantuml.idea.language.psi.PumlElementType"
+  tokenTypeClass="org.plantuml.idea.language.psi.PumlTokenType"
+
+  psiImplUtilClass="org.plantuml.idea.language.psi.impl.PumlPsiImplUtil"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (word|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)
+
+word ::= IDENTIFIER {
+  mixin="org.plantuml.idea.language.psi.impl.PumlNamedElementImpl"
+  implements="org.plantuml.idea.language.psi.PumlNamedElement"
+  methods=[ getName setName getNameIdentifier getPresentation getReferences toString]
+}

@@ -1,7 +1,7 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ImageLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +29,8 @@ public class FacadeImpl implements PlantUmlFacade {
 
     @Nullable
     @Override
-    public Collection<SourceAnnotation> annotateSyntaxErrors(PsiFile file, String source) {
-        return Annotator.annotateSyntaxErrors(file, source);
+    public Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile) {
+        return Annotator.annotateSyntaxErrors(source, virtualFile);
     }
 
     @Override
