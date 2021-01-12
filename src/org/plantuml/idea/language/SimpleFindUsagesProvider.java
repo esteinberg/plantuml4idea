@@ -23,9 +23,7 @@ public class SimpleFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        boolean b = psiElement instanceof PumlItem
-                && psiElement.getReference().resolve() == null;  //only declaration returns null
-        return b;
+        return psiElement instanceof PumlItem;
     }
 
     @Nullable
