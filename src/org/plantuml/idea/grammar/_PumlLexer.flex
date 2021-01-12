@@ -1,8 +1,9 @@
 package org.plantuml.idea.grammar;
                                   
+import com.intellij.lexer.FlexLexer;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.plantuml.idea.grammar.psi.PumlTypes;
-import com.intellij.psi.TokenType;
 
 %%
 
@@ -25,8 +26,8 @@ LINE_COMMENT=\s*("'")[^\r\n]*
 WORD_CHARACTER=[A-Za-z0-9]
 SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except bracket start, to be able to match BRACKET_IDENTIFIER      
 BLOCK_COMMENT="/'"([^'/])*("'/")
-BRACKET_IDENTIFIER="["([^\]\R])*("]")
-BRACKET_IDENTIFIER2="("([^\)\R])*(")")
+BRACKET_IDENTIFIER="["([^\]\r\n])*("]")
+BRACKET_IDENTIFIER2="("([^\)\r\n])*(")")
 
 %xstate LINE_START_STATE,IN_COMMENT
    
