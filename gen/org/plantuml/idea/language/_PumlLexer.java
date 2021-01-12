@@ -15,19 +15,13 @@ import org.plantuml.idea.language.psi.PumlTypes;
  */
 public class _PumlLexer implements FlexLexer {
 
-  /**
-   * This character denotes the end of file
-   */
+  /** This character denotes the end of file */
   public static final int YYEOF = -1;
 
-  /**
-   * initial size of the lookahead buffer
-   */
+  /** initial size of the lookahead buffer */
   private static final int ZZ_BUFFERSIZE = 16384;
 
-  /**
-   * lexical states
-   */
+  /** lexical states */
   public static final int YYINITIAL = 0;
   public static final int LINE_START_STATE = 2;
   public static final int IN_COMMENT = 4;
@@ -35,7 +29,7 @@ public class _PumlLexer implements FlexLexer {
   /**
    * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
    * ZZ_LEXSTATE[l+1] is the state in the DFA for the lexical state l
-   * at the beginning of a line
+   *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
   private static final int ZZ_LEXSTATE[] = {
@@ -44,25 +38,26 @@ public class _PumlLexer implements FlexLexer {
 
   /**
    * Translates characters to character classes
-   * Chosen bits are [8, 7, 6]
-   * Total runtime size is 1808 bytes
+   * Chosen bits are [7, 7, 7]
+   * Total runtime size is 1928 bytes
    */
   public static int ZZ_CMAP(int ch) {
-    return ZZ_CMAP_A[(ZZ_CMAP_Y[(ZZ_CMAP_Z[ch >> 13] << 7) | ((ch >> 6) & 0x7f)] << 6) | (ch & 0x3f)];
+    return ZZ_CMAP_A[(ZZ_CMAP_Y[ZZ_CMAP_Z[ch >> 14] | ((ch >> 7) & 0x7f)] << 7) | (ch & 0x7f)];
   }
 
-  /* The ZZ_CMAP_Z table has 136 entries */
+  /* The ZZ_CMAP_Z table has 68 entries */
   static final char ZZ_CMAP_Z[] = zzUnpackCMap(
-          "\1\0\1\1\206\2");
+          "\1\0\103\200");
 
-  /* The ZZ_CMAP_Y table has 384 entries */
+  /* The ZZ_CMAP_Y table has 256 entries */
   static final char ZZ_CMAP_Y[] = zzUnpackCMap(
-          "\1\0\1\1\1\2\127\1\1\3\45\1\1\4\1\5\76\1\1\3\277\1");
+          "\1\0\1\1\53\2\1\3\22\2\1\4\37\2\1\3\237\2");
 
-  /* The ZZ_CMAP_A table has 384 entries */
+  /* The ZZ_CMAP_A table has 640 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-          "\11\0\1\1\1\4\1\2\1\3\1\4\22\0\1\1\6\0\1\6\7\0\1\7\125\0\1\2\32\0\1\5\37\0" +
-                  "\1\5\77\0\13\5\35\0\2\2\5\0\1\5\57\0\1\5\40\0");
+          "\11\0\1\1\1\4\1\2\1\3\1\4\22\0\1\1\6\0\1\6\1\7\1\14\5\0\1\10\42\0\1\12\10" +
+                  "\0\1\11\1\0\1\13\47\0\1\2\32\0\1\5\337\0\1\5\177\0\13\5\35\0\2\2\5\0\1\5\57" +
+                  "\0\1\5\40\0");
 
   /**
    * Translates DFA states to action switch labels.
@@ -70,11 +65,11 @@ public class _PumlLexer implements FlexLexer {
   private static final int[] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-          "\3\0\1\1\1\2\2\3\1\4\1\1\1\2\2\3" +
-                  "\1\0\1\5\2\0\1\5";
+          "\3\0\1\1\1\2\2\3\1\4\3\1\1\2\2\3" +
+                  "\1\0\1\5\1\0\1\1\3\0\1\5";
 
   private static int[] zzUnpackAction() {
-    int[] result = new int[17];
+    int[] result = new int[22];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -99,12 +94,12 @@ public class _PumlLexer implements FlexLexer {
   private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-          "\0\0\0\10\0\20\0\30\0\40\0\50\0\40\0\20" +
-                  "\0\60\0\70\0\100\0\70\0\110\0\120\0\130\0\140" +
-                  "\0\20";
+          "\0\0\0\15\0\32\0\47\0\64\0\101\0\64\0\32" +
+                  "\0\116\0\133\0\150\0\165\0\202\0\165\0\217\0\234" +
+                  "\0\116\0\32\0\251\0\150\0\266\0\32";
 
   private static int[] zzUnpackRowMap() {
-    int[] result = new int[17];
+    int[] result = new int[22];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -128,15 +123,18 @@ public class _PumlLexer implements FlexLexer {
 
   private static final String ZZ_TRANS_PACKED_0 =
           "\1\4\1\5\1\6\1\7\1\6\1\10\1\4\1\11" +
-                  "\1\4\1\12\1\13\1\14\1\13\1\15\1\16\1\11" +
-                  "\10\0\1\4\5\0\1\4\2\0\1\5\1\6\1\7" +
-                  "\1\6\5\0\3\6\11\0\1\17\2\0\1\12\1\13" +
-                  "\1\14\1\13\1\15\1\16\2\0\1\15\3\13\1\15" +
-                  "\1\16\2\0\5\15\1\16\1\0\4\16\1\0\3\16" +
-                  "\6\17\1\20\10\0\1\21";
+                  "\1\12\1\13\4\4\1\14\1\15\1\16\1\15\1\17" +
+                  "\1\20\1\11\1\12\1\13\3\4\15\0\1\4\5\0" +
+                  "\1\4\3\0\3\4\1\0\1\5\1\6\1\7\1\6" +
+                  "\12\0\3\6\10\0\12\21\1\0\1\21\1\22\6\0" +
+                  "\1\23\6\0\12\24\1\0\1\22\1\24\1\0\1\14" +
+                  "\1\15\1\16\1\15\1\17\1\20\7\0\1\17\3\15" +
+                  "\1\17\1\20\7\0\5\17\1\20\6\0\4\20\1\0" +
+                  "\10\20\6\23\1\25\1\23\1\0\4\23\10\0\1\26" +
+                  "\4\0";
 
   private static int[] zzUnpackTrans() {
-    int[] result = new int[104];
+    int[] result = new int[195];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -174,11 +172,11 @@ public class _PumlLexer implements FlexLexer {
   private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-          "\2\0\1\10\4\1\1\11\4\1\1\0\1\1\2\0" +
-                  "\1\11";
+          "\2\0\1\10\4\1\1\11\6\1\1\0\1\1\1\0" +
+                  "\1\11\3\0\1\11";
 
   private static int[] zzUnpackAttribute() {
-    int[] result = new int[17];
+    int[] result = new int[22];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -248,21 +246,19 @@ public class _PumlLexer implements FlexLexer {
    */
   private boolean zzAtEOF;
 
-  /**
-   * denotes if the user-EOF-code has already been executed
-   */
+  /** denotes if the user-EOF-code has already been executed */
   private boolean zzEOFDone;
 
   /* user code: */
   public _PumlLexer() {
-    this((java.io.Reader) null);
+    this((java.io.Reader)null);
   }
 
 
   /**
    * Creates a new scanner
    *
-   * @param in the java.io.Reader to read input from.
+   * @param   in  the java.io.Reader to read input from.
    */
   public _PumlLexer(java.io.Reader in) {
     this.zzReader = in;
@@ -284,7 +280,7 @@ public class _PumlLexer implements FlexLexer {
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
     while (i < packed.length()) {
-      int count = packed.charAt(i++);
+      int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
     }
@@ -311,8 +307,9 @@ public class _PumlLexer implements FlexLexer {
   /**
    * Refills the input buffer.
    *
-   * @return {@code false}, iff there was new input.
-   * @throws java.io.IOException if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception   java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
     return true;
@@ -348,11 +345,12 @@ public class _PumlLexer implements FlexLexer {
   /**
    * Returns the character at position {@code pos} from the
    * matched text.
-   * <p>
+   *
    * It is equivalent to yytext().charAt(pos), but faster
    *
    * @param pos the position of the character to fetch.
    *            A value from 0 to yylength()-1.
+   *
    * @return the character at position pos
    */
   public final char yycharat(int pos) {
@@ -370,23 +368,24 @@ public class _PumlLexer implements FlexLexer {
 
   /**
    * Reports an error that occurred while scanning.
-   * <p>
+   *
    * In a wellformed scanner (no or only correct usage of
    * yypushback(int) and a match-all fallback rule) this method
    * will only be called with things that "Can't Possibly Happen".
    * If this method is called, something is seriously wrong
    * (e.g. a JFlex bug producing a faulty scanner etc.).
-   * <p>
+   *
    * Usual syntax/scanner level error handling should be done
    * in error fallback rules.
    *
-   * @param errorCode the code of the errormessage to display
+   * @param   errorCode  the code of the errormessage to display
    */
   private void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch (ArrayIndexOutOfBoundsException e) {
       message = ZZ_ERROR_MSG[ZZ_UNKNOWN_ERROR];
     }
 
@@ -414,8 +413,8 @@ public class _PumlLexer implements FlexLexer {
    * Resumes scanning until the next regular expression is matched,
    * the end of input is encountered or an I/O-Error occurs.
    *
-   * @return the next token
-   * @throws java.io.IOException if any I/O-Error occurs
+   * @return      the next token
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   public IElementType advance() throws java.io.IOException {
     int zzInput;
@@ -475,7 +474,7 @@ public class _PumlLexer implements FlexLexer {
               zzCurrentPosL += Character.charCount(zzInput);
             }
           }
-          int zzNext = zzTransL[zzRowMapL[zzState] + ZZ_CMAP(zzInput)];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + ZZ_CMAP(zzInput)];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -483,7 +482,7 @@ public class _PumlLexer implements FlexLexer {
           if ((zzAttributes & 1) == 1) {
             zzAction = zzState;
             zzMarkedPosL = zzCurrentPosL;
-            if ((zzAttributes & 8) == 8) break zzForAction;
+            if ( (zzAttributes & 8) == 8) break zzForAction;
           }
 
         }
@@ -527,13 +526,12 @@ public class _PumlLexer implements FlexLexer {
           case 5: {
             yybegin(YYINITIAL);
             return PumlTypes.COMMENT;
-          }
-          // fall through
-          case 10:
-            break;
+            } 
+            // fall through
+          case 10: break;
           default:
             zzScanError(ZZ_NO_MATCH);
-        }
+          }
       }
     }
   }

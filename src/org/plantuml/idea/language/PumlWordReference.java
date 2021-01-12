@@ -25,13 +25,12 @@ public class PumlWordReference extends PsiReferenceBase<PumlWord> implements Psi
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        Project project = myElement.getProject();
-        final List<PumlWord> properties = SimpleUtil.findFirstInFile(getElement().getContainingFile(), key);
+        final List<PumlWord> properties = SimpleUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
         List<ResolveResult> results = new ArrayList<>();
         for (PumlWord property : properties) {
             results.add(new PsiElementResolveResult(property));
         }
-        return results.toArray(new ResolveResult[results.size()]);
+        return results.toArray(new ResolveResult[0]);
     }
 
     @Nullable

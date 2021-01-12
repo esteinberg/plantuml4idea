@@ -22,25 +22,25 @@ import com.intellij.psi.TokenType;
             
 NEW_LINE_INDENT=[\ \t\f]*\R+
 WHITE_SPACE=[\ \t\f]
-END_OF_LINE_COMMENT=\s*("'")[^\r\n]*
-WORD_CHARACTER=[^\s/]        
+LINE_COMMENT=\s*("'")[^\r\n]*
+WORD_CHARACTER=[^\s/\[\(]        
 BLOCK_COMMENT="/'"([^'/])*("'/")
+BRACKET_IDENTIFIER="["([^\]\R])*("]")
+BRACKET_IDENTIFIER2="("([^\)\R])*(")")
 
 %xstate LINE_START_STATE,IN_COMMENT
    
 %%  
 
-//<YYINITIAL,LINE_START_STATE>"/'"         {yybegin(IN_COMMENT);return PumlTypes.COMMENT;}
-//<IN_COMMENT>"'/"     { yybegin(YYINITIAL);return PumlTypes.COMMENT;}
-//<IN_COMMENT>[^'\n]+   {return PumlTypes.COMMENT;}
-//<IN_COMMENT>"'"       {return PumlTypes.COMMENT;}
-//<IN_COMMENT>\n       {return PumlTypes.COMMENT; }
 
-
-<LINE_START_STATE>{END_OF_LINE_COMMENT}                          { yybegin(YYINITIAL); return PumlTypes.COMMENT; }
+<LINE_START_STATE>{LINE_COMMENT}                                 { yybegin(YYINITIAL); return PumlTypes.COMMENT; }
 <YYINITIAL, LINE_START_STATE>{BLOCK_COMMENT}                         { yybegin(YYINITIAL); return PumlTypes.COMMENT; }
+<YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER2}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>"/"                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>"["                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>"("                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{NEW_LINE_INDENT}                      { yybegin(LINE_START_STATE); return PumlTypes.NEW_LINE_INDENT; }
 <YYINITIAL, LINE_START_STATE>{WHITE_SPACE}+                         { yybegin(YYINITIAL); return PumlTypes.WHITE_SPACE; }
 

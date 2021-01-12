@@ -334,9 +334,13 @@
                       id="PlantUmlCompletionAutoPopupHandler"/>
 
         <psi.referenceContributor implementation="org.plantuml.idea.language.PumlReferenceContributor"/>
-        <lang.findUsagesProvider language="PUML"
-                                 implementationClass="org.plantuml.idea.language.SimpleFindUsagesProvider"/>
-        <gotoSymbolContributor implementation="org.plantuml.idea.language.SimpleChooseByNameContributor"/>
+        <!--    does not work properly and is probably useless anyway
+            <lang.findUsagesProvider language="PUML" implementationClass="org.plantuml.idea.language.SimpleFindUsagesProvider"/>
+            -->
+
+        <!-- annoying        
+                <gotoSymbolContributor implementation="org.plantuml.idea.language.SimpleChooseByNameContributor"/>
+                -->
         <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlWord"
                                  implementationClass="org.plantuml.idea.language.PumlElementManipulator"/>
     </extensions>
