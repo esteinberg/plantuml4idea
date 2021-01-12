@@ -3,7 +3,10 @@ package org.plantuml.idea.lang;
 import com.intellij.codeInsight.generation.actions.CommentByLineCommentAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
-import org.plantuml.idea.language.psi.PumlItem;
+import com.intellij.usageView.UsageInfo;
+import org.plantuml.idea.grammar.psi.PumlItem;
+
+import java.util.Collection;
 
 public class SimpleCodeInsightTest extends LightJavaCodeInsightFixtureTestCase {
 
@@ -34,29 +37,29 @@ public class SimpleCodeInsightTest extends LightJavaCodeInsightFixtureTestCase {
 //    myFixture.checkResultByFile("DefaultTestData.puml");
 //  }
 
-//  public void testRename() {
-//    myFixture.configureByFiles("RenameTestData.java", "RenameTestData.simple");
-//    myFixture.renameElementAtCaret("websiteUrl");
-//    myFixture.checkResultByFile("RenameTestData.simple", "RenameTestDataAfter.simple", false);
-//  }
+    public void testRename() {
+        myFixture.configureByFiles("DefaultTestData.puml");
+        myFixture.renameElementAtCaret("Foo:");
+        myFixture.checkResultByFile("DefaultTestData.puml", "DefaultTestDataAfter.puml", false);
+    }
 
 //  public void testFolding() {
 //    myFixture.configureByFile("DefaultTestData.puml");
 //    myFixture.testFolding(getTestDataPath() + "/FoldingTestData.java");
 //  }
 
-//  public void testFindUsages() {
-//    Collection<UsageInfo> usageInfos = myFixture.testFindUsages("FindUsagesTestData.simple", "FindUsagesTestData.java");
-//    assertEquals(1, usageInfos.size());
-//  }
+    public void testFindUsages() {
+        Collection<UsageInfo> usageInfos = myFixture.testFindUsages("DefaultTestData.puml");
+        assertEquals(3, usageInfos.size());
+    }
 
     public void testCommenter() {
-        myFixture.configureByText(PlantUmlFileType.INSTANCE, "<caret>website = https://en.wikipedia.org/");
+        myFixture.configureByText(PlantUmlFileType.INSTANCE, "<caret>foo");
         CommentByLineCommentAction commentAction = new CommentByLineCommentAction();
         commentAction.actionPerformedImpl(getProject(), myFixture.getEditor());
-        myFixture.checkResult("'website = https://en.wikipedia.org/");
+        myFixture.checkResult("'foo");
         commentAction.actionPerformedImpl(getProject(), myFixture.getEditor());
-        myFixture.checkResult("'website = https://en.wikipedia.org/");
+        myFixture.checkResult("foo");
     }
 
     public void testReference() {
@@ -64,7 +67,7 @@ public class SimpleCodeInsightTest extends LightJavaCodeInsightFixtureTestCase {
         PsiElement element = myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent();
         String text = element.getText();
 
-        assertEquals("Bob:", ((PumlItem) element.getReferences()[0].resolve()).getText());
+        assertEquals("Bob", ((PumlItem) element.getReferences()[0].resolve()).getText());
     }
 
 }

@@ -1,5 +1,5 @@
 // This is a generated file. Not intended for manual editing.
-package org.plantuml.idea.language.psi;
+package org.plantuml.idea.grammar.psi;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;

@@ -1,4 +1,4 @@
-package org.plantuml.idea.language.psi;
+package org.plantuml.idea.grammar.psi;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;

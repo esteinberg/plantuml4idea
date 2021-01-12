@@ -1,8 +1,7 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
                                   
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import org.plantuml.idea.language.psi.PumlTypes;
+import org.plantuml.idea.grammar.psi.PumlTypes;
 import com.intellij.psi.TokenType;
 
 %%
@@ -23,7 +22,8 @@ import com.intellij.psi.TokenType;
 NEW_LINE_INDENT=[\ \t\f]*\R+
 WHITE_SPACE=[\ \t\f]
 LINE_COMMENT=\s*("'")[^\r\n]*
-WORD_CHARACTER=[^\s/\[\(]        
+WORD_CHARACTER=[A-Za-z0-9]
+SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except bracket start, to be able to match BRACKET_IDENTIFIER      
 BLOCK_COMMENT="/'"([^'/])*("'/")
 BRACKET_IDENTIFIER="["([^\]\R])*("]")
 BRACKET_IDENTIFIER2="("([^\)\R])*(")")
@@ -38,6 +38,7 @@ BRACKET_IDENTIFIER2="("([^\)\R])*(")")
 <YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER2}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>{SPECIAL_CHARACTER}+                   { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>"/"                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>"["                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>"("                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }

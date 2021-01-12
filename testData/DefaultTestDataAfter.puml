@@ -1,0 +1,7 @@
+@startuml
+Alice -> Foo: Authentication Request
+Foo --> Alice: Authentication Response
+
+Alice -> Foo: Another authentication Request
+Alice <-- <caret>Foo: another authentication Response
+@enduml

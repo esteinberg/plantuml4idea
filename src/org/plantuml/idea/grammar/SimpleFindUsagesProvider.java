@@ -1,4 +1,4 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
 
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
@@ -7,8 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.language.psi.PumlItem;
-import org.plantuml.idea.language.psi.PumlTypes;
+import org.plantuml.idea.grammar.psi.PumlItem;
+import org.plantuml.idea.grammar.psi.PumlTypes;
 
 public class SimpleFindUsagesProvider implements FindUsagesProvider {
 

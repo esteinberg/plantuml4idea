@@ -1,4 +1,4 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
 
 import com.intellij.lexer.FlexAdapter;
 

@@ -337,11 +337,11 @@
         <typedHandler implementation="org.plantuml.idea.lang.PlantUmlCompletionAutoPopupHandler"
                       id="PlantUmlCompletionAutoPopupHandler"/>
 
-        <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlItem"
-                                 implementationClass="org.plantuml.idea.language.PumlElementManipulator"/>
-        <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.language.PumlNamesValidator"/>
+        <lang.elementManipulator forClass="org.plantuml.idea.grammar.psi.PumlItem"
+                                 implementationClass="org.plantuml.idea.grammar.PumlElementManipulator"/>
+        <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.grammar.PumlNamesValidator"/>
         <lang.findUsagesProvider language="PUML"
-                                 implementationClass="org.plantuml.idea.language.SimpleFindUsagesProvider"/>
+                                 implementationClass="org.plantuml.idea.grammar.SimpleFindUsagesProvider"/>
 
     </extensions>
 </idea-plugin>

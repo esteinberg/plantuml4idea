@@ -1,5 +1,5 @@
 // This is a generated file. Not intended for manual editing.
-package org.plantuml.idea.language.psi.impl;
+package org.plantuml.idea.grammar.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
@@ -7,8 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.language.psi.PumlItem;
-import org.plantuml.idea.language.psi.PumlVisitor;
+import org.plantuml.idea.grammar.psi.PumlItem;
+import org.plantuml.idea.grammar.psi.PumlVisitor;
 
 public class PumlItemImpl extends PumlNamedElementImpl implements PumlItem {
 

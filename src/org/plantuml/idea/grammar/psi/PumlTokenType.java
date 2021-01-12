@@ -1,4 +1,4 @@
-package org.plantuml.idea.language.psi;
+package org.plantuml.idea.grammar.psi;
 
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NonNls;

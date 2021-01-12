@@ -12,10 +12,10 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiUtilCore;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.grammar.PumlLexerAdapter;
+import org.plantuml.idea.grammar.parser.PumlParser;
+import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.language.PumlLexerAdapter;
-import org.plantuml.idea.language.parser.PumlParser;
-import org.plantuml.idea.language.psi.PumlTypes;
 
 /**
  * @author Eugene Steinberg

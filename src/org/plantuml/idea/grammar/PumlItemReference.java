@@ -1,4 +1,4 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -8,8 +8,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.language.psi.PumlItem;
 
 import java.util.ArrayList;
 import java.util.HashSet;

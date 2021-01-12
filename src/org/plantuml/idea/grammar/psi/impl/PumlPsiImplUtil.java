@@ -1,4 +1,4 @@
-package org.plantuml.idea.language.psi.impl;
+package org.plantuml.idea.grammar.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
@@ -6,11 +6,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.grammar.PumlItemReference;
+import org.plantuml.idea.grammar.psi.PumlElementFactory;
+import org.plantuml.idea.grammar.psi.PumlItem;
+import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.language.PumlItemReference;
-import org.plantuml.idea.language.psi.PumlElementFactory;
-import org.plantuml.idea.language.psi.PumlItem;
-import org.plantuml.idea.language.psi.PumlTypes;
 
 import javax.swing.*;
 

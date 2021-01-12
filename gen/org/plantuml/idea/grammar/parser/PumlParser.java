@@ -1,5 +1,5 @@
 // This is a generated file. Not intended for manual editing.
-package org.plantuml.idea.language.parser;
+package org.plantuml.idea.grammar.parser;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.LightPsiParser;
@@ -9,7 +9,7 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 
 import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import static org.plantuml.idea.language.psi.PumlTypes.*;
+import static org.plantuml.idea.grammar.psi.PumlTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class PumlParser implements PsiParser, LightPsiParser {

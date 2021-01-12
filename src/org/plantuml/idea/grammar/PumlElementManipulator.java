@@ -1,4 +1,4 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.AbstractElementManipulator;
@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.language.psi.PumlItem;
+import org.plantuml.idea.grammar.psi.PumlItem;
 
 public class PumlElementManipulator extends AbstractElementManipulator<PumlItem> {
     @Override

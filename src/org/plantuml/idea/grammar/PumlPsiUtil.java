@@ -1,4 +1,4 @@
-package org.plantuml.idea.language;
+package org.plantuml.idea.grammar;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -8,8 +8,8 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.language.psi.PumlItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
