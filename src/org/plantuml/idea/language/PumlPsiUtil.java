@@ -28,7 +28,7 @@ public class PumlPsiUtil {
 
         if (items != null) {
             for (PumlItem item : items) {
-                if (isSame(key, item)) {
+                if (isSame(key, item.getText())) {
                     if (firstMatch && item == element) {
                         returnFirst = false;
                         continue;
@@ -52,7 +52,7 @@ public class PumlPsiUtil {
                 if (item == element) {
                     return null;
                 }
-                if (isSame(key, item)) {
+                if (isSame(key, item.getText())) {
                     return item;
                 }
             }
@@ -62,8 +62,7 @@ public class PumlPsiUtil {
 
     static final Pattern SANITIZER = Pattern.compile("([a-zA-Z0-9].*[a-zA-Z0-9])");
 
-    public static boolean isSame(String p1, PumlItem property) {
-        String p2 = property.getText();
+    public static boolean isSame(String p1, String p2) {
         if (p1.equals(p2)) {
             return true;
         }
@@ -94,7 +93,7 @@ public class PumlPsiUtil {
                 PumlItem[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlItem.class);
                 if (properties != null) {
                     for (PumlItem property : properties) {
-                        if (isSame(key, property)) {
+                        if (isSame(key, property.getText())) {
                             result.add(property);
                         }
                     }
