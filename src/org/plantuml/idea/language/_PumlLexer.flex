@@ -8,13 +8,13 @@ import com.intellij.psi.TokenType;
 %%
 
 %{
-  public _PumlLexer() {
+  public PumlLexer() {
     this((java.io.Reader)null);
   }
 %}
 
 %public
-%class _PumlLexer
+%class PumlLexer
 %implements FlexLexer
 %function advance
 %type IElementType

@@ -13,7 +13,7 @@ import org.plantuml.idea.language.psi.PumlTypes;
  * <a href="http://www.jflex.de/">JFlex</a> 1.7.0
  * from the specification file <tt>_PumlLexer.flex</tt>
  */
-public class _PumlLexer implements FlexLexer {
+public class PumlLexer implements FlexLexer {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -250,8 +250,8 @@ public class _PumlLexer implements FlexLexer {
   private boolean zzEOFDone;
 
   /* user code: */
-  public _PumlLexer() {
-    this((java.io.Reader)null);
+  public PumlLexer() {
+    this((java.io.Reader) null);
   }
 
 
@@ -260,7 +260,7 @@ public class _PumlLexer implements FlexLexer {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  public _PumlLexer(java.io.Reader in) {
+  public PumlLexer(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -298,7 +298,7 @@ public class _PumlLexer implements FlexLexer {
   public void reset(CharSequence buffer, int start, int end, int initialState) {
     zzBuffer = buffer;
     zzCurrentPos = zzMarkedPos = zzStartRead = start;
-    zzAtEOF = false;
+    zzAtEOF  = false;
     zzAtBOL = true;
     zzEndRead = end;
     yybegin(initialState);
@@ -362,7 +362,7 @@ public class _PumlLexer implements FlexLexer {
    * Returns the length of the matched text region.
    */
   public final int yylength() {
-    return zzMarkedPos - zzStartRead;
+    return zzMarkedPos-zzStartRead;
   }
 
 

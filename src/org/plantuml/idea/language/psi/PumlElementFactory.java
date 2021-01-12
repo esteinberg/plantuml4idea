@@ -8,9 +8,9 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 
 public class PumlElementFactory {
 
-    public static PumlWord createWord(Project project, String name) {
+    public static PumlItem createWord(Project project, String name) {
         final PlantUmlFileImpl file = createFile(project, name);
-        return (PumlWord) file.getFirstChild();
+        return (PumlItem) file.getFirstChild();
     }
 
     public static PlantUmlFileImpl createFile(Project project, String text) {

@@ -16,12 +16,10 @@
   psiImplUtilClass="org.plantuml.idea.language.psi.impl.PumlPsiImplUtil"
 }
 
-simpleFile ::= item_*
+simpleFile ::= (item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)*
 
-private item_ ::= (word|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)
-
-word ::= IDENTIFIER {
-  mixin="org.plantuml.idea.language.psi.impl.PumlNamedElementImpl"
-  implements="org.plantuml.idea.language.psi.PumlNamedElement"
-  methods=[ getName setName getNameIdentifier getPresentation getReferences toString]
-}
+item ::= IDENTIFIER {
+   mixin="org.plantuml.idea.language.psi.impl.PumlNamedElementImpl"
+   implements="org.plantuml.idea.language.psi.PumlNamedElement"
+   methods=[ getName setName getNameIdentifier getPresentation getReferences toString]
+ }

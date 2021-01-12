@@ -36,38 +36,37 @@ public class PumlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // word|COMMENT|WHITE_SPACE|NEW_LINE_INDENT
-  static boolean item_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item_")) return false;
+  // IDENTIFIER
+  public static boolean item(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "item")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
-    r = word(b, l + 1);
-    if (!r) r = consumeToken(b, COMMENT);
-    if (!r) r = consumeToken(b, WHITE_SPACE);
-    if (!r) r = consumeToken(b, NEW_LINE_INDENT);
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER);
+    exit_section_(b, m, ITEM, r);
     return r;
   }
 
   /* ********************************************************** */
-  // item_*
+  // (item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)*
   static boolean simpleFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simpleFile")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!item_(b, l + 1)) break;
+      if (!simpleFile_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "simpleFile", c)) break;
     }
     return true;
   }
 
-  /* ********************************************************** */
-  // IDENTIFIER
-  public static boolean word(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "word")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+  // item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT
+  private static boolean simpleFile_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "simpleFile_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    exit_section_(b, m, WORD, r);
+    r = item(b, l + 1);
+    if (!r) r = consumeToken(b, COMMENT);
+    if (!r) r = consumeToken(b, WHITE_SPACE);
+    if (!r) r = consumeToken(b, NEW_LINE_INDENT);
     return r;
   }
 

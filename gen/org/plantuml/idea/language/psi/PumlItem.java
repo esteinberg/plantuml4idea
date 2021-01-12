@@ -5,7 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface PumlWord extends PumlNamedElement {
+public interface PumlItem extends PumlNamedElement {
 
   String getName();
 

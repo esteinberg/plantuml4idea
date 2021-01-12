@@ -7,17 +7,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.language.psi.PumlItem;
 import org.plantuml.idea.language.psi.PumlVisitor;
-import org.plantuml.idea.language.psi.PumlWord;
 
-public class PumlWordImpl extends PumlNamedElementImpl implements PumlWord {
+public class PumlItemImpl extends PumlNamedElementImpl implements PumlItem {
 
-  public PumlWordImpl(@NotNull ASTNode node) {
+  public PumlItemImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PumlVisitor visitor) {
-    visitor.visitWord(this);
+    visitor.visitItem(this);
   }
 
   @Override

@@ -4,11 +4,11 @@ package org.plantuml.idea.language.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import org.plantuml.idea.language.psi.impl.PumlWordImpl;
+import org.plantuml.idea.language.psi.impl.PumlItemImpl;
 
 public interface PumlTypes {
 
-  IElementType WORD = new PumlElementType("WORD");
+  IElementType ITEM = new PumlElementType("ITEM");
 
   IElementType COMMENT = new PumlTokenType("COMMENT");
   IElementType IDENTIFIER = new PumlTokenType("IDENTIFIER");
@@ -18,8 +18,8 @@ public interface PumlTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-      if (type == WORD) {
-        return new PumlWordImpl(node);
+      if (type == ITEM) {
+        return new PumlItemImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

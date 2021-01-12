@@ -341,7 +341,7 @@
         <!-- annoying        
                 <gotoSymbolContributor implementation="org.plantuml.idea.language.SimpleChooseByNameContributor"/>
                 -->
-        <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlWord"
+        <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlItem"
                                  implementationClass="org.plantuml.idea.language.PumlElementManipulator"/>
     </extensions>
 </idea-plugin>

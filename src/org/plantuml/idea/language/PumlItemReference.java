@@ -8,16 +8,16 @@ import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.language.psi.PumlWord;
+import org.plantuml.idea.language.psi.PumlItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PumlWordReference extends PsiReferenceBase<PumlWord> implements PsiPolyVariantReference {
+public class PumlItemReference extends PsiReferenceBase<PumlItem> implements PsiPolyVariantReference {
 
     private final String key;
 
-    public PumlWordReference(PumlWord element, String text) {
+    public PumlItemReference(PumlItem element, String text) {
         super(element);
         key = text;
     }
@@ -25,9 +25,9 @@ public class PumlWordReference extends PsiReferenceBase<PumlWord> implements Psi
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<PumlWord> properties = SimpleUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
+        final List<PumlItem> properties = SimpleUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
         List<ResolveResult> results = new ArrayList<>();
-        for (PumlWord property : properties) {
+        for (PumlItem property : properties) {
             results.add(new PsiElementResolveResult(property));
         }
         return results.toArray(new ResolveResult[0]);
@@ -44,9 +44,9 @@ public class PumlWordReference extends PsiReferenceBase<PumlWord> implements Psi
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<PumlWord> properties = SimpleUtil.findAll(project);
+        List<PumlItem> properties = SimpleUtil.findAll(project);
         List<LookupElement> variants = new ArrayList<>();
-        for (final PumlWord property : properties) {
+        for (final PumlItem property : properties) {
             if (property.getText() != null && property.getText().length() > 0) {
                 variants.add(LookupElementBuilder
                         .create(property).withIcon(PlantUmlFileType.PLANTUML_ICON)
@@ -59,7 +59,7 @@ public class PumlWordReference extends PsiReferenceBase<PumlWord> implements Psi
 
     @Override
     public PsiElement handleElementRename(@NotNull String newElementName) throws IncorrectOperationException {
-        PumlWord element = getElement();
+        PumlItem element = getElement();
         element.setName(newElementName);
         return element;
     }

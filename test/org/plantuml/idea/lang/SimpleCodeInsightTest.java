@@ -3,7 +3,7 @@ package org.plantuml.idea.lang;
 import com.intellij.codeInsight.generation.actions.CommentByLineCommentAction;
 import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
-import org.plantuml.idea.language.psi.PumlWord;
+import org.plantuml.idea.language.psi.PumlItem;
 
 public class SimpleCodeInsightTest extends LightJavaCodeInsightFixtureTestCase {
 
@@ -64,7 +64,7 @@ public class SimpleCodeInsightTest extends LightJavaCodeInsightFixtureTestCase {
         PsiElement element = myFixture.getFile().findElementAt(myFixture.getCaretOffset()).getParent();
         String text = element.getText();
 
-        assertEquals("Bob:", ((PumlWord) element.getReferences()[0].resolve()).getText());
+        assertEquals("Bob:", ((PumlItem) element.getReferences()[0].resolve()).getText());
     }
 
 }

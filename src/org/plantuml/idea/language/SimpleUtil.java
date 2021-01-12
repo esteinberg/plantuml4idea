@@ -9,7 +9,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.language.psi.PumlWord;
+import org.plantuml.idea.language.psi.PumlItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,14 +20,14 @@ import java.util.regex.Pattern;
 
 public class SimpleUtil {
 
-    public static List<PumlWord> findDeclarationOrUsagesInFile(PsiFile containingFile, @NotNull PumlWord element, String key) {
-        List<PumlWord> result = new ArrayList<>();
-        PumlWord[] properties = PsiTreeUtil.getChildrenOfType(containingFile, PumlWord.class);
+    public static List<PumlItem> findDeclarationOrUsagesInFile(PsiFile containingFile, @NotNull PumlItem element, String key) {
+        List<PumlItem> result = new ArrayList<>();
+        PumlItem[] properties = PsiTreeUtil.getChildrenOfType(containingFile, PumlItem.class);
         boolean returnFirst = true;
         boolean firstMatch = true;
 
         if (properties != null) {
-            for (PumlWord property : properties) {
+            for (PumlItem property : properties) {
                 if (isSame(key, property)) {
                     if (firstMatch && property == element) {
                         returnFirst = false;
@@ -47,7 +47,7 @@ public class SimpleUtil {
 
     static final Pattern SANITIZER = Pattern.compile("([a-zA-Z0-9].*[a-zA-Z0-9])");
 
-    public static boolean isSame(String p1, PumlWord property) {
+    public static boolean isSame(String p1, PumlItem property) {
         String p2 = property.getText();
         if (p1.equals(p2)) {
             return true;
@@ -69,16 +69,16 @@ public class SimpleUtil {
         return key.equals(key2);
     }
 
-    public static List<PumlWord> find(Project project, String key) {
-        List<PumlWord> result = new ArrayList<>();
+    public static List<PumlItem> find(Project project, String key) {
+        List<PumlItem> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(PlantUmlFileType.INSTANCE, GlobalSearchScope.allScope(project));
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile simpleFile = (PsiFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (simpleFile != null) {
-                PumlWord[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlWord.class);
+                PumlItem[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlItem.class);
                 if (properties != null) {
-                    for (PumlWord property : properties) {
+                    for (PumlItem property : properties) {
                         if (isSame(key, property)) {
                             result.add(property);
                         }
@@ -89,14 +89,14 @@ public class SimpleUtil {
         return result;
     }
 
-    public static List<PumlWord> findAll(Project project) {
-        List<PumlWord> result = new ArrayList<>();
+    public static List<PumlItem> findAll(Project project) {
+        List<PumlItem> result = new ArrayList<>();
         Collection<VirtualFile> virtualFiles =
                 FileTypeIndex.getFiles(PlantUmlFileType.INSTANCE, GlobalSearchScope.allScope(project));
         for (VirtualFile virtualFile : virtualFiles) {
             PsiFile simpleFile = (PsiFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (simpleFile != null) {
-                PumlWord[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlWord.class);
+                PumlItem[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlItem.class);
                 if (properties != null) {
                     Collections.addAll(result, properties);
                 }
