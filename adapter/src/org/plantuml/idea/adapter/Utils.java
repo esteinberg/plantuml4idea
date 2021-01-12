@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.svg.MyTranscoder;
+//import com.intellij.ui.svg.MyTranscoder;
 import com.intellij.util.ImageLoader;
 import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileSystem;
@@ -41,18 +41,19 @@ public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
 
     public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) {
-        try {
-            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
-            if (docSize != null) {
-                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
-            }
-            return transcoder.getImage();
-        } catch (Exception ex) {
-            if (docSize != null) {
-                docSize.setSize(0, 0);
-            }
-            throw new RuntimeException(ex);
-        }
+//        try {
+//            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
+//            if (docSize != null) {
+//                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
+//            }
+//            return transcoder.getImage();
+//        } catch (Exception ex) {
+//            if (docSize != null) {
+//                docSize.setSize(0, 0);
+//            }
+//            throw new RuntimeException(ex);
+//        }
+        return null;
     }
 
     @NotNull
