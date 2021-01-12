@@ -56,9 +56,13 @@ public class PumlPsiImplUtil {
         };
     }
 
+    public static PsiReference getReference(PumlItem element) {
+        return new PumlItemReference(element, element.getText());
+    }
 
+    @Deprecated
     public static PsiReference[] getReferences(PumlItem element) {
-        return new PsiReference[]{new PumlItemReference(element, element.getText())};
+        return new PsiReference[]{getReference(element)};
     }
 
     public static String toString(PumlItem element) {

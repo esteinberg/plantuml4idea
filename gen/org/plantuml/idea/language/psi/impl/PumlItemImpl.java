@@ -47,8 +47,8 @@ public class PumlItemImpl extends PumlNamedElementImpl implements PumlItem {
   }
 
   @Override
-  public PsiReference[] getReferences() {
-    return PumlPsiImplUtil.getReferences(this);
+  public PsiReference getReference() {
+    return PumlPsiImplUtil.getReference(this);
   }
 
   @Override

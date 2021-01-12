@@ -15,6 +15,6 @@ public interface PumlItem extends PumlNamedElement {
 
   ItemPresentation getPresentation();
 
-  PsiReference[] getReferences();
+  PsiReference getReference();
 
 }
