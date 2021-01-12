@@ -340,5 +340,8 @@
         <lang.elementManipulator forClass="org.plantuml.idea.language.psi.PumlItem"
                                  implementationClass="org.plantuml.idea.language.PumlElementManipulator"/>
         <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.language.PumlNamesValidator"/>
+        <lang.findUsagesProvider language="PUML"
+                                 implementationClass="org.plantuml.idea.language.SimpleFindUsagesProvider"/>
+
     </extensions>
 </idea-plugin>

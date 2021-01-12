@@ -39,7 +39,7 @@ public class PumlPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                return element.getText();
+                return element.getText() + element.getTextRange();
             }
 
             @Nullable
@@ -66,7 +66,7 @@ public class PumlPsiImplUtil {
     }
 
     public static String toString(PumlItem element) {
-        return element.getClass().getSimpleName() + "(" + element.getText() + ")";
+        return element.getClass().getSimpleName() + "(" + element.getText() + ")" + element.getTextRange();
     }
 
 }

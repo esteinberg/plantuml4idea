@@ -22,19 +22,19 @@ public class PumlPsiUtil {
 
     public static List<PumlItem> findDeclarationOrUsagesInFile(PsiFile containingFile, @NotNull PumlItem element, String key) {
         List<PumlItem> result = new ArrayList<>();
-        PumlItem[] properties = PsiTreeUtil.getChildrenOfType(containingFile, PumlItem.class);
+        PumlItem[] items = PsiTreeUtil.getChildrenOfType(containingFile, PumlItem.class);
         boolean returnFirst = true;
         boolean firstMatch = true;
 
-        if (properties != null) {
-            for (PumlItem property : properties) {
-                if (isSame(key, property)) {
-                    if (firstMatch && property == element) {
+        if (items != null) {
+            for (PumlItem item : items) {
+                if (isSame(key, item)) {
+                    if (firstMatch && item == element) {
                         returnFirst = false;
                         continue;
                     }
 
-                    result.add(property);
+                    result.add(item);
                     if (returnFirst) {
                         break;
                     }
@@ -43,6 +43,21 @@ public class PumlPsiUtil {
             }
         }
         return result;
+    }
+
+    public static PumlItem findDeclarationInFile(PsiFile containingFile, @NotNull PumlItem element, String key) {
+        PumlItem[] items = PsiTreeUtil.getChildrenOfType(containingFile, PumlItem.class);
+        if (items != null) {
+            for (PumlItem item : items) {
+                if (item == element) {
+                    return null;
+                }
+                if (isSame(key, item)) {
+                    return item;
+                }
+            }
+        }
+        return null;
     }
 
     static final Pattern SANITIZER = Pattern.compile("([a-zA-Z0-9].*[a-zA-Z0-9])");
@@ -89,17 +104,13 @@ public class PumlPsiUtil {
         return result;
     }
 
-    public static List<PumlItem> findAll(Project project) {
+    public static List<PumlItem> findAll(PumlItem item) {
         List<PumlItem> result = new ArrayList<>();
-        Collection<VirtualFile> virtualFiles =
-                FileTypeIndex.getFiles(PlantUmlFileType.INSTANCE, GlobalSearchScope.allScope(project));
-        for (VirtualFile virtualFile : virtualFiles) {
-            PsiFile simpleFile = (PsiFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (simpleFile != null) {
-                PumlItem[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlItem.class);
-                if (properties != null) {
-                    Collections.addAll(result, properties);
-                }
+        PsiFile file = item.getContainingFile();
+        if (file != null) {
+            PumlItem[] items = PsiTreeUtil.getChildrenOfType(file, PumlItem.class);
+            if (items != null) {
+                Collections.addAll(result, items);
             }
         }
         return result;

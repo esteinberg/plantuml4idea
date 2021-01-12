@@ -2,8 +2,9 @@ package org.plantuml.idea.language;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,9 +12,10 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.language.psi.PumlItem;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-public class PumlItemReference extends PsiReferenceBase<PumlItem> implements PsiPolyVariantReference {
+public class PumlItemReference extends PsiReferenceBase<PumlItem> {
 
     private final String key;
 
@@ -22,36 +24,43 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> implements Psi
         key = text;
     }
 
-    @NotNull
-    @Override
-    public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<PumlItem> properties = PumlPsiUtil.findDeclarationOrUsagesInFile(getElement().getContainingFile(), getElement(), key);
-        List<ResolveResult> results = new ArrayList<>();
-        for (PumlItem property : properties) {
-            results.add(new PsiElementResolveResult(property));
-        }
-        return results.toArray(new ResolveResult[0]);
-    }
 
     @Nullable
     @Override
     public PsiElement resolve() {
-        ResolveResult[] resolveResults = multiResolve(false);
-        return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
+        return PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
+    }
+
+    @Override
+    public boolean isReferenceTo(@NotNull PsiElement element) {
+        return super.isReferenceTo(element);
+    }
+
+    @Override
+    public boolean isSoft() {
+        return super.isSoft();
     }
 
     @NotNull
     @Override
     public Object[] getVariants() {
-        Project project = myElement.getProject();
-        List<PumlItem> properties = PumlPsiUtil.findAll(project);
+        PumlItem[] childrenOfType = PsiTreeUtil.getChildrenOfType(myElement.getContainingFile(), PumlItem.class);
+        HashSet<String> strings = new HashSet<>();
         List<LookupElement> variants = new ArrayList<>();
-        for (final PumlItem property : properties) {
-            if (property.getText() != null && property.getText().length() > 0) {
-                variants.add(LookupElementBuilder
-                        .create(property).withIcon(PlantUmlFileType.PLANTUML_ICON)
-                        .withTypeText(property.getContainingFile().getName())
-                );
+
+        if (childrenOfType != null) {
+            for (final PumlItem item : childrenOfType) {
+                String text = item.getText();
+                if (!strings.contains(text)) {
+                    strings.add(text);
+                    if (text != null && text.length() > 0) {
+                        variants.add(LookupElementBuilder
+                                .create(item).withIcon(PlantUmlFileType.PLANTUML_ICON)
+                                .withTypeText(item.getContainingFile().getName())
+                        );
+                    }
+                }
+
             }
         }
         return variants.toArray();
