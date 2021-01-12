@@ -62,6 +62,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean useBundled = true;
     private String lastBundledVersion;
     private boolean usePageTitles = true;
+    private boolean useGrammar = true;
 
 
     public static PlantUmlSettings getInstance() {
@@ -299,5 +300,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setUsePageTitles(final boolean usePageTitles) {
         this.usePageTitles = usePageTitles;
+    }
+
+    public boolean isUseGrammar() {
+        return useGrammar;
+    }
+
+    public void setUseGrammar(final boolean useGrammar) {
+        this.useGrammar = useGrammar;
     }
 }

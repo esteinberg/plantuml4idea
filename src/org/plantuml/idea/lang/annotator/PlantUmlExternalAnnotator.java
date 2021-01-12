@@ -58,7 +58,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
     public FileAnnotationResult doAnnotate(Info file) {
         // Temporary solution to avoid execution under read action in dumb mode. Should be removed after IDEA-229905 will be fixed
         Application application = ApplicationManager.getApplication();
-        if (application != null && application.isReadAccessAllowed() && !application.isUnitTestMode()) return null;
+        if (application != null && application.isReadAccessAllowed() && !application.isUnitTestMode()) {
+            return null;
+        }
 
         FileAnnotationResult result = new FileAnnotationResult();
         if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
