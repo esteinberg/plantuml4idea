@@ -4,6 +4,7 @@ import com.intellij.ide.structureView.StructureViewModel;
 import com.intellij.ide.structureView.StructureViewModelBase;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
+import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantUmlFileImpl;
@@ -11,8 +12,8 @@ import org.plantuml.idea.lang.PlantUmlFileImpl;
 public class PumlStructureViewModel extends StructureViewModelBase implements
         StructureViewModel.ElementInfoProvider {
 
-  public PumlStructureViewModel(PsiFile psiFile) {
-    super(psiFile, new PumlStructureViewElement(psiFile));
+  public PumlStructureViewModel(PsiFile psiFile, Document document) {
+    super(psiFile, new PumlStructureViewElement(psiFile, document));
   }
 
   @NotNull

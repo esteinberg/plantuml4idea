@@ -2,6 +2,7 @@ package org.plantuml.idea.grammar.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
@@ -44,8 +45,37 @@ public class PumlPsiImplUtil {
             @Nullable
             @Override
             public String getLocationString() {
+                long start = System.currentTimeMillis();
                 PsiFile containingFile = element.getContainingFile();
-                return containingFile == null ? null : containingFile.getName();
+                String s = containingFile == null ? null : containingFile.getName();
+                System.err.println("getLocationString " + (System.currentTimeMillis() - start) + "ms");
+                return s;
+            }
+
+            @Override
+            public Icon getIcon(boolean unused) {
+                return PlantUmlFileType.PLANTUML_ICON;
+            }
+        };
+    }
+
+    public static ItemPresentation getPresentation2(final PumlItem element, Document document) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getText();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                if (document == null) {
+                    return null;
+                }
+                long start = System.currentTimeMillis();
+                int lineNumber = document.getLineNumber(element.getTextOffset());
+                return "line: " + lineNumber;
             }
 
             @Override

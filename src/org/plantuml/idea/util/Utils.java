@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
 
+import static java.lang.Character.isLetter;
+
 public class Utils {
 
     public static int asInt(String renderDelay, int defaultValue) {
@@ -23,4 +25,12 @@ public class Utils {
         return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
     }
 
+    public static boolean containsLetters(CharSequence s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (isLetter(s.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
