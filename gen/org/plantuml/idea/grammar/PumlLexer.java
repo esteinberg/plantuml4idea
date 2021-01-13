@@ -55,9 +55,9 @@ public class PumlLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 640 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-          "\11\0\1\1\1\4\1\2\1\3\1\4\22\0\1\1\6\0\1\6\1\12\1\17\2\0\1\16\2\10\1\13\12" +
-                  "\11\7\0\32\11\1\14\1\0\1\15\1\0\1\7\1\0\32\11\12\0\1\2\32\0\1\5\337\0\1\5" +
-                  "\177\0\13\5\35\0\2\2\5\0\1\5\57\0\1\5\40\0");
+          "\11\0\1\3\1\2\1\1\1\4\1\2\22\0\1\3\6\0\1\6\1\12\1\17\2\0\1\16\2\10\1\13\12" +
+                  "\11\7\0\32\11\1\14\1\0\1\15\1\0\1\7\1\0\32\11\12\0\1\1\32\0\1\5\337\0\1\5" +
+                  "\177\0\13\5\35\0\2\1\5\0\1\5\57\0\1\5\40\0");
 
   /**
    * Translates DFA states to action switch labels.
@@ -65,8 +65,8 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-          "\3\0\1\1\1\2\2\3\1\4\5\1\1\2\2\3" +
-                  "\1\0\1\5\2\0\1\1\3\0\1\5";
+          "\3\0\1\1\1\2\1\3\1\2\1\4\5\1\1\2" +
+                  "\1\3\1\2\1\0\1\5\2\0\1\1\3\0\1\5";
 
   private static int[] zzUnpackAction() {
     int[] result = new int[25];
@@ -94,9 +94,9 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-          "\0\0\0\20\0\40\0\60\0\100\0\120\0\100\0\40" +
-                  "\0\140\0\160\0\200\0\220\0\240\0\260\0\300\0\260" +
-                  "\0\320\0\340\0\160\0\200\0\40\0\360\0\240\0\u0100" +
+          "\0\0\0\20\0\40\0\60\0\100\0\120\0\140\0\40" +
+                  "\0\160\0\200\0\220\0\240\0\260\0\300\0\320\0\340" +
+                  "\0\360\0\u0100\0\200\0\220\0\40\0\u0110\0\260\0\u0120" +
                   "\0\40";
 
   private static int[] zzUnpackRowMap() {
@@ -123,21 +123,22 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-          "\1\4\1\5\1\6\1\7\1\6\1\10\1\4\1\11" +
-                  "\1\4\1\12\1\13\1\14\1\15\4\4\1\16\1\17" +
-                  "\1\20\1\17\1\21\1\22\1\11\1\4\1\12\1\13" +
-                  "\1\14\1\15\3\4\20\0\1\4\5\0\3\4\4\0" +
-                  "\3\4\1\0\1\5\1\6\1\7\1\6\15\0\3\6" +
-                  "\13\0\1\4\5\0\1\4\2\11\1\12\3\0\3\4" +
-                  "\7\0\2\23\1\12\6\0\4\24\1\0\11\24\1\0" +
-                  "\1\25\6\0\1\26\11\0\4\27\1\0\10\27\1\25" +
-                  "\2\27\1\0\1\16\1\17\1\20\1\17\1\21\1\22" +
-                  "\12\0\1\21\3\17\1\21\1\22\12\0\5\21\1\22" +
-                  "\11\0\4\22\1\0\13\22\6\26\1\30\4\26\1\0" +
-                  "\4\26\13\0\1\31\4\0";
+          "\1\4\2\5\1\6\1\7\1\10\1\4\1\11\1\4" +
+                  "\1\12\1\13\1\14\1\15\4\4\2\16\1\17\1\20" +
+                  "\1\21\1\22\1\11\1\4\1\12\1\13\1\14\1\15" +
+                  "\3\4\20\0\1\4\5\0\3\4\4\0\3\4\1\0" +
+                  "\2\5\1\0\1\5\16\0\2\6\14\0\2\5\1\6" +
+                  "\1\7\13\0\1\4\5\0\1\4\2\11\1\12\3\0" +
+                  "\3\4\7\0\2\23\1\12\6\0\2\24\1\0\13\24" +
+                  "\1\0\1\25\6\0\1\26\11\0\2\27\1\0\12\27" +
+                  "\1\25\2\27\1\0\2\16\1\21\1\16\1\21\1\22" +
+                  "\12\0\2\21\2\17\1\21\1\22\12\0\2\16\1\17" +
+                  "\1\20\1\21\1\22\12\0\5\21\1\22\11\0\2\22" +
+                  "\1\0\15\22\6\26\1\30\4\26\1\0\4\26\13\0" +
+                  "\1\31\4\0";
 
   private static int[] zzUnpackTrans() {
-    int[] result = new int[272];
+    int[] result = new int[304];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -507,15 +508,15 @@ public class PumlLexer implements FlexLexer {
           case 6:
             break;
           case 2: {
-            yybegin(YYINITIAL);
-            return PumlTypes.WHITE_SPACE;
+            yybegin(LINE_START_STATE);
+            return PumlTypes.NEW_LINE_INDENT;
           }
           // fall through
           case 7:
             break;
           case 3: {
-            yybegin(LINE_START_STATE);
-            return PumlTypes.NEW_LINE_INDENT;
+            yybegin(YYINITIAL);
+            return PumlTypes.WHITE_SPACE;
           }
           // fall through
           case 8:

@@ -20,15 +20,15 @@ import org.plantuml.idea.grammar.psi.PumlTypes;
 %type IElementType
 %unicode
             
-NEW_LINE_INDENT=[\ \t\f]*\R+
+NEW_LINE_INDENT=\R+
 WHITE_SPACE=[\ \t\f]
 LINE_COMMENT=\s*("'")[^\r\n]*
 COMPLEX_WORD=[A-Za-z0-9_][A-Za-z0-9._-]*[A-Za-z0-9]
 WORD_CHARACTER=[A-Za-z0-9]
 SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except brackets start, to be able to match BRACKET_IDENTIFIER      
-BLOCK_COMMENT="/'"([^'/])*("'/")
-BRACKET_IDENTIFIER="["([^\]\r\n])*("]")
-BRACKET_IDENTIFIER2="("([^\)\r\n,])*(")")
+BLOCK_COMMENT="/'"([^'/])*("'/")           
+BRACKET_IDENTIFIER="["([^\]\r\n])*("]")     // [foo bar]
+BRACKET_IDENTIFIER_2="("([^\)\r\n,])*(")")  //without ',' for multiple items: (ProductOfferingPrice, ProductUsageSpec) 
 
 %xstate LINE_START_STATE,IN_COMMENT
    
@@ -38,7 +38,7 @@ BRACKET_IDENTIFIER2="("([^\)\r\n,])*(")")
 <LINE_START_STATE>{LINE_COMMENT}                                 { yybegin(YYINITIAL); return PumlTypes.COMMENT; }
 <YYINITIAL, LINE_START_STATE>{BLOCK_COMMENT}                         { yybegin(YYINITIAL); return PumlTypes.COMMENT; }
 <YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
-<YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER2}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER_2}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{COMPLEX_WORD}                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{SPECIAL_CHARACTER}+                   { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
