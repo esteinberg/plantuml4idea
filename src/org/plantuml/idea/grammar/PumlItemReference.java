@@ -17,6 +17,7 @@ import java.util.List;
 
 public class PumlItemReference extends PsiReferenceBase<PumlItem> {
 
+
     private final String key;
 
     public PumlItemReference(PumlItem element, String text) {
@@ -24,21 +25,10 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
         key = text;
     }
 
-
     @Nullable
     @Override
     public PsiElement resolve() {
         return PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
-    }
-
-    @Override
-    public boolean isReferenceTo(@NotNull PsiElement element) {
-        return super.isReferenceTo(element);
-    }
-
-    @Override
-    public boolean isSoft() {
-        return super.isSoft();
     }
 
     @NotNull
