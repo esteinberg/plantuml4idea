@@ -27,7 +27,7 @@ WORD_CHARACTER=[A-Za-z0-9]
 SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except bracket start, to be able to match BRACKET_IDENTIFIER      
 BLOCK_COMMENT="/'"([^'/])*("'/")
 BRACKET_IDENTIFIER="["([^\]\r\n])*("]")
-BRACKET_IDENTIFIER2="("([^\)\r\n])*(")")
+BRACKET_IDENTIFIER2="("([^\)\r\n,])*(")")
 
 %xstate LINE_START_STATE,IN_COMMENT
    

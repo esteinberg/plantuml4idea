@@ -31,3 +31,7 @@ Max -> Bob : something else
 @enduml                 
      
  
+@startuml
+ProductOfferingPrice -- ProductUsageSpec: ForUsage >
+(ProductOfferingPrice, ProductUsageSpec) .. ProductUsageSpecCharacteristic
+@enduml
