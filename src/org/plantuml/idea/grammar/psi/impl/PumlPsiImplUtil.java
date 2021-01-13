@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.grammar.PumlItemReference;
 import org.plantuml.idea.grammar.psi.PumlElementFactory;
 import org.plantuml.idea.grammar.psi.PumlItem;
-import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
 
 import javax.swing.*;
@@ -20,11 +19,11 @@ public class PumlPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(PumlItem element) {
-        return element.getNode().findChildByType(PumlTypes.IDENTIFIER).getPsi();
+        return (PsiElement) element.getNode().getFirstChildNode();
     }
 
     public static PsiElement setName(PumlItem element, String newName) {
-        ASTNode keyNode = element.getNode().findChildByType(PumlTypes.IDENTIFIER);
+        ASTNode keyNode = element.getNode().getFirstChildNode();
         if (keyNode != null) {
             PumlItem property = PumlElementFactory.createWord(element.getProject(), newName);
             ASTNode newKeyNode = property.getFirstChild().getNode();
@@ -39,7 +38,7 @@ public class PumlPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                return element.getText() + element.getTextRange();
+                return element.getText();
             }
 
             @Nullable

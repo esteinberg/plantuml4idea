@@ -18,7 +18,7 @@
 
 simpleFile ::= (item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)*
 
-item ::= IDENTIFIER {
+item ::= IDENTIFIER|OTHER {
    mixin="org.plantuml.idea.grammar.psi.impl.PumlNamedElementImpl"
    implements="org.plantuml.idea.grammar.psi.PumlNamedElement"
    methods=[ getName setName getNameIdentifier getPresentation getReference  toString]

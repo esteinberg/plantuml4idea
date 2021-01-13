@@ -13,6 +13,7 @@ public interface PumlTypes {
   IElementType COMMENT = new PumlTokenType("COMMENT");
   IElementType IDENTIFIER = new PumlTokenType("IDENTIFIER");
   IElementType NEW_LINE_INDENT = new PumlTokenType("NEW_LINE_INDENT");
+  IElementType OTHER = new PumlTokenType("OTHER");
   IElementType WHITE_SPACE = new PumlTokenType("WHITE_SPACE");
 
   class Factory {

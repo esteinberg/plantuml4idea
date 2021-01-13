@@ -25,6 +25,7 @@ WHITE_SPACE=[\ \t\f]
 LINE_COMMENT=\s*("'")[^\r\n]*
 COMPLEX_WORD=[A-Za-z0-9_][A-Za-z0-9._-]*[A-Za-z0-9]
 WORD_CHARACTER=[A-Za-z0-9]
+TAG=@[A-Za-z]*
 SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except brackets start, to be able to match BRACKET_IDENTIFIER      
 BLOCK_COMMENT="/'"([^'/])*("'/")           
 BRACKET_IDENTIFIER="["([^\]\r\n])*("]")     // [foo bar]
@@ -41,10 +42,11 @@ BRACKET_IDENTIFIER_2="("([^\)\r\n,])*(")")  //without ',' -> no eating multiple 
 <YYINITIAL, LINE_START_STATE>{BRACKET_IDENTIFIER_2}                  { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{COMPLEX_WORD}                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                      { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
-<YYINITIAL, LINE_START_STATE>{SPECIAL_CHARACTER}+                   { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
-<YYINITIAL, LINE_START_STATE>"/"                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
-<YYINITIAL, LINE_START_STATE>"["                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
-<YYINITIAL, LINE_START_STATE>"("                                    { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>{TAG}                                 { yybegin(YYINITIAL); return PumlTypes.IDENTIFIER; }
+<YYINITIAL, LINE_START_STATE>{SPECIAL_CHARACTER}+                   { yybegin(YYINITIAL); return PumlTypes.OTHER; }
+<YYINITIAL, LINE_START_STATE>"/"                                    { yybegin(YYINITIAL); return PumlTypes.OTHER; }
+<YYINITIAL, LINE_START_STATE>"["                                    { yybegin(YYINITIAL); return PumlTypes.OTHER; }
+<YYINITIAL, LINE_START_STATE>"("                                    { yybegin(YYINITIAL); return PumlTypes.OTHER; }
 <YYINITIAL, LINE_START_STATE>{NEW_LINE_INDENT}                      { yybegin(LINE_START_STATE); return PumlTypes.NEW_LINE_INDENT; }
 <YYINITIAL, LINE_START_STATE>{WHITE_SPACE}+                         { yybegin(YYINITIAL); return PumlTypes.WHITE_SPACE; }
 

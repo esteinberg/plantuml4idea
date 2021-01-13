@@ -36,14 +36,15 @@ public class PumlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER
+  // IDENTIFIER|OTHER
   public static boolean item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "item")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    if (!nextTokenIs(b, "<item>", IDENTIFIER, OTHER)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, ITEM, "<item>");
     r = consumeToken(b, IDENTIFIER);
-    exit_section_(b, m, ITEM, r);
+    if (!r) r = consumeToken(b, OTHER);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

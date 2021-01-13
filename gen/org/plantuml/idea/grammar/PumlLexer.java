@@ -55,9 +55,9 @@ public class PumlLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 640 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-          "\11\0\1\3\1\2\1\1\1\4\1\2\22\0\1\3\6\0\1\6\1\12\1\17\2\0\1\16\2\10\1\13\12" +
-                  "\11\7\0\32\11\1\14\1\0\1\15\1\0\1\7\1\0\32\11\12\0\1\1\32\0\1\5\337\0\1\5" +
-                  "\177\0\13\5\35\0\2\1\5\0\1\5\57\0\1\5\40\0");
+          "\11\0\1\3\1\2\1\1\1\4\1\2\22\0\1\3\6\0\1\6\1\14\1\21\2\0\1\20\2\10\1\15\12" +
+                  "\11\6\0\1\12\32\13\1\16\1\0\1\17\1\0\1\7\1\0\32\13\12\0\1\1\32\0\1\5\337\0" +
+                  "\1\5\177\0\13\5\35\0\2\1\5\0\1\5\57\0\1\5\40\0");
 
   /**
    * Translates DFA states to action switch labels.
@@ -65,11 +65,12 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-          "\3\0\1\1\1\2\1\3\1\2\1\4\5\1\1\2" +
-                  "\1\3\1\2\1\0\1\5\2\0\1\1\3\0\1\5";
+          "\3\0\1\1\1\2\1\3\1\2\1\4\1\1\2\5" +
+                  "\3\1\1\2\1\3\1\2\1\0\1\6\1\0\1\5" +
+                  "\1\0\1\5\3\0\1\6";
 
   private static int[] zzUnpackAction() {
-    int[] result = new int[25];
+    int[] result = new int[27];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -94,13 +95,13 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-          "\0\0\0\20\0\40\0\60\0\100\0\120\0\140\0\40" +
-                  "\0\160\0\200\0\220\0\240\0\260\0\300\0\320\0\340" +
-                  "\0\360\0\u0100\0\200\0\220\0\40\0\u0110\0\260\0\u0120" +
-                  "\0\40";
+          "\0\0\0\22\0\44\0\66\0\110\0\132\0\154\0\44" +
+                  "\0\176\0\220\0\242\0\264\0\306\0\330\0\352\0\374" +
+                  "\0\u010e\0\u0120\0\u0132\0\220\0\u0144\0\264\0\44\0\u0156" +
+                  "\0\330\0\u0168\0\44";
 
   private static int[] zzUnpackRowMap() {
-    int[] result = new int[25];
+    int[] result = new int[27];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -124,21 +125,23 @@ public class PumlLexer implements FlexLexer {
 
   private static final String ZZ_TRANS_PACKED_0 =
           "\1\4\2\5\1\6\1\7\1\10\1\4\1\11\1\4" +
-                  "\1\12\1\13\1\14\1\15\4\4\2\16\1\17\1\20" +
-                  "\1\21\1\22\1\11\1\4\1\12\1\13\1\14\1\15" +
-                  "\3\4\20\0\1\4\5\0\3\4\4\0\3\4\1\0" +
-                  "\2\5\1\0\1\5\16\0\2\6\14\0\2\5\1\6" +
-                  "\1\7\13\0\1\4\5\0\1\4\2\11\1\12\3\0" +
-                  "\3\4\7\0\2\23\1\12\6\0\2\24\1\0\13\24" +
-                  "\1\0\1\25\6\0\1\26\11\0\2\27\1\0\12\27" +
-                  "\1\25\2\27\1\0\2\16\1\21\1\16\1\21\1\22" +
-                  "\12\0\2\21\2\17\1\21\1\22\12\0\2\16\1\17" +
-                  "\1\20\1\21\1\22\12\0\5\21\1\22\11\0\2\22" +
-                  "\1\0\15\22\6\26\1\30\4\26\1\0\4\26\13\0" +
-                  "\1\31\4\0";
+                  "\1\12\1\13\1\12\1\14\1\15\1\16\4\4\2\17" +
+                  "\1\20\1\21\1\22\1\23\1\11\1\4\1\12\1\13" +
+                  "\1\12\1\14\1\15\1\16\3\4\22\0\1\4\5\0" +
+                  "\3\4\1\0\1\4\4\0\3\4\1\0\2\5\1\0" +
+                  "\1\5\20\0\2\6\16\0\2\5\1\6\1\7\15\0" +
+                  "\1\4\5\0\1\4\2\11\1\12\1\4\1\12\3\0" +
+                  "\3\4\7\0\2\24\1\12\1\0\1\12\6\0\1\4" +
+                  "\5\0\3\4\1\0\1\4\1\25\3\0\3\4\2\26" +
+                  "\1\0\15\26\1\0\1\27\6\0\1\30\13\0\2\31" +
+                  "\1\0\14\31\1\27\2\31\1\0\2\17\1\22\1\17" +
+                  "\1\22\1\23\14\0\2\22\2\20\1\22\1\23\14\0" +
+                  "\2\17\1\20\1\21\1\22\1\23\14\0\5\22\1\23" +
+                  "\13\0\2\23\1\0\17\23\13\0\1\25\6\0\6\30" +
+                  "\1\32\6\30\1\0\4\30\15\0\1\33\4\0";
 
   private static int[] zzUnpackTrans() {
-    int[] result = new int[304];
+    int[] result = new int[378];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -176,11 +179,11 @@ public class PumlLexer implements FlexLexer {
   private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-          "\2\0\1\10\4\1\1\11\10\1\1\0\1\1\2\0" +
-                  "\1\11\3\0\1\11";
+          "\2\0\1\10\4\1\1\11\11\1\1\0\1\1\1\0" +
+                  "\1\1\1\0\1\11\3\0\1\11";
 
   private static int[] zzUnpackAttribute() {
-    int[] result = new int[25];
+    int[] result = new int[27];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -502,37 +505,44 @@ public class PumlLexer implements FlexLexer {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: {
             yybegin(YYINITIAL);
-            return PumlTypes.IDENTIFIER;
+            return PumlTypes.OTHER;
           }
           // fall through
-          case 6:
+          case 7:
             break;
           case 2: {
             yybegin(LINE_START_STATE);
             return PumlTypes.NEW_LINE_INDENT;
           }
           // fall through
-          case 7:
+          case 8:
             break;
           case 3: {
             yybegin(YYINITIAL);
             return PumlTypes.WHITE_SPACE;
           }
           // fall through
-          case 8:
+          case 9:
             break;
           case 4: {
             return TokenType.BAD_CHARACTER;
           }
           // fall through
-          case 9:
+          case 10:
             break;
           case 5: {
+            yybegin(YYINITIAL);
+            return PumlTypes.IDENTIFIER;
+          }
+          // fall through
+          case 11:
+            break;
+          case 6: {
             yybegin(YYINITIAL);
             return PumlTypes.COMMENT;
             } 
             // fall through
-          case 10: break;
+          case 12: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }
