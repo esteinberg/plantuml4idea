@@ -23,7 +23,7 @@ import org.plantuml.idea.grammar.psi.PumlTypes;
 NEW_LINE_INDENT=[\ \t\f]*\R+
 WHITE_SPACE=[\ \t\f]
 LINE_COMMENT=\s*("'")[^\r\n]*
-COMPLEX_WORD=[A-Za-z0-9_]+[A-Za-z0-9_-]*[A-Za-z0-9]+
+COMPLEX_WORD=[A-Za-z0-9_][A-Za-z0-9._-]*[A-Za-z0-9]
 WORD_CHARACTER=[A-Za-z0-9]
 SPECIAL_CHARACTER=[^A-Za-z0-9\s/\[\(]   //except brackets start, to be able to match BRACKET_IDENTIFIER      
 BLOCK_COMMENT="/'"([^'/])*("'/")
