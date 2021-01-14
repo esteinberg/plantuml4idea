@@ -1,4 +1,6 @@
 @startuml
+'https://plantuml.com/state-diagram
+
 scale 350 width
 [*] --> NotShooting
 

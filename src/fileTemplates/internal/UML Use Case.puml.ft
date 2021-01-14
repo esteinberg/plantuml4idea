@@ -1,4 +1,6 @@
 @startuml
+'https://plantuml.com/use-case-diagram
+
 :Main Admin: as Admin
 (Use the application) as (Use)
 

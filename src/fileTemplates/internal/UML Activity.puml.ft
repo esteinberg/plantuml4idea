@@ -1,10 +1,37 @@
 @startuml
-(*)  --> "check input"
-If "input is verbose" then
---> [Yes] "turn on verbosity"
---> "run command"
+'https://plantuml.com/activity-diagram-beta
+
+start
+:ClickServlet.handleRequest();
+:new page;
+if (Page.onSecurityCheck) then (true)
+  :Page.onInit();
+  if (isForward?) then (no)
+    :Process controls;
+    if (continue processing?) then (no)
+      stop
+    endif
+
+    if (isPost?) then (yes)
+      :Page.onPost();
+    else (no)
+      :Page.onGet();
+    endif
+    :Page.onRender();
+  endif
+else (false)
+endif
+
+if (do redirect?) then (yes)
+  :redirect process;
 else
---> "run command"
-Endif
--->(*)
+  if (do forward?) then (yes)
+    :Forward request;
+  else (no)
+    :Render page template;
+  endif
+endif
+
+stop
+
 @enduml
