@@ -16,6 +16,7 @@ public class PumlNamesValidator implements NamesValidator {
     public boolean isIdentifier(@NotNull String name, Project project) {
         return (!name.isEmpty() && containsNone(name, new char[]{' ', '\t'}))
                 || (name.startsWith("[") && name.endsWith("]"))
+                || (name.startsWith("\"") && name.endsWith("\""))
                 || (name.startsWith("(") && name.endsWith(")"));
     }
 }
