@@ -17,7 +17,7 @@ public class Usage extends JTextArea {
                     + " - disable syntax check\n"
                     + " - enable partial rendering - renders each page on it's own, useful for big sequence diagram files\n"
                     + "\nPerformance tips:\n"
-                    + "- disable automatic rendering and use Update (Alt+D) or Reload (Alt+F) buttons\n"
+                    + "- disable automatic rendering and use Update (Ctrl Alt Shift F) or Reload (Ctrl Alt Shift G) buttons\n"
                     + "- do not put @newpage into included files (it prohibits incremental rendering)\n"
                     + "- try to enable partial rendering\n"
                     + "- disable syntax checking\n"
