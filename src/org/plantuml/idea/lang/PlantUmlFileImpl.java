@@ -17,6 +17,6 @@ public class PlantUmlFileImpl extends PsiFileBase {
     @NotNull
     @Override
     public FileType getFileType() {
-        return PlantUmlFileType.PLANTUML_FILE_TYPE;
+        return PlantUmlFileType.INSTANCE;
     }
 }

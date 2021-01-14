@@ -37,7 +37,7 @@ public class AddPartialRenderOptionIntention extends BaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, final Editor editor, PsiFile file) {
-        if (!file.getFileType().equals(PlantUmlFileType.PLANTUML_FILE_TYPE)) return false;
+        if (!file.getFileType().equals(PlantUmlFileType.INSTANCE)) return false;
         int offset = editor.getCaretModel().getOffset();
         return new AddPartialRenderCommand(editor, offset).isAvailable();
     }

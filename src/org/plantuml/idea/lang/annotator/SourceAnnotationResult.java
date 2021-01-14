@@ -42,11 +42,13 @@ public class SourceAnnotationResult {
     }
 
     private boolean inBlockComment(SyntaxHighlightAnnotation syntaxHighlightAnnotation) {
-        for (int i = 0, blockCommentsSize = blockComments.size(); i < blockCommentsSize; i++) {
-            SyntaxHighlightAnnotation blockComment = blockComments.get(i);
-            int startSourceOffset = syntaxHighlightAnnotation.startSourceOffset;
-            if (blockComment.getStartSourceOffset() < startSourceOffset && startSourceOffset < blockComment.getEndSourceOffset()) {
-                return true;
+        if (blockComments != null) {
+            for (int i = 0, blockCommentsSize = blockComments.size(); i < blockCommentsSize; i++) {
+                SyntaxHighlightAnnotation blockComment = blockComments.get(i);
+                int startSourceOffset = syntaxHighlightAnnotation.startSourceOffset;
+                if (blockComment.getStartSourceOffset() < startSourceOffset && startSourceOffset < blockComment.getEndSourceOffset()) {
+                    return true;
+                }
             }
         }
         return false;

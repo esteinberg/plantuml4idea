@@ -24,6 +24,7 @@ public enum LanguagePatternHolder {
 
     public final Pattern pluginSettingsPattern = createPattern(LanguageDescriptor.INSTANCE.pluginSettingsPattern, "");
     public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");
+    public final Pattern keywords2Pattern = createPattern(LanguageDescriptor.INSTANCE.keywords2, "");
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern2(LanguageDescriptor.INSTANCE.preproc, "");
     public final Pattern tagsPattern = Pattern.compile("@(start|end)(" + addWordStop(TAGS) + ")");

@@ -30,7 +30,7 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
         extend(
                 CompletionType.BASIC,
                 PlatformPatterns.psiElement(),
-                new SimpleProvider(LanguageDescriptor.INSTANCE.keywordsWithoutHighlight));
+                new SimpleProvider(LanguageDescriptor.INSTANCE.keywords2));
 
     }
 
@@ -54,7 +54,8 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
                 return;
             }
             super.fillCompletionVariants(parameters, result);
-            if (PlantUmlSettings.getInstance().isAutoComplete()) {
+            PlantUmlSettings settings = PlantUmlSettings.getInstance();
+            if (settings.isAutoComplete() && !settings.isUseGrammar()) { //PumlItemReference.getVariants duplicates it
                 WordCompletionContributor.addWordCompletionVariants(result, parameters, Collections.emptySet());
             }
         }

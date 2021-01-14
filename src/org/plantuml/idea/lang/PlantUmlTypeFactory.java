@@ -12,10 +12,10 @@ public class PlantUmlTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer) {
         consumer.consume(
-                PlantUmlFileType.PLANTUML_FILE_TYPE,
+                PlantUmlFileType.INSTANCE,
                 PlantUmlFileType.PLANTUML_EXT);
         consumer.consume(
-                PlantUmlFileType.PLANTUML_FILE_TYPE,
+                PlantUmlFileType.INSTANCE,
                 PlantUmlFileType.PLANTUML_EXT_2);
         consumer.consume(
                 PlantIUmlFileType.PLANTUML_FILE_TYPE,

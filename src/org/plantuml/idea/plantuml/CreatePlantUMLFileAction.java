@@ -31,6 +31,7 @@ public class CreatePlantUMLFileAction extends CreateFileFromTemplateAction imple
                 .addKind("Component", PlantUmlFileType.PLANTUML_ICON, "UML Component")
                 .addKind("State", PlantUmlFileType.PLANTUML_ICON, "UML State")
                 .addKind("Object", PlantUmlFileType.PLANTUML_ICON, "UML Object")
+                .addKind("Deployment", PlantUmlFileType.PLANTUML_ICON, "UML Deployment")
                 .addKind("Gantt", PlantUmlFileType.PLANTUML_ICON, "UML Gantt")
                 .addKind("MindMap", PlantUmlFileType.PLANTUML_ICON, "UML MindMap")
                 .addKind("Wireframe", PlantUmlFileType.PLANTUML_ICON, "Salt Wireframe")
