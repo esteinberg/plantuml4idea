@@ -16,7 +16,7 @@
   psiImplUtilClass="org.plantuml.idea.grammar.psi.impl.PumlPsiImplUtil"
 }
 
-simpleFile ::= (item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)*
+simpleFile ::= (item|COMMENT)*
 
 item ::= IDENTIFIER|OTHER {
    mixin="org.plantuml.idea.grammar.psi.impl.PumlNamedElementImpl"

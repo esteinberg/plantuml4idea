@@ -49,7 +49,7 @@ public class PumlParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT)*
+  // (item|COMMENT)*
   static boolean simpleFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simpleFile")) return false;
     while (true) {
@@ -60,14 +60,12 @@ public class PumlParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // item|COMMENT|WHITE_SPACE|NEW_LINE_INDENT
+  // item|COMMENT
   private static boolean simpleFile_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "simpleFile_0")) return false;
     boolean r;
     r = item(b, l + 1);
     if (!r) r = consumeToken(b, COMMENT);
-    if (!r) r = consumeToken(b, WHITE_SPACE);
-    if (!r) r = consumeToken(b, NEW_LINE_INDENT);
     return r;
   }
 
