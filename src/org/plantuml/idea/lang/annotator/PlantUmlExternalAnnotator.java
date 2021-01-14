@@ -109,23 +109,32 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         for (String line : strings) {
             commentMatcher.reset(line);
             if (commentMatcher.find()) {
-                result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(offset + commentMatcher.start(), offset + commentMatcher.end(), DefaultLanguageHighlighterColors.LINE_COMMENT));
+                SyntaxHighlightAnnotation lineComment = new SyntaxHighlightAnnotation(offset + commentMatcher.start(), offset + commentMatcher.end(), DefaultLanguageHighlighterColors.LINE_COMMENT);
+                result.addWithBlockCommentCheck(lineComment);
             } else {
-                annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
                 if (plantUmlSettings.isKeywordHighlighting()) {
-                    //not reliable when mixed braces ([)...(]), but it don't need to be
-                    List<IntRange> excludedRanges = join(rangesInside(line, "[", "]"), rangesInside(line, "(", ")"));
-                    excludedRanges = join(excludedRanges, rangesInside(line, "\"", "\""));
-
-                    annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
-                    annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
+                    highlightKeywords(result, keywords, types, offset, line);
                 }
+                annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
                 annotate(result, line, offset, null, DefaultLanguageHighlighterColors.METADATA, preproc);
                 annotate(result, line, offset, null, METADATA, tags);
             }
 
             offset += line.length() + 1;
         }
+    }
+
+    private void highlightKeywords(SourceAnnotationResult result, Matcher keywords, Matcher types, int offset, String line) {
+        int i = line.indexOf(":");  //it seems no keywords are after :
+        if (i > 0) {
+            line = line.substring(0, i);
+        }
+        //not reliable when mixed braces ([)...(]), but it don't need to be
+        List<IntRange> excludedRanges = join(rangesInside(line, "[", "]"), rangesInside(line, "(", ")"));
+        excludedRanges = join(excludedRanges, rangesInside(line, "\"", "\""));
+
+        annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
+        annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
     }
 
     private void annotate(SourceAnnotationResult result, String line, int offset, List<IntRange> excludedRanges, TextAttributesKey textAttributesKey, Matcher matcher) {
