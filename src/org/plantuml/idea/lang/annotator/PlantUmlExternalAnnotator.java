@@ -12,11 +12,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,11 @@ import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.METAD
  */
 public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExternalAnnotator.Info, FileAnnotationResult> {
     private static final Logger logger = Logger.getInstance(PlantUmlExternalAnnotator.class);
+    private PlantUmlSettings plantUmlSettings;
+
+    public PlantUmlExternalAnnotator() {
+        plantUmlSettings = PlantUmlSettings.getInstance();
+    }
 
     public static class Info {
 
@@ -63,7 +70,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         }
 
         FileAnnotationResult result = new FileAnnotationResult();
-        if (PlantUmlSettings.getInstance().isErrorAnnotationEnabled()) {
+        if (plantUmlSettings.isErrorAnnotationEnabled()) {
             String text = file.text;
 
             Map<Integer, String> sources = PlantUml.extractSources(text);
@@ -97,29 +104,51 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 
 
         String[] strings = StringUtils.splitPreserveAllTokens(source, "\n");
-        int i = 0;
+        int offset = 0;
         for (String line : strings) {
             commentMatcher.reset(line);
             if (commentMatcher.find()) {
-                result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(i + commentMatcher.start(), i + commentMatcher.end(), DefaultLanguageHighlighterColors.LINE_COMMENT));
+                result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(offset + commentMatcher.start(), offset + commentMatcher.end(), DefaultLanguageHighlighterColors.LINE_COMMENT));
             } else {
-                annotate(result, line, i, DefaultLanguageHighlighterColors.KEYWORD, keywords);
-                annotate(result, line, i, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
-                annotate(result, line, i, DefaultLanguageHighlighterColors.LABEL, types);
-                annotate(result, line, i, DefaultLanguageHighlighterColors.METADATA, preproc);
-                annotate(result, line, i, METADATA, tags);
+                annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
+                if (plantUmlSettings.isKeywordHighlighting()) {
+                    //not reliable when mixed braces ([)...(]), but it don't need to be
+                    List<IntRange> excludedRanges = Utils.join(Utils.rangesInside(line, "[", "]"), Utils.rangesInside(line, "(", ")"));
+
+                    annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
+                    annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
+                }
+                annotate(result, line, offset, null, DefaultLanguageHighlighterColors.METADATA, preproc);
+                annotate(result, line, offset, null, METADATA, tags);
             }
 
-            i += line.length() + 1;
+            offset += line.length() + 1;
         }
     }
 
-    private void annotate(SourceAnnotationResult result, String line, int i, TextAttributesKey textAttributesKey, Matcher matcher) {
+    private void annotate(SourceAnnotationResult result, String line, int offset, List<IntRange> excludedRanges, TextAttributesKey textAttributesKey, Matcher matcher) {
         matcher.reset(line);
+
         while (matcher.find()) {
-            result.addWithBlockCommentCheck(new SyntaxHighlightAnnotation(i + matcher.start(), i + matcher.end(), textAttributesKey));
+            if (isExcluded(excludedRanges, matcher.start())) {
+                continue;
+            }
+            SyntaxHighlightAnnotation a = new SyntaxHighlightAnnotation(offset + matcher.start(), offset + matcher.end(), textAttributesKey);
+            result.addWithBlockCommentCheck(a);
         }
     }
+
+    private boolean isExcluded(List<IntRange> excludedRanges, int start) {
+        if (excludedRanges != null) {
+            for (IntRange excludedRange : excludedRanges) {
+                if (excludedRange.containsInteger(start)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     private List<SyntaxHighlightAnnotation> annotateBlockComments(String source) {
         List<SyntaxHighlightAnnotation> result = new ArrayList<>();

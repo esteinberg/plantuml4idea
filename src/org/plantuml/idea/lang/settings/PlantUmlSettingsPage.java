@@ -49,6 +49,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JButton web;
     private JCheckBox usePageTitles;
     private JCheckBox grammarSupport;
+    private JCheckBox keywordHighlighting;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -179,6 +180,7 @@ public class PlantUmlSettingsPage implements Configurable {
         customPlantumlJar.setText(data.getCustomPlantumlJarPath());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
+        keywordHighlighting.setSelected(data.isKeywordHighlighting());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -197,6 +199,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setCustomPlantumlJarPath(customPlantumlJar.getText());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
+        data.setKeywordHighlighting(keywordHighlighting.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -223,6 +226,7 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
+        if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
         return false;
     }
 }

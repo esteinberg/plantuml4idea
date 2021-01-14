@@ -63,6 +63,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String lastBundledVersion;
     private boolean usePageTitles = true;
     private boolean useGrammar = true;
+    private boolean keywordHighlighting = true;
 
 
     public static PlantUmlSettings getInstance() {
@@ -175,7 +176,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         try {
             PlantUmlFacade bundled = PlantUmlFacade.getBundled();
             String version = bundled.version();
-            if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion !=null && !Objects.equals(lastBundledVersion, version)) {
+            if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion != null && !Objects.equals(lastBundledVersion, version)) {
                 useBundled = true;
                 SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
             }
@@ -308,5 +309,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setUseGrammar(final boolean useGrammar) {
         this.useGrammar = useGrammar;
+    }
+
+    public boolean isKeywordHighlighting() {
+        return keywordHighlighting;
+    }
+
+    public void setKeywordHighlighting(final boolean keywordHighlighting) {
+        this.keywordHighlighting = keywordHighlighting;
     }
 }
