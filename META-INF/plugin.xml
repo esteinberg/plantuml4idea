@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>3.1.0-grammar2</version>
+    <version>3.1.0-grammar3</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="193"/>
@@ -11,7 +11,9 @@
         <![CDATA[        
             <p>3.1.0-grammar</p>
             <ul>
-              <li>Experimental support for Go to Declaration/Usages, Rename</li>
+              <li>Added: Go to Declaration/Usages, Rename</li>
+              <li>Added: Structure view - shows the first occurrence of a word</li>
+              <li>Better keyword highlighting + settings to disable it</li>
             </ul> 
             <p>3.1</p>
             <ul>

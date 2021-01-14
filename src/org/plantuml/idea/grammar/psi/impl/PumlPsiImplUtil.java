@@ -45,11 +45,8 @@ public class PumlPsiImplUtil {
             @Nullable
             @Override
             public String getLocationString() {
-                long start = System.currentTimeMillis();
                 PsiFile containingFile = element.getContainingFile();
-                String s = containingFile == null ? null : containingFile.getName();
-                System.err.println("getLocationString " + (System.currentTimeMillis() - start) + "ms");
-                return s;
+                return containingFile == null ? null : containingFile.getName();
             }
 
             @Override
@@ -73,7 +70,6 @@ public class PumlPsiImplUtil {
                 if (document == null) {
                     return null;
                 }
-                long start = System.currentTimeMillis();
                 int lineNumber = document.getLineNumber(element.getTextOffset());
                 return "line: " + lineNumber;
             }
