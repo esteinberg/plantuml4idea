@@ -71,21 +71,21 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         }
 
         FileAnnotationResult result = new FileAnnotationResult();
-        if (plantUmlSettings.isErrorAnnotationEnabled()) {
+        if (plantUmlSettings.isErrorAnnotationEnabled() || plantUmlSettings.isKeywordHighlighting()) {
             String text = file.text;
 
             Map<Integer, String> sources = PlantUml.extractSources(text);
 
             for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
                 Integer sourceOffset = sourceData.getKey();
-
                 SourceAnnotationResult sourceAnnotationResult = new SourceAnnotationResult(sourceOffset);
-
                 String source = sourceData.getValue();
-                sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(source, file.virtualFile));
 
-                List<SyntaxHighlightAnnotation> blockComments = annotateBlockComments(source);
-                sourceAnnotationResult.addBlockComments(blockComments);
+                if (plantUmlSettings.isErrorAnnotationEnabled()) {
+                    sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(source, file.virtualFile));
+                    List<SyntaxHighlightAnnotation> blockComments = annotateBlockComments(source);
+                    sourceAnnotationResult.addBlockComments(blockComments);
+                }
 
                 annotateByLine(sourceAnnotationResult, source);
 
