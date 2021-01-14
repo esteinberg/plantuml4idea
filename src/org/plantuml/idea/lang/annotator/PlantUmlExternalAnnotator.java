@@ -97,8 +97,9 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 
     public void annotateByLine(SourceAnnotationResult result, String source) {
         Matcher keywords = LanguagePatternHolder.INSTANCE.keywordsPattern.matcher("");
-        Matcher pluginSettings = LanguagePatternHolder.INSTANCE.pluginSettingsPattern.matcher("");
+        Matcher keywords2 = LanguagePatternHolder.INSTANCE.keywords2Pattern.matcher("");
         Matcher types = LanguagePatternHolder.INSTANCE.typesPattern.matcher("");
+        Matcher pluginSettings = LanguagePatternHolder.INSTANCE.pluginSettingsPattern.matcher("");
         Matcher preproc = LanguagePatternHolder.INSTANCE.preprocPattern.matcher("");
         Matcher tags = LanguagePatternHolder.INSTANCE.tagsPattern.matcher("");
         Matcher commentMatcher = LanguagePatternHolder.INSTANCE.lineCommentPattern.matcher("");
@@ -113,7 +114,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
                 result.addWithBlockCommentCheck(lineComment);
             } else {
                 if (plantUmlSettings.isKeywordHighlighting()) {
-                    highlightKeywords(result, keywords, types, offset, line);
+                    highlightKeywords(result, keywords, types, keywords2, offset, line);
                 }
                 annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
                 annotate(result, line, offset, null, DefaultLanguageHighlighterColors.METADATA, preproc);
@@ -124,7 +125,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         }
     }
 
-    private void highlightKeywords(SourceAnnotationResult result, Matcher keywords, Matcher types, int offset, String line) {
+    private void highlightKeywords(SourceAnnotationResult result, Matcher keywords, Matcher types, Matcher keywords2, int offset, String line) {
         int i = line.indexOf(":");  //it seems no keywords are after :
         if (i > 0) {
             line = line.substring(0, i);
@@ -134,6 +135,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         excludedRanges = join(excludedRanges, rangesInside(line, "\"", "\""));
 
         annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
+        annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords2);
         annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
     }
 

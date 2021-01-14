@@ -79,7 +79,7 @@ public enum LanguageDescriptor {
 
     ));
 
-    public final List<String> keywordsWithoutHighlight = Collections.unmodifiableList(Arrays.asList(
+    public final List<String> keywords2 = Collections.unmodifiableList(Arrays.asList(
             "as",
             "also",
             "of",

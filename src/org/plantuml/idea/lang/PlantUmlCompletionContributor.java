@@ -30,7 +30,7 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
         extend(
                 CompletionType.BASIC,
                 PlatformPatterns.psiElement(),
-                new SimpleProvider(LanguageDescriptor.INSTANCE.keywordsWithoutHighlight));
+                new SimpleProvider(LanguageDescriptor.INSTANCE.keywords2));
 
     }
 
