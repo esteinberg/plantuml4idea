@@ -35,7 +35,7 @@ BRACKET_1=\[[^\]\r\n]+\]     // [foo bar]
 BRACKET_2=\([^\)\r\n,]+\)  //without ',' -> do not eat multiple items: (ProductOfferingPrice, ProductUsageSpec) 
 
 QUOTE_1=\"[^\"\r\n]+\"  // "foo bar"
-QUOTE_2=\'[^\'\r\n]+\'  // 'foo bar'
+//QUOTE_2=\'[^\'\r\n]+\'  // 'foo bar'  - perhaps better without it, it breaks brackets - [x]a'[y]b' (gantt sample) 
                       
 COMPLEX_WORD=[A-Za-z0-9_][A-Za-z0-9._-]*[A-Za-z0-9]
 WORD_CHARACTER=[A-Za-z0-9]
@@ -54,7 +54,7 @@ WHITE_SPACE=[\ \t\f]
 <YYINITIAL, LINE_START_STATE>{BRACKET_1}                               { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{BRACKET_2}                               { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{QUOTE_1}                                 { yybegin(YYINITIAL);        return itemType(); }
-<YYINITIAL, LINE_START_STATE>{QUOTE_2}                                 { yybegin(YYINITIAL);        return itemType(); }
+//<YYINITIAL, LINE_START_STATE>{QUOTE_2}                                 { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{COMPLEX_WORD}                            { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                         { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{TAG}                                     { yybegin(YYINITIAL);        return PumlTypes.IDENTIFIER; }

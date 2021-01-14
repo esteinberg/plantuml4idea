@@ -35,3 +35,7 @@ Max -> Bob : something else
 ProductOfferingPrice -- ProductUsageSpec: ForUsage >
 (ProductOfferingPrice, ProductUsageSpec) .. ProductUsageSpecCharacteristic
 @enduml
+
+@startuml
+ foo -> bar: [Test prototype]'s start and ends at [Test prototype]'s end
+@enduml
