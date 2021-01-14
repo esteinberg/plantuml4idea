@@ -7,7 +7,7 @@
     </constraints>
     <properties>
       <opaque value="true"/>
-      <toolTipText value="Error annotation"/>
+      <toolTipText value=""/>
     </properties>
     <border type="none"/>
     <children>
@@ -72,7 +72,7 @@
           <grid row="9" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Error and syntax annotation and highlighting"/>
+          <text value="Syntax checking"/>
         </properties>
       </component>
       <component id="36d0" class="javax.swing.JLabel">
@@ -385,7 +385,7 @@
       </component>
       <component id="2883d" class="javax.swing.JCheckBox" binding="keywordHighlighting">
         <constraints>
-          <grid row="10" column="0" row-span="1" col-span="3" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Keyword highlighting"/>
