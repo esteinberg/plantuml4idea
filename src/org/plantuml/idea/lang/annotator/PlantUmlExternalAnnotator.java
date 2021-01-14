@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.METADATA;
+import static org.plantuml.idea.util.Utils.join;
+import static org.plantuml.idea.util.Utils.rangesInside;
 
 /**
  * Author: Eugene Steinberg
@@ -113,7 +114,8 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
                 annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
                 if (plantUmlSettings.isKeywordHighlighting()) {
                     //not reliable when mixed braces ([)...(]), but it don't need to be
-                    List<IntRange> excludedRanges = Utils.join(Utils.rangesInside(line, "[", "]"), Utils.rangesInside(line, "(", ")"));
+                    List<IntRange> excludedRanges = join(rangesInside(line, "[", "]"), rangesInside(line, "(", ")"));
+                    excludedRanges = join(excludedRanges, rangesInside(line, "\"", "\""));
 
                     annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
                     annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
