@@ -40,11 +40,8 @@ Contributors:
 ### master
 * Current production branch
 
-### 1.x
-* deprecated branch, to be deleted
-
 ### grammar
-* Contains new experimental syntax support
+* old experimental syntax support - never finished
 * Grammar classes can be generated using tools/grammar-gen.sh
 * This script can run automatically when you run the plugin using "Plugin" Run/Debug configuration. Just add the script
 above as an external tool and make it run before the "Make" step.
