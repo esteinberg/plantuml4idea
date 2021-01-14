@@ -135,7 +135,7 @@ public class LazyApplicationPoolExecutor {
     }
 
     public synchronized void cancel() {
-        logger.debug("cancelling rendering: " + future);
+        logger.debug("cancelling rendering: ", future);
         nextCommand = null;
         future.cancel(false);
     }

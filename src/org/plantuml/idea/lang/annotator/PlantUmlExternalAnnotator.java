@@ -2,8 +2,6 @@ package org.plantuml.idea.lang.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
-import com.intellij.openapi.application.Application;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
@@ -64,11 +62,11 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
     @Nullable
     @Override
     public FileAnnotationResult doAnnotate(Info file) {
-        // Temporary solution to avoid execution under read action in dumb mode. Should be removed after IDEA-229905 will be fixed
-        Application application = ApplicationManager.getApplication();
-        if (application != null && application.isReadAccessAllowed() && !application.isUnitTestMode()) {
-            return null;
-        }
+//        // Temporary solution to avoid execution under read action in dumb mode. Should be removed after IDEA-229905 will be fixed
+//        Application application = ApplicationManager.getApplication();
+//        if (application != null && application.isReadAccessAllowed() && !application.isUnitTestMode()) {
+//            return null;
+//        }
 
         FileAnnotationResult result = new FileAnnotationResult();
         if (plantUmlSettings.isErrorAnnotationEnabled() || plantUmlSettings.isKeywordHighlighting()) {
