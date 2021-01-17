@@ -2,7 +2,6 @@ package org.plantuml.idea.grammar.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.editor.Document;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
@@ -56,7 +55,7 @@ public class PumlPsiImplUtil {
         };
     }
 
-    public static ItemPresentation getPresentation2(final PumlItem element, Document document) {
+    public static ItemPresentation getPresentation2(final PumlItem element, String line) {
         return new ItemPresentation() {
             @Nullable
             @Override
@@ -67,11 +66,7 @@ public class PumlPsiImplUtil {
             @Nullable
             @Override
             public String getLocationString() {
-                if (document == null) {
-                    return null;
-                }
-                int lineNumber = document.getLineNumber(element.getTextOffset());
-                return "line: " + lineNumber;
+                return line;
             }
 
             @Override

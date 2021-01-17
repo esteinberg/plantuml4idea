@@ -5,9 +5,9 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.grammar.psi.PumlItem;
@@ -21,13 +21,23 @@ import java.util.HashSet;
 import java.util.List;
 
 public class PumlStructureViewElement implements StructureViewTreeElement, SortableTreeElement {
+    private static final Logger LOG = Logger.getInstance(PumlStructureViewElement.class);
 
     private final NavigatablePsiElement myElement;
     private final Document document;
+    private String line;
 
     public PumlStructureViewElement(NavigatablePsiElement element, Document document) {
         this.myElement = element;
         this.document = document;
+        try {
+            if (element.isValid()) {
+                line = "line: " + document.getLineNumber(element.getTextOffset());
+            }
+        } catch (Throwable e) {
+            //old document, ignore, (maybe #isValid solves it, dunno)
+            LOG.debug(e);
+        }
     }
 
     @Override
@@ -61,7 +71,7 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
     @Override
     public ItemPresentation getPresentation() {
         if (myElement instanceof PumlItem) {
-            return PumlPsiImplUtil.getPresentation2((PumlItem) myElement, document);
+            return PumlPsiImplUtil.getPresentation2((PumlItem) myElement, line);
         }
         ItemPresentation presentation = myElement.getPresentation();
         return presentation != null ? presentation : new PresentationData();
@@ -70,7 +80,6 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        Document document = PsiDocumentManager.getInstance(myElement.getProject()).getDocument(myElement.getContainingFile());
         if (myElement instanceof PlantUmlFileImpl) {
             List<TreeElement> treeElements = new ArrayList<>();
             List<PumlItemImpl> list = PsiTreeUtil.getChildrenOfTypeAsList(myElement, PumlItemImpl.class);
@@ -88,7 +97,6 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
                     }
                 }
             }
-
 
             return treeElements.toArray(new TreeElement[0]);
         }

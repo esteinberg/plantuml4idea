@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PumlPsiUtil {
 
@@ -33,7 +31,7 @@ public class PumlPsiUtil {
 
         if (items != null) {
             for (PumlItem item : items) {
-                if (isSame(key, item.getText())) {
+                if (key.equals(item.getText())) {
                     if (firstMatch && item == element) {
                         returnFirst = false;
                         continue;
@@ -57,35 +55,12 @@ public class PumlPsiUtil {
                 if (item == element) {
                     return null;
                 }
-                if (isSame(key, item.getText())) {
+                if (key.equals(item.getText())) {
                     return item;
                 }
             }
         }
         return null;
-    }
-
-    static final Pattern SANITIZER = Pattern.compile("([a-zA-Z0-9].*[a-zA-Z0-9])");
-
-    public static boolean isSame(String p1, String p2) {
-        if (p1.equals(p2)) {
-            return true;
-        }
-        Matcher m = SANITIZER.matcher(p1);
-        String key = null;
-        if (m.find()) {
-            key = m.group();
-        }
-        if (key == null) {
-            return false;
-        }
-
-        String key2 = null;
-        m.reset(p2);
-        if (m.find()) {
-            key2 = m.group();
-        }
-        return key.equals(key2);
     }
 
     public static List<PumlItem> findDeclarationInAllFiles(Project project, String key) {
@@ -97,7 +72,7 @@ public class PumlPsiUtil {
                 PumlItem[] properties = PsiTreeUtil.getChildrenOfType(simpleFile, PumlItem.class);
                 if (properties != null) {
                     for (PumlItem property : properties) {
-                        if (isSame(key, property.getText())) {
+                        if (key.equals(property.getText())) {
                             result.add(property);
                             break;
                         }

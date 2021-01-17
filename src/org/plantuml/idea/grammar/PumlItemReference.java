@@ -2,6 +2,7 @@ package org.plantuml.idea.grammar;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class PumlItemReference extends PsiReferenceBase<PumlItem> {
 
+    private static final Logger LOG = Logger.getInstance(PumlItemReference.class);
 
     private final String key;
 
