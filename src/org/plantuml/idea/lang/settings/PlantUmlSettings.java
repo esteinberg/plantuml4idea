@@ -64,6 +64,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean usePageTitles = true;
     private boolean useGrammar = true;
     private boolean keywordHighlighting = true;
+    private boolean insertPair = true;
 
 
     public static PlantUmlSettings getInstance() {
@@ -317,5 +318,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setKeywordHighlighting(final boolean keywordHighlighting) {
         this.keywordHighlighting = keywordHighlighting;
+    }
+
+    public boolean isInsertPair() {
+        return insertPair;
+    }
+
+    public void setInsertPair(final boolean insertPair) {
+        this.insertPair = insertPair;
     }
 }

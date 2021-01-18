@@ -167,5 +167,6 @@
 
         <lang.psiStructureViewFactory language="PUML"
                                       implementationClass="org.plantuml.idea.grammar.structure.PumlStructureViewFactory"/>
+        <typedHandler implementation="org.plantuml.idea.lang.PlantUmlTypedHandlerDelegate"/>
     </extensions>
 </idea-plugin>

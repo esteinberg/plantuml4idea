@@ -50,6 +50,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox usePageTitles;
     private JCheckBox grammarSupport;
     private JCheckBox keywordHighlighting;
+    private JCheckBox insertPair;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -165,68 +166,71 @@ public class PlantUmlSettingsPage implements Configurable {
     }
 
     public void setData(PlantUmlSettings data) {
-        renderDelay.setText(data.getRenderDelay());
-        cacheSize.setText(data.getCacheSize());
         encoding.setText(data.getEncoding());
-        renderUrlLinks.setSelected(data.isRenderUrlLinks());
-        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         textFieldDotExecutable.setText(data.getDotExecutable());
         usePreferentiallyGRAPHIZ_DOT.setSelected(data.isUsePreferentiallyGRAPHIZ_DOT());
         config.setText(data.getConfig());
-        showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
-        PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         includePaths.setText(data.getIncludedPaths());
         switchToBundledAfterUpdate.setSelected(data.isSwitchToBundledAfterUpdate());
         customPlantumlJar.setText(data.getCustomPlantumlJarPath());
+        renderDelay.setText(data.getRenderDelay());
+        cacheSize.setText(data.getCacheSize());
+        PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
+        showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
+        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
+        renderUrlLinks.setSelected(data.isRenderUrlLinks());
+        insertPair.setSelected(data.isInsertPair());
     }
 
     public void getData(PlantUmlSettings data) {
-        data.setRenderDelay(renderDelay.getText());
-        data.setCacheSize(cacheSize.getText());
         data.setEncoding(encoding.getText());
-        data.setRenderUrlLinks(renderUrlLinks.isSelected());
-        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setDotExecutable(textFieldDotExecutable.getText());
         data.setUsePreferentiallyGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
         data.setConfig(config.getText());
-        data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
-        data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setIncludedPaths(includePaths.getText());
         data.setSwitchToBundledAfterUpdate(switchToBundledAfterUpdate.isSelected());
         data.setCustomPlantumlJarPath(customPlantumlJar.getText());
+        data.setRenderDelay(renderDelay.getText());
+        data.setCacheSize(cacheSize.getText());
+        data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
+        data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
+        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
+        data.setRenderUrlLinks(renderUrlLinks.isSelected());
+        data.setInsertPair(insertPair.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
-        if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
-            return true;
-        if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
-            return true;
         if (encoding.getText() != null ? !encoding.getText().equals(data.getEncoding()) : data.getEncoding() != null)
             return true;
-        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
-        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
             return true;
         if (usePreferentiallyGRAPHIZ_DOT.isSelected() != data.isUsePreferentiallyGRAPHIZ_DOT()) return true;
         if (config.getText() != null ? !config.getText().equals(data.getConfig()) : data.getConfig() != null)
-            return true;
-        if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
-        if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
             return true;
         if (includePaths.getText() != null ? !includePaths.getText().equals(data.getIncludedPaths()) : data.getIncludedPaths() != null)
             return true;
         if (switchToBundledAfterUpdate.isSelected() != data.isSwitchToBundledAfterUpdate()) return true;
         if (customPlantumlJar.getText() != null ? !customPlantumlJar.getText().equals(data.getCustomPlantumlJarPath()) : data.getCustomPlantumlJarPath() != null)
             return true;
+        if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
+            return true;
+        if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
+            return true;
+        if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
+            return true;
+        if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
+        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
+        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
+        if (insertPair.isSelected() != data.isInsertPair()) return true;
         return false;
     }
 }
