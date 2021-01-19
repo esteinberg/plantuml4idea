@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>3.3.0</version>
+    <version>3.4.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="193"/>
@@ -9,6 +9,11 @@
 
     <change-notes>
         <![CDATA[        
+            <p>3.4</p>
+            <ul>
+              <li>Fixed Spellchecking inspection</li>
+              <li>Added: Insert paired (), [] , {}, "" - can be disabled in settings</li>
+            </ul>   
             <p>3.3</p>
             <ul>
               <li>Find Usages performance optimization</li>
@@ -163,10 +168,14 @@
                                  implementationClass="org.plantuml.idea.grammar.PumlElementManipulator"/>
         <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.grammar.PumlNamesValidator"/>
         <lang.findUsagesProvider language="PUML"
-                                 implementationClass="org.plantuml.idea.grammar.SimpleFindUsagesProvider"/>
+                                 implementationClass="org.plantuml.idea.grammar.PumlFindUsagesProvider"/>
 
         <lang.psiStructureViewFactory language="PUML"
                                       implementationClass="org.plantuml.idea.grammar.structure.PumlStructureViewFactory"/>
         <typedHandler implementation="org.plantuml.idea.lang.PlantUmlTypedHandlerDelegate"/>
+        <spellchecker.support language="PUML"
+                              implementationClass="org.plantuml.idea.grammar.PumlSpellcheckingStrategy"/>
+        <spellchecker.dictionary.runtimeDictionaryProvider
+                implementation="org.plantuml.idea.grammar.PumlRuntimeDictionaryProvider"/>
     </extensions>
 </idea-plugin>

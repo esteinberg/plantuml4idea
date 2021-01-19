@@ -7,14 +7,14 @@ import com.intellij.psi.PsiReference;
 
 public interface PumlItem extends PumlNamedElement {
 
-  String getName();
+    String getName();
 
-  PsiElement setName(String newName);
+    PsiElement setName(String newName);
 
-  PsiElement getNameIdentifier();
+    PsiElement getNameIdentifier();
 
-  ItemPresentation getPresentation();
+    ItemPresentation getPresentation();
 
-  PsiReference getReference();
+    PsiReference getReference();
 
 }

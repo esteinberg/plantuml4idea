@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 
-public class SimpleFindUsagesProvider implements FindUsagesProvider {
+public class PumlFindUsagesProvider implements FindUsagesProvider {
 
     @Nullable
     @Override

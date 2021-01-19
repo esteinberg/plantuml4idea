@@ -24,6 +24,7 @@ public class PlantUmlParserDefinition implements ParserDefinition {
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(PumlTypes.COMMENT);
+    public static final TokenSet LITERALS = TokenSet.create(PumlTypes.IDENTIFIER);
 
     public static final IFileElementType FILE = new IFileElementType(PlantUmlLanguage.INSTANCE);
 
@@ -86,7 +87,7 @@ public class PlantUmlParserDefinition implements ParserDefinition {
     @Override
     @NotNull
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return LITERALS;
     }
 
     @NotNull

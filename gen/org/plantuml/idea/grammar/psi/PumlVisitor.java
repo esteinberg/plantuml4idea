@@ -7,16 +7,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class PumlVisitor extends PsiElementVisitor {
 
-  public void visitItem(@NotNull PumlItem o) {
-    visitNamedElement(o);
-  }
+    public void visitItem(@NotNull PumlItem o) {
+        visitNamedElement(o);
+    }
 
-  public void visitNamedElement(@NotNull PumlNamedElement o) {
-    visitPsiElement(o);
-  }
+    public void visitNamedElement(@NotNull PumlNamedElement o) {
+        visitPsiElement(o);
+    }
 
-  public void visitPsiElement(@NotNull PsiElement o) {
-    visitElement(o);
-  }
+    public void visitPsiElement(@NotNull PsiElement o) {
+        visitElement(o);
+    }
 
 }

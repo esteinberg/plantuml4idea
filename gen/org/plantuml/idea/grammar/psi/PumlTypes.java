@@ -8,19 +8,19 @@ import org.plantuml.idea.grammar.psi.impl.PumlItemImpl;
 
 public interface PumlTypes {
 
-  IElementType ITEM = new PumlElementType("ITEM");
+    IElementType ITEM = new PumlElementType("ITEM");
 
-  IElementType COMMENT = new PumlTokenType("COMMENT");
-  IElementType IDENTIFIER = new PumlTokenType("IDENTIFIER");
-  IElementType OTHER = new PumlTokenType("OTHER");
+    IElementType COMMENT = new PumlTokenType("COMMENT");
+    IElementType IDENTIFIER = new PumlTokenType("IDENTIFIER");
+    IElementType OTHER = new PumlTokenType("OTHER");
 
-  class Factory {
-    public static PsiElement createElement(ASTNode node) {
-      IElementType type = node.getElementType();
-      if (type == ITEM) {
-        return new PumlItemImpl(node);
-      }
-      throw new AssertionError("Unknown element type: " + type);
+    class Factory {
+        public static PsiElement createElement(ASTNode node) {
+            IElementType type = node.getElementType();
+            if (type == ITEM) {
+                return new PumlItemImpl(node);
+            }
+            throw new AssertionError("Unknown element type: " + type);
+        }
     }
-  }
 }
