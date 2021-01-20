@@ -17,19 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-;
-;
-;
-;
-;
-;
-;
-;
-;
-;
-
 public class PumlGrammarCheckingStrategy implements GrammarCheckingStrategy {
-
 
     @NotNull
     @Override
@@ -63,7 +51,7 @@ public class PumlGrammarCheckingStrategy implements GrammarCheckingStrategy {
 
     @Override
     public boolean isEnabledByDefault() {
-        return true;
+        return false;
     }
 
 
