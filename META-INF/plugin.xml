@@ -44,6 +44,7 @@
     </change-notes>
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true">com.intellij.platform.images</depends>
+    <depends optional="true" config-file="grazie-puml.xml">tanvd.grazi</depends>
 
     <application-components>
         <!-- Add your application components here -->
@@ -178,4 +179,5 @@
         <spellchecker.dictionary.runtimeDictionaryProvider
                 implementation="org.plantuml.idea.grammar.PumlRuntimeDictionaryProvider"/>
     </extensions>
+
 </idea-plugin>

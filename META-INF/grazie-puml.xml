@@ -1,0 +1,7 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij.grazie">
+        <grammar.strategy language="PUML" implementationClass="org.plantuml.idea.grammar.PumlGrammarCheckingStrategy"/>
+    </extensions>
+    <depends>tanvd.grazi</depends>
+</idea-plugin>
+
