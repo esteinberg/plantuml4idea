@@ -37,8 +37,8 @@ BRACKET_2=\([^\)\r\n,]+\)  //without ',' -> do not eat multiple items: (ProductO
 QUOTE_1=\"[^\"\r\n]+\"  // "foo bar"
 //QUOTE_2=\'[^\'\r\n]+\'  // 'foo bar'  - perhaps better without it, it breaks brackets - [x]a'[y]b' (gantt sample) 
                       
-COMPLEX_WORD=[\p{L}_][\p{L}._-]*[\p{L}]
-WORD_CHARACTER=[\p{L}]
+COMPLEX_WORD=[_\p{L}0-9@&%$#][._\-'\p{L}0-9@&%$#]*[\p{L}0-9@&%$#]
+WORD_CHARACTER=[\p{L}0-9]
 TAG=@[A-Za-z]*
 SPECIAL_CHARACTER=[^\p{L}\s/\[\(\"']   //except quotes, brackets start
 NEW_LINE=\R
