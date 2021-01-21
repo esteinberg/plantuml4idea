@@ -13,7 +13,7 @@ import org.plantuml.idea.grammar.psi.PumlTypes;
   }
   
   private IElementType itemType() {
-       if(org.plantuml.idea.util.Utils.containsLetters(yytext())) {
+       if(org.plantuml.idea.util.Utils.containsLettersOrNumbers(yytext())) {
             return PumlTypes.IDENTIFIER; 
         } else {
             return PumlTypes.OTHER; 
@@ -39,8 +39,8 @@ QUOTE_1=\"[^\"\r\n]+\"  // "foo bar"
                       
 COMPLEX_WORD=[_\p{L}0-9@&%$#][._\-'\p{L}0-9@&%$#]*[\p{L}0-9@&%$#]
 WORD_CHARACTER=[\p{L}0-9]
-TAG=@[A-Za-z]*
-SPECIAL_CHARACTER=[^\p{L}\s/\[\(\"']   //except quotes, brackets start
+//TAG=@[A-Za-z]+
+SPECIAL_CHARACTER=[^\p{L}0-9\s/\[\(\"']   //except quotes, brackets start
 NEW_LINE=\R
 WHITE_SPACE=[\ \t\f]
 
@@ -57,7 +57,7 @@ WHITE_SPACE=[\ \t\f]
 //<YYINITIAL, LINE_START_STATE>{QUOTE_2}                                 { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{COMPLEX_WORD}                            { yybegin(YYINITIAL);        return itemType(); }
 <YYINITIAL, LINE_START_STATE>{WORD_CHARACTER}+                         { yybegin(YYINITIAL);        return itemType(); }
-<YYINITIAL, LINE_START_STATE>{TAG}                                     { yybegin(YYINITIAL);        return PumlTypes.IDENTIFIER; }
+//<YYINITIAL, LINE_START_STATE>{TAG}                                     { yybegin(YYINITIAL);        return PumlTypes.IDENTIFIER; }
 <YYINITIAL, LINE_START_STATE>{SPECIAL_CHARACTER}+                      { yybegin(YYINITIAL);        return PumlTypes.OTHER; }
 <YYINITIAL, LINE_START_STATE>"/"                                       { yybegin(YYINITIAL);        return PumlTypes.OTHER; }
 <YYINITIAL, LINE_START_STATE>"["                                       { yybegin(YYINITIAL);        return PumlTypes.OTHER; }

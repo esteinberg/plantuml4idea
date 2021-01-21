@@ -39,3 +39,8 @@ ProductOfferingPrice -- ProductUsageSpec: ForUsage >
 @startuml
  foo -> bar: [Test prototype]'s start and ends at [Test prototype]'s end
 @enduml
+               
+@startuml
+123 -> [Оалвыалвы]:  Оалвыалвы
+@enduml
+

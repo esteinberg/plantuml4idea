@@ -11,6 +11,7 @@ import org.plantuml.idea.lang.PlantUmlFileType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Character.isDigit;
 import static java.lang.Character.isLetter;
 
 public class Utils {
@@ -30,9 +31,9 @@ public class Utils {
         return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
     }
 
-    public static boolean containsLetters(CharSequence s) {
+    public static boolean containsLettersOrNumbers(CharSequence s) {
         for (int i = 0; i < s.length(); i++) {
-            if (isLetter(s.charAt(i))) {
+            if (isLetter(s.charAt(i)) || isDigit(s.charAt(i))) {
                 return true;
             }
         }
