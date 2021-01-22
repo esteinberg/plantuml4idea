@@ -234,6 +234,7 @@ public class PlantUmlImageLabel extends JLabel {
         private void reset() {
             lastIndex = 0;
             lastFile = null;
+            lastText = "";
         }
 
         private boolean navigateToIncludedFile(String text) {
