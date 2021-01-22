@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,17 +14,15 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
@@ -38,7 +37,7 @@ public class ImageItem {
     @Nullable
     private BufferedImage image;
     @NotNull
-    private final UrlData[] urls;
+    private final List<LinkData> links;
     @Nullable
     private final String title;
     /**
@@ -74,7 +73,7 @@ public class ImageItem {
         this.title = title;
         this.filename = filename;
         this.imageBytes = imageBytes;
-        this.urls = this.parseUrls(svgBytes, baseDir);
+        this.links = this.parseLinks(svgBytes, baseDir);
     }
 
     public ImageItem(int page, ImageItem item, @NotNull PlantUml.ImageFormat format) {
@@ -83,7 +82,7 @@ public class ImageItem {
         this.pageSource = item.pageSource;
         this.documentSource = item.documentSource;
         this.image = item.image;
-        this.urls = item.urls;
+        this.links = item.links;
         this.imageBytes = item.imageBytes;
         this.renderingType = item.renderingType;
         this.title = item.title;
@@ -150,8 +149,8 @@ public class ImageItem {
     }
 
     @NotNull
-    public UrlData[] getUrls() {
-        return urls;
+    public List<LinkData> getLinks() {
+        return links;
     }
 
     protected boolean hasError() {
@@ -177,28 +176,42 @@ public class ImageItem {
         }
     }
 
-    public class UrlData {
-        private final URI uri;
+    public class LinkData {
+        private final String text;
         private final Rectangle clickArea;
+        private final boolean link;
 
-        public UrlData(URI uri, Rectangle clickArea) {
-            this.uri = uri;
+        public LinkData(String text, Rectangle clickArea, boolean link) {
+            this.text = text;
             this.clickArea = clickArea;
+            this.link = link;
         }
 
-        public URI getUri() {
-            return uri;
+        public String getText() {
+            return text;
+        }
+
+        public boolean isLink() {
+            return link;
         }
 
         public Rectangle getClickArea() {
             return clickArea;
         }
 
+        @Override
+        public String toString() {
+            return "LinkData{" +
+                    "text='" + text + '\'' +
+                    ", link=" + link +
+                    ", clickArea=" + clickArea +
+                    '}';
+        }
     }
 
-    private UrlData[] parseUrls(byte[] svgData, File baseDir) {
+    private List<LinkData> parseLinks(byte[] svgData, File baseDir) {
         if (svgData == null || svgData.length == 0 || baseDir == null) {
-            return new UrlData[0];
+            return Collections.emptyList();
         }
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -213,25 +226,57 @@ public class ImageItem {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new ByteArrayInputStream(svgData));
 
-            String xpathExpression = "//a";
+            ArrayList<LinkData> linkData = new ArrayList<>();
+            linkData.addAll(parseHyperLinks(document));
+            linkData.addAll(parseText(document));
 
-            XPathFactory xpf = XPathFactory.newInstance();
-            XPath xpath = xpf.newXPath();
-            XPathExpression expression = xpath.compile(xpathExpression);
-
-            NodeList svgPaths = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
-
-            List<UrlData> urls = new ArrayList<UrlData>();
-            for (int i = 0; i < svgPaths.getLength(); i++) {
-                urls.addAll(createUrl(svgPaths.item(i), baseDir));
-            }
-
-            return urls.toArray(new UrlData[urls.size()]);
+            return linkData;
 
         } catch (Exception e) {
             logger.debug(e);
-            return new UrlData[0];
+            return Collections.emptyList();
         }
+    }
+
+    @NotNull
+    private List<LinkData> parseHyperLinks(Document document) throws XPathExpressionException, URISyntaxException {
+        String xpathExpression = "//a";
+
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath xpath = xpf.newXPath();
+        XPathExpression expression = xpath.compile(xpathExpression);
+
+        NodeList svgPaths = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
+
+        List<LinkData> urls = new ArrayList<LinkData>();
+        for (int i = 0; i < svgPaths.getLength(); i++) {
+            urls.addAll(createLink(svgPaths.item(i)));
+        }
+        return urls;
+    }
+
+    private Collection<? extends LinkData> parseText(Document document) throws XPathExpressionException {
+        String xpathExpression = "//text";
+
+        XPathFactory xpf = XPathFactory.newInstance();
+        XPath xpath = xpf.newXPath();
+        XPathExpression expression = xpath.compile(xpathExpression);
+
+        NodeList nodes = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
+
+        List<LinkData> urls = new ArrayList<LinkData>();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node.getParentNode() != null && node.getParentNode().getNodeName().equals("a")) {
+                continue;
+            }
+            String textContent = node.getTextContent();
+            if (StringUtils.isEmpty(textContent)) {
+                continue;
+            }
+            urls.add(textNodeToUrlData(textContent, node, false));
+        }
+        return urls;
     }
 
     /**
@@ -242,47 +287,37 @@ public class ImageItem {
      * </text>
      * </a>
      */
-    private List<UrlData> createUrl(Node linkNode, File baseDir) throws URISyntaxException {
-        List<UrlData> urls = new ArrayList<UrlData>();
+    private List<LinkData> createLink(Node linkNode) throws URISyntaxException {
+        List<LinkData> urls = new ArrayList<LinkData>();
 
-        URI url = this.computeUri(linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue(), baseDir);
+        String nodeValue = linkNode.getAttributes().getNamedItem("xlink:href").getNodeValue();
 
         for (int i = 0; i < linkNode.getChildNodes().getLength(); i++) {
             Node child = linkNode.getChildNodes().item(i);
             if (child.getNodeName().equals("text")) {
-                NamedNodeMap nodeAttributes = child.getAttributes();
-                int x = (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue());
-                int y = (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue());
-                int textLength = (int) Float.parseFloat(nodeAttributes.getNamedItem("textLength").getNodeValue());
-                int height = (int) Float.parseFloat(nodeAttributes.getNamedItem("font-size").getNodeValue());
-
-                Rectangle rect = new Rectangle(
-                        x,
-                        y - height,
-                        textLength,
-                        height
-                );
-
-                urls.add(new UrlData(url, rect));
+                urls.add(textNodeToUrlData(nodeValue, child, true));
             }
         }
 
         return urls;
     }
 
-    /**
-     * If uri is a relative path, then assuming that full uri is file:/{path_to_diagram_file}/{uri}
-     *
-     * @param url absolute or relative url
-     * @return absolute uri
-     */
-    private URI computeUri(String url, File baseDir) throws URISyntaxException {
-        URI uri = new URI(url);
-        if (!uri.isAbsolute()) {
-            //Concatenating baseDir and relative URI
-            uri = new File(baseDir, url).toURI();
-        }
-        return uri;
+    @NotNull
+    private LinkData textNodeToUrlData(String text, Node child, boolean link) {
+        NamedNodeMap nodeAttributes = child.getAttributes();
+        int x = (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue());
+        int y = (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue());
+        int textLength = (int) Float.parseFloat(nodeAttributes.getNamedItem("textLength").getNodeValue());
+        int height = (int) Float.parseFloat(nodeAttributes.getNamedItem("font-size").getNodeValue());
+
+        Rectangle rect = new Rectangle(
+                x,
+                y - height,
+                textLength,
+                height
+        );
+
+        return new LinkData(text, rect, link);
     }
 
     @Override

@@ -242,7 +242,7 @@ public class PlantUmlNormalRenderer {
         byte[] svgBytes = new byte[0];
         if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
             svgBytes = bytes;
-        } else if (renderRequest.isRenderUrlLinks()) {
+        } else if (renderRequest.isRenderUrlLinks() ) {
             svgBytes = generateSvg(reader, page);
         }
 

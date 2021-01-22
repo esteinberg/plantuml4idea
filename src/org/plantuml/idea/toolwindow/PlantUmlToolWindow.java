@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.LowMemoryWatcher;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
@@ -61,6 +62,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private int lastValidVerticalScrollValue;
     private int lastValidHorizontalScrollValue;
+    private LocalFileSystem localFileSystem;
 
     public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -74,6 +76,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
         fileManager = VirtualFileManager.getInstance();
+        localFileSystem = LocalFileSystem.getInstance();
 
         setupUI();
         lazyExecutor = new LazyApplicationPoolExecutor(settings.getRenderDelayAsInt(), executionStatusPanel);
@@ -429,7 +432,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (cacheItem.getRenderRequest().getFormat() == PlantUml.ImageFormat.SVG) {
 //            component = new PlantUmlImagePanelSvg(imageWithData, pageNumber, cacheItem.getRenderRequest());
         } else {
-            component = new PlantUmlImageLabel(imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest());
+            component = new PlantUmlImageLabel(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult(), fileEditorManager, localFileSystem);
         }
         addScrollBarListeners(component);
 

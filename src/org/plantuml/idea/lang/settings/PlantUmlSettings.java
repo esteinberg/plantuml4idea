@@ -42,7 +42,6 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
     private boolean autoHide = true;
-    private boolean renderUrlLinks = false;
     private String renderDelay = String.valueOf(RENDER_DELAY_DEFAULT_VALUE);
     private String cacheSize = String.valueOf(CACHE_SIZE_DEFAULT_VALUE);
     private boolean autoRender = true;
@@ -50,7 +49,10 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean usePreferentiallyGRAPHIZ_DOT = false;
     private String encoding = "UTF-8";
     private String config = "";
+
+    private boolean renderUrlLinks = false;
     private boolean showUrlLinksBorder;
+
     private String plantuml_limit_size;
     private String includedPaths;
     private boolean doNotDisplayErrors = false;

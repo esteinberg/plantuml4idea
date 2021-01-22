@@ -143,7 +143,7 @@
 //
 //        boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
 //
-//        for (ImageItem.UrlData url : imageItem.getUrls()) {
+//        for (ImageItem.LinkData url : imageItem.getUrls()) {
 //            final URI uri = url.getUri();
 //            JLabel button = new JLabel();
 //            if (showUrlLinksBorder) {

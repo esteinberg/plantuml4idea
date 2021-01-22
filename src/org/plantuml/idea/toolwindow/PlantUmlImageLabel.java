@@ -2,6 +2,15 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
@@ -15,13 +24,15 @@ import org.plantuml.idea.action.context.*;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderResult;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.io.File;
 import java.net.URI;
+import java.util.Map;
 
 public class PlantUmlImageLabel extends JLabel {
     private static final AnAction[] AN_ACTIONS = {
@@ -49,16 +60,22 @@ public class PlantUmlImageLabel extends JLabel {
     });
 
     private static Logger logger = Logger.getInstance(PlantUmlImageLabel.class);
+    private final Project project;
+    private final RenderResult renderResult;
     private RenderRequest renderRequest;
     private ImageItem imageWithData;
     private Image originalImage;
 
-    public PlantUmlImageLabel() {
-    }
+    private FileEditorManager fileEditorManager;
+    private LocalFileSystem localFileSystem;
 
-    public PlantUmlImageLabel(JPanel parent, ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public PlantUmlImageLabel(Project project, JPanel parent, ImageItem imageWithData, int i, RenderRequest renderRequest, RenderResult renderResult, FileEditorManager fileEditorManager, LocalFileSystem localFileSystem) {
         this.imageWithData = imageWithData;
+        this.project = project;
+        this.renderResult = renderResult;
         setup(parent, this.imageWithData, i, renderRequest);
+        this.fileEditorManager = fileEditorManager;
+        this.localFileSystem = localFileSystem;
     }
 
     public ImageItem getImageWithData() {
@@ -77,14 +94,14 @@ public class PlantUmlImageLabel extends JLabel {
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageWithData.hasImage()) {
-            setDiagram(parent, imageWithData, this);
+            setDiagram(parent, imageWithData, renderRequest, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
         this.renderRequest = renderRequest;
     }
 
-    private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, final JLabel label) {
+    private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, RenderRequest renderRequest, final JLabel label) {
         originalImage = imageItem.getImage();
         Image scaledImage;
 
@@ -106,20 +123,20 @@ public class PlantUmlImageLabel extends JLabel {
         label.removeAll();
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
 
-        for (ImageItem.UrlData url : imageItem.getUrls()) {
-            final URI uri = url.getUri();
+        for (ImageItem.LinkData linkData : imageItem.getLinks()) {
             JLabel button = new JLabel();
             if (showUrlLinksBorder) {
                 button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
             }
-            Rectangle area = url.getClickArea();
+            Rectangle area = linkData.getClickArea();
 
-            int tolerance = 5;
+            int tolerance = 2;
             double scale = ctx.getScale(ScaleType.SYS_SCALE);
-            int x = (int) ((double) area.x / scale);
-            int y = (int) (area.y / scale);
-            int width = (int) ((area.width) / scale) + tolerance;
-            int height = (int) ((area.height) / scale) + tolerance;
+            int x = (int) ((double) area.x / scale) - 2 * tolerance;
+            int width = (int) ((area.width) / scale) + 4 * tolerance;
+
+            int y = (int) (area.y / scale) - tolerance;
+            int height = (int) ((area.height) / scale) + 5 * tolerance;
 
             area = new Rectangle(x, y, width, height);
 
@@ -131,18 +148,93 @@ public class PlantUmlImageLabel extends JLabel {
             //When user clicks on item, url is opened in default system browser
             button.addMouseListener(new MouseAdapter() {
                 @Override
-                public void mouseClicked(MouseEvent e) {
+                public void mousePressed(MouseEvent e) {
+                    String text = linkData.getText();
                     try {
-                        Desktop.getDesktop().browse(uri);
-                    } catch (IOException ex) {
+                        if (linkData.isLink()) {
+                            if (isWebReferenceUrl(text)) {
+                                Desktop.getDesktop().browse(URI.create(text));
+                            } else {
+
+                                if (openFile(new File(renderRequest.getBaseDir(), text))) return;
+                                navigateToSource(text);
+                            }
+                        } else {
+                            navigateToSource(text);
+                        }
+                    } catch (
+                            Exception ex) {
                         logger.warn(ex);
                     }
+                }
+
+                private void navigateToSource(String text) {
+                    File sourceFile = renderRequest.getSourceFile();
+                    VirtualFile virtualFile = localFileSystem.findFileByPath(sourceFile.getAbsolutePath());
+                    if (virtualFile != null) {
+                        Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+                        if (document != null) {
+                            String documentText = document.getText();
+                            int i = documentText.indexOf(text);
+                            if (i >= 0) {
+                                navigateToEditor(virtualFile, i);
+                            } else {
+                                navigateToIncludedFile(text);
+                            }
+                        }
+                    }
+                }
+
+                private void navigateToIncludedFile(String text) {
+                    Map<File, Long> includedFiles = renderResult.getIncludedFiles();
+                    for (File file : includedFiles.keySet()) {
+                        VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
+                        if (virtualFile != null) {
+                            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+                            if (document != null) {
+                                String documentText = document.getText();
+                                int i = documentText.indexOf(text);
+                                if (i >= 0) {
+                                    navigateToEditor(virtualFile, i);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                private void navigateToEditor(VirtualFile virtualFile, int i) {
+                    FileEditor[] fileEditors = fileEditorManager.openFile(virtualFile, true, true);
+                    if (fileEditors.length != 0) {
+                        FileEditor fileEditor = fileEditors[0];
+                        if (fileEditor instanceof TextEditor) {
+                            Editor editor = ((TextEditor) fileEditor).getEditor();
+                            editor.getCaretModel().moveToOffset(i);
+                        }
+                    }
+                }
+
+                private boolean openFile(File file) {
+                    if (file.exists()) {
+                        VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
+                        if (virtualFile == null) {
+                            return false;
+                        }
+                        FileEditor[] fileEditors = fileEditorManager.openFile(virtualFile, true, true);
+                        return fileEditors.length > 0;
+                    }
+                    return false;
                 }
             });
 
 
             label.add(button);
         }
+
+    }
+
+    public static boolean isWebReferenceUrl(String url) {
+        return url.startsWith("www.") || url.startsWith("http://") || url.startsWith("https://") || url.startsWith("about:") || url.startsWith("mailto:");
     }
 
     public Image getOriginalImage() {
