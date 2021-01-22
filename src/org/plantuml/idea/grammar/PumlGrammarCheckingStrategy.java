@@ -6,6 +6,7 @@ import com.intellij.grazie.grammar.strategy.impl.ReplaceCharRule;
 import com.intellij.grazie.grammar.strategy.impl.RuleGroup;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
 import kotlin.ranges.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +24,8 @@ public class PumlGrammarCheckingStrategy implements GrammarCheckingStrategy {
     @Override
     public ElementBehavior getElementBehavior(@NotNull PsiElement root, @NotNull PsiElement child) {
         if (child.getNode().getElementType() == PumlTypes.OTHER) {
+            return ElementBehavior.ABSORB;
+        } else if (child instanceof PsiWhiteSpace && child.getText().contains("\n")) {
             return ElementBehavior.ABSORB;
         } else {
             return ElementBehavior.TEXT;
