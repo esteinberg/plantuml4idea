@@ -50,8 +50,9 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String encoding = "UTF-8";
     private String config = "";
 
-    private boolean renderUrlLinks = false;
+    private boolean renderLinks = true;
     private boolean showUrlLinksBorder;
+    private boolean linkOpensSearchBar = true;
 
     private String plantuml_limit_size;
     private String includedPaths;
@@ -94,12 +95,12 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         this.lastBundledVersion = lastBundledVersion;
     }
 
-    public boolean isRenderUrlLinks() {
-        return renderUrlLinks;
+    public boolean isRenderLinks() {
+        return renderLinks;
     }
 
-    public void setRenderUrlLinks(boolean renderUrlLinks) {
-        this.renderUrlLinks = renderUrlLinks;
+    public void setRenderLinks(boolean renderLinks) {
+        this.renderLinks = renderLinks;
     }
 
     public String getDotExecutable() {
@@ -328,5 +329,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setInsertPair(final boolean insertPair) {
         this.insertPair = insertPair;
+    }
+
+    public boolean isLinkOpensSearchBar() {
+        return linkOpensSearchBar;
+    }
+
+    public void setLinkOpensSearchBar(final boolean linkOpensSearchBar) {
+        this.linkOpensSearchBar = linkOpensSearchBar;
     }
 }

@@ -446,7 +446,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     public void applyNewSettings(PlantUmlSettings plantUmlSettings) {
         lazyExecutor.setDelay(plantUmlSettings.getRenderDelayAsInt());
         renderCache.setMaxCacheSize(plantUmlSettings.getCacheSizeAsInt());
-        renderUrlLinks = plantUmlSettings.isRenderUrlLinks();
+        renderUrlLinks = plantUmlSettings.isRenderLinks();
     }
 
     private JSeparator separator() {

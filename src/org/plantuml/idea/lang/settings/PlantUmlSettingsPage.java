@@ -51,6 +51,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox grammarSupport;
     private JCheckBox keywordHighlighting;
     private JCheckBox insertPair;
+    private JCheckBox linkOpensSearchBar;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -181,8 +182,9 @@ public class PlantUmlSettingsPage implements Configurable {
         grammarSupport.setSelected(data.isUseGrammar());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
-        renderUrlLinks.setSelected(data.isRenderUrlLinks());
+        renderUrlLinks.setSelected(data.isRenderLinks());
         insertPair.setSelected(data.isInsertPair());
+        linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -201,8 +203,9 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setUseGrammar(grammarSupport.isSelected());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
-        data.setRenderUrlLinks(renderUrlLinks.isSelected());
+        data.setRenderLinks(renderUrlLinks.isSelected());
         data.setInsertPair(insertPair.isSelected());
+        data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -229,8 +232,9 @@ public class PlantUmlSettingsPage implements Configurable {
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
         if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
-        if (renderUrlLinks.isSelected() != data.isRenderUrlLinks()) return true;
+        if (renderUrlLinks.isSelected() != data.isRenderLinks()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
+        if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
         return false;
     }
 }

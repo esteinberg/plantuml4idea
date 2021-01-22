@@ -15,10 +15,7 @@ import org.plantuml.idea.rendering.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
 
@@ -79,11 +76,11 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         boolean shouldRender = pageSelected && (obsolete || !cachedItem.hasImage(page));
 
         if (shouldRender) {
-            Pair<ImageItem, Map<File, Long>> imageItemMapPair = renderImage(renderRequest, page, formatOption, partialSource);
+            Pair<ImageItem, LinkedHashMap<File, Long>> imageItemMapPair = renderImage(renderRequest, page, formatOption, partialSource);
             renderResult.addRenderedImage(imageItemMapPair.first);
             renderResult.addIncludedFiles(imageItemMapPair.second);
         } else if (obsolete) {
-            Pair<ImageItem, Map<File, Long>> imageItemMapPair = updateTitle(renderRequest, page, partialSource);
+            Pair<ImageItem, LinkedHashMap<File, Long>> imageItemMapPair = updateTitle(renderRequest, page, partialSource);
             renderResult.addUpdatedTitle(imageItemMapPair.first);
             renderResult.addIncludedFiles(imageItemMapPair.second);
         } else {
@@ -93,7 +90,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         logger.debug("processing of page ", page, " done in ", System.currentTimeMillis() - partialPageProcessingStart, "ms");
     }
 
-    private Pair<ImageItem, Map<File, Long>> updateTitle(RenderRequest renderRequest, int page, String partialSource) {
+    private Pair<ImageItem, LinkedHashMap<File, Long>> updateTitle(RenderRequest renderRequest, int page, String partialSource) {
         long start = System.currentTimeMillis();
         logger.debug("updating title, page ", page);
 
@@ -117,13 +114,13 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     }
 
 
-    private Pair<ImageItem, Map<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
+    private Pair<ImageItem, LinkedHashMap<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
         DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = info.getTotalPages();
         DiagramInfo.Titles titles = info.getTitles();
-        HashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);
+        LinkedHashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);
                         
         if (totalPages > 1) {
             throw new PartialRenderingException();

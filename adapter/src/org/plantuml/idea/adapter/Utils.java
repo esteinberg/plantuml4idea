@@ -33,9 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
@@ -151,14 +149,16 @@ public class Utils {
     }
 
     @NotNull
-    public static HashMap<File, Long> getIncludedFiles(SourceStringReader reader) {
+    public static LinkedHashMap<File, Long> getIncludedFiles(SourceStringReader reader) {
         long start = System.currentTimeMillis();
-        HashMap<File, Long> includedFiles = new HashMap<>();
+        LinkedHashMap<File, Long> includedFiles = new LinkedHashMap<>();
         List<BlockUml> blocks = reader.getBlocks();
         for (BlockUml block : blocks) {
             try {
                 Set<File> convert = FileWithSuffix.convert(block.getIncluded());
-                for (File file : convert) {
+                ArrayList<File> files = new ArrayList<>(convert);
+                files.sort(File::compareTo);
+                for (File file : files) {
                     includedFiles.put(file, file.lastModified());
                 }
             } catch (FileNotFoundException e) {

@@ -364,14 +364,6 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="db7be" class="javax.swing.JCheckBox" binding="showUrlLinksBorder">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Debug: show border around links"/>
-            </properties>
-          </component>
           <component id="a73e0" class="javax.swing.JCheckBox" binding="usePageTitles">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -418,6 +410,22 @@
             </constraints>
             <properties>
               <text value="Insert paired (), [] , {}, &quot;&quot;"/>
+            </properties>
+          </component>
+          <component id="11b85" class="javax.swing.JCheckBox" binding="linkOpensSearchBar">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Link opens a search bar"/>
+            </properties>
+          </component>
+          <component id="db7be" class="javax.swing.JCheckBox" binding="showUrlLinksBorder">
+            <constraints>
+              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Debug: show link border "/>
             </properties>
           </component>
         </children>

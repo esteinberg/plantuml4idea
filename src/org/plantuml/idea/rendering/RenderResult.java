@@ -1,10 +1,14 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 /**
@@ -20,7 +24,7 @@ public class RenderResult {
     private int rendered;
     private int updatedTitles;
     private int cached;
-    private Map<File, Long> includedFiles;
+    private LinkedHashMap<File, Long> includedFiles;
 
     public RenderResult(RenderingType strategy, int totalPages) {
         this.strategy = strategy;
@@ -32,17 +36,17 @@ public class RenderResult {
         this.pages = totalPages;
     }
 
-    public Map<File, Long> getIncludedFiles() {
+    public LinkedHashMap<File, Long> getIncludedFiles() {
         return includedFiles;
     }
 
-    public void setIncludedFiles(Map<File, Long> includedFiles) {
+    public void setIncludedFiles(LinkedHashMap<File, Long> includedFiles) {
         this.includedFiles = includedFiles;
     }
 
-    public void addIncludedFiles(Map<File, Long> map) {
+    public void addIncludedFiles(LinkedHashMap<File, Long> map) {
         if (includedFiles == null) {
-            includedFiles = new HashMap<>();
+            includedFiles = new LinkedHashMap<>();
         }
         includedFiles.putAll(map);
     }
@@ -132,4 +136,12 @@ public class RenderResult {
     }
 
 
+    public boolean includedFilesContains(File file) {
+        for (File f : includedFiles.keySet()) {
+            if (FileUtil.filesEqual(f, file)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

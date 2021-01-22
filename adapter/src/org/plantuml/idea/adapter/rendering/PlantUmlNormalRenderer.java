@@ -210,7 +210,6 @@ public class PlantUmlNormalRenderer {
         return cachedItem != null && pagesCount != cachedItem.getImageItems().length;
     }
 
-
     @NotNull
     protected ImageItem generateImageItem(RenderRequest renderRequest,
                                           String documentSource,
