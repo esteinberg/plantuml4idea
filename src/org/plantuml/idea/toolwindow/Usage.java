@@ -10,7 +10,11 @@ public class Usage extends JTextArea {
 
                     + "- A new file can be created from template (File | New | PlantUML File)\n"
                     + "- PlantUML code can be placed anywhere, '*' are ignored for usage in Java comments\n"
-                    + "- About screen tests Graphviz installation\n"
+                    + "- About screen tests Graphviz installation\n\n"
+
+                    + "- Clicking on the rendered text finds it in the editor\n"
+                    + "- Ctrl + Click in the editor navigates between occurrences\n"
+                    + "- Structure view displays the first occurrence\n"
                     + "\nIntentions (Alt+Enter):\n"
                     + "- reverse arrow\n"
                     + "- with a caret on top of @startuml:\n"
@@ -18,6 +22,7 @@ public class Usage extends JTextArea {
                     + " - enable partial rendering - renders each page on it's own, useful for big sequence diagram files\n"
                     + "\nPerformance tips:\n"
                     + "- disable automatic rendering and use Update (Ctrl Alt Shift F) or Reload (Ctrl Alt Shift G) buttons\n"
+                    + "- disable 'Render links'\n"
                     + "- do not put @newpage into included files (it prohibits incremental rendering)\n"
                     + "- try to enable partial rendering\n"
                     + "- disable syntax checking\n"

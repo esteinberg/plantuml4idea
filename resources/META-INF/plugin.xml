@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>3.6.0</version>
+    <version>3.6.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="193"/>
@@ -11,7 +11,9 @@
         <![CDATA[        
             <p>3.6</p>
             <ul>
-              <li>Image links into source code</li>
+              <li>Image text links into the source code - by text matching, repeated clicks cycles occurrences</li>
+              <li>Fixed regression - unnecessary image rendering</li>
+              <li>Little improved grammar</li>
             </ul>       
             <p>3.5</p>
             <ul>
