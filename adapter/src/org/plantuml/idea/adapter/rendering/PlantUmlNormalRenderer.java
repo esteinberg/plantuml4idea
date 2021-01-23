@@ -20,10 +20,8 @@ import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
@@ -49,7 +47,7 @@ public class PlantUmlNormalRenderer {
         FileFormat pFormat = Format.from(renderRequest.getFormat());
         String fileSuffix = pFormat.getFileSuffix();
         int requestedPageNumber = renderRequest.getPage();
-        int zoom = renderRequest.getZoom();
+        int zoom = renderRequest.getScaledZoom();
         try {
             SourceStringReader reader = newSourceStringReader(renderRequest.getSource(), true, renderRequest.getSourceFile());
 
@@ -115,7 +113,7 @@ public class PlantUmlNormalRenderer {
             // image generation.                     
             SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
 
-            DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
+            DiagramInfo info = zoomDiagram(reader, renderRequest.getScaledZoom());
             Integer totalPages = info.getTotalPages();
 
             if (totalPages == 0) {
@@ -166,7 +164,7 @@ public class PlantUmlNormalRenderer {
 
     private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, SourceStringReader reader, DiagramInfo info, RenderResult renderResult, FileFormatOption formatOption, int i, boolean pageRequested) throws IOException {
         boolean obsolete = renderRequest.requestedRefreshOrIncludesChanged()
-                || renderRequest.getZoom() != cachedItem.getZoom()
+                || renderRequest.getScaledZoom() != cachedItem.getScaledZoom()
                 || !sourceSplit[i].equals(cachedItem.getImagesItemPageSource(i))
                 || cachedItem.titleChaged(info.getTitle(i), i);
 

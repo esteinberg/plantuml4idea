@@ -42,7 +42,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private JPanel imagesPanel;
     private JScrollPane scrollPane;
 
-    private int zoom = 100;
+    private int unscaledZoom = 100;
     private int selectedPage = -1;
 
     private RenderCache renderCache;
@@ -165,7 +165,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setZoom(Math.max(zoom - e.getWheelRotation() * 10, 1));
+                    setUnscaledZoom(Math.max(unscaledZoom - e.getWheelRotation() * 10, 1));
                 } else {
                     e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
@@ -206,7 +206,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
-        logger.debug("renderLater ", project.getName(), " ", delay);
+        logger.debug("renderLater ", new Exception("log"));
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -246,6 +246,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     }
 
                     RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, fileManager);
+                    logger.debug("cacheItem ", betterItem);
                     if (betterItem != null) {
                         cachedItem = betterItem;
                     }
@@ -256,7 +257,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     } else if (cachedItem.includedFilesChanged(fileDocumentManager, fileManager)) {
                         logger.debug("includedFilesChanged");
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
-                    } else if (cachedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, zoom)) {
+                    } else if (cachedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, scaledZoom)) {
                         logger.debug("render required");
                         lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
                     } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
@@ -284,17 +285,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
 
     @NotNull
-    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final int zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
-        logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", zoom=", zoom);
+    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final int scaledZoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
+        logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", scaledZoom);
         int version = sequence.incrementAndGet();
 
-        return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
+        return new MyRenderCommand(reason, selectedFile, source, page, scaledZoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, int zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
-            super(reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, int scaledZoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
+            super(reason, selectedFile, source, page, scaledZoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
@@ -459,12 +460,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
 
-    public int getZoom() {
-        return zoom;
+    public int getUnscaledZoom() {
+        return unscaledZoom;
     }
 
     public int getScaledZoom() {
-        return (int) (zoom * getSystemScale());
+        return (int) (unscaledZoom * getSystemScale());
     }
 
     private double getSystemScale() {
@@ -475,8 +476,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
     }
 
-    public void setZoom(int zoom) {
-        this.zoom = zoom;
+    public void setUnscaledZoom(int unscaledZoom) {
+        this.unscaledZoom = unscaledZoom;
         renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
     }
 

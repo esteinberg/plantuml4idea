@@ -14,7 +14,7 @@ public class RenderRequest {
     @NotNull
     private final PlantUml.ImageFormat format;
     private final int page;
-    private final int zoom;
+    private final int scaledZoom;
     private final Integer version;
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
@@ -24,7 +24,7 @@ public class RenderRequest {
                          @NotNull String source,
                          @NotNull PlantUml.ImageFormat format,
                          int page,
-                         int zoom,
+                         int scaledZoom,
                          Integer version,
                          boolean renderUrlLinks,
                          RenderCommand.Reason reason) {
@@ -32,7 +32,7 @@ public class RenderRequest {
         this.source = source;
         this.format = format;
         this.page = page;
-        this.zoom = zoom;
+        this.scaledZoom = scaledZoom;
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
         this.reason = reason;
@@ -44,7 +44,7 @@ public class RenderRequest {
         this.source = renderRequest.source;
         this.format = format;
         this.page = renderRequest.page;
-        this.zoom = renderRequest.zoom;
+        this.scaledZoom = renderRequest.scaledZoom;
         this.useSettings = renderRequest.useSettings;
         this.version = null;
     }
@@ -72,8 +72,8 @@ public class RenderRequest {
         return page;
     }
 
-    public int getZoom() {
-        return zoom;
+    public int getScaledZoom() {
+        return scaledZoom;
     }
 
     public Integer getVersion() {
@@ -110,7 +110,7 @@ public class RenderRequest {
                 .append("sourceFilePath", sourceFilePath)
                 .append("format", format)
                 .append("page", page)
-                .append("zoom", zoom)
+                .append("scaledZoom", scaledZoom)
                 .append("renderUrlLinks", renderUrlLinks)
                 .append("reason", reason)
                 .append("version", version)

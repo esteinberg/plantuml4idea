@@ -34,8 +34,8 @@ public class FacadeImpl implements PlantUmlFacade {
     }
 
     @Override
-    public void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber) throws IOException {
-        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, zoom, -1, false, null);
+    public void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int scaledZoom, int pageNumber) throws IOException {
+        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, scaledZoom, -1, false, null);
         PlantUmlRendererUtil.renderAndSave(renderRequest, path, pathPrefix);
     }
 

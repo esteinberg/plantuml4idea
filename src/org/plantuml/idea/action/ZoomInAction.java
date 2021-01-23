@@ -13,7 +13,7 @@ public class ZoomInAction extends ZoomAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         if (project != null) {
-            setZoom(project, Math.min(MAX_ZOOM, getZoom(project) + ZOOM_STEP));
+            setUnscaledZoom(project, Math.min(MAX_ZOOM, getUnscaledZoom(project) + ZOOM_STEP));
         }
     }
 
@@ -24,7 +24,7 @@ public class ZoomInAction extends ZoomAction {
             boolean enabled = UIUtils.hasAnyImage(project);
             e.getPresentation().setEnabled(enabled);
             if (enabled) {
-                int zoom = getZoom(project);
+                int zoom = getUnscaledZoom(project);
                 e.getPresentation().setEnabled(zoom < MAX_ZOOM);
             }
         }

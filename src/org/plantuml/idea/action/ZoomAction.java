@@ -16,14 +16,14 @@ public abstract class ZoomAction extends DumbAwareAction {
     protected static int MIN_ZOOM = 20;
     protected static int ZOOM_STEP = 20;
 
-    protected int getZoom(Project project) {
+    protected int getUnscaledZoom(Project project) {
         PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
-        return plantUML.getZoom();
+        return plantUML.getUnscaledZoom();
     }
 
-    protected void setZoom(Project project, int zoom) {
+    protected void setUnscaledZoom(Project project, int unscaledZoom) {
         PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
-        plantUML.setZoom(zoom);
+        plantUML.setUnscaledZoom(unscaledZoom);
     }
 
 

@@ -222,6 +222,7 @@ public class PlantUmlImageLabel extends JLabel {
                 return;
             }
 
+            reset();
         }
 
         private boolean continuing(String text) {

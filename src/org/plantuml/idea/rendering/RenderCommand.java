@@ -17,7 +17,7 @@ public abstract class RenderCommand implements Runnable {
     protected String sourceFilePath;
     protected final String source;
     protected final int page;
-    protected int zoom;
+    protected int scaledZoom;
     protected RenderCacheItem cachedItem;
     protected int version;
     protected boolean renderUrlLinks;
@@ -33,12 +33,12 @@ public abstract class RenderCommand implements Runnable {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, int page, int zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+    public RenderCommand(Reason reason, String sourceFilePath, String source, int page, int scaledZoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.page = page;
-        this.zoom = zoom;
+        this.scaledZoom = scaledZoom;
         this.cachedItem = cachedItem;
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
@@ -59,7 +59,7 @@ public abstract class RenderCommand implements Runnable {
 
             PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
 
-            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, scaledZoom, version, renderUrlLinks, reason);
             long s1 = System.currentTimeMillis();
             final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
             logger.debug("render ", (System.currentTimeMillis() - s1), "ms");
@@ -111,7 +111,7 @@ public abstract class RenderCommand implements Runnable {
                 .append("reason", reason)
                 .append("sourceFilePath", sourceFilePath)
                 .append("page", page)
-                .append("zoom", zoom)
+                .append("scaledZoom", scaledZoom)
                 .append("cachedItem", cachedItem)
                 .append("version", version)
                 .toString();

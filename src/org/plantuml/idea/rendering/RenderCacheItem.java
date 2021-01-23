@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -14,6 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class RenderCacheItem {
+    private static final Logger LOG = Logger.getInstance(RenderCacheItem.class);
 
     private final RenderRequest renderRequest;
     private final RenderResult renderResult;
@@ -46,16 +48,20 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean imageMissingOrSourceOrZoomChanged(String source, int page, int zoom) {
+    public boolean imageMissingOrSourceOrZoomChanged(String source, int page, int scaledZoom) {
         if (imageMissing(page)) {
+            LOG.debug("image missing");
             return true;
         }
-        if (zoom != renderRequest.getZoom()) {
+        if (scaledZoom != renderRequest.getScaledZoom()) {
+            LOG.debug("zoom changed");
             return true;
         }
         if (!renderRequest.getSource().equals(source)) {
+            LOG.debug("source changed");
             return true;
         }
+        LOG.debug("imageMissingOrSourceOrZoomChanged = false");
         return false;
     }
 
@@ -137,8 +143,8 @@ public class RenderCacheItem {
         return version;
     }
 
-    public int getZoom() {
-        return renderRequest.getZoom();
+    public int getScaledZoom() {
+        return renderRequest.getScaledZoom();
     }
 
     public int getRequestedPage() {

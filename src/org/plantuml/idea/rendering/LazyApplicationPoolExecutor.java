@@ -90,7 +90,7 @@ public class LazyApplicationPoolExecutor {
         logger.debug("scheduleNext");
         if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.reason != RenderCommand.Reason.REFRESH) {
             if (previousCommand.page == nextCommand.page
-                    && previousCommand.zoom == nextCommand.zoom
+                    && previousCommand.scaledZoom == nextCommand.scaledZoom
                     && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
                     && previousCommand.source.equals(nextCommand.source)) {
                 logger.debug("nextCommand is same as previous, skipping");

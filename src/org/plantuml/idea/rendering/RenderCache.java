@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
 
@@ -7,9 +8,10 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
 public class RenderCache {
+    public static final Logger logger = Logger.getInstance(RenderCache.class);
+
     private ArrayDeque<RenderCacheItem> cacheItems;
     private int maxCacheSize;
     private RenderCacheItem displayedItem;
@@ -26,22 +28,23 @@ public class RenderCache {
         }
     }
 
-    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, int zoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
+    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, int scaledZoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
         RenderCacheItem cacheItem = null;
 
         //error not cached in ArrayDeque
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
                 && !displayedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)
-                && !displayedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, zoom)) {
+                && !displayedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, scaledZoom)) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }
 
 
-        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.getZoom() == zoom) {
+        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.getScaledZoom() == scaledZoom) {
             cacheItem = displayedItem;
             if (cacheItem.getSource().equals(source)) {
+                logger.debug("returning displayedItem");
                 return cacheItem;
             }
         }
@@ -50,7 +53,7 @@ public class RenderCache {
         Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
         while (iterator.hasNext()) {
             RenderCacheItem next = iterator.next();
-            if (next.getSourceFilePath().equals(sourceFilePath) && next.getZoom() == zoom) {
+            if (next.getSourceFilePath().equals(sourceFilePath) && next.getScaledZoom() == scaledZoom) {
                 if (cacheItem == null) {
                     cacheItem = next;
                     if (cacheItem.getSource().equals(source)) {
