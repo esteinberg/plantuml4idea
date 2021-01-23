@@ -44,3 +44,6 @@ ProductOfferingPrice -- ProductUsageSpec: ForUsage >
 123 -> [Оалвыалвы]:  Оалвыалвы
 @enduml
 
+
+   !preproc foo !notProc 
+   ==foo bar==
