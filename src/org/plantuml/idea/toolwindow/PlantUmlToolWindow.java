@@ -206,7 +206,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
-        logger.debug("renderLater ", new Exception("log"));
+        logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
