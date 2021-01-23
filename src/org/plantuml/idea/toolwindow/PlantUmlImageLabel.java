@@ -65,14 +65,20 @@ public class PlantUmlImageLabel extends JLabel {
     });
 
     private static Logger logger = Logger.getInstance(PlantUmlImageLabel.class);
-    private final Project project;
-    private final RenderResult renderResult;
+    private Project project;
+    private RenderResult renderResult;
     private RenderRequest renderRequest;
     private ImageItem imageWithData;
     private Image originalImage;
 
     private FileEditorManager fileEditorManager;
     private LocalFileSystem localFileSystem;
+
+    /**
+     * Method AboutDialog.$$$setupUI$$$() contains an invokespecial instruction referencing an unresolved constructor PlantUmlImageLabel.<init>().
+     */
+    public PlantUmlImageLabel() {
+    }
 
     public PlantUmlImageLabel(Project project, JPanel parent, ImageItem imageWithData, int i, RenderRequest renderRequest, RenderResult renderResult, FileEditorManager fileEditorManager, LocalFileSystem localFileSystem) {
         this.imageWithData = imageWithData;
