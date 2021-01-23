@@ -83,7 +83,7 @@
 //    public void setup(@NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
 //        setOpaque(true);
 //        setBackground(JBColor.WHITE);
-//        if (imageWithData.hasImage()) {
+//        if (imageWithData.hasImageBytes()) {
 //            setDiagram(imageWithData);
 //        } else {
 //            add(new JLabel("page not rendered, probably plugin error, please report it and try to hit reload"));

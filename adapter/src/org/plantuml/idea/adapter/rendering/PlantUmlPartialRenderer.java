@@ -69,7 +69,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         boolean obsolete = cachedItem == null
                 || renderRequest.requestedRefreshOrIncludesChanged()
                 || RenderingType.PARTIAL.renderingTypeChanged(cachedItem)
-                || renderRequest.getScaledZoom() != cachedItem.getScaledZoom()
+                || !renderRequest.getZoom().equals(cachedItem.getZoom())
                 || !partialSource.equals(cachedItem.getImagesItemPageSource(page));
 
         boolean pageSelected = renderRequest.getPage() == -1 || renderRequest.getPage() == page;
@@ -117,7 +117,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private Pair<ImageItem, LinkedHashMap<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
-        DiagramInfo info = zoomDiagram(reader, renderRequest.getScaledZoom());
+        DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
         Integer totalPages = info.getTotalPages();
         DiagramInfo.Titles titles = info.getTitles();
         LinkedHashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);

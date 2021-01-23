@@ -9,6 +9,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,7 +30,7 @@ public interface PlantUmlFacade {
     @Nullable
     Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile);
 
-    void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, int zoom, int pageNumber)
+    void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber)
             throws IOException;
 
     RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem);

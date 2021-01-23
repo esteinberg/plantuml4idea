@@ -15,8 +15,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.scale.ScaleContext;
-import com.intellij.ui.scale.ScaleType;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
@@ -25,12 +23,15 @@ import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.listener.PlantUmlAncestorListener;
 import org.plantuml.idea.util.UIUtils;
+import org.plantuml.idea.util.Utils;
 
 import javax.swing.*;
 import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.RESET_DELAY;
 
 /**
  * @author Eugene Steinberg
@@ -42,7 +43,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private JPanel imagesPanel;
     private JScrollPane scrollPane;
 
-    private int unscaledZoom = 100;
+    private Zoom zoom = new Zoom(this, 100);
     private int selectedPage = -1;
 
     private RenderCache renderCache;
@@ -165,7 +166,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setUnscaledZoom(Math.max(unscaledZoom - e.getWheelRotation() * 10, 1));
+                    setUnscaledZoom(Math.max(zoom.getUnscaledZoom() - e.getWheelRotation() * 10, 1));
                 } else {
                     e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
@@ -207,73 +208,73 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
         logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (isProjectValid(project)) {
-                    String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
-                    String sourceFilePath = null;
-                    RenderCacheItem cachedItem = null;
+        ApplicationManager.getApplication().invokeLater(Utils.logDuration("EDT renderLater", () -> {
+            if (isProjectValid(project)) {
 
-                    int scaledZoom = getScaledZoom();
-                    if ("".equals(source)) { //is included file or some crap?
-                        logger.debug("empty source");
-                        cachedItem = renderCache.getDisplayedItem();
-                        if (cachedItem == null) {
-                            logger.debug("no DisplayedItem, empty source, reason=", reason);
-                            return;
-                        }
+                String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
+                String sourceFilePath = null;
+                RenderCacheItem cachedItem = null;
 
-                        source = cachedItem.getSource();
-                        sourceFilePath = cachedItem.getSourceFilePath();
-                    } else {
-                        VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager);
-                        if (selectedFile != null) {
-                            sourceFilePath = selectedFile.getPath();
-                        } else {
-                            sourceFilePath = "DUMMY_NO_PATH";
-                        }
-                    }
-
-                    selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
-
-                    logger.debug("setting selected page from storage ", selectedPage);
-
-                    if (reason == RenderCommand.Reason.REFRESH) {
-                        logger.debug("executing command, reason=", reason);
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedPage, scaledZoom, null, delay));
+                if ("".equals(source)) { //is included file or some crap?
+                    logger.debug("empty source");
+                    cachedItem = renderCache.getDisplayedItem();
+                    if (cachedItem == null) {
+                        logger.debug("no DisplayedItem, empty source, reason=", reason);
                         return;
                     }
 
-                    RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, scaledZoom, fileDocumentManager, fileManager);
-                    logger.debug("cacheItem ", betterItem);
-                    if (betterItem != null) {
-                        cachedItem = betterItem;
-                    }
-
-                    if (cachedItem == null) {
-                        logger.debug("no cached item");
-                        lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedPage, scaledZoom, null, delay));
-                    } else if (cachedItem.includedFilesChanged(fileDocumentManager, fileManager)) {
-                        logger.debug("includedFilesChanged");
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
-                    } else if (cachedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, scaledZoom)) {
-                        logger.debug("render required");
-                        lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, scaledZoom, cachedItem, delay));
-                    } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
-                        logger.debug("render not required, displaying cached item ", cachedItem);
-                        displayExistingDiagram(cachedItem);
+                    source = cachedItem.getSource();
+                    sourceFilePath = cachedItem.getSourceFilePath();
+                } else {
+                    VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager, fileDocumentManager);
+                    if (selectedFile != null) {
+                        sourceFilePath = selectedFile.getPath();
                     } else {
-                        logger.debug("render not required, item already displayed ", cachedItem);
-                        if (reason != RenderCommand.Reason.CARET) {
-                            cachedItem.setVersion(sequence.incrementAndGet());
-                            lazyExecutor.cancel();
-                            executionStatusPanel.updateNow(cachedItem.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
-                        }
+                        sourceFilePath = "DUMMY_NO_PATH";
+                    }
+                }
+
+                selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+
+                logger.debug("setting selected page from storage ", selectedPage);
+
+                if (reason == RenderCommand.Reason.REFRESH) {
+                    logger.debug("executing command, reason=", reason);
+                    lazyExecutor.execute(getCommand(RenderCommand.Reason.REFRESH, sourceFilePath, source, selectedPage, zoom, null, delay));
+                    return;
+                }
+
+                RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager);
+                logger.debug("cacheItem ", betterItem);
+                if (betterItem != null) {
+                    cachedItem = betterItem;
+                }
+
+                if (cachedItem == null) {
+                    logger.debug("no cached item");
+                    lazyExecutor.execute(getCommand(reason, sourceFilePath, source, selectedPage, zoom, null, delay));
+                } else if (cachedItem.includedFilesChanged(fileDocumentManager, fileManager)) {
+                    logger.debug("includedFilesChanged");
+                    lazyExecutor.execute(getCommand(RenderCommand.Reason.INCLUDES, sourceFilePath, source, selectedPage, zoom, cachedItem, delay));
+                } else if (cachedItem.imageMissingOrZoomChanged(selectedPage, zoom)) {
+                    logger.debug("render required imageMissingOrZoomChanged");
+                    lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, delay));
+                } else if (cachedItem.sourceChanged(source)) {
+                    logger.debug("render required sourceChanged");
+                    lazyExecutor.execute(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, RESET_DELAY));
+                } else if (!renderCache.isDisplayed(cachedItem, selectedPage)) {
+                    logger.debug("render not required, displaying cached item ", cachedItem);
+                    displayExistingDiagram(cachedItem);
+                } else {
+                    logger.debug("render not required, item already displayed ", cachedItem);
+                    if (reason != RenderCommand.Reason.CARET) {
+                        cachedItem.setVersion(sequence.incrementAndGet());
+                        lazyExecutor.cancel();
+                        executionStatusPanel.updateNow(cachedItem.getVersion(), ExecutionStatusPanel.State.DONE, "cached");
                     }
                 }
             }
-        });
+        }));
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
@@ -285,17 +286,17 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
 
     @NotNull
-    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final int scaledZoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
-        logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", scaledZoom);
+    protected RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final Zoom zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
+        logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
         int version = sequence.incrementAndGet();
 
-        return new MyRenderCommand(reason, selectedFile, source, page, scaledZoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
+        return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
     }
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, int scaledZoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
-            super(reason, selectedFile, source, page, scaledZoom, cachedItem, version, renderUrlLinks, delay, label);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
+            super(reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
@@ -460,24 +461,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
 
-    public int getUnscaledZoom() {
-        return unscaledZoom;
-    }
-
-    public int getScaledZoom() {
-        return (int) (unscaledZoom * getSystemScale());
-    }
-
-    private double getSystemScale() {
-        try {
-            return ScaleContext.create(imagesPanel).getScale(ScaleType.SYS_SCALE);
-        } catch (Throwable e) {
-            return 1;
-        }
+    @NotNull
+    public Zoom getZoom() {
+        return zoom;
     }
 
     public void setUnscaledZoom(int unscaledZoom) {
-        this.unscaledZoom = unscaledZoom;
+        zoom = new Zoom(imagesPanel, unscaledZoom);
         renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
     }
 

@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ import java.util.List;
 import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
 public class ImageItem {
+    private static final Logger LOG = Logger.getInstance(ImageItem.class);
 
     private final int page;
     @Nullable
@@ -73,6 +75,7 @@ public class ImageItem {
         this.title = title;
         this.filename = filename;
         this.imageBytes = imageBytes;
+
         this.links = this.parseLinks(svgBytes, baseDir);
     }
 
@@ -109,10 +112,6 @@ public class ImageItem {
         return image;
     }
 
-    public void setImage(@Nullable BufferedImage image) {
-        this.image = image;
-    }
-
     @NotNull
     public String getDocumentSource() {
         return documentSource;
@@ -132,11 +131,8 @@ public class ImageItem {
         return page;
     }
 
-    public boolean hasImage() {
-        if (image == null && imageBytes != null) {
-            initImage();
-        }
-        return image != null;
+    public boolean hasImageBytes() {
+        return imageBytes != null;
     }
 
     public byte[] getImageBytes() {
@@ -165,13 +161,13 @@ public class ImageItem {
         if (getImageBytes() != null) {
             if (format == PlantUml.ImageFormat.PNG) {
                 try {
-                    setImage(UIUtils.getBufferedImage(getImageBytes()));
+                    this.image = UIUtils.getBufferedImage(getImageBytes());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (format == PlantUml.ImageFormat.SVG) {  //could be done parallelly
                 BufferedImage bufferedImage = PlantUmlFacade.get().loadWithoutCache(null, new ByteArrayInputStream(getImageBytes()), 1.0f, null);
-                setImage(bufferedImage);
+                this.image = bufferedImage;
             }
         }
     }
@@ -214,6 +210,7 @@ public class ImageItem {
             return Collections.emptyList();
         }
         try {
+            long start = System.currentTimeMillis();
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             //http://stackoverflow.com/a/155874/685796
             factory.setValidating(false);
@@ -230,8 +227,8 @@ public class ImageItem {
             linkData.addAll(parseHyperLinks(document));
             linkData.addAll(parseText(document));
 
+            LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
-
         } catch (Exception e) {
             logger.debug(e);
             return Collections.emptyList();
@@ -326,7 +323,7 @@ public class ImageItem {
                 .append("page", page)
                 .append("description", description)
                 .append("title", title)
-                .append("hasImage", hasImage())
+                .append("hasImageBytes", hasImageBytes())
                 .toString();
     }
 

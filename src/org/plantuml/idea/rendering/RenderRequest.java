@@ -3,6 +3,7 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
@@ -14,7 +15,8 @@ public class RenderRequest {
     @NotNull
     private final PlantUml.ImageFormat format;
     private final int page;
-    private final int scaledZoom;
+    @NotNull
+    private final Zoom zoom;
     private final Integer version;
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
@@ -24,7 +26,8 @@ public class RenderRequest {
                          @NotNull String source,
                          @NotNull PlantUml.ImageFormat format,
                          int page,
-                         int scaledZoom,
+                         @NotNull
+                                 Zoom zoom,
                          Integer version,
                          boolean renderUrlLinks,
                          RenderCommand.Reason reason) {
@@ -32,7 +35,7 @@ public class RenderRequest {
         this.source = source;
         this.format = format;
         this.page = page;
-        this.scaledZoom = scaledZoom;
+        this.zoom = zoom;
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
         this.reason = reason;
@@ -44,7 +47,7 @@ public class RenderRequest {
         this.source = renderRequest.source;
         this.format = format;
         this.page = renderRequest.page;
-        this.scaledZoom = renderRequest.scaledZoom;
+        this.zoom = renderRequest.zoom;
         this.useSettings = renderRequest.useSettings;
         this.version = null;
     }
@@ -72,8 +75,9 @@ public class RenderRequest {
         return page;
     }
 
-    public int getScaledZoom() {
-        return scaledZoom;
+    @NotNull
+    public Zoom getZoom() {
+        return zoom;
     }
 
     public Integer getVersion() {
@@ -110,7 +114,7 @@ public class RenderRequest {
                 .append("sourceFilePath", sourceFilePath)
                 .append("format", format)
                 .append("page", page)
-                .append("scaledZoom", scaledZoom)
+                .append("scaledZoom", zoom)
                 .append("renderUrlLinks", renderUrlLinks)
                 .append("reason", reason)
                 .append("version", version)

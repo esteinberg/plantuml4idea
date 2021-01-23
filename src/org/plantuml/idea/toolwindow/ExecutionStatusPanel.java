@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -119,14 +120,11 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
     }
 
     private void updateLabelLater() {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (state != null) {
-                    state.update(label, myMouseAdapter, message, runnable);
-                }
+        ApplicationManager.getApplication().invokeLater(Utils.logDuration("EDT updateLabel", () -> {
+            if (state != null) {
+                state.update(label, myMouseAdapter, message, runnable);
             }
-        });
+        }));
     }
 
     public enum State {

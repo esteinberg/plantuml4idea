@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import java.io.File;
 import java.util.Arrays;
@@ -48,20 +49,23 @@ public class RenderCacheItem {
         return titles;
     }
 
-    public boolean imageMissingOrSourceOrZoomChanged(String source, int page, int scaledZoom) {
+    public boolean imageMissingOrZoomChanged(int page, Zoom scaledZoom) {
         if (imageMissing(page)) {
             LOG.debug("image missing");
             return true;
         }
-        if (scaledZoom != renderRequest.getScaledZoom()) {
+        if (!scaledZoom.equals(renderRequest.getZoom())) {
             LOG.debug("zoom changed");
             return true;
         }
+        return false;
+    }
+
+    public boolean sourceChanged(String source) {
         if (!renderRequest.getSource().equals(source)) {
             LOG.debug("source changed");
             return true;
         }
-        LOG.debug("imageMissingOrSourceOrZoomChanged = false");
         return false;
     }
 
@@ -143,8 +147,9 @@ public class RenderCacheItem {
         return version;
     }
 
-    public int getScaledZoom() {
-        return renderRequest.getScaledZoom();
+    @NotNull
+    public Zoom getZoom() {
+        return renderRequest.getZoom();
     }
 
     public int getRequestedPage() {
@@ -184,7 +189,7 @@ public class RenderCacheItem {
     public boolean hasImage(int i) {
         ImageItem imageItem = getImageItem(i);
         if (imageItem != null) {
-            return imageItem.hasImage();
+            return imageItem.hasImageBytes();
         }
         return false;
     }

@@ -49,7 +49,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 
             PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                     imageFormat, file.getAbsolutePath(), null,
-                    UIUtils.getPlantUmlToolWindow(project).getScaledZoom(), getPage(e));
+                    UIUtils.getPlantUmlToolWindow(project).getZoom(), getPage(e));
 
             Desktop.getDesktop().open(file);
         } catch (IOException ex) {

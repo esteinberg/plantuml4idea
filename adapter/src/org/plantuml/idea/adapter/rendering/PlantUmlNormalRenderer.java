@@ -18,6 +18,7 @@ import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -47,7 +48,7 @@ public class PlantUmlNormalRenderer {
         FileFormat pFormat = Format.from(renderRequest.getFormat());
         String fileSuffix = pFormat.getFileSuffix();
         int requestedPageNumber = renderRequest.getPage();
-        int zoom = renderRequest.getScaledZoom();
+        Zoom zoom = renderRequest.getZoom();
         try {
             SourceStringReader reader = newSourceStringReader(renderRequest.getSource(), true, renderRequest.getSourceFile());
 
@@ -113,7 +114,7 @@ public class PlantUmlNormalRenderer {
             // image generation.                     
             SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
 
-            DiagramInfo info = zoomDiagram(reader, renderRequest.getScaledZoom());
+            DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
             Integer totalPages = info.getTotalPages();
 
             if (totalPages == 0) {
@@ -164,7 +165,7 @@ public class PlantUmlNormalRenderer {
 
     private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, SourceStringReader reader, DiagramInfo info, RenderResult renderResult, FileFormatOption formatOption, int i, boolean pageRequested) throws IOException {
         boolean obsolete = renderRequest.requestedRefreshOrIncludesChanged()
-                || renderRequest.getScaledZoom() != cachedItem.getScaledZoom()
+                || !renderRequest.getZoom().equals(cachedItem.getZoom())
                 || !sourceSplit[i].equals(cachedItem.getImagesItemPageSource(i))
                 || cachedItem.titleChaged(info.getTitle(i), i);
 

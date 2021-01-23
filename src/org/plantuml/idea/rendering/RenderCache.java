@@ -3,6 +3,7 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
@@ -28,20 +29,22 @@ public class RenderCache {
         }
     }
 
-    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, int scaledZoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
+    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, Zoom zoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
         RenderCacheItem cacheItem = null;
 
         //error not cached in ArrayDeque
         if (displayedItem != null
                 && displayedItem.getRenderResult().hasError()
                 && !displayedItem.includedFilesChanged(fileDocumentManager, virtualFileManager)
-                && !displayedItem.imageMissingOrSourceOrZoomChanged(source, selectedPage, scaledZoom)) {
+                && !displayedItem.imageMissingOrZoomChanged(selectedPage, zoom)
+                && !displayedItem.sourceChanged(source)
+        ) {
             logger.debug("returning displayedItem (error=true, requiresRendering=false)");
             return displayedItem;
         }
 
 
-        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.getScaledZoom() == scaledZoom) {
+        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.equals(zoom)) {
             cacheItem = displayedItem;
             if (cacheItem.getSource().equals(source)) {
                 logger.debug("returning displayedItem");
@@ -53,7 +56,7 @@ public class RenderCache {
         Iterator<RenderCacheItem> iterator = cacheItems.descendingIterator();
         while (iterator.hasNext()) {
             RenderCacheItem next = iterator.next();
-            if (next.getSourceFilePath().equals(sourceFilePath) && next.getScaledZoom() == scaledZoom) {
+            if (next.getSourceFilePath().equals(sourceFilePath) && next.getZoom().equals(zoom)) {
                 if (cacheItem == null) {
                     cacheItem = next;
                     if (cacheItem.getSource().equals(source)) {

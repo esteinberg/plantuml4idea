@@ -18,7 +18,7 @@ public abstract class ZoomAction extends DumbAwareAction {
 
     protected int getUnscaledZoom(Project project) {
         PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
-        return plantUML.getUnscaledZoom();
+        return plantUML.getZoom().getUnscaledZoom();
     }
 
     protected void setUnscaledZoom(Project project, int unscaledZoom) {

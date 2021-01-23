@@ -1,5 +1,6 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +16,7 @@ import static java.lang.Character.isDigit;
 import static java.lang.Character.isLetter;
 
 public class Utils {
+    private static final Logger LOG = Logger.getInstance(Utils.class);
 
     public static int asInt(String renderDelay, int defaultValue) {
         int i = defaultValue;
@@ -86,5 +88,13 @@ public class Utils {
             r1.addAll(r2);
             return r1;
         }
+    }
+
+    public static Runnable logDuration(final String name, Runnable r) {
+        return () -> {
+            long start = System.currentTimeMillis();
+            r.run();
+            LOG.debug(name + " done in ", (System.currentTimeMillis() - start), "ms");
+        };
     }
 }

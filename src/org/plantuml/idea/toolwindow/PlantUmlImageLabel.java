@@ -104,7 +104,7 @@ public class PlantUmlImageLabel extends JLabel {
     public void setup(JPanel parent, @NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
-        if (imageWithData.hasImage()) {
+        if (imageWithData.hasImageBytes()) {
             setDiagram(parent, imageWithData, renderRequest, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
@@ -113,6 +113,7 @@ public class PlantUmlImageLabel extends JLabel {
     }
 
     private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, RenderRequest renderRequest, final JLabel label) {
+        long start = System.currentTimeMillis();
         originalImage = imageItem.getImage();
         Image scaledImage;
 
@@ -121,6 +122,8 @@ public class PlantUmlImageLabel extends JLabel {
 //        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
         label.setIcon(new JBImageIcon(scaledImage));
+
+
         label.addMouseListener(new PopupHandler() {
 
             @Override
@@ -157,35 +160,12 @@ public class PlantUmlImageLabel extends JLabel {
             button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             //When user clicks on item, url is opened in default system browser
-            button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    long start = System.currentTimeMillis();
-                    String text = linkData.getText();
-                    try {
-                        if (linkData.isLink()) {
-                            if (isWebReferenceUrl(text)) {
-                                Desktop.getDesktop().browse(URI.create(text));
-                            } else {
-                                if (openFile(new File(renderRequest.getBaseDir(), text))) return;
-                                navigator.findNextSourceAndNavigate(text);
-                            }
-                        } else {
-                            navigator.findNextSourceAndNavigate(text);
-                        }
-                    } catch (
-                            Exception ex) {
-                        logger.warn(ex);
-                    }
-                    logger.debug("mousePressed ", (System.currentTimeMillis() - start), "ms");
-                }
-
-            });
-
+            button.addMouseListener(new MyMouseAdapter(linkData, renderRequest));
 
             label.add(button);
         }
 
+        logger.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
     }
 
     LinkNavigator navigator = new LinkNavigator();
@@ -338,5 +318,38 @@ public class PlantUmlImageLabel extends JLabel {
 
     public Image getOriginalImage() {
         return originalImage;
+    }
+
+    private class MyMouseAdapter extends MouseAdapter {
+        private final ImageItem.LinkData linkData;
+        private final RenderRequest renderRequest;
+
+        public MyMouseAdapter(ImageItem.LinkData linkData, RenderRequest renderRequest) {
+            this.linkData = linkData;
+            this.renderRequest = renderRequest;
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            long start = System.currentTimeMillis();
+            String text = linkData.getText();
+            try {
+                if (linkData.isLink()) {
+                    if (isWebReferenceUrl(text)) {
+                        Desktop.getDesktop().browse(URI.create(text));
+                    } else {
+                        if (openFile(new File(renderRequest.getBaseDir(), text))) return;
+                        navigator.findNextSourceAndNavigate(text);
+                    }
+                } else {
+                    navigator.findNextSourceAndNavigate(text);
+                }
+            } catch (
+                    Exception ex) {
+                logger.warn(ex);
+            }
+            logger.debug("mousePressed ", (System.currentTimeMillis() - start), "ms");
+        }
+
     }
 }

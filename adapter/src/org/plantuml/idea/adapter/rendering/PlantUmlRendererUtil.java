@@ -15,6 +15,7 @@ import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class PlantUmlRendererUtil {
         return renderResult;
     }
 
-    public static DiagramInfo zoomDiagram(SourceStringReader reader, int zoom) {
+    public static DiagramInfo zoomDiagram(SourceStringReader reader, Zoom zoom) {
         logger.debug("zooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
@@ -91,7 +92,9 @@ public class PlantUmlRendererUtil {
         return new DiagramInfo(totalPages, titles, fileOrDirname);
     }
 
-    private static void zoomDiagram(Diagram diagram, int zoom) {
+    private static void zoomDiagram(Diagram diagram, Zoom zoom) {
+        int osScaledZoom = zoom.getScaledZoom();
+        
         if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
             for (Diagram page : newpagedDiagram.getDiagrams()) {
@@ -99,8 +102,8 @@ public class PlantUmlRendererUtil {
                     AbstractPSystem descriptionDiagram = (AbstractPSystem) page;
                     Scale scale = descriptionDiagram.getScale();
 
-                    if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
-                        descriptionDiagram.setScale(calculateScale(zoom, scale));
+                    if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {
+                        descriptionDiagram.setScale(calculateScale(osScaledZoom, scale));
                     }
                 }
             }
@@ -108,8 +111,8 @@ public class PlantUmlRendererUtil {
             AbstractPSystem d = (AbstractPSystem) diagram;
             Scale scale = d.getScale();
 
-            if (scale == null || scale instanceof ScaleSimple || zoom != 100) {
-                d.setScale(calculateScale(zoom, scale));
+            if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {
+                d.setScale(calculateScale(osScaledZoom, scale));
             }
         }
     }

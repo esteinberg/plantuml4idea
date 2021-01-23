@@ -51,7 +51,7 @@ public class LazyApplicationPoolExecutor {
      */
     public synchronized void execute(@NotNull final RenderCommand command) {
         Delay delay = command.delay;
-        logger.debug("#execute ", command, " delay=", delay);
+        logger.debug("#execute ", delay, " ", command);
         nextCommand = command;
 
         if (delay == Delay.RESET_DELAY) {
@@ -90,7 +90,7 @@ public class LazyApplicationPoolExecutor {
         logger.debug("scheduleNext");
         if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.reason != RenderCommand.Reason.REFRESH) {
             if (previousCommand.page == nextCommand.page
-                    && previousCommand.scaledZoom == nextCommand.scaledZoom
+                    && previousCommand.zoom.equals(nextCommand.zoom)
                     && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
                     && previousCommand.source.equals(nextCommand.source)) {
                 logger.debug("nextCommand is same as previous, skipping");
