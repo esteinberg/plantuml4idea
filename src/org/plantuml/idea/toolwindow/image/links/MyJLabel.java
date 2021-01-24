@@ -78,6 +78,9 @@ public class MyJLabel extends JLabel {
 
     private boolean containsText(String text, List<String> list) {
         for (String s : list) {
+            if (s.length() == 0) {
+                continue;
+            }
             if (text.contains(s)) {
                 return true;
             }

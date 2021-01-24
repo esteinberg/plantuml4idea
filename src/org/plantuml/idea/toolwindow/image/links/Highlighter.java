@@ -81,10 +81,10 @@ public class Highlighter {
                 PsiElement elementAtOffset = PsiUtilCore.getElementAtOffset(file, offset);
                 if (elementAtOffset instanceof PumlItem) {
                     String text = elementAtOffset.getText();
-                    list.add(text);
+                    list.add(sanitize(text));
                 } else if (elementAtOffset.getNode().getElementType() == PumlTypes.IDENTIFIER) {
                     String text = elementAtOffset.getText();
-                    list.add(text);
+                    list.add(sanitize(text));
                 }
             } else {
                 int startOffset = editor.logicalPositionToOffset(selectionStart);
@@ -96,6 +96,25 @@ public class Highlighter {
 
         }
         return list;
+    }
+
+    private String sanitize(String text) {
+        char[] charArray = text.toCharArray();
+        int start = -1; 
+        int end = -1; 
+        for (int i = 0, charArrayLength = charArray.length; i < charArrayLength; i++) {
+            char c = charArray[i];
+            if (Character.isLetter(c)) {
+                if (start == -1) {
+                    start = i;
+                }
+                end =i;
+            }
+        }
+        if (start != -1) {
+            return text.substring(start, end);
+        }
+        return text;
     }
 
 }
