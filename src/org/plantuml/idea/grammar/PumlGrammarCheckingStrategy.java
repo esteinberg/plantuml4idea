@@ -80,7 +80,8 @@ public class PumlGrammarCheckingStrategy implements GrammarCheckingStrategy {
         return Collections.emptyList();
     }
 
-    @Override
+    @SuppressWarnings({"UnstableApiUsage", "MissingOverride", "deprecation"})
+    // to be removed in 2021.1, remove @Override to keep compatibility
     public boolean isTypoAccepted(@NotNull PsiElement psiElement, @NotNull IntRange intRange, @NotNull IntRange intRange1) {
         return true;
     }
