@@ -2,7 +2,6 @@ package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -48,7 +47,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private JPanel imagesPanel;
     private JScrollPane scrollPane;
 
-    private Zoom zoom = new Zoom(this, 100);
+    private Zoom zoom;
     private int selectedPage = -1;
 
     private RenderCache renderCache;
@@ -75,6 +74,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
+        zoom = new Zoom(toolWindow.getComponent(), 100);
 
         PlantUmlSettings settings = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
         renderCache = new RenderCache(settings.getCacheSizeAsInt());
@@ -219,9 +219,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
-    private Alarm myAlarm=new Alarm(Alarm.ThreadToUse.SWING_THREAD);
+    private Alarm myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
+        if (!toolWindow.isVisible()) {
+            logger.debug("tool window not visible, aborting");
+            return;
+        }
         Runnable renderRunnable = () -> {
             logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
             if (isProjectValid(project)) {
@@ -309,6 +313,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         int version = sequence.incrementAndGet();
 
         return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
+    }
+
+    public boolean isToolWindowVisible() {
+        return toolWindow.isVisible();
     }
 
 
@@ -493,7 +501,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void changeZoom(int unscaledZoom) {
-        zoom = new Zoom(imagesPanel, unscaledZoom);
+        zoom = new Zoom(this, unscaledZoom);
         if (PlantUmlSettings.getInstance().isDisplaySvg()) {
             for (Component component : imagesPanel.getComponents()) {
                 if (component instanceof ImageContainerSvg) {

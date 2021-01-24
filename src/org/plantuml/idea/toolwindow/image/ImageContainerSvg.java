@@ -3,7 +3,6 @@ package org.plantuml.idea.toolwindow.image;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
@@ -177,7 +176,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         int width = (int) ((area.width) / scale + 5 * tolerance);
 
         int y = (int) (area.y / scale + 3 * tolerance);
-        int height = (int) ((area.height) / scale + 2 * tolerance);
+        int height = (int) ((area.height) / scale + tolerance);
 
         area = new Rectangle(x, y, width, height);
         return area;

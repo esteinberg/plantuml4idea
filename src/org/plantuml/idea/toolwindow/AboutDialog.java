@@ -1,6 +1,7 @@
 package org.plantuml.idea.toolwindow;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.ImageItem;
@@ -8,6 +9,7 @@ import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.image.ImageContainerPng;
+import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class AboutDialog extends JDialog {
+    private final Project project;
     Logger logger = Logger.getInstance(AboutDialog.class);
     private JPanel contentPane;
     private JButton buttonOK;
@@ -30,7 +33,8 @@ public class AboutDialog extends JDialog {
     private ImageContainerPng testDot;
     private Usage usage;
 
-    public AboutDialog() {
+    public AboutDialog(Project project) {
+        this.project = project;
         setTitle("PlantUML integration");
         setContentPane(contentPane);
         setModal(true);
@@ -78,15 +82,9 @@ public class AboutDialog extends JDialog {
         dispose();
     }
 
-    public static void main(String[] args) {
-        AboutDialog dialog = new AboutDialog();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
-
     private void testDot() {
-        RenderRequest renderRequest = new RenderRequest("", PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, new Zoom(contentPane, 100), null, false, RenderCommand.Reason.REFRESH);
+        Zoom zoom = new Zoom(UIUtils.getPlantUmlToolWindow(project), 100);
+        RenderRequest renderRequest = new RenderRequest("", PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);
         try {

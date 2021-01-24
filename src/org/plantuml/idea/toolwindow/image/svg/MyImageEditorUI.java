@@ -289,7 +289,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //                zoomModel.setZoomFactor(1.0);
 //            }
 //        }
-        zoomModel.setZoomFactor(initialZoom.getDoubleScaledZoom());
+        zoomModel.setZoomFactor(initialZoom.getDoubleUnScaledZoom());
 
 
     }

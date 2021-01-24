@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorUI;
@@ -179,7 +180,7 @@ public class ImageItem {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            } else if (format == PlantUml.ImageFormat.SVG) {  //could be done parallelly
+            } else if (format == PlantUml.ImageFormat.SVG) {
                 MyImageEditorImpl init = getEditor(project, renderRequest, renderResult);
             }
         }
@@ -187,7 +188,7 @@ public class ImageItem {
     }
 
     public MyImageEditorImpl getEditor(final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
-        if (editor != null) {
+        if (editor != null && !editor.isDisposed()) {
             return editor;
         }
         long start = System.currentTimeMillis();
@@ -208,7 +209,8 @@ public class ImageItem {
             @Override
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
                 Double scale = (Double) propertyChangeEvent.getNewValue();
-                ImageContainerSvg.updateLinks(contentComponent, ScaleContext.create(editor.getComponent()), scale);
+                Zoom zoom = new Zoom(contentComponent, (int) (scale * 100));
+                ImageContainerSvg.updateLinks(contentComponent, ScaleContext.create(editor.getComponent()), zoom.getDoubleScaledZoom());
             }
         });
 
@@ -219,7 +221,9 @@ public class ImageItem {
             }
         });
 
-        ImageContainerSvg.initLinks(project, this, renderRequest, renderResult, contentComponent, ScaleContext.create(this.editor.getComponent()), renderRequest.getZoom().getDoubleScaledZoom());
+        ScaleContext ctx = ScaleContext.create(UIUtils.getPlantUmlToolWindow(project));
+        Double doubleScaledZoom = renderRequest.getZoom().getDoubleScaledZoom();
+        ImageContainerSvg.initLinks(project, this, renderRequest, renderResult, contentComponent, ctx, doubleScaledZoom);
         LOG.debug("init getEditor done in ", System.currentTimeMillis() - start, "ms");
 
         return this.editor;

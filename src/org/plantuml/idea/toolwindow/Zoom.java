@@ -16,6 +16,9 @@ public class Zoom {
     private boolean displaySvg;
     private double systemScale;
 
+    /**
+     * use a component in hierarchy
+     */
     public Zoom(@Nullable JComponent context, int unscaledZoom) {
         this.unscaledZoom = unscaledZoom;
         systemScale = getSystemScale(context);
@@ -29,6 +32,10 @@ public class Zoom {
 
     public int getUnscaledZoom() {
         return unscaledZoom;
+    }
+
+    public Double getDoubleUnScaledZoom() {
+        return (double) unscaledZoom / 100;
     }
 
     public Double getDoubleScaledZoom() {

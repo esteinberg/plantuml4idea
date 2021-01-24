@@ -111,7 +111,9 @@ public class PlantUmlNormalRenderer {
         String documentSource = renderRequest.getSource();
         try {
             // image generation.                     
+            long start = System.currentTimeMillis();
             SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
+            logger.debug("newSourceStringReader done in ", System.currentTimeMillis() - start, "ms");
 
             DiagramInfo info = zoomDiagram(renderRequest, reader, renderRequest.getZoom());
             Integer totalPages = info.getTotalPages();
@@ -140,6 +142,7 @@ public class PlantUmlNormalRenderer {
                             && !cachedPageCountChanged(cachedItem, totalPages);
 
             logger.debug("incremental rendering=", incrementalRendering, ", totalPages=", totalPages);
+            logger.debug("sum of all before render ", System.currentTimeMillis() - start, "ms");
 
 
             for (int i = 0; i < totalPages; i++) {

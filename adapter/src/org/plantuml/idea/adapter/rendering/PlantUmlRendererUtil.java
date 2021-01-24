@@ -63,7 +63,7 @@ public class PlantUmlRendererUtil {
     }
 
     public static DiagramInfo zoomDiagram(RenderRequest renderRequest, SourceStringReader reader, Zoom zoom) {
-        logger.debug("zooming diagram");
+        long start1 = System.currentTimeMillis();
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
         String fileOrDirname = null;
@@ -88,7 +88,9 @@ public class PlantUmlRendererUtil {
             break;
         }
         DiagramInfo.Titles titles = getTitles(blocks);
-        return new DiagramInfo(totalPages, titles, fileOrDirname);
+        DiagramInfo diagramInfo = new DiagramInfo(totalPages, titles, fileOrDirname);
+        logger.debug("zoomDiagram done in ", System.currentTimeMillis() - start1, "ms");
+        return diagramInfo;
     }
 
     private static void zoomDiagram(PlantUml.ImageFormat format, Diagram diagram, Zoom zoom) {

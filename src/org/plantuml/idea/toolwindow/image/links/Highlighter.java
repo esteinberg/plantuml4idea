@@ -33,11 +33,14 @@ public class Highlighter {
     }
 
     public void highlightImages(PlantUmlToolWindow plantUmlToolWindow, Editor editor) {
-        if (editor == null) {
+        if (editor == null || editor.getProject() == null || !plantUmlToolWindow.isToolWindowVisible()) {
             return;
         }
         myAlarm.cancelAllRequests();
         myAlarm.addRequest(() -> {
+            if (editor.isDisposed()) {
+                return;
+            }
             highlight(plantUmlToolWindow, editor);
         }, 10);
     }
@@ -100,15 +103,15 @@ public class Highlighter {
 
     private String sanitize(String text) {
         char[] charArray = text.toCharArray();
-        int start = -1; 
-        int end = -1; 
+        int start = -1;
+        int end = -1;
         for (int i = 0, charArrayLength = charArray.length; i < charArrayLength; i++) {
             char c = charArray[i];
             if (Character.isLetter(c)) {
                 if (start == -1) {
                     start = i;
                 }
-                end =i;
+                end = i;
             }
         }
         if (start != -1) {

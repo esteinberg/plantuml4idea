@@ -4,7 +4,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.scale.ScaleContext;
@@ -122,12 +121,12 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
         //Removing all children from image label and creating transparent buttons for each item with url
         label.removeAll();
-        initLinks(project, imageItem, renderRequest, renderResult, label, ctx, 1.0);
+        initLinks(project, imageItem, renderRequest, renderResult, label, ctx);
 
         LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
     }
 
-    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx, Double imageScale) {
+    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx) {
         long start = System.currentTimeMillis();
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();

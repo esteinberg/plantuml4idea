@@ -57,9 +57,7 @@ public class PlantUmlCaretListener implements CaretListener {
         }
 
         if (settings.isAutoRender()) {
-            if (plantUmlToolWindow != null) {
-                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
-            }
+            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
         }
 
         if (settings.isHighlightInImages()) {
