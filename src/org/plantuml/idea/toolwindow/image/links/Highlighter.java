@@ -21,6 +21,7 @@ import org.plantuml.idea.toolwindow.image.ImageContainer;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Highlighter {
@@ -69,6 +70,9 @@ public class Highlighter {
         List<String> list = new ArrayList<>();
         Document document = editor.getDocument();
         PsiFile file = PsiEditorUtil.getPsiFile(editor);
+        if (!file.isValid()) {
+            return Collections.emptyList(); 
+        }
         for (CaretState caretsAndSelection : caretsAndSelections) {
             LogicalPosition selectionStart = caretsAndSelection.getSelectionStart();
             LogicalPosition selectionEnd = caretsAndSelection.getSelectionEnd();
@@ -78,7 +82,7 @@ public class Highlighter {
                 if (document.getTextLength() == offset) {
                     offset = offset - 1;
                 }
-                if (StringUtils.isWhitespace(editor.getDocument().getText(TextRange.from(offset, 1)))) {
+                if (StringUtils.isWhitespace(document.getText(TextRange.from(offset, 1)))) {
                     offset = offset - 1;
                 }
                 PsiElement elementAtOffset = PsiUtilCore.getElementAtOffset(file, offset);
