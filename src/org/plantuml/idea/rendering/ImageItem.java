@@ -208,7 +208,7 @@ public class ImageItem {
             @Override
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
                 Double scale = (Double) propertyChangeEvent.getNewValue();
-                ImageContainerSvg.initLinks(project, ImageItem.this, renderRequest, renderResult, contentComponent, ScaleContext.create(editor.getComponent()), scale);
+                ImageContainerSvg.updateLinks(contentComponent, ScaleContext.create(editor.getComponent()), scale);
             }
         });
 

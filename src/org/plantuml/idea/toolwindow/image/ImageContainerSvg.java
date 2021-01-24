@@ -79,6 +79,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         setup(this.imageWithData, i, renderRequest);
     }
 
+
     @Override
     public ImageItem getImageWithData() {
         return imageWithData;
@@ -128,9 +129,18 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     }
 
+    public static void updateLinks(JComponent image, ScaleContext ctx, Double imageScale) {
+        Component[] components = image.getComponents();
+        for (Component component : components) {
+            MyJLabel jLabel = (MyJLabel) component;
+            Rectangle area = getRectangle(ctx, imageScale, jLabel.getLinkData());
+            jLabel.updatePosition(area);
+        }
+    }
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx, Double imageScale) {
         long start = System.currentTimeMillis();
+        //probably not needed if initting on background
         //https://stackoverflow.com/a/28048290/685796
         image.setVisible(false);
 
@@ -143,26 +153,9 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         for (int i = 0; i < links.size(); i++) {
             ImageItem.LinkData linkData = links.get(i);
 
-            Rectangle area = linkData.getClickArea();
+            Rectangle area = getRectangle(ctx, imageScale, linkData);
 
-            double tolerance = 1 * imageScale;
-            double scale = ctx.getScale(ScaleType.SYS_SCALE) / imageScale;
-            int x = (int) ((double) area.x / scale);
-            int width = (int) ((area.width) / scale + 5 * tolerance);
-
-            int y = (int) (area.y / scale + 3 * tolerance);
-            int height = (int) ((area.height) / scale + 2 * tolerance);
-
-            area = new Rectangle(x, y, width, height);
-
-            JLabel button = new MyJLabel(linkData, area);
-            if (showUrlLinksBorder) {
-                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
-            }
-            button.setLocation(area.getLocation());
-            button.setSize(area.getSize());
-
-            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            JLabel button = new MyJLabel(linkData, area, showUrlLinksBorder);
 
             //When user clicks on item, url is opened in default system browser
             button.addMouseListener(new MyMouseAdapter(navigator, linkData, renderRequest));
@@ -172,6 +165,22 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
         image.setVisible(true);
         LOG.debug("initLinks done in ", System.currentTimeMillis() - start, "ms");
+    }
+
+    @NotNull
+    private static Rectangle getRectangle(ScaleContext ctx, Double imageScale, ImageItem.LinkData linkData) {
+        Rectangle area = linkData.getClickArea();
+
+        double tolerance = 1 * imageScale;
+        double scale = ctx.getScale(ScaleType.SYS_SCALE) / imageScale;
+        int x = (int) ((double) area.x / scale);
+        int width = (int) ((area.width) / scale + 5 * tolerance);
+
+        int y = (int) (area.y / scale + 3 * tolerance);
+        int height = (int) ((area.height) / scale + 2 * tolerance);
+
+        area = new Rectangle(x, y, width, height);
+        return area;
     }
 
 

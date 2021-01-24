@@ -136,27 +136,9 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
         for (ImageItem.LinkData linkData : imageItem.getLinks()) {
 
-            Rectangle area = linkData.getClickArea();
+            Rectangle area = getRectangle(ctx, linkData);
 
-            int tolerance = 1;
-            double scale = ctx.getScale(ScaleType.SYS_SCALE);
-            int x = (int) ((double) area.x / scale) - 2 * tolerance;
-            int width = (int) ((area.width) / scale) + 4 * tolerance;
-
-            int y = (int) (area.y / scale);
-            int height = (int) ((area.height) / scale) + 5 * tolerance;
-
-            area = new Rectangle(x, y, width, height);
-
-
-            JLabel button = new MyJLabel(linkData, area);
-            if (showUrlLinksBorder) {
-                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
-            }
-            button.setLocation(area.getLocation());
-            button.setSize(area.getSize());
-
-            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            JLabel button = new MyJLabel(linkData, area, showUrlLinksBorder);
 
             //When user clicks on item, url is opened in default system browser
             button.addMouseListener(new MyMouseAdapter(navigator, linkData, renderRequest));
@@ -164,6 +146,22 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
             image.add(button);
         }
         LOG.debug("initLinks done in ", System.currentTimeMillis() - start, "ms");
+    }
+
+    @NotNull
+    private static Rectangle getRectangle(ScaleContext ctx, ImageItem.LinkData linkData) {
+        Rectangle area = linkData.getClickArea();
+
+        int tolerance = 1;
+        double scale = ctx.getScale(ScaleType.SYS_SCALE);
+        int x = (int) ((double) area.x / scale) - 2 * tolerance;
+        int width = (int) ((area.width) / scale) + 4 * tolerance;
+
+        int y = (int) (area.y / scale);
+        int height = (int) ((area.height) / scale) + 5 * tolerance;
+
+        area = new Rectangle(x, y, width, height);
+        return area;
     }
 
 
