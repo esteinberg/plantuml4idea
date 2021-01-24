@@ -69,6 +69,9 @@ public class Highlighter {
         java.util.List<CaretState> caretsAndSelections = editor.getCaretModel().getCaretsAndSelections();
         List<String> list = new ArrayList<>();
         Document document = editor.getDocument();
+        if (editor.getProject() == null) {
+            return Collections.emptyList();
+        }
         PsiFile file = PsiEditorUtil.getPsiFile(editor);
         if (!file.isValid()) {
             return Collections.emptyList(); 
@@ -90,6 +93,9 @@ public class Highlighter {
                     String text = elementAtOffset.getText();
                     list.add(sanitize(text));
                 } else if (elementAtOffset.getNode().getElementType() == PumlTypes.IDENTIFIER) {
+                    String text = elementAtOffset.getText();
+                    list.add(sanitize(text));
+                } else  {
                     String text = elementAtOffset.getText();
                     list.add(sanitize(text));
                 }
