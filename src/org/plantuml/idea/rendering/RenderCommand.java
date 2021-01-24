@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
@@ -17,6 +18,7 @@ import static org.plantuml.idea.util.Utils.logDuration;
 public abstract class RenderCommand implements Runnable {
     public static final Logger logger = Logger.getInstance(RenderCommand.class);
 
+    private final Project project;
     protected Reason reason;
     protected String sourceFilePath;
     protected final String source;
@@ -37,7 +39,8 @@ public abstract class RenderCommand implements Runnable {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+    public RenderCommand(Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+        this.project = project;
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
         this.source = source;
@@ -69,7 +72,7 @@ public abstract class RenderCommand implements Runnable {
             logger.debug("render ", (System.currentTimeMillis() - s1), "ms");
 
             long s2 = System.currentTimeMillis();
-            initImages(result);
+            initImages(renderRequest, result);
             logger.debug("initImages ", (System.currentTimeMillis() - s2), "ms");
 
             final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
@@ -90,10 +93,10 @@ public abstract class RenderCommand implements Runnable {
         }
     }
 
-    private void initImages(RenderResult result) {
+    private void initImages(RenderRequest renderRequest, RenderResult result) {
         List<ImageItem> imageItems = result.getImageItems();
         for (ImageItem imageItem : imageItems) {
-            imageItem.initImage();
+            imageItem.initImage(this.project, renderRequest, result);
         }
     }
 

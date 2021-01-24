@@ -53,6 +53,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox insertPair;
     private JCheckBox linkOpensSearchBar;
     private JCheckBox displaySvg;
+    private JCheckBox highlightInImages;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -177,16 +178,17 @@ public class PlantUmlSettingsPage implements Configurable {
         customPlantumlJar.setText(data.getCustomPlantumlJarPath());
         renderDelay.setText(data.getRenderDelay());
         cacheSize.setText(data.getCacheSize());
-        displaySvg.setSelected(data.isDisplaySvg());
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
-        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
-        renderUrlLinks.setSelected(data.isRenderLinks());
         insertPair.setSelected(data.isInsertPair());
-        linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
+        displaySvg.setSelected(data.isDisplaySvg());
+        renderUrlLinks.setSelected(data.isRenderLinks());
+        highlightInImages.setSelected(data.isHighlightInImages());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
+        linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
+        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -199,16 +201,17 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setCustomPlantumlJarPath(customPlantumlJar.getText());
         data.setRenderDelay(renderDelay.getText());
         data.setCacheSize(cacheSize.getText());
-        data.setDisplaySvg(displaySvg.isSelected());
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
-        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
-        data.setRenderLinks(renderUrlLinks.isSelected());
         data.setInsertPair(insertPair.isSelected());
-        data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
+        data.setDisplaySvg(displaySvg.isSelected());
+        data.setRenderLinks(renderUrlLinks.isSelected());
+        data.setHighlightInImages(highlightInImages.isSelected());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
+        data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
+        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -228,17 +231,18 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
             return true;
-        if (displaySvg.isSelected() != data.isDisplaySvg()) return true;
         if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
             return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
-        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
-        if (renderUrlLinks.isSelected() != data.isRenderLinks()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
-        if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
+        if (displaySvg.isSelected() != data.isDisplaySvg()) return true;
+        if (renderUrlLinks.isSelected() != data.isRenderLinks()) return true;
+        if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
+        if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
+        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         return false;
     }
 }

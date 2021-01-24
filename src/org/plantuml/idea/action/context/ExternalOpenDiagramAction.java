@@ -1,7 +1,6 @@
 package org.plantuml.idea.action.context;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -10,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.RenderRequest;
-import org.plantuml.idea.toolwindow.image.ImageContainerPng;
+import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -35,7 +34,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
         RenderRequest renderRequest = data.getRenderRequest();
         String selectedSource = renderRequest.getSource();
         File sourceFile = renderRequest.getSourceFile();
@@ -58,7 +57,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
     }
 
     protected int getPage(AnActionEvent e) {
-        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
         return data.getPage();
     }
 

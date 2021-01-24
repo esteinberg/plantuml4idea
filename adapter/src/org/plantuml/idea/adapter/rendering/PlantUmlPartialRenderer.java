@@ -15,7 +15,10 @@ import org.plantuml.idea.rendering.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
 
@@ -97,7 +100,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
         String title = getTitle(reader);
         Map<File, Long> includedFiles = Utils.getIncludedFiles(reader);
-        
+
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
         logger.debug("updateTitle " + (System.currentTimeMillis() - start));
@@ -117,11 +120,11 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private Pair<ImageItem, LinkedHashMap<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
-        DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
+        DiagramInfo info = zoomDiagram(renderRequest, reader, renderRequest.getZoom());
         Integer totalPages = info.getTotalPages();
         DiagramInfo.Titles titles = info.getTitles();
         LinkedHashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);
-                        
+
         if (totalPages > 1) {
             throw new PartialRenderingException();
         }

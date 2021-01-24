@@ -23,6 +23,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
+import org.plantuml.idea.toolwindow.image.links.Highlighter;
 import org.plantuml.idea.toolwindow.listener.PlantUmlAncestorListener;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
@@ -66,6 +67,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private int lastValidVerticalScrollValue;
     private int lastValidHorizontalScrollValue;
     private LocalFileSystem localFileSystem;
+    private Highlighter highlighter;
 
     public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -101,6 +103,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
 
         applyNewSettings(PlantUmlSettings.getInstance());
+        highlighter = new Highlighter();
     }
 
     private void setupUI() {
@@ -168,7 +171,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    setUnscaledZoom(Math.max(zoom.getUnscaledZoom() - e.getWheelRotation() * 10, 1));
+                    changeZoom(Math.max(zoom.getUnscaledZoom() - e.getWheelRotation() * 10, 1));
                 } else {
                     e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
@@ -302,10 +305,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
     }
 
+
     private class MyRenderCommand extends RenderCommand {
 
         public MyRenderCommand(Reason reason, String selectedFile, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
-            super(reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
+            super(project, reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
         }
 
         @Override
@@ -416,6 +420,11 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             logger.debug("displaying image ", requestedPage);
             displayImage(cacheItem, requestedPage, imagesWithData[requestedPage]);
         }
+
+        if (PlantUmlSettings.getInstance().isHighlightInImages()) {
+            highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager));
+        }
+        
         logger.debug("displayImages done in ", System.currentTimeMillis() - start, "ms");
 
 
@@ -477,7 +486,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return zoom;
     }
 
-    public void setUnscaledZoom(int unscaledZoom) {
+    public void changeZoom(int unscaledZoom) {
         zoom = new Zoom(imagesPanel, unscaledZoom);
         if (PlantUmlSettings.getInstance().isDisplaySvg()) {
             for (Component component : imagesPanel.getComponents()) {

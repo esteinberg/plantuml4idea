@@ -3,42 +3,43 @@ package org.plantuml.idea.toolwindow.image;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.PopupHandler;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
-import org.intellij.images.ui.ImageComponent;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.context.*;
+import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.links.LinkNavigator;
+import org.plantuml.idea.toolwindow.image.links.MyJLabel;
 import org.plantuml.idea.toolwindow.image.links.MyMouseAdapter;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
-import org.plantuml.idea.toolwindow.image.svg.MyImageEditorUI;
+import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.nio.charset.StandardCharsets;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 /**
  * TODO CopyDiagramToClipboardContextAction not working
  */
-public class ImageContainerSvg extends JPanel {
+public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     private static final AnAction[] AN_ACTIONS = {
             new SaveDiagramToFileContextAction(),
             new CopyDiagramToClipboardContextAction(),
+            new CopySvgToClipboard(),
             Separator.getInstance(),
             new CopyDiagramAsTxtToClipboardContextAction(),
             new CopyDiagramAsUnicodeTxtToClipboardContextAction(),
@@ -49,9 +50,9 @@ public class ImageContainerSvg extends JPanel {
             new ExternalOpenDiagramAsPNGAction(),
             new ExternalOpenDiagramAsSVGAction(),
             Separator.getInstance(),
-            new CopyPlantUmlServerLinkContextAction()
+            new CopyPlantUmlServerLinkContextAction(),
     };
-    private static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
+    public static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
 
         @NotNull
         @Override
@@ -78,14 +79,17 @@ public class ImageContainerSvg extends JPanel {
         setup(this.imageWithData, i, renderRequest);
     }
 
+    @Override
     public ImageItem getImageWithData() {
         return imageWithData;
     }
 
+    @Override
     public int getPage() {
         return imageWithData.getPage();
     }
 
+    @Override
     public RenderRequest getRenderRequest() {
         return renderRequest;
     }
@@ -107,35 +111,7 @@ public class ImageContainerSvg extends JPanel {
      * @param imageItem source image and url data
      */
     private void setDiagram(@NotNull final ImageItem imageItem) {
-        long start = System.currentTimeMillis();
-        LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", new String(imageItem.getImageBytes(), StandardCharsets.UTF_8));
-        editor = new MyImageEditorImpl(project, virtualFile, true, this);
-        ImageComponent imageComponent = editor.getComponent().getImageComponent();
-        JComponent contentComponent = editor.getContentComponent();
-
-        editor.setTransparencyChessboardVisible(PlantUmlSettings.getInstance().isShowChessboard());
-
-        if (imageItem.hasError()) {
-            imageComponent.setTransparencyChessboardWhiteColor(Color.BLACK);
-            imageComponent.setTransparencyChessboardBlankColor(Color.BLACK);
-        }
-
-        contentComponent.addPropertyChangeListener(MyImageEditorUI.ZOOM_FACTOR_PROP, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                Double scale = (Double) propertyChangeEvent.getNewValue();
-
-                initLinks(project, imageItem, renderRequest, renderResult, contentComponent, ScaleContext.create(editor.getComponent()), scale);
-            }
-        });
-
-        contentComponent.addMouseListener(new PopupHandler() {
-
-            @Override
-            public void invokePopup(Component comp, int x, int y) {
-                ACTION_POPUP_MENU.getComponent().show(comp, x, y);
-            }
-        });
+        editor = imageItem.getEditor(project, renderRequest, renderResult);
 
         addHierarchyListener(new HierarchyListener() {
             @Override
@@ -148,41 +124,41 @@ public class ImageContainerSvg extends JPanel {
             }
         });
 
-        add(editor.getComponent());
+        add(this.editor.getComponent());
 
-        initLinks(project, imageItem, renderRequest, renderResult, contentComponent, ScaleContext.create(editor.getComponent()), 1.0);
-
-        LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
     }
 
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx, Double imageScale) {
         long start = System.currentTimeMillis();
+        //https://stackoverflow.com/a/28048290/685796
+        image.setVisible(false);
+
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
 
         image.removeAll();
-        LOG.debug("initLinks A1 ", System.currentTimeMillis() - start, "ms");
 
         List<ImageItem.LinkData> links = imageItem.getLinks();
         for (int i = 0; i < links.size(); i++) {
             ImageItem.LinkData linkData = links.get(i);
-            JLabel button = new JLabel();
-            if (showUrlLinksBorder) {
-                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
-            }
+
             Rectangle area = linkData.getClickArea();
 
             double tolerance = 1 * imageScale;
             double scale = ctx.getScale(ScaleType.SYS_SCALE) / imageScale;
             int x = (int) ((double) area.x / scale);
-            int width = (int) ((area.width) / scale) + (int) (5 * tolerance);
+            int width = (int) ((area.width) / scale + 5 * tolerance);
 
-            int y = (int) (area.y / scale) + (int) (3 * tolerance);
-            int height = (int) ((area.height) / scale) + (int) (2 * tolerance);
+            int y = (int) (area.y / scale + 3 * tolerance);
+            int height = (int) ((area.height) / scale + 2 * tolerance);
 
             area = new Rectangle(x, y, width, height);
 
+            JLabel button = new MyJLabel(linkData, area);
+            if (showUrlLinksBorder) {
+                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
+            }
             button.setLocation(area.getLocation());
             button.setSize(area.getSize());
 
@@ -193,6 +169,8 @@ public class ImageContainerSvg extends JPanel {
 
             image.add(button);
         }
+
+        image.setVisible(true);
         LOG.debug("initLinks done in ", System.currentTimeMillis() - start, "ms");
     }
 
@@ -202,4 +180,40 @@ public class ImageContainerSvg extends JPanel {
         editor.getZoomModel().setZoomFactor(d / 100);
         editor.getZoomModel().setZoomLevelChanged(true);
     }
+
+    @Override
+    public Image getPngImage() {
+        //            double zoomFactor = editor.getZoomModel().getZoomFactor();
+        //            InputStream inputStream = editor.getFile().getInputStream();
+        //            Image load = SVGLoader.load(inputStream, (float) zoomFactor);
+        //            ImageIO.write((BufferedImage)image, "png", new File(path + ".png"));
+        //        
+        //todo can't get it to transform to png
+
+        RenderRequest rr = new RenderRequest(this.renderRequest, PlantUml.ImageFormat.PNG);
+        Zoom zoom = UIUtils.getPlantUmlToolWindow(project).getZoom();
+        rr.setZoom(zoom);
+        RenderResult render = PlantUmlFacade.get().render(rr, null);
+        BufferedImage image = render.getImageItem(getPage()).getImage(project, rr, render);
+        return image;
+    }
+
+    @Override
+    public void highlight(List<String> list) {
+        Component[] components = this.editor.getContentComponent().getComponents();
+        for (Component component : components) {
+            MyJLabel jLabel = (MyJLabel) component;
+            jLabel.highlight(list);
+        }
+    }
+
+    @Override
+    public @Nullable
+    Object getData(@NotNull @NonNls String s) {
+        if (CONTEXT_COMPONENT.is(s)) {
+            return this;
+        }
+        return null;
+    }
+
 }

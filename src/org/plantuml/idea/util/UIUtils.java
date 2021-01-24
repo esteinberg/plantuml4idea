@@ -137,7 +137,10 @@ public class UIUtils {
     }
 
     @Nullable
-    public static PlantUmlToolWindow getPlantUmlToolWindow(@NotNull Project project) {
+    public static PlantUmlToolWindow getPlantUmlToolWindow(Project project) {
+        if (project == null) {
+            return null;
+        }
         PlantUmlToolWindow result = null;
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow != null) {
@@ -179,11 +182,15 @@ public class UIUtils {
         }
 
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
+
+        renderPlantUmlToolWindowLater(plantUmlToolWindow, delay, reason);
+    }
+
+    public static void renderPlantUmlToolWindowLater(PlantUmlToolWindow plantUmlToolWindow, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         if (plantUmlToolWindow != null) {
             plantUmlToolWindow.renderLater(delay, reason);
         }
     }
-
 
     public static boolean hasAnyImage(Project project) {
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(project);
@@ -205,4 +212,6 @@ public class UIUtils {
         }
         return null;
     }
+
+
 }

@@ -7,15 +7,19 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
+import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.toolwindow.image.links.Highlighter;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlCaretListener implements CaretListener {
     private static Logger logger = Logger.getInstance(PlantUmlCaretListener.class);
     public FileDocumentManager instance = FileDocumentManager.getInstance();
     private PlantUmlSettings settings;
+    private Highlighter highlighter;
 
     public PlantUmlCaretListener() {
         settings = PlantUmlSettings.getInstance();
+        highlighter = new Highlighter();
     }
 
     @Override
@@ -24,8 +28,17 @@ public class PlantUmlCaretListener implements CaretListener {
             return;//console            
         }
         logger.debug("caretPositionChanged");
+        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(e.getEditor().getProject());
+        if (plantUmlToolWindow == null) {
+            return;
+        }
+
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            UIUtils.renderPlantUmlToolWindowLater(plantUmlToolWindow, LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+        }
+
+        if (settings.isHighlightInImages()) {
+            highlighter.highlightImages(plantUmlToolWindow, e.getEditor());
         }
     }
 
@@ -35,8 +48,18 @@ public class PlantUmlCaretListener implements CaretListener {
             return;//console            
         }
         logger.debug("caretAdded");
+
+        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(e.getEditor().getProject());
+        if (plantUmlToolWindow == null) {
+            return;
+        }
+
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(e.getEditor().getProject(), LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            UIUtils.renderPlantUmlToolWindowLater(plantUmlToolWindow, LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+        }
+
+        if (settings.isHighlightInImages()) {
+            highlighter.highlightImages(plantUmlToolWindow, e.getEditor());
         }
     }
 

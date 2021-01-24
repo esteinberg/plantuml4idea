@@ -5,13 +5,16 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorEventMulticaster;
+import com.intellij.openapi.editor.event.SelectionListener;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.listener.PlantUmlCaretListener;
 import org.plantuml.idea.toolwindow.listener.PlantUmlDocumentListener;
+import org.plantuml.idea.toolwindow.listener.PlantUmlSelectionListener;
 
 public class PlantUmlApplicationComponent implements ApplicationComponent {
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
     private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
+    private SelectionListener selectionListener = new PlantUmlSelectionListener();
 
     public PlantUmlApplicationComponent() {
         PlantUmlApplicationComponent.class.getClassLoader().setDefaultAssertionStatus(false);
@@ -22,6 +25,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.addDocumentListener(plantUmlDocumentListener);
         eventMulticaster.addCaretListener(plantUmlCaretListener);
+        eventMulticaster.addSelectionListener(selectionListener);
     }
 
     @Override
@@ -29,6 +33,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.removeDocumentListener(plantUmlDocumentListener);
         eventMulticaster.removeCaretListener(plantUmlCaretListener);
+        eventMulticaster.removeSelectionListener(selectionListener);
     }
 
     @Override

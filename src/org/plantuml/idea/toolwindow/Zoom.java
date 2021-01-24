@@ -14,10 +14,12 @@ public class Zoom {
     private final int unscaledZoom;
     private final int scaledZoom;
     private boolean displaySvg;
+    private double systemScale;
 
     public Zoom(@Nullable JComponent context, int unscaledZoom) {
         this.unscaledZoom = unscaledZoom;
-        scaledZoom = (int) (unscaledZoom * getSystemScale(context));
+        systemScale = getSystemScale(context);
+        scaledZoom = (int) (unscaledZoom * systemScale);
         displaySvg = PlantUmlSettings.getInstance().isDisplaySvg();
     }
 
@@ -29,10 +31,11 @@ public class Zoom {
         return unscaledZoom;
     }
 
+    public Double getDoubleScaledZoom() {
+        return (double) scaledZoom / 100;
+    }
+
     public int getScaledZoom() {
-        if (displaySvg) {
-            return 100;
-        }
         return scaledZoom;
     }
 
@@ -75,4 +78,6 @@ public class Zoom {
     public void updateSettings() {
         displaySvg = PlantUmlSettings.getInstance().isDisplaySvg();
     }
+
+
 }

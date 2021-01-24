@@ -71,6 +71,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     private boolean displaySvg = true;
     boolean showChessboard = true;
+    private boolean highlightInImages = false;
 
     public static PlantUmlSettings getInstance() {
         if (Classloaders.isUnitTest()) {
@@ -355,5 +356,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setDisplaySvg(final boolean displaySvg) {
         this.displaySvg = displaySvg;
+    }
+
+    public boolean isHighlightInImages() {
+        return highlightInImages;
+    }
+
+    public void setHighlightInImages(final boolean highlightInImages) {
+        this.highlightInImages = highlightInImages;
     }
 }

@@ -11,6 +11,7 @@ import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
 import com.intellij.util.ui.ImageUtil;
 import com.intellij.util.ui.JBImageIcon;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.context.*;
@@ -19,12 +20,14 @@ import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.image.links.LinkNavigator;
+import org.plantuml.idea.toolwindow.image.links.MyJLabel;
 import org.plantuml.idea.toolwindow.image.links.MyMouseAdapter;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
-public class ImageContainerPng extends JLabel {
+public class ImageContainerPng extends JLabel implements ImageContainer {
     private static final AnAction[] AN_ACTIONS = {
             new SaveDiagramToFileContextAction(),
             new CopyDiagramToClipboardContextAction(),
@@ -49,7 +52,7 @@ public class ImageContainerPng extends JLabel {
         }
     });
 
-    private static Logger logger = Logger.getInstance(ImageContainerPng.class);
+    private static Logger LOG = Logger.getInstance(ImageContainerPng.class);
     private Project project;
     private RenderResult renderResult;
     private RenderRequest renderRequest;
@@ -71,14 +74,17 @@ public class ImageContainerPng extends JLabel {
         setup(parent, this.imageWithData, i, renderRequest);
     }
 
+    @Override
     public ImageItem getImageWithData() {
         return imageWithData;
     }
 
+    @Override
     public int getPage() {
         return imageWithData.getPage();
     }
 
+    @Override
     public RenderRequest getRenderRequest() {
         return renderRequest;
     }
@@ -96,7 +102,7 @@ public class ImageContainerPng extends JLabel {
 
     private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, RenderRequest renderRequest, final JLabel label) {
         long start = System.currentTimeMillis();
-        originalImage = imageItem.getImage();
+        originalImage = imageItem.getImage(project, renderRequest, renderResult);
         Image scaledImage;
 
         ScaleContext ctx = ScaleContext.create(parent);
@@ -118,20 +124,18 @@ public class ImageContainerPng extends JLabel {
         label.removeAll();
         initLinks(project, imageItem, renderRequest, renderResult, label, ctx, 1.0);
 
-        logger.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
+        LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
     }
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx, Double imageScale) {
+        long start = System.currentTimeMillis();
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
 
         image.removeAll();
 
         for (ImageItem.LinkData linkData : imageItem.getLinks()) {
-            JLabel button = new JLabel();
-            if (showUrlLinksBorder) {
-                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
-            }
+
             Rectangle area = linkData.getClickArea();
 
             int tolerance = 1;
@@ -144,6 +148,11 @@ public class ImageContainerPng extends JLabel {
 
             area = new Rectangle(x, y, width, height);
 
+
+            JLabel button = new MyJLabel(linkData, area);
+            if (showUrlLinksBorder) {
+                button.setBorder(new ColoredSideBorder(Color.RED, Color.RED, Color.RED, Color.RED, 1));
+            }
             button.setLocation(area.getLocation());
             button.setSize(area.getSize());
 
@@ -154,11 +163,30 @@ public class ImageContainerPng extends JLabel {
 
             image.add(button);
         }
+        LOG.debug("initLinks done in ", System.currentTimeMillis() - start, "ms");
     }
 
 
-    public Image getOriginalImage() {
+    @Override
+    public Image getPngImage() {
         return originalImage;
     }
 
+    @Override
+    public void highlight(List<String> list) {
+        Component[] components = this.getComponents();
+        for (Component component : components) {
+            MyJLabel jLabel = (MyJLabel) component;
+            jLabel.highlight(list);
+        }
+    }
+
+    @Override
+    public @Nullable
+    Object getData(@NotNull @NonNls String s) {
+        if (CONTEXT_COMPONENT.is(s)) {
+            return this;
+        }
+        return null;
+    }
 }

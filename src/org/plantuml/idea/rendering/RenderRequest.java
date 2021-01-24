@@ -16,7 +16,7 @@ public class RenderRequest {
     private final PlantUml.ImageFormat format;
     private final int page;
     @NotNull
-    private final Zoom zoom;
+    private Zoom zoom;
     private final Integer version;
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
@@ -52,6 +52,9 @@ public class RenderRequest {
         this.version = null;
     }
 
+    public void setZoom(@NotNull Zoom zoom) {
+        this.zoom = zoom;
+    }
 
     @NotNull
     public String getSource() {

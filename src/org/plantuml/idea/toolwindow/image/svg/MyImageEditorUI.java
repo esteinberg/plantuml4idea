@@ -50,7 +50,7 @@ import org.intellij.images.ui.ImageComponentDecorator;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -59,7 +59,10 @@ import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.beans.PropertyChangeEvent;
@@ -83,7 +86,8 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     private final DeleteProvider deleteProvider;
     private final CopyPasteSupport copyPasteSupport;
 
-    private final ImageZoomModel zoomModel = new ImageZoomModelImpl();
+    private final ImageZoomModel zoomModel;
+    private final Zoom initialZoom;
     private final ImageWheelAdapter wheelAdapter = new ImageWheelAdapter();
     private final ChangeListener changeListener = new DocumentChangeListener();
     private final ImageComponent imageComponent = new ImageComponent();
@@ -97,9 +101,11 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //    this(editor, false);
 //  }
 
-    MyImageEditorUI(@Nullable ImageEditor editor, boolean isEmbedded, ImageContainerSvg imageContainerSvg) {
+    MyImageEditorUI(@Nullable ImageEditor editor, boolean isEmbedded, Zoom zoomModel) {
         this.editor = editor;
         this.isEmbedded = isEmbedded;
+        this.zoomModel = new ImageZoomModelImpl();
+        initialZoom = zoomModel;
 
         imageComponent.addPropertyChangeListener(ZOOM_FACTOR_PROP, e -> imageComponent.setZoomFactor(getZoomModel().getZoomFactor()));
 //    Options options = OptionsManager.getInstance().getOptions();
@@ -183,12 +189,13 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //    add(topPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.WEST);
 
-        myScrollPane.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                updateZoomFactor();
-            }
-        });
+        //CUSTOM
+//        myScrollPane.addComponentListener(new ComponentAdapter() {
+//            @Override
+//            public void componentResized(ComponentEvent e) {
+//                updateZoomFactor();
+//            }
+//        });
 
         updateInfo();
     }
@@ -273,14 +280,18 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         if (imageProvider == null) return;
         document.setFormat(format);
 
-        if (previousImage == null || !zoomModel.isZoomLevelChanged()) {
-            Options options = OptionsManager.getInstance().getOptions();
-            ZoomOptions zoomOptions = options.getEditorOptions().getZoomOptions();
+        //CUSTOM
+//        if (previousImage == null || !zoomModel.isZoomLevelChanged()) {
+//            Options options = OptionsManager.getInstance().getOptions();
+//            ZoomOptions zoomOptions = options.getEditorOptions().getZoomOptions();
+//
+//            if (!(zoomOptions.isSmartZooming() && updateZoomFactor())) {
+//                zoomModel.setZoomFactor(1.0);
+//            }
+//        }
+        zoomModel.setZoomFactor(initialZoom.getDoubleScaledZoom());
 
-            if (!(zoomOptions.isSmartZooming() && updateZoomFactor())) {
-                zoomModel.setZoomFactor(1.0);
-            }
-        }
+
     }
 
     private boolean updateZoomFactor() {

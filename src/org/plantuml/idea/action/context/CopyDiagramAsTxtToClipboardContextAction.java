@@ -2,7 +2,6 @@ package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.CharsetToolkit;
@@ -13,7 +12,7 @@ import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.toolwindow.image.ImageContainerPng;
+import org.plantuml.idea.toolwindow.image.ImageContainer;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -33,7 +32,7 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
         if (data != null) {
             RenderRequest renderRequest = data.getRenderRequest();
             RenderResult render = PlantUmlFacade.get().render(new RenderRequest(renderRequest, getFormat()), null);

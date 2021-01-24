@@ -2,7 +2,6 @@ package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.ui.TextTransferable;
@@ -11,7 +10,7 @@ import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.image.ImageContainerPng;
+import org.plantuml.idea.toolwindow.image.ImageContainer;
 
 import javax.swing.*;
 
@@ -27,7 +26,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final AnActionEvent e) {
-        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
         if (data != null) {
             ImageItem imageWithData = data.getImageWithData();
             String source;

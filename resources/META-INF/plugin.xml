@@ -1,14 +1,22 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>3.6.2</version>
+    <version>4.0.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
     <!-- IJ 12+ -->
-    <idea-version since-build="193"/>
+    <idea-version since-build="203"/>
 
-    <description>PlantUML diagramming tool integration</description>
+    <description>PlantUML diagramming tool integration. Now better and faster, with code navigation and highlighting.
+    </description>
 
     <change-notes>
         <![CDATA[        
+            <p>4.0</p>
+            <ul>
+              <li>Switched to SVG image display:</li>
+              <li>- 2x faster than before (with links)</li>
+              <li>- instant zoom</li>
+              <li>Highlighting of the selected text in images</li>
+            </ul>        
             <p>3.6</p>
             <ul>
               <li>Image text links into the source code - by text matching, repeated clicks cycles occurrences</li>
@@ -128,8 +136,14 @@
                         text="Do not Display Error Images"
                         description="Click on the status label to display the error, click again to return to the last image."
                 />
+                <action id="org.plantuml.idea.action.ImageHighlightToggleAction"
+                        class="org.plantuml.idea.action.ImageHighlightToggleAction"
+                        text="Highlight text occurrences in images"/>
+                />
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
-                        class="org.plantuml.idea.action.DisplaySvgToggleAction" text="Display SVG (Disable for PNG)"/>
+                        class="org.plantuml.idea.action.DisplaySvgToggleAction"
+                        text="Use New SVG Display (Disable for Old PNG)"
+                />
                 />
                 <separator/>
                 <action id="PlantUML.ShowSettings" class="org.plantuml.idea.action.ShowSettingsAction"

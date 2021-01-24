@@ -29,7 +29,7 @@ import org.intellij.images.thumbnail.actionSystem.ThumbnailViewActions;
 import org.intellij.images.vfs.IfsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
+import org.plantuml.idea.toolwindow.Zoom;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,14 +50,14 @@ public final class MyImageEditorImpl implements ImageEditor {
 //  }
 
     /**
-     * @param isEmbedded        if it's true the toolbar and the image info are disabled and an image is left-side aligned
-     * @param imageContainerSvg
+     * @param isEmbedded if it's true the toolbar and the image info are disabled and an image is left-side aligned
+     * @param zoomModel
      */
-    public MyImageEditorImpl(@NotNull Project project, @NotNull VirtualFile file, boolean isEmbedded, ImageContainerSvg imageContainerSvg) {
+    public MyImageEditorImpl(@NotNull Project project, @NotNull VirtualFile file, boolean isEmbedded, Zoom zoomModel) {
         this.project = project;
         this.file = file;
 
-        editorUI = new MyImageEditorUI(this, isEmbedded, imageContainerSvg);
+        editorUI = new MyImageEditorUI(this, isEmbedded, zoomModel);
         Disposer.register(this, editorUI);
 
         VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {

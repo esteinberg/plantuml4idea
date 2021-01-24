@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.Zoom;
 
@@ -35,11 +36,11 @@ public class PlantUmlRendererUtil {
             throws IOException {
         Utils.prepareEnvironment(renderRequest);
 
-        NORMAL_RENDERER.renderAndSave(renderRequest,  path, pathPrefix);
+        NORMAL_RENDERER.renderAndSave(renderRequest, path, pathPrefix);
     }
 
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-         Utils.prepareEnvironment(renderRequest);
+        Utils.prepareEnvironment(renderRequest);
 
         long start = System.currentTimeMillis();
         String source = renderRequest.getSource();
@@ -57,11 +58,11 @@ public class PlantUmlRendererUtil {
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
         logger.debug("doRender ", System.currentTimeMillis() - start, "ms");
-            
+
         return renderResult;
     }
 
-    public static DiagramInfo zoomDiagram(SourceStringReader reader, Zoom zoom) {
+    public static DiagramInfo zoomDiagram(RenderRequest renderRequest, SourceStringReader reader, Zoom zoom) {
         logger.debug("zooming diagram");
         int totalPages = 0;
         List<BlockUml> blocks = reader.getBlocks();
@@ -80,9 +81,7 @@ public class PlantUmlRendererUtil {
             Diagram diagram = block.getDiagram();
             logger.debug("getDiagram done in  ", System.currentTimeMillis() - start, " ms");
 
-            start = System.currentTimeMillis();
-            zoomDiagram(diagram, zoom);
-            logger.debug("zoom diagram done in  ", System.currentTimeMillis() - start, " ms");
+            zoomDiagram(renderRequest.getFormat(), diagram, zoom);
             fileOrDirname = block.getFileOrDirname();
             totalPages = totalPages + diagram.getNbImages();
 
@@ -92,9 +91,14 @@ public class PlantUmlRendererUtil {
         return new DiagramInfo(totalPages, titles, fileOrDirname);
     }
 
-    private static void zoomDiagram(Diagram diagram, Zoom zoom) {
+    private static void zoomDiagram(PlantUml.ImageFormat format, Diagram diagram, Zoom zoom) {
+        if (format == PlantUml.ImageFormat.SVG) {
+            logger.debug("skipping SVG zooming");
+            return;
+        }
+        long start = System.currentTimeMillis();
         int osScaledZoom = zoom.getScaledZoom();
-        
+
         if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
             for (Diagram page : newpagedDiagram.getDiagrams()) {
@@ -115,6 +119,7 @@ public class PlantUmlRendererUtil {
                 d.setScale(calculateScale(osScaledZoom, scale));
             }
         }
+        logger.debug("zoom diagram done in  ", System.currentTimeMillis() - start, " ms");
     }
 
     @NotNull

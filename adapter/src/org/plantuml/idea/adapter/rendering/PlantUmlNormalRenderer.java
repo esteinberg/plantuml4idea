@@ -36,10 +36,9 @@ public class PlantUmlNormalRenderer {
      * Renders source code and saves diagram images to files according to provided naming scheme
      * and image format.
      *
-     *
      * @param renderRequest
-     * @param source              source code to be rendered
-     * @param path                path to use with first file
+     * @param source        source code to be rendered
+     * @param path          path to use with first file
      * @throws IOException in case of rendering or saving fails
      */
     public void renderAndSave(RenderRequest renderRequest, String path, String pathPrefix)
@@ -52,7 +51,7 @@ public class PlantUmlNormalRenderer {
         try {
             SourceStringReader reader = newSourceStringReader(renderRequest.getSource(), true, renderRequest.getSourceFile());
 
-            zoomDiagram(reader, zoom);
+            zoomDiagram(renderRequest, reader, zoom);
 
             VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
             if (requestedPageNumber >= 0) {
@@ -114,7 +113,7 @@ public class PlantUmlNormalRenderer {
             // image generation.                     
             SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
 
-            DiagramInfo info = zoomDiagram(reader, renderRequest.getZoom());
+            DiagramInfo info = zoomDiagram(renderRequest, reader, renderRequest.getZoom());
             Integer totalPages = info.getTotalPages();
 
             if (totalPages == 0) {
@@ -240,7 +239,7 @@ public class PlantUmlNormalRenderer {
         byte[] svgBytes = new byte[0];
         if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
             svgBytes = bytes;
-        } else if (renderRequest.isRenderUrlLinks() ) {
+        } else if (renderRequest.isRenderUrlLinks()) {
             svgBytes = generateSvg(reader, page);
         }
 
