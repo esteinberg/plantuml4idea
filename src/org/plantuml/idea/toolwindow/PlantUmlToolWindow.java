@@ -21,6 +21,8 @@ import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.toolwindow.image.ImageContainerPng;
+import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
 import org.plantuml.idea.toolwindow.listener.PlantUmlAncestorListener;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
@@ -162,7 +164,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     private void addScrollBarListeners(JComponent panel) {
-        panel.addMouseWheelListener(new MouseWheelListener() {
+        MouseWheelListener l = new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
@@ -172,9 +174,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     scrollPane.dispatchEvent(e);
                 }
             }
-        });
-
-        panel.addMouseMotionListener(new MouseMotionListener() {
+        };
+        MouseMotionListener l1 = new MouseMotionListener() {
             private int x, y;
 
             @Override
@@ -197,8 +198,15 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 x = e.getXOnScreen();
                 y = e.getYOnScreen();
             }
-        });
+        };
+        panel.addMouseWheelListener(l);
+        panel.addMouseMotionListener(l1);
+        for (Component component : Utils.getAllComponents(panel)) {
+            component.addMouseWheelListener(l);
+            component.addMouseMotionListener(l1);
+        }
     }
+
 
     @Override
     public void dispose() {
@@ -210,6 +218,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
         ApplicationManager.getApplication().invokeLater(Utils.logDuration("EDT renderLater", () -> {
             if (isProjectValid(project)) {
+                zoom.updateSettings();
 
                 String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
                 String sourceFilePath = null;
@@ -397,6 +406,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
         imagesPanel.removeAll();
 
+        long start = System.currentTimeMillis();
         if (requestedPage == -1) {
             logger.debug("displaying images ", requestedPage);
             for (int i = 0; i < imagesWithData.length; i++) {
@@ -406,6 +416,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             logger.debug("displaying image ", requestedPage);
             displayImage(cacheItem, requestedPage, imagesWithData[requestedPage]);
         }
+        logger.debug("displayImages done in ", System.currentTimeMillis() - start, "ms");
 
 
         imagesPanel.revalidate();
@@ -432,9 +443,9 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         }
         JComponent component = null;
         if (cacheItem.getRenderRequest().getFormat() == PlantUml.ImageFormat.SVG) {
-//            component = new PlantUmlImagePanelSvg(imageWithData, pageNumber, cacheItem.getRenderRequest());
+            component = new ImageContainerSvg(project, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         } else {
-            component = new PlantUmlImageLabel(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult(), fileEditorManager, localFileSystem);
+            component = new ImageContainerPng(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         }
         addScrollBarListeners(component);
 
@@ -468,7 +479,16 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public void setUnscaledZoom(int unscaledZoom) {
         zoom = new Zoom(imagesPanel, unscaledZoom);
-        renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+        if (PlantUmlSettings.getInstance().isDisplaySvg()) {
+            for (Component component : imagesPanel.getComponents()) {
+                if (component instanceof ImageContainerSvg) {
+                    ImageContainerSvg component1 = (ImageContainerSvg) component;
+                    component1.setZoom(unscaledZoom);
+                }
+            }
+        } else {
+            renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+        }
     }
 
     public void setSelectedPage(int selectedPage) {

@@ -3,8 +3,8 @@ package org.plantuml.idea.action.save;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class SaveDiagramToFileAction extends AbstractSaveDiagramAction {
     protected int getPageNumber(AnActionEvent e) {
         PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(e.getProject());
         JPanel imagesPanel = umlToolWindow.getImagesPanel();
-        PlantUmlImageLabel image = (PlantUmlImageLabel) imagesPanel.getComponent(0);
+        ImageContainerPng image = (ImageContainerPng) imagesPanel.getComponent(0);
         return image.getPage();
     }
 

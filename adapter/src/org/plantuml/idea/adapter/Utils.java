@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-//import com.intellij.ui.svg.MyTranscoder;
 import com.intellij.util.ImageLoader;
 import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileSystem;
@@ -24,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
+import org.plantuml.idea.toolwindow.MyTranscoder;
 import org.w3c.dom.Document;
 
 import java.awt.image.BufferedImage;
@@ -33,25 +33,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
 
+    @SuppressWarnings("KotlinInternalInJava")
     public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) {
-//        try {
-//            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
-//            if (docSize != null) {
-//                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
-//            }
-//            return transcoder.getImage();
-//        } catch (Exception ex) {
-//            if (docSize != null) {
-//                docSize.setSize(0, 0);
-//            }
-//            throw new RuntimeException(ex);
-//        }
-        return null;
+        try {
+            long start = System.currentTimeMillis();
+            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
+            if (docSize != null) {
+                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
+            }
+            BufferedImage image = transcoder.getImage();
+            LOG.debug("loadWithoutCache done in ", System.currentTimeMillis() - start, "ms");
+            return image;
+        } catch (Exception ex) {
+            if (docSize != null) {
+                docSize.setSize(0, 0);
+            }
+            throw new RuntimeException(ex);
+        }
     }
 
     @NotNull
@@ -189,7 +195,7 @@ public class Utils {
     }
 
     private static boolean onlyCurrentlyDisplayed(FileDocumentManager documentManager, com.intellij.openapi.editor.Document[] unsavedDocuments, @Nullable String sourceFile) {
-        if (unsavedDocuments.length == 1 && sourceFile!=null) {
+        if (unsavedDocuments.length == 1 && sourceFile != null) {
             com.intellij.openapi.editor.Document unsavedDocument = unsavedDocuments[0];
             VirtualFile file = documentManager.getFile(unsavedDocument);
             if (file != null) {
@@ -197,6 +203,6 @@ public class Utils {
             }
         }
         return false;
-        
+
     }
 }

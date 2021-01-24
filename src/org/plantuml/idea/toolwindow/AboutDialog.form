@@ -66,7 +66,7 @@
                 <properties/>
                 <border type="line" title="Graphviz dot configuration check"/>
                 <children>
-                  <component id="84579" class="org.plantuml.idea.toolwindow.PlantUmlImageLabel" binding="testDot">
+                  <component id="84579" class="org.plantuml.idea.toolwindow.image.ImageContainerPng" binding="testDot">
                     <constraints>
                       <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="1" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>

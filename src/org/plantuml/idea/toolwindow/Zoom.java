@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 
 import javax.swing.*;
 
@@ -12,10 +13,12 @@ public class Zoom {
 
     private final int unscaledZoom;
     private final int scaledZoom;
+    private boolean displaySvg;
 
     public Zoom(@Nullable JComponent context, int unscaledZoom) {
         this.unscaledZoom = unscaledZoom;
         scaledZoom = (int) (unscaledZoom * getSystemScale(context));
+        displaySvg = PlantUmlSettings.getInstance().isDisplaySvg();
     }
 
     public Zoom(int unscaledZoom) {
@@ -27,6 +30,9 @@ public class Zoom {
     }
 
     public int getScaledZoom() {
+        if (displaySvg) {
+            return 100;
+        }
         return scaledZoom;
     }
 
@@ -41,6 +47,9 @@ public class Zoom {
 
     @Override
     public boolean equals(Object o) {
+        if (displaySvg) {
+            return true;
+        }
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -52,5 +61,18 @@ public class Zoom {
     @Override
     public int hashCode() {
         return scaledZoom;
+    }
+
+    @Override
+    public String toString() {
+        return "Zoom{" +
+                "unscaledZoom=" + unscaledZoom +
+                ", scaledZoom=" + scaledZoom +
+                ", displaySvg=" + displaySvg +
+                '}';
+    }
+
+    public void updateSettings() {
+        displaySvg = PlantUmlSettings.getInstance().isDisplaySvg();
     }
 }

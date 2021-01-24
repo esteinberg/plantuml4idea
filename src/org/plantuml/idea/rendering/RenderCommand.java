@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 import org.plantuml.idea.toolwindow.Zoom;
@@ -60,7 +61,7 @@ public abstract class RenderCommand implements Runnable {
             label.update(version, ExecutionStatusPanel.State.EXECUTING);
 
 
-            PlantUml.ImageFormat imageFormat = PlantUml.ImageFormat.PNG;
+            PlantUml.ImageFormat imageFormat = PlantUmlSettings.getInstance().isDisplaySvg() ? PlantUml.ImageFormat.SVG : PlantUml.ImageFormat.PNG;
 
             final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
             long s1 = System.currentTimeMillis();

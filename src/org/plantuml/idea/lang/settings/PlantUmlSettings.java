@@ -69,6 +69,8 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean keywordHighlighting = true;
     private boolean insertPair = true;
 
+    private boolean displaySvg = true;
+    boolean showChessboard = true;
 
     public static PlantUmlSettings getInstance() {
         if (Classloaders.isUnitTest()) {
@@ -85,6 +87,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
             migratedCfg = true;
         }
         return service;
+    }
+
+    public boolean isShowChessboard() {
+        return showChessboard;
+    }
+
+    public void setShowChessboard(boolean showChessboard) {
+        this.showChessboard = showChessboard;
     }
 
     public String getLastBundledVersion() {
@@ -337,5 +347,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setLinkOpensSearchBar(final boolean linkOpensSearchBar) {
         this.linkOpensSearchBar = linkOpensSearchBar;
+    }
+
+    public boolean isDisplaySvg() {
+        return displaySvg;
+    }
+
+    public void setDisplaySvg(final boolean displaySvg) {
+        this.displaySvg = displaySvg;
     }
 }

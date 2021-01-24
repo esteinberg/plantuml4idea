@@ -128,6 +128,9 @@
                         text="Do not Display Error Images"
                         description="Click on the status label to display the error, click again to return to the last image."
                 />
+                <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
+                        class="org.plantuml.idea.action.DisplaySvgToggleAction" text="Display SVG (Disable for PNG)"/>
+                />
                 <separator/>
                 <action id="PlantUML.ShowSettings" class="org.plantuml.idea.action.ShowSettingsAction"
                         text="Open Settings"/>

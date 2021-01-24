@@ -5,8 +5,8 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
 
         PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
         JPanel imagesPanel = umlToolWindow.getImagesPanel();
-        PlantUmlImageLabel component = (PlantUmlImageLabel) imagesPanel.getComponent(0);
+        ImageContainerPng component = (ImageContainerPng) imagesPanel.getComponent(0);
         final Image image = component.getOriginalImage();
 
         CopyPasteManager.getInstance().setContents(new Transferable() {

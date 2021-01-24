@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.RenderRequest;
-import org.plantuml.idea.toolwindow.PlantUmlImageLabel;
+import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -35,7 +35,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         RenderRequest renderRequest = data.getRenderRequest();
         String selectedSource = renderRequest.getSource();
         File sourceFile = renderRequest.getSourceFile();
@@ -58,7 +58,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
     }
 
     protected int getPage(AnActionEvent e) {
-        PlantUmlImageLabel data = (PlantUmlImageLabel) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        ImageContainerPng data = (ImageContainerPng) e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
         return data.getPage();
     }
 

@@ -20,7 +20,7 @@ import java.awt.image.BufferedImage
 import java.io.IOException
 import java.io.StringReader
 
-internal class MyTranscoder(private val scale: Double) : ImageTranscoder() {
+class MyTranscoder(private val scale: Double) : ImageTranscoder() {
     companion object {
 
         @Throws(TranscoderException::class)

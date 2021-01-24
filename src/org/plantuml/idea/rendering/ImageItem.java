@@ -149,7 +149,7 @@ public class ImageItem {
         return links;
     }
 
-    protected boolean hasError() {
+    public boolean hasError() {
         String description = getDescription();
         if (description == null || description.isEmpty() || "(Error)".equals(description)) {
             return true;
@@ -158,6 +158,7 @@ public class ImageItem {
     }
 
     void initImage() {
+        long start = System.currentTimeMillis();
         if (getImageBytes() != null) {
             if (format == PlantUml.ImageFormat.PNG) {
                 try {
@@ -170,6 +171,7 @@ public class ImageItem {
                 this.image = bufferedImage;
             }
         }
+        LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
     }
 
     public class LinkData {

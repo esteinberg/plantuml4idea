@@ -7,6 +7,7 @@ import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -26,7 +27,7 @@ public class AboutDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JEditorPane aboutEditorPane;
-    private PlantUmlImageLabel testDot;
+    private ImageContainerPng testDot;
     private Usage usage;
 
     public AboutDialog() {
