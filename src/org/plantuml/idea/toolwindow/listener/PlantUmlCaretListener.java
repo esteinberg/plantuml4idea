@@ -34,7 +34,9 @@ public class PlantUmlCaretListener implements CaretListener {
         }
 
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(plantUmlToolWindow, LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            if (plantUmlToolWindow != null) {
+                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            }
         }
 
         if (settings.isHighlightInImages()) {
@@ -55,7 +57,9 @@ public class PlantUmlCaretListener implements CaretListener {
         }
 
         if (settings.isAutoRender()) {
-            UIUtils.renderPlantUmlToolWindowLater(plantUmlToolWindow, LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            if (plantUmlToolWindow != null) {
+                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            }
         }
 
         if (settings.isHighlightInImages()) {

@@ -183,10 +183,6 @@ public class UIUtils {
 
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
 
-        renderPlantUmlToolWindowLater(plantUmlToolWindow, delay, reason);
-    }
-
-    public static void renderPlantUmlToolWindowLater(PlantUmlToolWindow plantUmlToolWindow, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         if (plantUmlToolWindow != null) {
             plantUmlToolWindow.renderLater(delay, reason);
         }

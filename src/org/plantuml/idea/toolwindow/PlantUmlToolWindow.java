@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
@@ -34,6 +35,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.NOW;
 import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.RESET_DELAY;
 
 /**
@@ -217,12 +219,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
+    private Alarm myAlarm=new Alarm(Alarm.ThreadToUse.SWING_THREAD);
+
     public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
-        logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
-        ApplicationManager.getApplication().invokeLater(Utils.logDuration("EDT renderLater", () -> {
+        Runnable renderRunnable = () -> {
+            logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
             if (isProjectValid(project)) {
                 zoom.updateSettings();
-
                 String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
                 String sourceFilePath = null;
                 RenderCacheItem cachedItem = null;
@@ -286,7 +289,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                     }
                 }
             }
-        }));
+        };
+
+        int i = myAlarm.cancelAllRequests();
+        myAlarm.addRequest(Utils.logDuration("EDT renderLater", renderRunnable), delay == NOW ? 0 : 10);
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
@@ -424,7 +430,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         if (PlantUmlSettings.getInstance().isHighlightInImages()) {
             highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager));
         }
-        
+
         logger.debug("displayImages done in ", System.currentTimeMillis() - start, "ms");
 
 
