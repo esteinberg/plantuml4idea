@@ -113,19 +113,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     private void setDiagram(@NotNull final ImageItem imageItem) {
         editor = imageItem.getEditor(project, renderRequest, renderResult);
 
-        addHierarchyListener(new HierarchyListener() {
-            @Override
-            public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
-                Container changedParent = hierarchyEvent.getChangedParent();
-                if (changedParent.isValid()) {
-                    LOG.debug("disposing svg editor ", editor);
-                    editor.dispose();
-                }
-            }
-        });
-
         add(this.editor.getComponent());
-
     }
 
     public static void updateLinks(JComponent image, ScaleContext ctx, Double imageScale) {
