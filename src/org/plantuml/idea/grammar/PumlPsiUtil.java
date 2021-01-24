@@ -1,14 +1,9 @@
 package org.plantuml.idea.grammar;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.impl.java.stubs.index.JavaShortClassNameIndex;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -94,18 +89,4 @@ public class PumlPsiUtil {
         return result;
     }
 
-    public static Collection<PsiClass> findJavaClass(PumlItem element) {
-        if (DumbService.isDumb(element.getProject())) {
-            return Collections.emptyList();
-        }
-        String text = element.getText();
-
-        Module moduleForFile = ModuleUtilCore.findModuleForFile(element.getContainingFile());
-        if (moduleForFile != null) {
-            GlobalSearchScope scope = GlobalSearchScope.moduleScope(moduleForFile);
-            return JavaShortClassNameIndex.getInstance().get(text, element.getProject(), scope);
-        } else {
-            return JavaShortClassNameIndex.getInstance().get(text, element.getProject(), GlobalSearchScope.allScope(element.getProject()));
-        }
-    }
 }
