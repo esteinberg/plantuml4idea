@@ -69,7 +69,7 @@ public class RenderCacheItem {
         return false;
     }
 
-    private boolean imageMissing(int page) {
+    public boolean imageMissing(int page) {
         if (page == -1) {
             for (int i = 0; i < imageItems.length; i++) {
                 if (!hasImage(i)) {
@@ -77,9 +77,7 @@ public class RenderCacheItem {
                 }
             }
         } else {
-            if (!hasImage(page)) {
-                return true;
-            }
+            return !hasImage(page);
         }
         return false;
     }
@@ -194,18 +192,6 @@ public class RenderCacheItem {
         return false;
     }
 
-    public boolean titleChaged(String s, int i) {
-        ImageItem imageItem = getImageItem(i);
-        if (imageItem != null) {
-            String title = imageItem.getTitle();
-            if (title == null && s == null) {
-                return false;
-            }
-            return !StringUtils.equals(s, title);
-        }
-        return true;
-    }
-
     public void dispose() {
         try {
             for (ImageItem imageItem : imageItems) {
@@ -215,4 +201,25 @@ public class RenderCacheItem {
             LOG.error(e);
         }
     }
+
+    public boolean sourceChanged(String[] sourceSplit, int page) {
+        return !sourceSplit[page].equals(getImagesItemPageSource(page));
+    }
+
+    public boolean zoomChanged(RenderRequest renderRequest) {
+        return !renderRequest.getZoom().equals(getZoom());
+    }
+
+    public boolean titleChanged(int page, String title) {
+        ImageItem imageItem = getImageItem(page);
+        if (imageItem != null) {
+            String title1 = imageItem.getTitle();
+            if (title1 == null && title == null) {
+                return false;
+            }
+            return !StringUtils.equals(title, title1);
+        }
+        return true;
+    }
+
 }

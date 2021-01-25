@@ -3,29 +3,16 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.ex.VirtualFileManagerEx;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.io.URLUtil;
-import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
-import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.core.DiagramDescription;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
-import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
-import org.plantuml.idea.toolwindow.Zoom;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-
-import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
 
 
 public class PlantUmlNormalRenderer {
@@ -47,36 +34,29 @@ public class PlantUmlNormalRenderer {
         FileFormat pFormat = Format.from(renderRequest.getFormat());
         String fileSuffix = pFormat.getFileSuffix();
         int requestedPageNumber = renderRequest.getPage();
-        Zoom zoom = renderRequest.getZoom();
         try {
-            SourceStringReader reader = newSourceStringReader(renderRequest.getSource(), true, renderRequest.getSourceFile());
-
-            zoomDiagram(renderRequest, reader, zoom);
+            DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, renderRequest.getSource());
 
             VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
             if (requestedPageNumber >= 0) {
                 outputStream = new FileOutputStream(path);
-                reader.outputImage(outputStream, requestedPageNumber, new FileFormatOption(pFormat));
+                diagramFactory.outputImage(outputStream, requestedPageNumber, new FileFormatOption(pFormat));
                 outputStream.close();
                 vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, path));
             } else {
                 if (pathPrefix == null) {
                     throw new IllegalArgumentException("pathPrefix is null");
                 }
-                List<BlockUml> blocks = reader.getBlocks();
-                DiagramInfo.Titles titles = getTitles(blocks);
-                int imageСounter = 0;
-
                 PlantUmlSettings settings = PlantUmlSettings.getInstance();
                 boolean usePageTitles = settings.isUsePageTitles();
 
-                for (BlockUml block : blocks) {
-                    Diagram diagram = block.getDiagram();
-                    int pages = diagram.getNbImages();
+                for (MyBlock block : diagramFactory.getBlockInfos()) {
+                    net.sourceforge.plantuml.core.Diagram diagram = block.getDiagram();
+                    int pages = block.getNbImages();
                     for (int page = 0; page < pages; ++page) {
                         String fPath;
                         if (usePageTitles) {
-                            String titleOrPageNumber = titles.getTitleOrPageNumber(imageСounter);
+                            String titleOrPageNumber = block.getTitles().getTitleOrPageNumber(page);
                             if (page == 0 && pathPrefix.endsWith("-" + titleOrPageNumber)) {
                                 pathPrefix = pathPrefix.substring(0, pathPrefix.length() - ("-" + titleOrPageNumber).length());
                             }
@@ -90,7 +70,8 @@ public class PlantUmlNormalRenderer {
                         }
                         outputStream = new FileOutputStream(fPath);
                         try {
-                            reader.outputImage(outputStream, imageСounter++, new FileFormatOption(pFormat));
+//                            reader.outputImage(outputStream, imageСounter++, new FileFormatOption(pFormat));
+                            diagram.exportDiagram(outputStream, page++, new FileFormatOption(pFormat));
                         } finally {
                             outputStream.close();
                         }
@@ -108,15 +89,14 @@ public class PlantUmlNormalRenderer {
     }
 
     public RenderResult doRender(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit) {
-        String documentSource = renderRequest.getSource();
         try {
             // image generation.                     
             long start = System.currentTimeMillis();
-            SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
+            DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, renderRequest.getSource());
+
             logger.debug("newSourceStringReader done in ", System.currentTimeMillis() - start, "ms");
 
-            DiagramInfo info = zoomDiagram(renderRequest, reader, renderRequest.getZoom());
-            Integer totalPages = info.getTotalPages();
+            int totalPages = diagramFactory.getTotalPages();
 
             if (totalPages == 0) {
                 return new RenderResult(RenderingType.NORMAL, 0);
@@ -145,54 +125,54 @@ public class PlantUmlNormalRenderer {
             logger.debug("sum of all before render ", System.currentTimeMillis() - start, "ms");
 
 
-            for (int i = 0; i < totalPages; i++) {
-                boolean pageRequested = renderRequestPage == -1 || renderRequestPage == i;
+            for (int page = 0; page < totalPages; page++) {
+                boolean pageRequested = renderRequestPage == -1 || renderRequestPage == page;
                 if (incrementalRendering) {
-                    incrementalRendering(renderRequest, cachedItem, sourceSplit, documentSource, reader, info, renderResult, formatOption, i, pageRequested);
+                    incrementalRendering(renderRequest, cachedItem, sourceSplit, renderRequest.getSource(), diagramFactory, renderResult, formatOption, page, pageRequested);
                 } else {
-                    normalRendering(renderRequest, sourceSplit, documentSource, reader, info, renderResult, formatOption, containsIncludedNewPage, i, pageRequested);
+                    normalRendering(renderRequest, sourceSplit, renderRequest.getSource(), diagramFactory, renderResult, formatOption, containsIncludedNewPage, page, pageRequested);
                 }
             }
-            renderResult.setIncludedFiles(Utils.getIncludedFiles(reader));
+            renderResult.setIncludedFiles(diagramFactory.getIncludedFiles());
             return renderResult;
         } catch (UnsupportedOperationException e) {
             throw e;
         } catch (RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
-            logger.error("Failed to render image " + documentSource, e);
+            logger.error("Failed to render image " + renderRequest.getSource(), e);
             return new RenderResult(RenderingType.NORMAL, 0);
         }
     }
 
-    private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, SourceStringReader reader, DiagramInfo info, RenderResult renderResult, FileFormatOption formatOption, int i, boolean pageRequested) throws IOException {
+    private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, DiagramFactory info, RenderResult renderResult, FileFormatOption formatOption, int page, boolean pageRequested) throws IOException {
         boolean obsolete = renderRequest.requestedRefreshOrIncludesChanged()
-                || !renderRequest.getZoom().equals(cachedItem.getZoom())
-                || !sourceSplit[i].equals(cachedItem.getImagesItemPageSource(i))
-                || cachedItem.titleChaged(info.getTitle(i), i);
+                || cachedItem.zoomChanged(renderRequest)
+                || cachedItem.sourceChanged(sourceSplit, page)
+                || cachedItem.titleChanged(page, info.getTitle(page));
 
-        boolean shouldRender = pageRequested && (obsolete || !cachedItem.hasImage(i));
+        boolean shouldRender = pageRequested && (obsolete || cachedItem.imageMissing(page));
 
         if (shouldRender) {
-            ImageItem imageItem = generateImageItem(renderRequest, documentSource, sourceSplit[i], reader, formatOption, i, i, RenderingType.NORMAL, info.getTitle(i), info.getFilename());
+            ImageItem imageItem = info.generateImageItem(renderRequest, documentSource, sourceSplit[page], formatOption, page, page, RenderingType.NORMAL);
             renderResult.addRenderedImage(imageItem);
         } else if (obsolete) {
-            logger.debug("page ", i, "  title only");
-            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[i], i, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename()));
+            logger.debug("page ", page, "  title only");
+            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[page], page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(page), info.getFilename(page)));
         } else {
-            logger.debug("page ", i, " cached");
-            renderResult.addCachedImage(cachedItem.getImageItem(i));
+            logger.debug("page ", page, " cached");
+            renderResult.addCachedImage(cachedItem.getImageItem(page));
         }
     }
 
-    private void normalRendering(RenderRequest renderRequest, String[] sourceSplit, String documentSource, SourceStringReader reader, DiagramInfo info, RenderResult renderResult, FileFormatOption formatOption, boolean containsIncludedNewPage, int i, boolean pageRequested) throws IOException {
-        String pageSource = pageSource(sourceSplit, containsIncludedNewPage, i);
+    private void normalRendering(RenderRequest renderRequest, String[] sourceSplit, String documentSource, DiagramFactory info, RenderResult renderResult, FileFormatOption formatOption, boolean containsIncludedNewPage, int page, boolean pageRequested) {
+        String pageSource = pageSource(sourceSplit, containsIncludedNewPage, page);
         if (pageRequested) {
-            ImageItem imageItem = generateImageItem(renderRequest, documentSource, pageSource, reader, formatOption, i, i, RenderingType.NORMAL, info.getTitle(i), info.getFilename());
+            ImageItem imageItem = info.generateImageItem(renderRequest, documentSource, pageSource, formatOption, page, page, RenderingType.NORMAL);
             renderResult.addRenderedImage(imageItem);
         } else {
-            logger.debug("page ", i, "  title only");
-            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, i, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(i), info.getFilename());
+            logger.debug("page ", page, "  title only");
+            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(page), info.getFilename(page));
             renderResult.addUpdatedTitle(imageItem);
         }
     }
@@ -209,60 +189,6 @@ public class PlantUmlNormalRenderer {
 
     protected boolean cachedPageCountChanged(RenderCacheItem cachedItem, int pagesCount) {
         return cachedItem != null && pagesCount != cachedItem.getImageItems().length;
-    }
-
-    @NotNull
-    protected ImageItem generateImageItem(RenderRequest renderRequest,
-                                          String documentSource,
-                                          @Nullable String pageSource,
-                                          SourceStringReader reader,
-                                          FileFormatOption formatOption,
-                                          int page,
-                                          int logPage,
-                                          RenderingType renderingType,
-                                          String title,
-                                          String filename) throws IOException {
-        checkCancel();
-        long start = System.currentTimeMillis();
-
-        ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-
-        DiagramDescription diagramDescription;
-        try {
-            diagramDescription = reader.outputImage(imageStream, page, formatOption);
-        } catch (UnsupportedOperationException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RenderingCancelledException(e);
-        }
-        byte[] bytes = imageStream.toByteArray();
-
-        logger.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms");
-
-        byte[] svgBytes = new byte[0];
-        if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
-            svgBytes = bytes;
-        } else if (renderRequest.isRenderUrlLinks()) {
-            svgBytes = generateSvg(reader, page);
-        }
-
-
-        ObjectUtils.assertNotNull(diagramDescription);
-        String description = diagramDescription.getDescription();
-        if (description != null && description.contains("entities")) {
-            description = "ok";
-        }
-
-        return new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, description, bytes, svgBytes, renderingType, title, filename);
-    }
-
-    protected byte[] generateSvg(SourceStringReader reader, int i) throws IOException {
-        long start = System.currentTimeMillis();
-        ByteArrayOutputStream svgStream = new ByteArrayOutputStream();
-        reader.outputImage(svgStream, i, SVG);
-        byte[] svgBytes = svgStream.toByteArray();
-        logger.debug("generated ", SVG.getFileFormat(), " for page ", i, " in ", System.currentTimeMillis() - start, "ms");
-        return svgBytes;
     }
 
 

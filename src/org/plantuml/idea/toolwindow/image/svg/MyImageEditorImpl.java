@@ -30,7 +30,6 @@ import org.intellij.images.editor.ImageEditor;
 import org.intellij.images.editor.ImageZoomModel;
 import org.intellij.images.fileTypes.ImageFileTypeManager;
 import org.intellij.images.thumbnail.actionSystem.ThumbnailViewActions;
-import org.intellij.images.vfs.IfsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.toolwindow.Zoom;
@@ -91,7 +90,7 @@ public final class MyImageEditorImpl implements ImageEditor {
     void setValue(VirtualFile file) {
         try {
             //CUSTOM
-            editorUI.setImageProvider(new MyScaledImageProvider(file), IfsUtil.getFormat(file));
+            editorUI.setImageProvider(new MyScaledImageProvider(file), "svg");
 //            editorUI.setImageProvider(IfsUtil.getImageProvider(file), IfsUtil.getFormat(file));
 
         } catch (Exception e) {

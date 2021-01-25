@@ -1,22 +1,15 @@
 package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import net.sourceforge.plantuml.*;
-import net.sourceforge.plantuml.core.Diagram;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
-import net.sourceforge.plantuml.error.PSystemError;
+import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
-import net.sourceforge.plantuml.sequencediagram.Event;
-import net.sourceforge.plantuml.sequencediagram.Newpage;
-import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
-import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.rendering.*;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.rendering.RenderCacheItem;
+import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.rendering.RenderingCancelledException;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,135 +55,6 @@ public class PlantUmlRendererUtil {
         return renderResult;
     }
 
-    public static DiagramInfo zoomDiagram(RenderRequest renderRequest, SourceStringReader reader, Zoom zoom) {
-        long start1 = System.currentTimeMillis();
-        int totalPages = 0;
-        List<BlockUml> blocks = reader.getBlocks();
-        String fileOrDirname = null;
-
-        if (blocks.size() > 1) {
-//            logger.error("more than 1 block"); //TODO
-            //happens when the source is incorrectly extracted and contains multiple diagrams
-        }
-
-        for (int i = 0; i < blocks.size(); i++) {
-            BlockUml block = blocks.get(i);
-
-            long start = System.currentTimeMillis();
-            checkCancel();
-            Diagram diagram = block.getDiagram();
-            logger.debug("getDiagram done in  ", System.currentTimeMillis() - start, " ms");
-
-            zoomDiagram(renderRequest.getFormat(), diagram, zoom);
-            fileOrDirname = block.getFileOrDirname();
-            totalPages = totalPages + diagram.getNbImages(); //TODO SLOW for large sequence
-
-            break;
-        }
-        DiagramInfo.Titles titles = getTitles(blocks);
-        DiagramInfo diagramInfo = new DiagramInfo(totalPages, titles, fileOrDirname);
-        logger.debug("zoomDiagram done in ", System.currentTimeMillis() - start1, "ms");
-        return diagramInfo;
-    }
-
-    private static void zoomDiagram(PlantUml.ImageFormat format, Diagram diagram, Zoom zoom) {
-        if (format == PlantUml.ImageFormat.SVG) {
-            logger.debug("skipping SVG zooming");
-            return;
-        }
-        long start = System.currentTimeMillis();
-        int osScaledZoom = zoom.getScaledZoom();
-
-        if (diagram instanceof NewpagedDiagram) {
-            NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
-            for (Diagram page : newpagedDiagram.getDiagrams()) {
-                if (page instanceof AbstractPSystem) {
-                    AbstractPSystem descriptionDiagram = (AbstractPSystem) page;
-                    Scale scale = descriptionDiagram.getScale();
-
-                    if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {
-                        descriptionDiagram.setScale(calculateScale(osScaledZoom, scale));
-                    }
-                }
-            }
-        } else if (diagram instanceof AbstractPSystem) { //gantt, salt wireframe - but has no effect
-            AbstractPSystem d = (AbstractPSystem) diagram;
-            Scale scale = d.getScale();
-
-            if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {
-                d.setScale(calculateScale(osScaledZoom, scale));
-            }
-        }
-        logger.debug("zoom diagram done in  ", System.currentTimeMillis() - start, " ms");
-    }
-
-    @NotNull
-    private static ScaleSimple calculateScale(int zoom, Scale scale) {
-        return new ScaleSimple(getPlantUmlScale(scale) * zoom / 100f);
-    }
-
-    private static double getPlantUmlScale(Scale scale) {
-        double plantUmlScale = 1.0;
-        if (scale instanceof ScaleSimple) {
-            plantUmlScale = scale.getScale(1, 1);
-        }
-        return plantUmlScale;
-    }
-
-    @NotNull
-    protected static DiagramInfo.Titles getTitles(List<BlockUml> blocks) {
-        long start = System.currentTimeMillis();
-        List<String> titles = new ArrayList<String>();
-        for (BlockUml block : blocks) {
-            Diagram diagram = block.getDiagram();
-            if (diagram instanceof SequenceDiagram) {
-                SequenceDiagram sequenceDiagram = (SequenceDiagram) diagram;
-                addTitle(titles, sequenceDiagram.getTitle().getDisplay());
-                List<Event> events = sequenceDiagram.events();
-                for (Event event : events) {
-                    if (event instanceof Newpage) {
-                        Display title = ((Newpage) event).getTitle();
-                        addTitle(titles, title);
-                    }
-                }
-            } else if (diagram instanceof NewpagedDiagram) {
-                NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
-                List<Diagram> diagrams = newpagedDiagram.getDiagrams();
-                for (Diagram diagram1 : diagrams) {
-                    if (diagram1 instanceof UmlDiagram) {
-                        DisplayPositionned title = ((UmlDiagram) diagram1).getTitle();
-                        addTitle(titles, title.getDisplay());
-                    }
-                }
-            } else if (diagram instanceof UmlDiagram) {
-                DisplayPositionned title = ((UmlDiagram) diagram).getTitle();
-                addTitle(titles, title.getDisplay());
-            } else if (diagram instanceof PSystemError) {
-                DisplayPositionned title = ((PSystemError) diagram).getTitle();
-                if (title == null) {
-                    titles.add(null);
-                } else {
-                    addTitle(titles, title.getDisplay());
-                }
-            } else if (diagram instanceof TitledDiagram) {
-                addTitle(titles, ((TitledDiagram) diagram).getTitle().getDisplay());
-            } else {
-                titles.add(null);
-            }
-            break;
-        }
-        logger.debug("getTitles done in ", System.currentTimeMillis() - start, "ms");
-        return new DiagramInfo.Titles(titles);
-    }
-
-
-    protected static void addTitle(List<String> titles, Display display) {
-        if (display.size() > 0) {
-            titles.add(display.toString());
-        } else {
-            titles.add(null);
-        }
-    }
 
     public static void checkCancel() {
         if (Thread.currentThread().isInterrupted()) {

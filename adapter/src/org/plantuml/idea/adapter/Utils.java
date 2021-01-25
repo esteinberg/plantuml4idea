@@ -5,13 +5,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ImageLoader;
-import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileSystem;
-import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
-import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
@@ -28,15 +25,10 @@ import org.w3c.dom.Document;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
@@ -152,27 +144,6 @@ public class Utils {
     public static String encode(String source) throws IOException {
         Transcoder defaultTranscoder = TranscoderUtil.getDefaultTranscoder();
         return defaultTranscoder.encode(source);
-    }
-
-    @NotNull
-    public static LinkedHashMap<File, Long> getIncludedFiles(SourceStringReader reader) {
-        long start = System.currentTimeMillis();
-        LinkedHashMap<File, Long> includedFiles = new LinkedHashMap<>();
-        List<BlockUml> blocks = reader.getBlocks();
-        for (BlockUml block : blocks) {
-            try {
-                Set<File> convert = FileWithSuffix.convert(block.getIncluded());
-                ArrayList<File> files = new ArrayList<>(convert);
-                files.sort(File::compareTo);
-                for (File file : files) {
-                    includedFiles.put(file, file.lastModified());
-                }
-            } catch (FileNotFoundException e) {
-                LOG.warn(e);
-            }
-        }
-        LOG.debug("getIncludedFiles ", (System.currentTimeMillis() - start), "ms");
-        return includedFiles;
     }
 
     public static void saveAllDocuments(@Nullable String sourceFilePath) {

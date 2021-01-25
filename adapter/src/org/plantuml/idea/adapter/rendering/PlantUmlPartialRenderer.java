@@ -9,7 +9,6 @@ import net.sourceforge.plantuml.error.PSystemErrorV2;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
-import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.rendering.*;
 
 import java.io.ByteArrayOutputStream;
@@ -20,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.*;
+import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.newSourceStringReader;
 
 
 public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
@@ -98,8 +97,9 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         logger.debug("updating title, page ", page);
 
         SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
-        String title = getTitle(reader);
-        Map<File, Long> includedFiles = Utils.getIncludedFiles(reader);
+        DiagramFactory diagrams = DiagramFactory.create(reader, null);
+        Map<File, Long> includedFiles = diagrams.getIncludedFiles();
+        String title = diagrams.getTitle(0);
 
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
 
@@ -108,31 +108,18 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         return new Pair(imageItem, includedFiles);
     }
 
-    private String getTitle(SourceStringReader reader) {
-        DiagramInfo.Titles titles = getTitles(reader.getBlocks());
-        if (titles.size() > 1) {
-            throw new PartialRenderingException();
-        }
-        return titles.get(0);
-    }
-
 
     private Pair<ImageItem, LinkedHashMap<File, Long>> renderImage(RenderRequest renderRequest, int page, FileFormatOption formatOption, String partialSource) {
         logger.debug("rendering partially, page ", page);
-        SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
-        DiagramInfo info = zoomDiagram(renderRequest, reader, renderRequest.getZoom());
-        Integer totalPages = info.getTotalPages();
-        DiagramInfo.Titles titles = info.getTitles();
-        LinkedHashMap<File, Long> includedFiles = Utils.getIncludedFiles(reader);
+        DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, partialSource);
+        Integer totalPages = diagramFactory.getTotalPages();
+        LinkedHashMap<File, Long> includedFiles = diagramFactory.getIncludedFiles();
 
         if (totalPages > 1) {
             throw new PartialRenderingException();
         }
-        if (titles.size() > 1) {
-            logger.warn("too many titles " + titles + ", partialSource=" + partialSource);
-        }
         try {
-            ImageItem item = generateImageItem(renderRequest, renderRequest.getSource(), partialSource, reader, formatOption, 0, page, RenderingType.PARTIAL, titles.get(0), info.getFilename());
+            ImageItem item = diagramFactory.generateImageItem(renderRequest, renderRequest.getSource(), partialSource, formatOption, 0, page, RenderingType.PARTIAL);
             ImageItem imageItem = new ImageItem(page, item, renderRequest.getFormat());
             return new Pair<>(imageItem, includedFiles);
         } catch (RenderingCancelledException e) {
