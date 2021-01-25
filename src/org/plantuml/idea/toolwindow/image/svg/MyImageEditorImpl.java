@@ -25,6 +25,7 @@ import com.intellij.openapi.vfs.newvfs.RefreshQueue;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
 import com.intellij.util.ImageLoader;
+import org.apache.batik.transcoder.TranscoderException;
 import org.intellij.images.editor.ImageDocument;
 import org.intellij.images.editor.ImageEditor;
 import org.intellij.images.editor.ImageZoomModel;
@@ -42,6 +43,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
@@ -241,32 +243,40 @@ public final class MyImageEditorImpl implements ImageEditor {
             try {
                 double zoom = getZoomModel().getZoomFactor();
                 if (image == null || !this.zoom.equals(zoom)) {
-                    long start = System.currentTimeMillis();
-                    ByteArrayInputStream in = new ByteArrayInputStream(file.contentsToByteArray());
-                    InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
-                    Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
-                    //it shows what is in png document - unZOOMED values, not limited by px limit
-                    ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
-
-                    ScaleContext scaleContext = ScaleContext.create(component);
-
-                    double scale = scaleContext.getScale(ScaleType.SYS_SCALE);
-                    double scaledZoom;
-                    if (PlantUmlSettings.getInstance().isSvgPreviewScaling()) {
-                        scaledZoom = zoom * scale;
-                    } else {
-                        scaledZoom = zoom;
-                    }
-
-                    image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
-                    this.outSize = outSize;
-                    this.zoom = zoom;
-                    LOG.debug("ScaledImageProvider done in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", this.outSize.getWidth(), " hight=", this.outSize.getHeight());
+                    createImage(component, zoom);
                 }
                 return image;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        private synchronized void createImage(Component component, double zoom) throws IOException, TranscoderException {
+            if (image != null && this.zoom.equals(zoom)) {
+                return;
+            }
+            
+            long start = System.currentTimeMillis();
+            ByteArrayInputStream in = new ByteArrayInputStream(file.contentsToByteArray());
+            InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
+            Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
+            //it shows what is in png document - unZOOMED values, not limited by px limit
+            ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
+
+            ScaleContext scaleContext = ScaleContext.create(component);
+
+            double scale = scaleContext.getScale(ScaleType.SYS_SCALE);
+            double scaledZoom;
+            if (PlantUmlSettings.getInstance().isSvgPreviewScaling()) {
+                scaledZoom = zoom * scale;
+            } else {
+                scaledZoom = zoom;
+            }
+
+            image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
+            this.outSize = outSize;
+            this.zoom = zoom;
+            LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", this.image.getWidth(), " hight=", this.image.getHeight() ," docWidth=", this.outSize.getWidth(), " docHight=", this.outSize.getHeight());
         }
     }
 }
