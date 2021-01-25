@@ -215,39 +215,34 @@ public final class MyImageEditorImpl implements ImageEditor {
     }
 
     public class MyScaledImageProvider implements ImageDocument.ScaledImageProvider {
+
         private final VirtualFile file;
-        private volatile ImageLoader.Dimension2DDouble outSize;
-        private volatile Double zoom;
-        private volatile BufferedImage image;
+
         private volatile boolean renderingInProgress;
+
+        private volatile Holder holder = new Holder();
 
         public MyScaledImageProvider(VirtualFile file) {
             this.file = file;
         }
 
-        public ImageLoader.Dimension2DDouble getOutSize() {
-            return outSize;
-        }
-
-        public BufferedImage getImage() {
-            return image;
-        }
-
-        public Double getZoom() {
-            return zoom;
+        public Holder getHolder() {
+            return holder;
         }
 
         @Override
         public BufferedImage apply(Double bullshitScale, Component component) {
             double zoom = getZoomModel().getZoomFactor();
-            if ((image == null || !this.zoom.equals(zoom)) && !renderingInProgress) {
+            Holder holder = this.holder;
+            if (holder.isChanged(zoom) && !renderingInProgress) {
                 createImage(component, zoom);
             }
-            return image;
+            return holder.image;
         }
 
         public synchronized void createImage(Component component, double zoom) {
-            if (image != null && this.zoom.equals(zoom)) {
+            Holder holder = this.holder;
+            if (holder.image != null && holder.zoom.equals(zoom)) {
                 return;
             }
             try {
@@ -269,15 +264,60 @@ public final class MyImageEditorImpl implements ImageEditor {
                     scaledZoom = zoom;
                 }
 
-                image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
-                this.outSize = outSize;
-                this.zoom = zoom;
-                LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", this.image.getWidth(), " hight=", this.image.getHeight(), " docWidth=", this.outSize.getWidth(), " docHight=", this.outSize.getHeight());
+                BufferedImage image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
+
+                Holder newHolder = new Holder(image, outSize, zoom);
+
+                this.holder = newHolder;
+                LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", newHolder.image.getWidth(), " hight=", newHolder.image.getHeight(), " docWidth=", newHolder.outSize.getWidth(), " docHight=", newHolder.outSize.getHeight());
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
                 renderingInProgress = false;
             }
+        }
+
+        class Holder {
+            private final ImageLoader.Dimension2DDouble outSize;
+            private final Double zoom;
+            private final BufferedImage image;
+
+            public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, Double zoom) {
+                this.outSize = outSize;
+                this.zoom = zoom;
+                this.image = image;
+            }
+
+            public Holder() {
+                this(null, null, -1.0);
+            }
+
+            private boolean isChanged(double zoom) {
+                return image == null || !this.zoom.equals(zoom);
+            }
+
+            public ImageLoader.Dimension2DDouble getOutSize() {
+                return outSize;
+            }
+
+            public Double getZoom() {
+                return zoom;
+            }
+
+            public BufferedImage getImage() {
+                return image;
+            }
+
+            @Override
+            public String toString() {
+                return "Holder{" +
+                        "outSize=" + outSize +
+                        ", zoom=" + zoom +
+                        ", image=" + image +
+                        '}';
+            }
+
+
         }
     }
 }

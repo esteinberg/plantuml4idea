@@ -603,10 +603,12 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //            imageComponent.setCanvasSize((int) Math.ceil(bounds.width * zoom), (int) Math.ceil(bounds.height * zoom));
 //        }
         if (imageProvider != null) {
-            ImageLoader.Dimension2DDouble outSize = imageProvider.getOutSize();
-            if (outSize != null) {
-                Double zoom = imageProvider.getZoom();
-                BufferedImage image = imageProvider.getImage();
+            MyImageEditorImpl.MyScaledImageProvider.Holder holder = imageProvider.getHolder();
+            if (holder.getImage() != null) {
+                BufferedImage image = holder.getImage();
+                Double zoom = holder.getZoom();
+                ImageLoader.Dimension2DDouble outSize = holder.getOutSize();
+
                 int w = (int) Math.floor(outSize.getWidth() * zoom);
                 int h = (int) Math.floor(outSize.getHeight() * zoom);
 //                int w = (int) Math.ceil(outSize.getWidth() * zoom);
