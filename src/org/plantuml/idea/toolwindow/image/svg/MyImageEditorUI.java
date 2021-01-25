@@ -52,7 +52,6 @@ import org.intellij.images.ui.ImageComponentDecorator;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.rendering.RenderCache;
 import org.plantuml.idea.toolwindow.Zoom;
 
 import javax.swing.*;
@@ -436,7 +435,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         public void setZoomFactor(double newZoom) {
             double oldZoomFactor = getZoomFactor();
 
-            RenderCache.logger.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
+            LOG.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
             if (Double.compare(oldZoomFactor, newZoom) == 0) return;
             this.zoomFactor = newZoom;
 
@@ -454,20 +453,18 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         public void setZoomFactorOptimized(double newZoom) {
             double oldZoomFactor = getZoomFactor();
 
-            RenderCache.logger.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
+            LOG.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
             if (Double.compare(oldZoomFactor, newZoom) == 0) return;
             this.zoomFactor = newZoom;
 
             alarm.cancelAllRequests();
             alarm.addRequest(() -> {
-                RenderCache.logger.debug("imageProvider.apply, zoom=", this.zoomFactor);
-                //render with new zoom
-                imageProvider.apply(-1d, imageComponent);
+                LOG.debug("imageProvider.apply, zoom=", this.zoomFactor);
 
-                //display it
+                imageProvider.createImage(imageComponent, newZoom);
+
                 SwingUtilities.invokeLater(() -> {
-                    // Change current size
-                    RenderCache.logger.debug("refreshing UI");
+                    LOG.debug("refreshing UI");
 
                     revalidate();
                     repaint();
