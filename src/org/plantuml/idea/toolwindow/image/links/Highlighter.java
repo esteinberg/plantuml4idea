@@ -6,6 +6,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiEditorUtil;
@@ -72,8 +73,8 @@ public class Highlighter {
         if (editor.getProject() == null) {
             return Collections.emptyList();
         }
-        PsiFile file = PsiEditorUtil.getPsiFile(editor);
-        if (!file.isValid()) {
+        PsiFile file = PsiDocumentManager.getInstance(editor.getProject()).getPsiFile(editor.getDocument());
+        if (file==null || !file.isValid()) {
             return Collections.emptyList(); 
         }
         for (CaretState caretsAndSelection : caretsAndSelections) {
