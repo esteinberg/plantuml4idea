@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.scale.ScaleContext;
@@ -195,6 +196,9 @@ public class ImageItem {
 
         LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", new String(getImageBytes(), StandardCharsets.UTF_8));
         this.editor = new MyImageEditorImpl(project, virtualFile, true, renderRequest.getZoom());
+
+        Disposer.register(UIUtils.getPlantUmlToolWindow(project), editor);
+
         ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
         JComponent contentComponent = this.editor.getContentComponent();
 
@@ -227,6 +231,12 @@ public class ImageItem {
         LOG.debug("init getEditor done in ", System.currentTimeMillis() - start, "ms");
 
         return this.editor;
+    }
+
+    public void dispose() {
+        if (editor != null) {
+            Disposer.dispose(editor);
+        }
     }
 
     public class LinkData {

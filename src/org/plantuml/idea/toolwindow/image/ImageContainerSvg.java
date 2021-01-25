@@ -21,12 +21,11 @@ import org.plantuml.idea.toolwindow.image.links.LinkNavigator;
 import org.plantuml.idea.toolwindow.image.links.MyJLabel;
 import org.plantuml.idea.toolwindow.image.links.MyMouseAdapter;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
+import org.plantuml.idea.toolwindow.image.svg.MyImageEditorUI;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
@@ -171,10 +170,9 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
 
-    public void setZoom(int unscaledZoom) {
-        double d = unscaledZoom;
-        editor.getZoomModel().setZoomFactor(d / 100);
-        editor.getZoomModel().setZoomLevelChanged(true);
+    public void setZoomOptimized(int unscaledZoom) {
+        MyImageEditorUI.ImageZoomModelImpl zoomModel = (MyImageEditorUI.ImageZoomModelImpl) editor.getZoomModel();
+        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100);
     }
 
     @Override

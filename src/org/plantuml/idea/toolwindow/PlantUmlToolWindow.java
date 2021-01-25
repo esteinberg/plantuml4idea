@@ -18,6 +18,7 @@ import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
+import org.plantuml.idea.action.ZoomAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
@@ -69,6 +70,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private int lastValidHorizontalScrollValue;
     private LocalFileSystem localFileSystem;
     private Highlighter highlighter;
+    private Alarm zoomAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
     public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
         super(new BorderLayout());
@@ -501,14 +503,28 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void changeZoom(int unscaledZoom) {
+        unscaledZoom = Math.min(ZoomAction.MAX_ZOOM, unscaledZoom);
+        int oldUnscaled = zoom.getUnscaledZoom();
+        //do always, so that changed OS scaling takes effect
         zoom = new Zoom(this, unscaledZoom);
+
+        if (oldUnscaled == unscaledZoom) {
+            return;
+        }
+
+        logger.debug("changing zoom to unscaledZoom=", unscaledZoom);
+
         if (PlantUmlSettings.getInstance().isDisplaySvg()) {
-            for (Component component : imagesPanel.getComponents()) {
-                if (component instanceof ImageContainerSvg) {
-                    ImageContainerSvg component1 = (ImageContainerSvg) component;
-                    component1.setZoom(unscaledZoom);
+            int i = zoomAlarm.cancelAllRequests();
+            int finalUnscaledZoom = unscaledZoom;
+            zoomAlarm.addRequest(() -> {
+                for (Component component : imagesPanel.getComponents()) {
+                    if (component instanceof ImageContainerSvg) {
+                        ((ImageContainerSvg) component).setZoomOptimized(finalUnscaledZoom);
+                    }
                 }
-            }
+
+            }, 10);
         } else {
             renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }

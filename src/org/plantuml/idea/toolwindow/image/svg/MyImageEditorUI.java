@@ -22,6 +22,7 @@ import com.intellij.ide.DeleteProvider;
 import com.intellij.ide.util.DeleteHandler;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
@@ -34,11 +35,12 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBLayeredPane;
 import com.intellij.ui.components.Magnificator;
+import com.intellij.util.Alarm;
+import com.intellij.util.ImageLoader;
 import com.intellij.util.LazyInitializer.NotNullValue;
 import com.intellij.util.ui.JBUI;
 import org.intellij.images.ImagesBundle;
 import org.intellij.images.editor.ImageDocument;
-import org.intellij.images.editor.ImageDocument.ScaledImageProvider;
 import org.intellij.images.editor.ImageEditor;
 import org.intellij.images.editor.ImageZoomModel;
 import org.intellij.images.editor.actionSystem.ImageEditorActions;
@@ -50,6 +52,7 @@ import org.intellij.images.ui.ImageComponentDecorator;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.rendering.RenderCache;
 import org.plantuml.idea.toolwindow.Zoom;
 
 import javax.swing.*;
@@ -74,6 +77,8 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:aefimov.box@gmail.com">Alexey Efimov</a>
  */
 public final class MyImageEditorUI extends JPanel implements DataProvider, CopyProvider, ImageComponentDecorator, Disposable {
+    private static final Logger LOG = Logger.getInstance(MyImageEditorUI.class);
+
     @NonNls
     private static final String IMAGE_PANEL = "image";
     @NonNls
@@ -96,6 +101,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
     private final JScrollPane myScrollPane;
     private final boolean isEmbedded;
+    private MyImageEditorImpl.MyScaledImageProvider imageProvider;
 
 //  MyImageEditorUI(@Nullable ImageEditor editor) {
 //    this(editor, false);
@@ -104,7 +110,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     MyImageEditorUI(@Nullable ImageEditor editor, boolean isEmbedded, Zoom zoomModel) {
         this.editor = editor;
         this.isEmbedded = isEmbedded;
-        this.zoomModel = new ImageZoomModelImpl();
+        this.zoomModel = new ImageZoomModelImpl(editor);
         initialZoom = zoomModel;
 
         imageComponent.addPropertyChangeListener(ZOOM_FACTOR_PROP, e -> imageComponent.setZoomFactor(getZoomModel().getZoomFactor()));
@@ -273,11 +279,14 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         return zoomModel;
     }
 
-    public void setImageProvider(ScaledImageProvider imageProvider, String format) {
+    public void setImageProvider(MyImageEditorImpl.MyScaledImageProvider imageProvider, String format) {
+        zoomModel.setZoomFactor(initialZoom.getDoubleUnScaledZoom());   //must be before imageProvider
+
         ImageDocument document = imageComponent.getDocument();
         BufferedImage previousImage = document.getValue();
         document.setValue(imageProvider);
         if (imageProvider == null) return;
+        this.imageProvider = imageProvider;
         document.setFormat(format);
 
         //CUSTOM
@@ -289,7 +298,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //                zoomModel.setZoomFactor(1.0);
 //            }
 //        }
-        zoomModel.setZoomFactor(initialZoom.getDoubleUnScaledZoom());
 
 
     }
@@ -387,7 +395,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         }
     }
 
-    private class ImageZoomModelImpl implements ImageZoomModel {
+    public class ImageZoomModelImpl implements ImageZoomModel {
         private boolean myZoomLevelChanged;
         private final NotNullValue<Double> IMAGE_MAX_ZOOM_FACTOR = new NotNullValue<Double>() {
             @NotNull
@@ -412,26 +420,63 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         };
         private double zoomFactor = 0.0d;
 
+        Alarm alarm;
+
+        public ImageZoomModelImpl(Disposable editor) {
+            alarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, editor);
+        }
+
         @Override
         public double getZoomFactor() {
             return zoomFactor;
         }
 
+        @Deprecated
         @Override
-        public void setZoomFactor(double zoomFactor) {
+        public void setZoomFactor(double newZoom) {
             double oldZoomFactor = getZoomFactor();
 
-            if (Double.compare(oldZoomFactor, zoomFactor) == 0) return;
-            this.zoomFactor = zoomFactor;
+            RenderCache.logger.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
+            if (Double.compare(oldZoomFactor, newZoom) == 0) return;
+            this.zoomFactor = newZoom;
 
             // Change current size
-            updateImageComponentSize();
 
             revalidate();
             repaint();
             myZoomLevelChanged = false;
 
-            imageComponent.firePropertyChange(ZOOM_FACTOR_PROP, oldZoomFactor, zoomFactor);
+            imageComponent.firePropertyChange(ZOOM_FACTOR_PROP, oldZoomFactor, newZoom);
+            updateImageComponentSize();
+        }
+
+
+        public void setZoomFactorOptimized(double newZoom) {
+            double oldZoomFactor = getZoomFactor();
+
+            RenderCache.logger.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
+            if (Double.compare(oldZoomFactor, newZoom) == 0) return;
+            this.zoomFactor = newZoom;
+
+            alarm.cancelAllRequests();
+            alarm.addRequest(() -> {
+                RenderCache.logger.debug("imageProvider.apply, zoom=", this.zoomFactor);
+                //render with new zoom
+                imageProvider.apply(-1d, imageComponent);
+
+                //display it
+                SwingUtilities.invokeLater(() -> {
+                    // Change current size
+                    RenderCache.logger.debug("refreshing UI");
+
+                    revalidate();
+                    repaint();
+                    myZoomLevelChanged = false;
+
+                    imageComponent.firePropertyChange(ZOOM_FACTOR_PROP, oldZoomFactor, newZoom);
+                    updateImageComponentSize();
+                });
+            }, 10);
         }
 
         private double getMaximumZoomFactor() {
@@ -519,6 +564,8 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         public boolean isZoomLevelChanged() {
             return myZoomLevelChanged;
         }
+
+
     }
 
     @Nullable
@@ -552,20 +599,45 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     }
 
     private void updateImageComponentSize() {
-        Rectangle bounds = imageComponent.getDocument().getBounds();
-        if (bounds != null) {
-            final double zoom = getZoomModel().getZoomFactor();
-            imageComponent.setCanvasSize((int) Math.ceil(bounds.width * zoom), (int) Math.ceil(bounds.height * zoom));
+        //CUSTOM
+//        Rectangle bounds = imageComponent.getDocument().getBounds();
+//        if (bounds != null) {
+//            final double zoom = getZoomModel().getZoomFactor();
+//            imageComponent.setCanvasSize((int) Math.ceil(bounds.width * zoom), (int) Math.ceil(bounds.height * zoom));
+//        }
+        if (imageProvider != null) {
+            ImageLoader.Dimension2DDouble outSize = imageProvider.getOutSize();
+            if (outSize != null) {
+                Double zoom = imageProvider.getZoom();
+                BufferedImage image = imageProvider.getImage();
+                int w = (int) Math.floor(outSize.getWidth() * zoom);
+                int h = (int) Math.floor(outSize.getHeight() * zoom);
+//                int w = (int) Math.ceil(outSize.getWidth() * zoom);
+//                int h = (int) Math.ceil(outSize.getHeight() * zoom); 
+                //totally wrong when pixels limit hits
+                int w1 = image.getWidth();
+                int h1 = image.getHeight();
+                //hopefully a little better quality
+                if (Math.abs(w - w1) == 1 || Math.abs(h - h1) == 1) {
+                    w = w1;
+                    h = h1;
+                }
+                LOG.debug("setCanvasSize ", w, "x", h);
+                imageComponent.setCanvasSize(w, h);
+            }
         }
     }
 
     private class DocumentChangeListener implements ChangeListener {
         @Override
         public void stateChanged(@NotNull ChangeEvent e) {
-            updateImageComponentSize();
+            //CUSTOM - must be after rendering!
+            // updateImageComponentSize();
 
             ImageDocument document = imageComponent.getDocument();
             BufferedImage value = document.getValue();
+
+            updateImageComponentSize();
 
             CardLayout layout = (CardLayout) contentPanel.getLayout();
             layout.show(contentPanel, value != null ? IMAGE_PANEL : ERROR_PANEL);

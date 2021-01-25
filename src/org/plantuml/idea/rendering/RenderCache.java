@@ -25,7 +25,10 @@ public class RenderCache {
     public void setMaxCacheSize(int maxCacheSize) {
         this.maxCacheSize = maxCacheSize;
         while (cacheItems.size() > maxCacheSize) {
-            cacheItems.removeFirst();
+            RenderCacheItem renderCacheItem = cacheItems.removeFirst();
+            if (renderCacheItem != displayedItem) {
+                renderCacheItem.dispose();
+            }
         }
     }
 
@@ -75,7 +78,8 @@ public class RenderCache {
 
     public void addToCache(RenderCacheItem cacheItem) {
         if (cacheItems.size() > 0 && cacheItems.size() + 1 > maxCacheSize) {
-            cacheItems.removeFirst();
+            RenderCacheItem renderCacheItem = cacheItems.removeFirst();
+            renderCacheItem.dispose();
         }
         cacheItems.add(cacheItem);
     }
@@ -107,6 +111,7 @@ public class RenderCache {
         if (displayedItem == cachedItem) {
             displayedItem = null;
         }
+        cachedItem.dispose();
     }
 
     public boolean isSameFile(RenderCacheItem cachedItem) {
@@ -117,7 +122,11 @@ public class RenderCache {
     }
 
     public void clear() {
-        cacheItems.clear();
+        while (true) {
+            RenderCacheItem poll = cacheItems.poll();
+            if (poll == null) break;
+            poll.dispose();
+        }
     }
 
     public RenderCacheItem getLast() {

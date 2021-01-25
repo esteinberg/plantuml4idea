@@ -205,4 +205,14 @@ public class RenderCacheItem {
         }
         return true;
     }
+
+    public void dispose() {
+        try {
+            for (ImageItem imageItem : imageItems) {
+                imageItem.dispose();
+            }
+        } catch (Throwable e) {
+            LOG.error(e);
+        }
+    }
 }

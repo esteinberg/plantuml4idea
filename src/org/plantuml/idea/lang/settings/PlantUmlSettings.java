@@ -38,6 +38,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
+    private static final int SVG_SIZE = 8192;
 
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
@@ -72,6 +73,8 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean displaySvg = true;
     boolean showChessboard = true;
     private boolean highlightInImages = false;
+    private String maxSvgSize = String.valueOf(SVG_SIZE);
+    private boolean svgPreviewScaling;
 
     public static PlantUmlSettings getInstance() {
         if (Classloaders.isUnitTest()) {
@@ -144,6 +147,10 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public int getCacheSizeAsInt() {
         return Utils.asInt(cacheSize, CACHE_SIZE_DEFAULT_VALUE);
+    }
+
+    public float getMaxSvgSizeAsFloat() {
+        return Utils.asInt(maxSvgSize, SVG_SIZE);
     }
 
     public void setCacheSize(String cacheSize) {
@@ -364,5 +371,21 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setHighlightInImages(final boolean highlightInImages) {
         this.highlightInImages = highlightInImages;
+    }
+
+    public String getMaxSvgSize() {
+        return maxSvgSize;
+    }
+
+    public void setMaxSvgSize(final String maxSvgSize) {
+        this.maxSvgSize = maxSvgSize;
+    }
+
+    public boolean isSvgPreviewScaling() {
+        return svgPreviewScaling;
+    }
+
+    public void setSvgPreviewScaling(final boolean svgPreviewScaling) {
+        this.svgPreviewScaling = svgPreviewScaling;
     }
 }

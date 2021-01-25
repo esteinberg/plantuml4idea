@@ -83,7 +83,7 @@ public class PlantUmlRendererUtil {
 
             zoomDiagram(renderRequest.getFormat(), diagram, zoom);
             fileOrDirname = block.getFileOrDirname();
-            totalPages = totalPages + diagram.getNbImages();
+            totalPages = totalPages + diagram.getNbImages(); //TODO SLOW for large sequence
 
             break;
         }
@@ -139,6 +139,7 @@ public class PlantUmlRendererUtil {
 
     @NotNull
     protected static DiagramInfo.Titles getTitles(List<BlockUml> blocks) {
+        long start = System.currentTimeMillis();
         List<String> titles = new ArrayList<String>();
         for (BlockUml block : blocks) {
             Diagram diagram = block.getDiagram();
@@ -178,6 +179,7 @@ public class PlantUmlRendererUtil {
             }
             break;
         }
+        logger.debug("getTitles done in ", System.currentTimeMillis() - start, "ms");
         return new DiagramInfo.Titles(titles);
     }
 

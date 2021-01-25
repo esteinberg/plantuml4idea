@@ -12,9 +12,7 @@
         <![CDATA[        
             <p>4.0</p>
             <ul>
-              <li>Switched to SVG image display:</li>
-              <li>- much faster than before</li>
-              <li>- instant zoom</li>
+              <li>Switched to a much faster SVG preview</li>
               <li>Highlighting of the selected text in images</li>
             </ul>        
             <p>3.6</p>
@@ -142,7 +140,8 @@
                 />
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
                         class="org.plantuml.idea.action.DisplaySvgToggleAction"
-                        text="Use New SVG Display (Disable for Old PNG)"
+                        text="Use New SVG Preview (Disable for Old PNG)"
+                        description="SVG is much faster"
                 />
                 />
                 <separator/>

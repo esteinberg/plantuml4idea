@@ -22,6 +22,7 @@ public class Zoom {
     public Zoom(@Nullable JComponent context, int unscaledZoom) {
         this.unscaledZoom = unscaledZoom;
         systemScale = getSystemScale(context);
+        LOG.debug("systemScale=", systemScale);
         scaledZoom = (int) (unscaledZoom * systemScale);
         displaySvg = PlantUmlSettings.getInstance().isDisplaySvg();
     }

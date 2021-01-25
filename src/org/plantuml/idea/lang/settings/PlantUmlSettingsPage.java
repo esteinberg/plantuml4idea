@@ -54,6 +54,8 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox linkOpensSearchBar;
     private JCheckBox displaySvg;
     private JCheckBox highlightInImages;
+    private JTextField maxSvgSize;
+    private JCheckBox svgPreviewScaling;
 
     public PlantUmlSettingsPage() {
         browse.addActionListener(new ActionListener() {
@@ -83,6 +85,7 @@ public class PlantUmlSettingsPage implements Configurable {
             LOG.error(throwable);
         }
     }
+
 
     private void browseForjar(@NotNull final JTextField target) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, false, true, true, false, false);
@@ -179,6 +182,7 @@ public class PlantUmlSettingsPage implements Configurable {
         renderDelay.setText(data.getRenderDelay());
         cacheSize.setText(data.getCacheSize());
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
+        maxSvgSize.setText(data.getMaxSvgSize());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
@@ -189,6 +193,7 @@ public class PlantUmlSettingsPage implements Configurable {
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
+        svgPreviewScaling.setSelected(data.isSvgPreviewScaling());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -202,6 +207,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setRenderDelay(renderDelay.getText());
         data.setCacheSize(cacheSize.getText());
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
+        data.setMaxSvgSize(maxSvgSize.getText());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
@@ -212,6 +218,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
+        data.setSvgPreviewScaling(svgPreviewScaling.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -233,6 +240,8 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
             return true;
+        if (maxSvgSize.getText() != null ? !maxSvgSize.getText().equals(data.getMaxSvgSize()) : data.getMaxSvgSize() != null)
+            return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
@@ -243,6 +252,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
         if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
+        if (svgPreviewScaling.isSelected() != data.isSvgPreviewScaling()) return true;
         return false;
     }
 }

@@ -16,11 +16,15 @@
 package org.plantuml.idea.toolwindow.image.svg;
 
 import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.*;
 import com.intellij.openapi.vfs.newvfs.RefreshQueue;
+import com.intellij.ui.scale.ScaleContext;
+import com.intellij.ui.scale.ScaleType;
+import com.intellij.util.ImageLoader;
 import org.intellij.images.editor.ImageDocument;
 import org.intellij.images.editor.ImageEditor;
 import org.intellij.images.editor.ImageZoomModel;
@@ -30,9 +34,16 @@ import org.intellij.images.vfs.IfsUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.toolwindow.image.svg.batik.MySvgDocumentFactoryKt;
+import org.plantuml.idea.toolwindow.image.svg.batik.MySvgTranscoder;
+import org.w3c.dom.Document;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Image viewer implementation.
@@ -40,6 +51,8 @@ import java.awt.*;
  * @author <a href="mailto:aefimov.box@gmail.com">Alexey Efimov</a>
  */
 public final class MyImageEditorImpl implements ImageEditor {
+    private static final Logger LOG = Logger.getInstance(MyImageEditorImpl.class);
+
     private final Project project;
     private final VirtualFile file;
     private final MyImageEditorUI editorUI;
@@ -77,8 +90,12 @@ public final class MyImageEditorImpl implements ImageEditor {
 
     void setValue(VirtualFile file) {
         try {
-            editorUI.setImageProvider(IfsUtil.getImageProvider(file), IfsUtil.getFormat(file));
+            //CUSTOM
+            editorUI.setImageProvider(new MyScaledImageProvider(file), IfsUtil.getFormat(file));
+//            editorUI.setImageProvider(IfsUtil.getImageProvider(file), IfsUtil.getFormat(file));
+
         } catch (Exception e) {
+            LOG.error(e);
             //     Error loading image file
             editorUI.setImageProvider(null, null);
         }
@@ -194,6 +211,62 @@ public final class MyImageEditorImpl implements ImageEditor {
             // Change document
             Runnable postRunnable = () -> setValue(file);
             RefreshQueue.getInstance().refresh(true, false, postRunnable, ModalityState.current(), file);
+        }
+    }
+
+    public class MyScaledImageProvider implements ImageDocument.ScaledImageProvider {
+        private final VirtualFile file;
+        private volatile ImageLoader.Dimension2DDouble outSize;
+        private volatile Double zoom;
+        private volatile BufferedImage image;
+
+        public MyScaledImageProvider(VirtualFile file) {
+            this.file = file;
+        }
+
+        public ImageLoader.Dimension2DDouble getOutSize() {
+            return outSize;
+        }
+
+        public BufferedImage getImage() {
+            return image;
+        }
+
+        public Double getZoom() {
+            return zoom;
+        }
+
+        @Override
+        public BufferedImage apply(Double bullshitScale, Component component) {
+            try {
+                double zoom = getZoomModel().getZoomFactor();
+                if (image == null || !this.zoom.equals(zoom)) {
+                    long start = System.currentTimeMillis();
+                    ByteArrayInputStream in = new ByteArrayInputStream(file.contentsToByteArray());
+                    InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
+                    Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
+                    //it shows what is in png document - unZOOMED values, not limited by px limit
+                    ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
+
+                    ScaleContext scaleContext = ScaleContext.create(component);
+
+                    double scale = scaleContext.getScale(ScaleType.SYS_SCALE);
+                    double scaledZoom;
+                    if (PlantUmlSettings.getInstance().isSvgPreviewScaling()) {
+                        scaledZoom = zoom * scale;
+                    } else {
+                        scaledZoom = zoom;
+                    }
+
+                    image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
+                    this.outSize = outSize;
+                    this.zoom = zoom;
+                    LOG.debug("ScaledImageProvider done in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", this.outSize.getWidth(), " hight=", this.outSize.getHeight());
+                }
+                return image;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
