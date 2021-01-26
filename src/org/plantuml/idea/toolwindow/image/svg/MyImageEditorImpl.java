@@ -244,10 +244,13 @@ public final class MyImageEditorImpl implements ImageEditor {
             if (holder.image != null && holder.zoom.equals(zoom)) {
                 return;
             }
+            byte[] buf = null;
             try {
                 renderingInProgress = true;
                 long start = System.currentTimeMillis();
-                ByteArrayInputStream in = new ByteArrayInputStream(file.contentsToByteArray());
+                buf = file.contentsToByteArray();
+
+                ByteArrayInputStream in = new ByteArrayInputStream(buf);
                 InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
                 Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
                 //it shows what is in png document - unZOOMED values, not limited by px limit
@@ -270,7 +273,11 @@ public final class MyImageEditorImpl implements ImageEditor {
                 this.holder = newHolder;
                 LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", newHolder.image.getWidth(), " hight=", newHolder.image.getHeight(), " docWidth=", newHolder.outSize.getWidth(), " docHight=", newHolder.outSize.getHeight());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                String source = null;
+                if (buf != null) {
+                    source = new String(buf, StandardCharsets.UTF_8);
+                }
+                throw new RuntimeException(e.getMessage() + ", imageSource: " + source, e);
             } finally {
                 renderingInProgress = false;
             }

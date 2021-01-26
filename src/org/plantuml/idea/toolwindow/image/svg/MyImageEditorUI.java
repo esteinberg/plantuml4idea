@@ -282,7 +282,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         zoomModel.setZoomFactor(initialZoom.getDoubleUnScaledZoom());   //must be before imageProvider
 
         ImageDocument document = imageComponent.getDocument();
-        BufferedImage previousImage = document.getValue();
         document.setValue(imageProvider);
         if (imageProvider == null) return;
         this.imageProvider = imageProvider;

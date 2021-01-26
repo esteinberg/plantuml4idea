@@ -1,7 +1,6 @@
 package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.util.ObjectUtils;
 import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.Log;
@@ -20,10 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.checkCancel;
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.newSourceStringReader;
@@ -70,7 +66,7 @@ public class DiagramFactory {
             break;
         }
         DiagramFactory diagramFactory = new DiagramFactory(myBlocks, totalPages);
-        LOG.debug("create done in ", System.currentTimeMillis() - start1, "ms");
+        LOG.debug("diagramFactory done in ", System.currentTimeMillis() - start1, "ms");
         return diagramFactory;
     }
 
@@ -150,8 +146,7 @@ public class DiagramFactory {
 
         ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
 
-        DiagramDescription diagramDescription;
-        diagramDescription = outputImage(imageStream, page, formatOption);
+        DiagramDescription diagramDescription = outputImage(imageStream, page, formatOption);
 
         byte[] bytes = imageStream.toByteArray();
 
@@ -160,12 +155,12 @@ public class DiagramFactory {
         byte[] svgBytes = new byte[0];
         if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
             svgBytes = bytes;
-        } else if (renderRequest.isRenderUrlLinks()) {
+        } else if (renderRequest.getFormat() == PlantUml.ImageFormat.PNG && renderRequest.isRenderUrlLinks()) { //todo check if exporting
             svgBytes = generateSvg(page);
         }
 
 
-        ObjectUtils.assertNotNull(diagramDescription);
+        Objects.requireNonNull(diagramDescription);
         String description = diagramDescription.getDescription();
         if (description != null && description.contains("entities")) {
             description = "ok";

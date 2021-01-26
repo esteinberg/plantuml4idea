@@ -330,61 +330,86 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         @Override
         public void displayResultOnEDT(RenderCacheItem newItem, long total, RenderResult result) {
-            if (reason == Reason.REFRESH) {
-                if (cachedItem != null) {
-                    renderCache.removeFromCache(cachedItem);
+            try {
+                if (reason == Reason.REFRESH) {
+                    if (cachedItem != null) {
+                        renderCache.removeFromCache(cachedItem);
+                    }
                 }
-            }
-            if (!newItem.getRenderResult().hasError()) {
-                renderCache.addToCache(newItem);
-            }
-            logger.debug("displaying item ", newItem);
+                if (!newItem.getRenderResult().hasError()) {
+                    renderCache.addToCache(newItem);
+                }
+                logger.debug("displaying item ", newItem);
 
-            if (renderCache.getDisplayedItem() != null
+                if (silentError(newItem)) {
+                    executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.ERROR, total, result, new SwitchBetweenOldImageAndSilentError(newItem));
+                } else {
+                    boolean updateStatus = displayDiagram(newItem, false);
+                    if (updateStatus) {
+                        executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, total, result, new SwitchBetweenCurrentErrorAndOldImage(newItem));
+                    }
+                }
+            } catch (Throwable e) {
+                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.ERROR, total, result, null);
+                logger.error(e);
+            }
+        }
+
+        private boolean silentError(RenderCacheItem newItem) {
+            return renderCache.getDisplayedItem() != null
                     && !renderCache.getDisplayedItem().getRenderResult().hasError()
                     && newItem.getRenderResult().hasError()
-                    && PlantUmlSettings.getInstance().isDoNotDisplayErrors()) {
-                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.ERROR, total, result, new Runnable() {
+                    && PlantUmlSettings.getInstance().isDoNotDisplayErrors();
+        }
 
-                    private RenderCacheItem oldDiagram;
+        private class SwitchBetweenCurrentErrorAndOldImage implements Runnable {
 
-                    @Override
-                    public void run() {
-                        final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
+            private RenderCacheItem oldDiagram;
+            private boolean hasError;
 
-                        if (oldDiagram != null && displayedItem != oldDiagram) {
-                            displayDiagram(oldDiagram, true);
-                            SwingUtilities.invokeLater(() -> oldDiagram = null);
-                        } else if (displayedItem != newItem) {
-                            displayDiagram(newItem, true);
+            public SwitchBetweenCurrentErrorAndOldImage(RenderCacheItem newItem) {
+                hasError = newItem.getRenderResult().hasError();
+            }
+
+            @Override
+            public void run() {
+                if (hasError) {
+                    final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
+                    if (oldDiagram != null && displayedItem != oldDiagram) {
+                        displayDiagram(oldDiagram, true);
+                        SwingUtilities.invokeLater(() -> oldDiagram = null);
+                    } else {
+                        RenderCacheItem renderCacheItem = renderCache.getLast();
+                        if (renderCacheItem != null && displayedItem != renderCacheItem) {
+                            displayDiagram(renderCacheItem, true);
                             SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
-
                         }
                     }
-                });
-            } else if (displayDiagram(newItem, false)) {
-                executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, total, result, new Runnable() {
+                }
+            }
+        }
 
-                    private RenderCacheItem oldDiagram;
-                    private boolean hasError = newItem.getRenderResult().hasError();
+        private class SwitchBetweenOldImageAndSilentError implements Runnable {
 
-                    @Override
-                    public void run() {
-                        if (hasError) {
-                            final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
-                            if (oldDiagram != null && displayedItem != oldDiagram) {
-                                displayDiagram(oldDiagram, true);
-                                SwingUtilities.invokeLater(() -> oldDiagram = null);
-                            } else {
-                                RenderCacheItem renderCacheItem = renderCache.getLast();
-                                if (renderCacheItem != null && displayedItem != renderCacheItem) {
-                                    displayDiagram(renderCacheItem, true);
-                                    SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
-                                }
-                            }
-                        }
-                    }
-                });
+            private final RenderCacheItem newItem;
+            private RenderCacheItem oldDiagram;
+
+            public SwitchBetweenOldImageAndSilentError(RenderCacheItem newItem) {
+                this.newItem = newItem;
+            }
+
+            @Override
+            public void run() {
+                final RenderCacheItem displayedItem = renderCache.getDisplayedItem();
+
+                if (oldDiagram != null && displayedItem != oldDiagram) {
+                    displayDiagram(oldDiagram, true);
+                    SwingUtilities.invokeLater(() -> oldDiagram = null);
+                } else if (displayedItem != newItem) {
+                    displayDiagram(newItem, true);
+                    SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
+
+                }
             }
         }
     }

@@ -43,27 +43,6 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         }
     }
 
-    @NotNull
-    protected RenderResult renderError(RenderRequest renderRequest, PartialRenderingException e) {
-        RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, 1);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            LineLocationImpl lineLocation = new LineLocationImpl("", null);
-            StringLocated o = new StringLocated("", lineLocation);
-            List<StringLocated> data = Collections.singletonList(o);
-            UmlSource source = new UmlSource(data, false);
-
-            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), lineLocation);
-            PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
-            pSystemError.exportDiagram(os, 0, new FileFormatOption(FileFormat.PNG));
-        } catch (IOException e1) {
-            logger.warn(e1);
-            throw e;
-        }
-        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
-        return renderResult;
-    }
-
     public void processPage(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, String s, FileFormatOption formatOption, RenderResult renderResult, int page) {
         long partialPageProcessingStart = System.currentTimeMillis();
         String partialSource = "@startuml\n" + s + "\n@enduml";
@@ -129,5 +108,28 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         }
     }
 
+
+    @NotNull
+    protected RenderResult renderError(RenderRequest renderRequest, PartialRenderingException e) {
+        RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, 1);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        FileFormat fileFormat = Format.from(renderRequest);
+        try {
+            LineLocationImpl lineLocation = new LineLocationImpl("", null);
+            StringLocated o = new StringLocated("", lineLocation);
+            List<StringLocated> data = Collections.singletonList(o);
+            UmlSource source = new UmlSource(data, false);
+
+            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), lineLocation);
+            PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
+            pSystemError.exportDiagram(os, 0, new FileFormatOption(fileFormat));
+        } catch (IOException e1) {
+            logger.warn(e1);
+            throw e;
+        }
+
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
+        return renderResult;
+    }
 
 }

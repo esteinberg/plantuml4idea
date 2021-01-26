@@ -94,8 +94,14 @@ public class Utils {
     public static Runnable logDuration(final String name, Runnable r) {
         return () -> {
             long start = System.currentTimeMillis();
-            r.run();
-            LOG.debug(name + " done in ", (System.currentTimeMillis() - start), "ms");
+            try {
+                r.run();
+            } catch (Throwable e) {
+                LOG.error(e);
+                throw new RuntimeException(e);
+            } finally {
+                LOG.debug(name + " done in ", (System.currentTimeMillis() - start), "ms");
+            }
         };
     }
 

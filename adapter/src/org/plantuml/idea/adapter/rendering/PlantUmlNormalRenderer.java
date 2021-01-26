@@ -90,11 +90,8 @@ public class PlantUmlNormalRenderer {
 
     public RenderResult doRender(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit) {
         try {
-            // image generation.                     
             long start = System.currentTimeMillis();
             DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, renderRequest.getSource());
-
-            logger.debug("newSourceStringReader done in ", System.currentTimeMillis() - start, "ms");
 
             int totalPages = diagramFactory.getTotalPages();
 

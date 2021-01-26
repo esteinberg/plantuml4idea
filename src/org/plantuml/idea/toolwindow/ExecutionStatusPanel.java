@@ -8,7 +8,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +22,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
     private volatile String message = "---";
     public static String DESCRIPTION;
     private MyMouseAdapter myMouseAdapter;
-    private Runnable runnable;
+    private Runnable mouseOnClickAction;
 
     {
         {
@@ -74,7 +73,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
     public synchronized void update(int version, State state) {
         if (this.version <= version) {
-            updateState(version, state, message, runnable);
+            updateState(version, state, message, mouseOnClickAction);
             updateLabelLater();
         }
     }
@@ -86,10 +85,10 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
         }
     }
 
-    public void updateNow(Integer version, State state, long total, RenderResult result, Runnable r) {
+    public void updateNow(Integer version, State state, long total, @NotNull RenderResult result, Runnable mouseOnClickAction) {
         if (this.version <= version) {
-            updateState(version, state, total, result, r);
-            state.update(label, myMouseAdapter, message, this.runnable);
+            updateState(version, state, total, result, mouseOnClickAction);
+            state.update(label, myMouseAdapter, message, this.mouseOnClickAction);
         }
     }
 
@@ -100,7 +99,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
         }
     }
 
-    protected void updateState(int version, State state, long total, RenderResult result, Runnable r) {
+    protected void updateState(int version, State state, long total, RenderResult result, Runnable mouseOnClickAction) {
         int rendered = result.getRendered();
         int updatedTitles = result.getUpdatedTitles();
         int cached = result.getCached();
@@ -108,23 +107,23 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
                 + rendered + ","
                 + updatedTitles + ","
                 + cached + "]";
-        updateState(version, state, message, r);
+        updateState(version, state, message, mouseOnClickAction);
     }
 
 
-    private void updateState(Integer version, State state, String message, Runnable r) {
+    private void updateState(Integer version, State state, String message, Runnable mouseOnClickAction) {
         this.version = version;
         this.message = message;
         this.state = state;
-        this.runnable = r;
+        this.mouseOnClickAction = mouseOnClickAction;
     }
 
     private void updateLabelLater() {
-        ApplicationManager.getApplication().invokeLater(Utils.logDuration("EDT updateLabel", () -> {
+        SwingUtilities.invokeLater(() -> {
             if (state != null) {
-                state.update(label, myMouseAdapter, message, runnable);
+                state.update(label, myMouseAdapter, message, mouseOnClickAction);
             }
-        }));
+        });
     }
 
     public enum State {
@@ -142,14 +141,14 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             this.description = description;
         }
 
-        public void update(JLabel comp, MyMouseAdapter myMouseAdapter, String message, Runnable r) {
+        public void update(JLabel comp, MyMouseAdapter myMouseAdapter, String message, Runnable mouseOnClickAction) {
             ApplicationManager.getApplication().assertIsDispatchThread();
             if (comp != null) { //strange NPE
                 comp.setText(message);
                 comp.setForeground(this.color);
             }
             if (myMouseAdapter != null) {
-                myMouseAdapter.setRunnable(r);
+                myMouseAdapter.setRunnable(mouseOnClickAction);
             }
         }
     }
