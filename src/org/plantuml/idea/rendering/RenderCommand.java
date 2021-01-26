@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -67,6 +68,7 @@ public abstract class RenderCommand implements Runnable {
             PlantUml.ImageFormat imageFormat = PlantUmlSettings.getInstance().isDisplaySvg() ? PlantUml.ImageFormat.SVG : PlantUml.ImageFormat.PNG;
 
             final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            renderRequest.disableSvgZoom();
             long s1 = System.currentTimeMillis();
             final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
             logger.debug("render ", (System.currentTimeMillis() - s1), "ms");
@@ -124,7 +126,7 @@ public abstract class RenderCommand implements Runnable {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("reason", reason)
                 .append("sourceFilePath", sourceFilePath)
                 .append("page", page)

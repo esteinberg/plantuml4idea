@@ -1,6 +1,7 @@
 package org.plantuml.idea.rendering;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.toolwindow.Zoom;
@@ -21,6 +22,7 @@ public class RenderRequest {
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
     protected boolean useSettings = true;
+    private boolean disableSvgZoom;
 
     public RenderRequest(String sourceFilePath,
                          @NotNull String source,
@@ -113,7 +115,7 @@ public class RenderRequest {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("sourceFilePath", sourceFilePath)
                 .append("format", format)
                 .append("page", page)
@@ -122,8 +124,17 @@ public class RenderRequest {
                 .append("reason", reason)
                 .append("version", version)
                 .append("useSettings", useSettings)
+                .append("disableSvgZoom", disableSvgZoom)
                 .toString();
     }
 
+
+    public void disableSvgZoom() {
+        disableSvgZoom = true;
+    }
+
+    public boolean isDisableSvgZoom() {
+        return disableSvgZoom;
+    }
 
 }

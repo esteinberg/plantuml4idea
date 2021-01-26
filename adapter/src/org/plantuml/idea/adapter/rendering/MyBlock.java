@@ -3,9 +3,11 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.PlantUml;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.rendering.RenderRequest;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class MyBlock {
         fileOrDirname = block.getFileOrDirname();
         titles = new Titles(diagram);
     }
+
 
     public String getFilename() {
         return fileOrDirname;
@@ -73,13 +76,13 @@ public class MyBlock {
     }
 
 
-    public void zoomDiagram(PlantUml.ImageFormat format, Zoom zoom) {
-        if (format == PlantUml.ImageFormat.SVG) {     //todo maybe zoom for exporting??
+    public void zoomDiagram(RenderRequest renderRequest) {
+        if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG && renderRequest.isDisableSvgZoom()) {
             LOG.debug("skipping SVG zooming");
             return;
         }
         long start = System.currentTimeMillis();
-        int osScaledZoom = zoom.getScaledZoom();
+        int osScaledZoom = renderRequest.getZoom().getScaledZoom();
 
         if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
@@ -105,4 +108,14 @@ public class MyBlock {
     }
 
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("fileOrDirname", fileOrDirname)
+                .append("titles", titles)
+                .append("blockUml", blockUml)
+                .append("nbImages", nbImages)
+                .append("diagram", diagram)
+                .toString();
+    }
 }

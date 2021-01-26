@@ -62,11 +62,12 @@ public class PlantUmlRendererUtil {
         }
     }
 
-    public static SourceStringReader newSourceStringReader(String source, boolean useSettings, File file) {
+    public static SourceStringReader newSourceStringReader(String source, RenderRequest renderRequest) {
+        File file = renderRequest.getSourceFile();
         long start = System.currentTimeMillis();
         List<String> configAsList;
         String encoding;
-        if (useSettings) {
+        if (renderRequest.isUseSettings()) {
             PlantUmlSettings settings = PlantUmlSettings.getInstance();
             encoding = settings.getEncoding();
             configAsList = settings.getConfigAsList();

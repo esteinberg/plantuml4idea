@@ -132,9 +132,7 @@ public class PlantUmlNormalRenderer {
             }
             renderResult.setIncludedFiles(diagramFactory.getIncludedFiles());
             return renderResult;
-        } catch (UnsupportedOperationException e) {
-            throw e;
-        } catch (RenderingCancelledException e) {
+        } catch (UnsupportedOperationException | RenderingCancelledException e) {
             throw e;
         } catch (Throwable e) {
             logger.error("Failed to render image " + renderRequest.getSource(), e);
@@ -142,34 +140,34 @@ public class PlantUmlNormalRenderer {
         }
     }
 
-    private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, DiagramFactory info, RenderResult renderResult, FileFormatOption formatOption, int page, boolean pageRequested) throws IOException {
+    private void incrementalRendering(RenderRequest renderRequest, RenderCacheItem cachedItem, String[] sourceSplit, String documentSource, DiagramFactory factory, RenderResult renderResult, FileFormatOption formatOption, int page, boolean pageRequested) throws IOException {
         boolean obsolete = renderRequest.requestedRefreshOrIncludesChanged()
                 || cachedItem.zoomChanged(renderRequest)
                 || cachedItem.sourceChanged(sourceSplit, page)
-                || cachedItem.titleChanged(page, info.getTitle(page));
+                || cachedItem.titleChanged(page, factory.getTitle(page));
 
         boolean shouldRender = pageRequested && (obsolete || cachedItem.imageMissing(page));
 
         if (shouldRender) {
-            ImageItem imageItem = info.generateImageItem(renderRequest, documentSource, sourceSplit[page], formatOption, page, page, RenderingType.NORMAL);
+            ImageItem imageItem = factory.generateImageItem(renderRequest, documentSource, sourceSplit[page], formatOption, page, page, RenderingType.NORMAL);
             renderResult.addRenderedImage(imageItem);
         } else if (obsolete) {
             logger.debug("page ", page, "  title only");
-            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[page], page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(page), info.getFilename(page)));
+            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[page], page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page)));
         } else {
             logger.debug("page ", page, " cached");
             renderResult.addCachedImage(cachedItem.getImageItem(page));
         }
     }
 
-    private void normalRendering(RenderRequest renderRequest, String[] sourceSplit, String documentSource, DiagramFactory info, RenderResult renderResult, FileFormatOption formatOption, boolean containsIncludedNewPage, int page, boolean pageRequested) {
+    private void normalRendering(RenderRequest renderRequest, String[] sourceSplit, String documentSource, DiagramFactory factory, RenderResult renderResult, FileFormatOption formatOption, boolean containsIncludedNewPage, int page, boolean pageRequested) {
         String pageSource = pageSource(sourceSplit, containsIncludedNewPage, page);
         if (pageRequested) {
-            ImageItem imageItem = info.generateImageItem(renderRequest, documentSource, pageSource, formatOption, page, page, RenderingType.NORMAL);
+            ImageItem imageItem = factory.generateImageItem(renderRequest, documentSource, pageSource, formatOption, page, page, RenderingType.NORMAL);
             renderResult.addRenderedImage(imageItem);
         } else {
             logger.debug("page ", page, "  title only");
-            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, info.getTitle(page), info.getFilename(page));
+            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page));
             renderResult.addUpdatedTitle(imageItem);
         }
     }

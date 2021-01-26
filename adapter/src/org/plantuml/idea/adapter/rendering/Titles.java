@@ -12,6 +12,7 @@ import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,12 +77,6 @@ public class Titles {
         return null;
     }
 
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("titles", titles)
-                .toString();
-    }
 
     public String getTitleOrPageNumber(int imageСounter) {
         if (titles.size() > imageСounter) {
@@ -119,5 +114,12 @@ public class Titles {
         }
     }
 
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("titles", titles)
+                .toString();
+    }
 
 }

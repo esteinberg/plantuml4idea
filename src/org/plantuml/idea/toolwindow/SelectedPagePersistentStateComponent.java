@@ -4,6 +4,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderCacheItem;
 
@@ -77,7 +78,7 @@ public class SelectedPagePersistentStateComponent implements PersistentStateComp
 
         @Override
         public String toString() {
-            return new ToStringBuilder(this)
+            return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                     .append("maxEntries", maxEntries)
                     .toString();
         }

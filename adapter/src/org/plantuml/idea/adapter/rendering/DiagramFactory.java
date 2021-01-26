@@ -7,6 +7,8 @@ import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -22,7 +24,6 @@ import java.io.OutputStream;
 import java.util.*;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.checkCancel;
-import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.newSourceStringReader;
 
 
 public class DiagramFactory {
@@ -33,31 +34,30 @@ public class DiagramFactory {
     public DiagramFactory(List<MyBlock> myBlocks, int totalPages) {
         this.myBlocks = myBlocks;
         this.totalPages = totalPages;
+
+        if (myBlocks.size() > 1) {
+            LOG.debug("more than 1 block ", this);
+            //happens when the source is incorrectly extracted and contains multiple diagrams
+        }
     }
 
     public static DiagramFactory create(RenderRequest renderRequest, String documentSource) {
-        SourceStringReader reader = newSourceStringReader(documentSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
+        SourceStringReader reader = PlantUmlRendererUtil.newSourceStringReader(documentSource, renderRequest);
         return create(reader, renderRequest);
     }
 
     public static DiagramFactory create(SourceStringReader reader, RenderRequest renderRequest) {
         long start1 = System.currentTimeMillis();
         int totalPages = 0;
-        List<BlockUml> blocks = reader.getBlocks();
         List<MyBlock> myBlocks = new ArrayList<>();
 
-        if (blocks.size() > 1) {
-            LOG.debug("more than 1 block ", blocks);
-            //happens when the source is incorrectly extracted and contains multiple diagramFactory
-        }
-
-        for (BlockUml blockUml : blocks) {
+        for (BlockUml blockUml : reader.getBlocks()) {
             checkCancel();
             long start = System.currentTimeMillis();
 
             MyBlock myBlockInfo = new MyBlock(blockUml);
             if (renderRequest != null) {
-                myBlockInfo.zoomDiagram(renderRequest.getFormat(), renderRequest.getZoom());
+                myBlockInfo.zoomDiagram(renderRequest);
             }
             myBlocks.add(myBlockInfo);
             totalPages = totalPages + myBlockInfo.getNbImages();
@@ -65,6 +65,8 @@ public class DiagramFactory {
 
             break;
         }
+
+
         DiagramFactory diagramFactory = new DiagramFactory(myBlocks, totalPages);
         LOG.debug("diagramFactory done in ", System.currentTimeMillis() - start1, "ms");
         return diagramFactory;
@@ -187,5 +189,14 @@ public class DiagramFactory {
         }
         LOG.debug("getIncludedFiles ", (System.currentTimeMillis() - start), "ms");
         return includedFiles;
+    }
+
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("myBlocks", myBlocks)
+                .append("totalPages", totalPages)
+                .toString();
     }
 }

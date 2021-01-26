@@ -8,6 +8,7 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.scale.ScaleContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -386,7 +387,7 @@ public class ImageItem {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("page", page)
                 .append("description", description)
                 .append("title", title)

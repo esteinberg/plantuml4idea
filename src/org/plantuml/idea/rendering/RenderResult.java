@@ -2,6 +2,7 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class RenderResult {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this)
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("pages", pages)
                 .append("rendered", rendered)
                 .append("updatedTitles", updatedTitles)

@@ -19,8 +19,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.newSourceStringReader;
-
 
 public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     private static final Logger logger = Logger.getInstance(PlantUmlPartialRenderer.class);
@@ -71,11 +69,11 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         logger.debug("processing of page ", page, " done in ", System.currentTimeMillis() - partialPageProcessingStart, "ms");
     }
 
-    private Pair<ImageItem, LinkedHashMap<File, Long>> updateTitle(RenderRequest renderRequest, int page, String partialSource) {
+    private static Pair<ImageItem, LinkedHashMap<File, Long>> updateTitle(RenderRequest renderRequest, int page, String partialSource) {
         long start = System.currentTimeMillis();
         logger.debug("updating title, page ", page);
 
-        SourceStringReader reader = newSourceStringReader(partialSource, renderRequest.isUseSettings(), renderRequest.getSourceFile());
+        SourceStringReader reader = PlantUmlRendererUtil.newSourceStringReader(partialSource, renderRequest);
         DiagramFactory diagrams = DiagramFactory.create(reader, null);
         Map<File, Long> includedFiles = diagrams.getIncludedFiles();
         String title = diagrams.getTitle(0);
