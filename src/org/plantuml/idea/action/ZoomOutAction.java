@@ -26,6 +26,7 @@ public class ZoomOutAction extends ZoomAction {
             if (enabled) {
                 int zoom = getUnscaledZoom(project);
                 e.getPresentation().setEnabled(zoom > MIN_ZOOM);
+                e.getPresentation().setDescription("Actual zoom: "+zoom+"%");
             }
         }
     }

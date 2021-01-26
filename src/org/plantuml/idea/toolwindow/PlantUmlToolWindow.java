@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
@@ -553,6 +554,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         } else {
             renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }
+
+        WindowManager.getInstance().getStatusBar(project).setInfo("Zoomed changed to " + unscaledZoom + "%");
     }
 
     public void setSelectedPage(int selectedPage) {

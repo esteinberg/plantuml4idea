@@ -28,11 +28,16 @@ public abstract class ZoomAction extends DumbAwareAction {
 
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent e) {         
         final Project project = e.getProject();
-        if (project != null) {
-            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
-        }
+            if (project != null) {
+                boolean enabled = UIUtils.hasAnyImage(project);
+                e.getPresentation().setEnabled(enabled);
+                if (enabled) {
+                    int zoom = getUnscaledZoom(project);
+                    e.getPresentation().setDescription("Actual zoom: "+zoom+"%");
+                }
+            }
     }
 
 }
