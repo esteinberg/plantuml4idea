@@ -168,7 +168,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
 
     override fun getExternalResourceSecurity(resourceURL: ParsedURL?, docURL: ParsedURL?): ExternalResourceSecurity {
         return ExternalResourceSecurity {
-            val se = SecurityException("NO_EXTERNAL_RESOURCE_ALLOWED")
+            val se = SecurityException("NO_EXTERNAL_RESOURCE_ALLOWED: "+resourceURL)
             se.fillInStackTrace()
             throw se
         }
@@ -231,7 +231,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
     }
 
     override fun checkLoadExternalResource(resourceURL: ParsedURL?, docURL: ParsedURL?) {
-        getExternalResourceSecurity(resourceURL, docURL).checkLoadExternalResource()
+//        getExternalResourceSecurity(resourceURL, docURL).checkLoadExternalResource()
     }
 
     override fun loadDocument(url: String?) {
