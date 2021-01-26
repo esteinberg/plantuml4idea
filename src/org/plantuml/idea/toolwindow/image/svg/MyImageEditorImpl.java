@@ -35,6 +35,7 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.svg.batik.MySvgDocumentFactoryKt;
 import org.plantuml.idea.toolwindow.image.svg.batik.MySvgTranscoder;
+import org.plantuml.idea.util.UIUtils;
 import org.w3c.dom.Document;
 
 import javax.swing.*;
@@ -256,7 +257,7 @@ public final class MyImageEditorImpl implements ImageEditor {
                 //it shows what is in png document - unZOOMED values, not limited by px limit
                 ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
 
-                ScaleContext scaleContext = ScaleContext.create(component);
+                ScaleContext scaleContext = ScaleContext.create(UIUtils.getPlantUmlToolWindow(project));
 
                 double scale = scaleContext.getScale(ScaleType.SYS_SCALE);
                 double scaledZoom;

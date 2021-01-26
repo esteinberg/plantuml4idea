@@ -4,8 +4,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.scale.ScaleContext;
-import com.intellij.ui.scale.ScaleType;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -115,16 +113,16 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         add(this.editor.getComponent());
     }
 
-    public static void updateLinks(JComponent image, ScaleContext ctx, Double imageScale) {
+    public static void updateLinks(JComponent image, Zoom zoom) {
         Component[] components = image.getComponents();
         for (Component component : components) {
             MyJLabel jLabel = (MyJLabel) component;
-            Rectangle area = getRectangle(ctx, imageScale, jLabel.getLinkData());
+            Rectangle area = getRectangle(zoom, jLabel.getLinkData());
             jLabel.updatePosition(area);
         }
     }
 
-    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx, Double imageScale) {
+    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image) {
         long start = System.currentTimeMillis();
         //probably not needed if initting on background
         //https://stackoverflow.com/a/28048290/685796
@@ -132,6 +130,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
+        Zoom zoom = renderRequest.getZoom();
 
         image.removeAll();
 
@@ -139,7 +138,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         for (int i = 0; i < links.size(); i++) {
             ImageItem.LinkData linkData = links.get(i);
 
-            Rectangle area = getRectangle(ctx, imageScale, linkData);
+            Rectangle area = getRectangle(zoom, linkData);
 
             JLabel button = new MyJLabel(linkData, area, showUrlLinksBorder);
 
@@ -154,11 +153,12 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
     @NotNull
-    private static Rectangle getRectangle(ScaleContext ctx, Double imageScale, ImageItem.LinkData linkData) {
+    private static Rectangle getRectangle(Zoom zoom, ImageItem.LinkData linkData) {
         Rectangle area = linkData.getClickArea();
+        Double imageScale = zoom.getDoubleScaledZoom();
 
         double tolerance = 1 * imageScale;
-        double scale = ctx.getScale(ScaleType.SYS_SCALE) / imageScale;
+        double scale = zoom.getSystemScale() / imageScale;
         int x = (int) ((double) area.x / scale);
         int width = (int) ((area.width) / scale + 5 * tolerance);
 

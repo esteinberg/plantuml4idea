@@ -3,6 +3,7 @@ package org.plantuml.idea.toolwindow;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCommand;
@@ -83,7 +84,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot() {
-        Zoom zoom = new Zoom(UIUtils.getPlantUmlToolWindow(project), 100);
+        Zoom zoom = new Zoom(UIUtils.getPlantUmlToolWindow(project), 100, PlantUmlSettings.getInstance());
         RenderRequest renderRequest = new RenderRequest("", PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);

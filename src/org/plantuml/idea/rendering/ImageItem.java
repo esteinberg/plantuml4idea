@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.PopupHandler;
-import com.intellij.ui.scale.ScaleContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -214,8 +213,8 @@ public class ImageItem {
             @Override
             public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
                 Double scale = (Double) propertyChangeEvent.getNewValue();
-                Zoom zoom = new Zoom(contentComponent, (int) (scale * 100));
-                ImageContainerSvg.updateLinks(contentComponent, ScaleContext.create(editor.getComponent()), zoom.getDoubleScaledZoom());
+                Zoom zoom = new Zoom(contentComponent, (int) (scale * 100), PlantUmlSettings.getInstance());
+                ImageContainerSvg.updateLinks(contentComponent, zoom);
             }
         });
 
@@ -226,9 +225,7 @@ public class ImageItem {
             }
         });
 
-        ScaleContext ctx = ScaleContext.create(UIUtils.getPlantUmlToolWindow(project));
-        Double doubleScaledZoom = renderRequest.getZoom().getDoubleScaledZoom();
-        ImageContainerSvg.initLinks(project, this, renderRequest, renderResult, contentComponent, ctx, doubleScaledZoom);
+        ImageContainerSvg.initLinks(project, this, renderRequest, renderResult, contentComponent);
         LOG.debug("init getEditor done in ", System.currentTimeMillis() - start, "ms");
 
         return this.editor;

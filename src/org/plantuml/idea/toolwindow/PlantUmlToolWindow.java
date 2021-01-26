@@ -72,14 +72,16 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private LocalFileSystem localFileSystem;
     private Highlighter highlighter;
     private Alarm zoomAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
+    private final PlantUmlSettings settings;
 
     public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
         super(new BorderLayout());
         this.project = project;
         this.toolWindow = toolWindow;
-        zoom = new Zoom(toolWindow.getComponent(), 100);
+        settings = PlantUmlSettings.getInstance();
+        zoom = new Zoom(toolWindow.getComponent(), 100, settings);
 
-        PlantUmlSettings settings = PlantUmlSettings.getInstance();// Make sure settings are loaded and applied before we start rendering.
+        // Make sure settings are loaded and applied before we start rendering.
         renderCache = new RenderCache(settings.getCacheSizeAsInt());
         selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
         plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
@@ -107,7 +109,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         //must be last
         this.toolWindow.getComponent().addAncestorListener(plantUmlAncestorListener);
 
-        applyNewSettings(PlantUmlSettings.getInstance());
+        applyNewSettings(settings);
         highlighter = new Highlighter();
     }
 
@@ -232,7 +234,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         Runnable renderRunnable = () -> {
             logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
             if (isProjectValid(project)) {
-                zoom.updateSettings();
+
                 String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
                 String sourceFilePath = null;
                 RenderCacheItem cachedItem = null;
@@ -257,6 +259,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 }
 
                 selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                zoom = zoom.refresh(this, this.settings);
 
                 logger.debug("setting selected page from storage ", selectedPage);
 
@@ -360,7 +363,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             return renderCache.getDisplayedItem() != null
                     && !renderCache.getDisplayedItem().getRenderResult().hasError()
                     && newItem.getRenderResult().hasError()
-                    && PlantUmlSettings.getInstance().isDoNotDisplayErrors();
+                    && settings.isDoNotDisplayErrors();
         }
 
         private class SwitchBetweenCurrentErrorAndOldImage implements Runnable {
@@ -463,7 +466,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             displayImage(cacheItem, requestedPage, imagesWithData[requestedPage]);
         }
 
-        if (PlantUmlSettings.getInstance().isHighlightInImages()) {
+        if (settings.isHighlightInImages()) {
             highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager));
         }
 
@@ -532,7 +535,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         unscaledZoom = Math.min(ZoomAction.MAX_ZOOM, unscaledZoom);
         int oldUnscaled = zoom.getUnscaledZoom();
         //do always, so that changed OS scaling takes effect
-        zoom = new Zoom(this, unscaledZoom);
+        zoom = new Zoom(this, unscaledZoom, settings);
 
         if (oldUnscaled == unscaledZoom) {
             return;
@@ -540,7 +543,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         logger.debug("changing zoom to unscaledZoom=", unscaledZoom);
 
-        if (PlantUmlSettings.getInstance().isDisplaySvg()) {
+        if (settings.isDisplaySvg()) {
             int i = zoomAlarm.cancelAllRequests();
             int finalUnscaledZoom = unscaledZoom;
             zoomAlarm.addRequest(() -> {

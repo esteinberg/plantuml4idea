@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.scale.ScaleContext;
-import com.intellij.ui.scale.ScaleType;
 import com.intellij.util.ui.ImageUtil;
 import com.intellij.util.ui.JBImageIcon;
 import org.jetbrains.annotations.NonNls;
@@ -18,6 +17,7 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.links.LinkNavigator;
 import org.plantuml.idea.toolwindow.image.links.MyJLabel;
 import org.plantuml.idea.toolwindow.image.links.MyMouseAdapter;
@@ -121,21 +121,22 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
         //Removing all children from image label and creating transparent buttons for each item with url
         label.removeAll();
-        initLinks(project, imageItem, renderRequest, renderResult, label, ctx);
+        initLinks(project, imageItem, renderRequest, renderResult, label);
 
         LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
     }
 
-    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image, ScaleContext ctx) {
+    public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image) {
         long start = System.currentTimeMillis();
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
+        Zoom zoom = renderRequest.getZoom();
 
         image.removeAll();
 
         for (ImageItem.LinkData linkData : imageItem.getLinks()) {
 
-            Rectangle area = getRectangle(ctx, linkData);
+            Rectangle area = getRectangle(zoom, linkData);
 
             JLabel button = new MyJLabel(linkData, area, showUrlLinksBorder);
 
@@ -148,11 +149,11 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
     }
 
     @NotNull
-    private static Rectangle getRectangle(ScaleContext ctx, ImageItem.LinkData linkData) {
+    private static Rectangle getRectangle(Zoom zoom, ImageItem.LinkData linkData) {
         Rectangle area = linkData.getClickArea();
 
         int tolerance = 1;
-        double scale = ctx.getScale(ScaleType.SYS_SCALE);
+        double scale = zoom.getSystemScale();
         int x = (int) ((double) area.x / scale) - 2 * tolerance;
         int width = (int) ((area.width) / scale) + 4 * tolerance;
 
