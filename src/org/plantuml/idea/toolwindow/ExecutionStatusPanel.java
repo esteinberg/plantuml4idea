@@ -89,6 +89,10 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
         if (this.version <= version) {
             updateState(version, state, total, result, mouseOnClickAction);
             state.update(label, myMouseAdapter, message, this.mouseOnClickAction);
+        } else {
+            //something else is already running, update all but color
+            updateState(version, this.state, total, result, mouseOnClickAction);
+            state.update(label, myMouseAdapter, message, this.mouseOnClickAction);
         }
     }
 
