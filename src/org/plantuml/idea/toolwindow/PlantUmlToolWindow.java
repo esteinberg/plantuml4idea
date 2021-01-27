@@ -178,11 +178,12 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (e.isControlDown()) {
-                    changeZoom(Math.max(zoom.getUnscaledZoom() - e.getWheelRotation() * 10, 1));
+                    changeZoom(Math.max(zoom.getUnscaledZoom() - e.getWheelRotation() * 10, 1), e.getPoint());
                 } else {
                     e.setSource(scrollPane);
                     scrollPane.dispatchEvent(e);
                 }
+                e.consume();
             }
         };
         MouseMotionListener l1 = new MouseMotionListener() {
@@ -201,6 +202,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
                 x = e.getXOnScreen();
                 y = e.getYOnScreen();
+                e.consume();
             }
 
             @Override
@@ -491,6 +493,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return true;
     }
 
+    public JScrollPane getScrollPane() {
+        return scrollPane;
+    }
+
     public void displayImage(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
@@ -531,7 +537,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         return zoom;
     }
 
-    public void changeZoom(int unscaledZoom) {
+    public void changeZoom(int unscaledZoom, Point point) {
         unscaledZoom = Math.min(ZoomAction.MAX_ZOOM, unscaledZoom);
         int oldUnscaled = zoom.getUnscaledZoom();
         //do always, so that changed OS scaling takes effect
@@ -549,7 +555,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             zoomAlarm.addRequest(() -> {
                 for (Component component : imagesPanel.getComponents()) {
                     if (component instanceof ImageContainerSvg) {
-                        ((ImageContainerSvg) component).setZoomOptimized(finalUnscaledZoom);
+                        ((ImageContainerSvg) component).setZoomOptimized(finalUnscaledZoom, point);
                     }
                 }
 

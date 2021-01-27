@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
     <version>4.0.0</version>
-    <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg</vendor>
+    <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
 
@@ -127,6 +127,7 @@
                 <action id="PlantUML.AutoRender"
                         class="org.plantuml.idea.action.AutoRenderToggleAction"
                         text="Automatically Render"/>
+                <separator/>
                 <action id="PlantUML.AutoHideToolWindowToggle"
                         class="org.plantuml.idea.action.AutoHideToolWindowToggleAction"
                         text="Automatically Show/Hide Tool Window"/>
@@ -137,8 +138,9 @@
                 />
                 <action id="org.plantuml.idea.action.ImageHighlightToggleAction"
                         class="org.plantuml.idea.action.ImageHighlightToggleAction"
-                        text="Highlight text occurrences in images"/>
+                        text="Highlight Text Occurrences in Images"/>
                 />
+                <separator/>
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
                         class="org.plantuml.idea.action.DisplaySvgToggleAction"
                         text="Use New SVG Preview (Disable for Old PNG)"

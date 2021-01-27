@@ -21,23 +21,23 @@ public abstract class ZoomAction extends DumbAwareAction {
         return plantUML.getZoom().getUnscaledZoom();
     }
 
-    protected void setUnscaledZoom(Project project, int unscaledZoom) {
+    protected void changeZoom(Project project, int unscaledZoom) {
         PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
-        plantUML.changeZoom(unscaledZoom);
+        plantUML.changeZoom(unscaledZoom, null);
     }
 
 
     @Override
-    public void update(@NotNull AnActionEvent e) {         
+    public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
-            if (project != null) {
-                boolean enabled = UIUtils.hasAnyImage(project);
-                e.getPresentation().setEnabled(enabled);
-                if (enabled) {
-                    int zoom = getUnscaledZoom(project);
-                    e.getPresentation().setDescription("Actual zoom: "+zoom+"%");
-                }
+        if (project != null) {
+            boolean enabled = UIUtils.hasAnyImage(project);
+            e.getPresentation().setEnabled(enabled);
+            if (enabled) {
+                int zoom = getUnscaledZoom(project);
+                e.getPresentation().setDescription("Actual zoom: " + zoom + "%");
             }
+        }
     }
 
 }

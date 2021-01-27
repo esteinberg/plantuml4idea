@@ -1,22 +1,27 @@
 package org.plantuml.idea.lang.settings;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Field;
 import java.net.URI;
 
 /**
@@ -24,6 +29,7 @@ import java.net.URI;
  */
 public class PlantUmlSettingsPage implements Configurable {
     private static final Logger LOG = Logger.getInstance(PlantUmlSettingsPage.class);
+    public static final Icon COINS = IconLoader.getIcon("/images/coins_in_hand.png", PlantUmlSettingsPage.class);
 
     private JPanel panel;
     private JTextField textFieldDotExecutable;
@@ -31,7 +37,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JButton browse;
     private JTextField renderDelay;
     private JTextField cacheSize;
-    private JCheckBox renderUrlLinks;
+    private JCheckBox renderLinksPng;
     private JCheckBox usePreferentiallyGRAPHIZ_DOT;
     private JTextField encoding;
     private JTextArea config;
@@ -56,20 +62,21 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox highlightInImages;
     private JTextField maxSvgSize;
     private JCheckBox svgPreviewScaling;
+    private JButton donate;
+    private JLabel svgPreviewLimitLabel;
 
     public PlantUmlSettingsPage() {
-        browse.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browseForFile(textFieldDotExecutable);
+        donate.setIcon(COINS);
+        donate.addActionListener(e -> {
+
+            try {
+                Desktop.getDesktop().browse(new URI("https://www.paypal.com/donate/?business=75YN7U7H7D7XU&item_name=PlantUML+integration+-+IntelliJ+plugin&currency_code=EUR"));
+            } catch (Exception ee) {
+                throw new RuntimeException(ee);
             }
         });
-        browseCustomPlantumlJar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                browseForjar(customPlantumlJar);
-            }
-        });
+        browse.addActionListener(e -> browseForFile(textFieldDotExecutable));
+        browseCustomPlantumlJar.addActionListener(e -> browseForjar(customPlantumlJar));
         web.setVisible(Desktop.isDesktopSupported());
         web.addActionListener(e -> {
             try {
@@ -84,6 +91,42 @@ public class PlantUmlSettingsPage implements Configurable {
         } catch (Throwable throwable) {
             LOG.error(throwable);
         }
+
+        addListeners();
+    }
+
+    private void addListeners() {
+        for (Field field : PlantUmlSettingsPage.class.getDeclaredFields()) {
+            try {
+                Object o = field.get(this);
+                if (o instanceof JToggleButton) {
+                    JToggleButton button = (JToggleButton) o;
+                    button.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            updateComponents();
+                        }
+                    });
+                }
+                if (o instanceof JTextField) {
+                    JTextField jTextField = (JTextField) o;
+                    jTextField.getDocument().addDocumentListener(new DocumentAdapter() {
+                        @Override
+                        protected void textChanged(DocumentEvent e) {
+                            updateComponents();
+                        }
+                    });
+                }
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void updateComponents() {
+        DialogUtils.disableByAny(new JComponent[]{renderLinksPng}, displaySvg);
+        DialogUtils.enabledByAny(new JComponent[]{svgPreviewScaling, svgPreviewLimitLabel, maxSvgSize}, displaySvg);
+        DialogUtils.enabledByAny(new JComponent[]{highlightInImages, linkOpensSearchBar, showUrlLinksBorder}, displaySvg, renderLinksPng);
     }
 
 
@@ -158,9 +201,10 @@ public class PlantUmlSettingsPage implements Configurable {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
 
         setData(settings);
-
         bundledPlantUMLRadioButton.setSelected(settings.isUseBundled());
         customPlantUMLRadioButton.setSelected(!settings.isUseBundled());
+
+        updateComponents();
     }
 
     @Override
@@ -188,7 +232,7 @@ public class PlantUmlSettingsPage implements Configurable {
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
         insertPair.setSelected(data.isInsertPair());
         displaySvg.setSelected(data.isDisplaySvg());
-        renderUrlLinks.setSelected(data.isRenderLinks());
+        renderLinksPng.setSelected(data.isRenderLinks());
         highlightInImages.setSelected(data.isHighlightInImages());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
@@ -213,7 +257,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
         data.setInsertPair(insertPair.isSelected());
         data.setDisplaySvg(displaySvg.isSelected());
-        data.setRenderLinks(renderUrlLinks.isSelected());
+        data.setRenderLinks(renderLinksPng.isSelected());
         data.setHighlightInImages(highlightInImages.isSelected());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
@@ -247,7 +291,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
         if (displaySvg.isSelected() != data.isDisplaySvg()) return true;
-        if (renderUrlLinks.isSelected() != data.isRenderLinks()) return true;
+        if (renderLinksPng.isSelected() != data.isRenderLinks()) return true;
         if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;

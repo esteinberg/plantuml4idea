@@ -170,9 +170,9 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
 
-    public void setZoomOptimized(int unscaledZoom) {
+    public void setZoomOptimized(int unscaledZoom, Point point) {
         MyImageEditorUI.ImageZoomModelImpl zoomModel = (MyImageEditorUI.ImageZoomModelImpl) editor.getZoomModel();
-        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100);
+        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100, point);
     }
 
     @Override

@@ -449,7 +449,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         }
 
 
-        public void setZoomFactorOptimized(double newZoom) {
+        public void setZoomFactorOptimized(double newZoom, Point point) {
             double oldZoomFactor = getZoomFactor();
 
             LOG.debug("oldZoomFactor=", oldZoomFactor, " newZoom=", newZoom);
@@ -459,7 +459,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             alarm.cancelAllRequests();
             alarm.addRequest(() -> {
                 LOG.debug("imageProvider.apply, zoom=", this.zoomFactor);
-
                 imageProvider.createImage(imageComponent, newZoom);
 
                 SwingUtilities.invokeLater(() -> {
@@ -471,6 +470,18 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
                     imageComponent.firePropertyChange(ZOOM_FACTOR_PROP, oldZoomFactor, newZoom);
                     updateImageComponentSize();
+
+                    //todo zoom position
+//                    if (point!=null && zoomModel.getZoomFactor()> oldZoomFactor) {
+//                        Point mousePoint = point;
+//                        double zoomChange = zoomModel.getZoomFactor() / oldZoomFactor;
+//                        Point newPosition = new Point((int) Math.max(0, (oldPosition.getX() + mousePoint.getX()) * zoomChange - mousePoint.getX()),
+//                                (int) Math.max(0, (oldPosition.getY() + mousePoint.getY()) * zoomChange - mousePoint.getY()));
+//                        scrollPane.getViewport().setViewPosition(newPosition);            
+////                        Component view = scrollPane.getViewport().getView();
+////                        scrollPane.setViewport(null);
+////                        scrollPane.setViewportView(view);
+//                    }
                 });
             }, 10);
         }

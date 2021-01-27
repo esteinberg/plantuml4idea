@@ -13,7 +13,7 @@ public class ZoomInAction extends ZoomAction {
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
         if (project != null) {
-            setUnscaledZoom(project, getUnscaledZoom(project) + ZOOM_STEP);
+            changeZoom(project, getUnscaledZoom(project) + ZOOM_STEP);
         }
     }
 
@@ -26,7 +26,7 @@ public class ZoomInAction extends ZoomAction {
             if (enabled) {
                 int zoom = getUnscaledZoom(project);
                 e.getPresentation().setEnabled(zoom < MAX_ZOOM);
-                e.getPresentation().setDescription("Actual zoom: "+zoom+"%");
+                e.getPresentation().setDescription("Actual zoom: " + zoom + "%");
             }
         }
     }
