@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
+import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +59,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     });
 
     private static Logger LOG = Logger.getInstance(ImageContainerSvg.class);
+    private final Alarm zoomAlarm;
 
     private RenderRequest renderRequest;
     private final Project project;
@@ -71,13 +73,13 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         this.renderRequest = renderRequest;
         this.renderResult = renderResult;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+        zoomAlarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
         setup(this.imageWithData, i, renderRequest);
     }
 
 
     @Override
-    public ImageItem getImageWithData() {
+    public ImageItem getImageItem() {
         return imageWithData;
     }
 
@@ -172,7 +174,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     public void setZoomOptimized(int unscaledZoom, Point point) {
         MyImageEditorUI.ImageZoomModelImpl zoomModel = (MyImageEditorUI.ImageZoomModelImpl) editor.getZoomModel();
-        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100, point);
+        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100, point, zoomAlarm);
     }
 
     @Override
@@ -210,4 +212,8 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         return null;
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

@@ -2,8 +2,6 @@ package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ImageLoader;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.Classloaders;
@@ -15,11 +13,8 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.Zoom;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Collection;
 
 /**
@@ -43,11 +38,6 @@ public class FacadeImpl implements PlantUmlFacade {
     @Override
     public RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
         return PlantUmlRendererUtil.render(renderRequest, cachedItem);
-    }
-
-    @Override
-    public BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize) {
-        return Utils.loadWithoutCache(url, stream, scale, docSize);
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.plantuml.idea.toolwindow.image;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
@@ -58,8 +57,6 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
     private ImageItem imageWithData;
     private Image originalImage;
 
-    private FileEditorManager fileEditorManager;
-
     /**
      * Method AboutDialog.$$$setupUI$$$() contains an invokespecial instruction referencing an unresolved constructor ImageContainerPng.<init>().
      */
@@ -74,7 +71,7 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
     }
 
     @Override
-    public ImageItem getImageWithData() {
+    public ImageItem getImageItem() {
         return imageWithData;
     }
 
@@ -88,11 +85,12 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
         return renderRequest;
     }
 
-    public void setup(JPanel parent, @NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public void setup(JPanel parent, @NotNull ImageItem imageItem, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
-        if (imageWithData.hasImageBytes()) {
-            setDiagram(parent, imageWithData, renderRequest, this);
+        originalImage = imageItem.getImage(project, renderRequest, renderResult);
+        if (originalImage != null) {
+            setDiagram(parent, imageItem, renderRequest, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
@@ -101,29 +99,32 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
     private void setDiagram(JPanel parent, @NotNull final ImageItem imageItem, RenderRequest renderRequest, final JLabel label) {
         long start = System.currentTimeMillis();
-        originalImage = imageItem.getImage(project, renderRequest, renderResult);
         Image scaledImage;
+        if (originalImage != null) {
+            ScaleContext ctx = ScaleContext.create(parent);
+            scaledImage = ImageUtil.ensureHiDPI(originalImage, ctx);
+            //        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
 
-        ScaleContext ctx = ScaleContext.create(parent);
-        scaledImage = ImageUtil.ensureHiDPI(originalImage, ctx);
-//        scaledImage = ImageLoader.scaleImage(scaledImage, ctx.getScale(JBUI.ScaleType.SYS_SCALE));
-
-        label.setIcon(new JBImageIcon(scaledImage));
+            label.setIcon(new JBImageIcon(scaledImage));
 
 
-        label.addMouseListener(new PopupHandler() {
+            label.addMouseListener(new PopupHandler() {
 
-            @Override
-            public void invokePopup(Component comp, int x, int y) {
-                ACTION_POPUP_MENU.getComponent().show(comp, x, y);
-            }
-        });
+                @Override
+                public void invokePopup(Component comp, int x, int y) {
+                    ACTION_POPUP_MENU.getComponent().show(comp, x, y);
+                }
+            });
 
-        //Removing all children from image label and creating transparent buttons for each item with url
-        label.removeAll();
-        initLinks(project, imageItem, renderRequest, renderResult, label);
+            //Removing all children from image label and creating transparent buttons for each item with url
+            label.removeAll();
+            initLinks(project, imageItem, renderRequest, renderResult, label);
 
-        LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
+            LOG.debug("setDiagram done in ", System.currentTimeMillis() - start, "ms");
+        } else {
+            setText("page not rendered, probably plugin error, please report it and try to hit reload");
+        }
+
     }
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image) {
@@ -186,5 +187,10 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
             return this;
         }
         return null;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

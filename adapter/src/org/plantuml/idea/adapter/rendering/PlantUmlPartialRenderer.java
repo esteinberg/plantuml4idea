@@ -47,8 +47,9 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
         boolean obsolete = cachedItem == null
                 || renderRequest.requestedRefreshOrIncludesChanged()
+                || cachedItem.differentFormat(renderRequest)
+                || cachedItem.zoomChanged(renderRequest)
                 || RenderingType.PARTIAL.renderingTypeChanged(cachedItem)
-                || !renderRequest.getZoom().equals(cachedItem.getZoom())
                 || !partialSource.equals(cachedItem.getImagesItemPageSource(page));
 
         boolean pageSelected = renderRequest.getPage() == -1 || renderRequest.getPage() == page;

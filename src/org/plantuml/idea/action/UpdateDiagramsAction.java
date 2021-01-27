@@ -28,7 +28,7 @@ public class UpdateDiagramsAction extends DumbAwareAction {
         if (project != null) {
             PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (plantUmlToolWindow != null) {
-                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.MANUAL_UPDATE);
+                plantUmlToolWindow.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.MANUAL_UPDATE);
             }
         }
     }

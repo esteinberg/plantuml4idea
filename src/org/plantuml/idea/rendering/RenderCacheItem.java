@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.toolwindow.Zoom;
@@ -194,13 +193,14 @@ public class RenderCacheItem {
     }
 
     public void dispose() {
-        try {
-            for (ImageItem imageItem : imageItems) {
-                imageItem.dispose();
-            }
-        } catch (Throwable e) {
-            LOG.error(e);
-        }
+//        LOG.debug("disposing ", this);
+//        try {
+//            for (ImageItem imageItem : imageItems) {
+//                imageItem.dispose();
+//            }
+//        } catch (Throwable e) {
+//            LOG.error(e);
+//        }
     }
 
     public boolean sourceChanged(String[] sourceSplit, int page) {
@@ -223,4 +223,7 @@ public class RenderCacheItem {
         return true;
     }
 
+    public boolean differentFormat(RenderRequest renderRequest) {
+        return renderRequest.getFormat() != getRenderRequest().getFormat();
+    }
 }

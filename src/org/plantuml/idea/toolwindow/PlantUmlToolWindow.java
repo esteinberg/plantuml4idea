@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -23,6 +24,7 @@ import org.plantuml.idea.action.ZoomAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.PlantUml;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.toolwindow.image.ImageContainerPng;
 import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
 import org.plantuml.idea.toolwindow.image.links.Highlighter;
@@ -72,6 +74,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     private LocalFileSystem localFileSystem;
     private Highlighter highlighter;
     private Alarm zoomAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
+    public Alarm backgroundZoomAlarm;
     private final PlantUmlSettings settings;
 
     public PlantUmlToolWindow(Project project, final ToolWindow toolWindow) {
@@ -111,6 +114,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         applyNewSettings(settings);
         highlighter = new Highlighter();
+        backgroundZoomAlarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
     }
 
     private void setupUI() {
@@ -228,13 +232,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private Alarm myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
-    public void renderLater(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
+    public void processRequest(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
         if (!toolWindow.isVisible()) {
             logger.debug("tool window not visible, aborting");
             return;
         }
         Runnable renderRunnable = () -> {
-            logger.debug("renderLater ", project.getName(), " ", delay, " ", reason);
+            logger.debug("processRequest ", project.getName(), " ", delay, " ", reason);
             if (isProjectValid(project)) {
 
                 String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
@@ -304,7 +308,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         };
 
         int i = myAlarm.cancelAllRequests();
-        myAlarm.addRequest(Utils.logDuration("EDT renderLater", renderRunnable), delay == NOW ? 0 : 10);
+        myAlarm.addRequest(Utils.logDuration("EDT processRequest", renderRunnable), delay == NOW ? 0 : 10);
     }
 
     public void displayExistingDiagram(RenderCacheItem last) {
@@ -325,6 +329,13 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     public boolean isToolWindowVisible() {
         return toolWindow.isVisible();
+    }
+
+    public void highlightImages(Editor editor) {
+        if (editor == null) {
+            return;
+        }
+        highlighter.highlightImages(this, editor);
     }
 
 
@@ -425,7 +436,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             logger.debug("skipping displaying older result", cacheItem);
             return false;
         }
-
+        long start = System.currentTimeMillis();
 
         //maybe track position per file?
         RenderCacheItem displayedItem = renderCache.getDisplayedItem();
@@ -437,42 +448,53 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
         renderCache.setDisplayedItem(cacheItem);
 
-        ImageItem[] imagesWithData = cacheItem.getImageItems();
-        RenderResult imageResult = cacheItem.getRenderResult();
+        ImageItem[] imageItems = cacheItem.getImageItems();
+        RenderResult renderResult = cacheItem.getRenderResult();
         int requestedPage = cacheItem.getRequestedPage();
 
-        if (requestedPage >= imageResult.getPages()) {
-            logger.debug("requestedPage >= imageResult.getPages()", requestedPage, ">=", imageResult.getPages());
+        if (requestedPage >= renderResult.getPages()) {
+            logger.debug("requestedPage >= renderResult.getPages()", requestedPage, ">=", renderResult.getPages());
             requestedPage = -1;
-            if (!imageResult.hasError()) {
+            if (!renderResult.hasError()) {
                 logger.debug("toolWindow.page=", requestedPage, " (previously page=", selectedPage, ")");
                 selectedPage = requestedPage;
             }
         }
 
-        for (Component component : imagesPanel.getComponents()) {
-            if (component instanceof Disposable) {
-                Disposer.dispose((Disposable) component);
-            }
-        }
-        imagesPanel.removeAll();
-
-        long start = System.currentTimeMillis();
         if (requestedPage == -1) {
-            logger.debug("displaying images ", requestedPage);
-            for (int i = 0; i < imagesWithData.length; i++) {
-                displayImage(cacheItem, i, imagesWithData[i]);
+            boolean incrementalDisplay = cacheItem.getRenderRequest().getReason() != RenderCommand.Reason.REFRESH && renderCache.isSameFile(cacheItem);
+            logger.debug("displaying images ", requestedPage, ", incrementalDisplay=", incrementalDisplay);
+
+            Component[] children = imagesPanel.getComponents();
+            if (incrementalDisplay && children.length == renderResult.getPages() * 2) {
+                for (int i = 0; i < imageItems.length; i++) {
+                    ImageContainer container = (ImageContainer) children[i * 2];
+                    ImageItem imageItem = imageItems[i];
+                    if (container.getImageItem() == imageItem) {
+                        continue;
+                    } else {
+                        Disposer.dispose(container);
+                        imagesPanel.remove(i * 2);
+
+                        JComponent component = createImageContainer(cacheItem, i, imageItem);
+                        imagesPanel.add(component, i * 2);
+                    }
+                }
+            } else {
+                removeAllImages();
+                for (int i = 0; i < imageItems.length; i++) {
+                    displayImage(cacheItem, i, imageItems[i]);
+                }
             }
         } else {
             logger.debug("displaying image ", requestedPage);
-            displayImage(cacheItem, requestedPage, imagesWithData[requestedPage]);
+            removeAllImages();
+            displayImage(cacheItem, requestedPage, imageItems[requestedPage]);
         }
 
         if (settings.isHighlightInImages()) {
             highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager));
         }
-
-        logger.debug("displayImages done in ", System.currentTimeMillis() - start, "ms");
 
 
         imagesPanel.revalidate();
@@ -489,8 +511,19 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             });
         }
 
+        logger.debug("EDT displayImages done in ", System.currentTimeMillis() - start, "ms");
 
         return true;
+    }
+
+    private void removeAllImages() {
+        Component[] children = imagesPanel.getComponents();
+        imagesPanel.removeAll();
+        for (Component component : children) {
+            if (component instanceof Disposable) {
+                Disposer.dispose((Disposable) component);
+            }
+        }
     }
 
     public JScrollPane getScrollPane() {
@@ -498,6 +531,14 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     public void displayImage(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {
+        JComponent component = createImageContainer(cacheItem, pageNumber, imageWithData);
+
+        imagesPanel.add(component);
+        imagesPanel.add(separator());
+    }
+
+    @NotNull
+    private JComponent createImageContainer(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {
         if (imageWithData == null) {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
@@ -508,11 +549,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             component = new ImageContainerPng(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         }
         addScrollBarListeners(component);
-
-        if (pageNumber != 0 && imagesPanel.getComponentCount() > 0) {
-            imagesPanel.add(separator());
-        }
-        imagesPanel.add(component);
+        return component;
     }
 
 
@@ -561,7 +598,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
             }, 10);
         } else {
-            renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+            processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }
 
         WindowManager.getInstance().getStatusBar(project).setInfo("Zoomed changed to " + unscaledZoom + "%");
@@ -572,7 +609,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             logger.debug("page ", selectedPage, " selected");
             this.selectedPage = selectedPage;
             selectedPagePersistentStateComponent.setPage(selectedPage, renderCache.getDisplayedItem());
-            renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+            processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
         }
     }
 

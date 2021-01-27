@@ -1,8 +1,6 @@
 package org.plantuml.idea.external;
 
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ImageLoader;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
 import org.plantuml.idea.plantuml.PlantUml;
@@ -11,11 +9,8 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.Zoom;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Collection;
 
 public interface PlantUmlFacade {
@@ -34,8 +29,6 @@ public interface PlantUmlFacade {
             throws IOException;
 
     RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem);
-
-    BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/);
 
     String version();
 

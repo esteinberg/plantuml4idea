@@ -4,72 +4,24 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ImageLoader;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
-import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.util.XMLResourceDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
-import org.plantuml.idea.toolwindow.MyTranscoder;
-import org.w3c.dom.Document;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
-
-    @SuppressWarnings("KotlinInternalInJava")
-    public static BufferedImage loadWithoutCache(@Nullable URL url, @NotNull InputStream stream, double scale, @Nullable ImageLoader.Dimension2DDouble docSize /*OUT*/) {
-        try {
-            long start = System.currentTimeMillis();
-            MyTranscoder transcoder = MyTranscoder.createImage(scale, createTranscodeInput(url, stream));
-            if (docSize != null) {
-                docSize.setSize(transcoder.getOrigDocWidth(), transcoder.getOrigDocHeight());
-            }
-            BufferedImage image = transcoder.getImage();
-            LOG.debug("loadWithoutCache done in ", System.currentTimeMillis() - start, "ms");
-            return image;
-        } catch (Exception ex) {
-            if (docSize != null) {
-                docSize.setSize(0, 0);
-            }
-            throw new RuntimeException(ex);
-        }
-    }
-
-    @NotNull
-    private static TranscoderInput createTranscodeInput(@Nullable URL url, @NotNull InputStream stream) throws IOException {
-        TranscoderInput myTranscoderInput;
-        String uri = null;
-        try {
-            if (url != null && "jar".equals(url.getProtocol())) {
-                // workaround for BATIK-1217
-                url = new URL(url.getPath());
-            }
-            uri = url != null ? url.toURI().toString() : null;
-        } catch (URISyntaxException ignore) {
-        }
-
-        Document document = new SAXSVGDocumentFactory(XMLResourceDescriptor.getXMLParserClassName()).createDocument(uri, stream);
-        //          patchColors(url, document);
-        myTranscoderInput = new TranscoderInput(document);
-        return myTranscoderInput;
-    }
 
     @NotNull
     public static void prepareEnvironment(RenderRequest renderRequest) {

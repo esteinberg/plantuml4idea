@@ -104,7 +104,6 @@ public class PlantUmlNormalRenderer {
             if (renderRequestPage >= totalPages) {
                 renderRequestPage = -1;
             }
-            RenderResult renderResult = new RenderResult(RenderingType.NORMAL, totalPages);
 
             FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest));
 
@@ -122,6 +121,7 @@ public class PlantUmlNormalRenderer {
             logger.debug("sum of all before render ", System.currentTimeMillis() - start, "ms");
 
 
+            RenderResult renderResult = new RenderResult(RenderingType.NORMAL, totalPages);
             for (int page = 0; page < totalPages; page++) {
                 boolean pageRequested = renderRequestPage == -1 || renderRequestPage == page;
                 if (incrementalRendering) {
@@ -144,6 +144,7 @@ public class PlantUmlNormalRenderer {
         boolean obsolete = renderRequest.requestedRefreshOrIncludesChanged()
                 || cachedItem.zoomChanged(renderRequest)
                 || cachedItem.sourceChanged(sourceSplit, page)
+                || cachedItem.differentFormat(renderRequest)
                 || cachedItem.titleChanged(page, factory.getTitle(page));
 
         boolean shouldRender = pageRequested && (obsolete || cachedItem.imageMissing(page));

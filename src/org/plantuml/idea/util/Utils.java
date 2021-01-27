@@ -10,6 +10,8 @@ import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
 
 import java.awt.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,5 +117,11 @@ public class Utils {
             }
         }
         return compList;
+    }
+
+    public static String stacktraceToString(Throwable e) {
+        StringWriter errorMsg = new StringWriter();
+        e.printStackTrace(new PrintWriter(errorMsg));
+        return errorMsg.toString();
     }
 }

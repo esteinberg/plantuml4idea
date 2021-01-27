@@ -28,7 +28,7 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
     public void actionPerformed(final AnActionEvent e) {
         ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
         if (data != null) {
-            ImageItem imageWithData = data.getImageWithData();
+            ImageItem imageWithData = data.getImageItem();
             String source;
             if (imageWithData.getRenderingType() == RenderingType.PARTIAL) {
                 source = imageWithData.getPageSource();

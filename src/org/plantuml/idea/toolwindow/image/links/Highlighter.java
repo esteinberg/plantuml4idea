@@ -9,13 +9,13 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiEditorUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Alarm;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 
@@ -28,10 +28,12 @@ import java.util.List;
 public class Highlighter {
 
     private static final Logger LOG = Logger.getInstance(Highlighter.class);
+    private final PlantUmlSettings plantUmlSettings;
     private Alarm myAlarm;
 
     public Highlighter() {
         myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
+        plantUmlSettings = PlantUmlSettings.getInstance();
     }
 
     public void highlightImages(PlantUmlToolWindow plantUmlToolWindow, Editor editor) {
@@ -53,7 +55,12 @@ public class Highlighter {
         Component[] components = imagesPanel.getComponents();
 
         if (components.length > 0) {
-            List<String> list = getListForHighlighting(editor);
+            List<String> list;
+            if (plantUmlSettings.isHighlightInImages()) {
+                list = getListForHighlighting(editor);
+            } else {
+                list = Collections.emptyList();
+            }
 
             for (Component component : components) {
                 if (component instanceof ImageContainer) {
@@ -74,8 +81,8 @@ public class Highlighter {
             return Collections.emptyList();
         }
         PsiFile file = PsiDocumentManager.getInstance(editor.getProject()).getPsiFile(editor.getDocument());
-        if (file==null || !file.isValid()) {
-            return Collections.emptyList(); 
+        if (file == null || !file.isValid()) {
+            return Collections.emptyList();
         }
         for (CaretState caretsAndSelection : caretsAndSelections) {
             LogicalPosition selectionStart = caretsAndSelection.getSelectionStart();
@@ -96,7 +103,7 @@ public class Highlighter {
                 } else if (elementAtOffset.getNode().getElementType() == PumlTypes.IDENTIFIER) {
                     String text = elementAtOffset.getText();
                     list.add(sanitize(text));
-                } else  {
+                } else {
                     String text = elementAtOffset.getText();
                     list.add(sanitize(text));
                 }
@@ -112,7 +119,7 @@ public class Highlighter {
         return list;
     }
 
-    private String sanitize(String text) {
+    protected static String sanitize(String text) {
         char[] charArray = text.toCharArray();
         int start = -1;
         int end = -1;
@@ -126,7 +133,7 @@ public class Highlighter {
             }
         }
         if (start != -1) {
-            return text.substring(start, end);
+            return text.substring(start, end + 1);
         }
         return text;
     }

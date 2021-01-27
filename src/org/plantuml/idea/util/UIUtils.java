@@ -35,8 +35,8 @@ public class UIUtils {
     public static final NotificationGroup NOTIFICATION = new NotificationGroup("PlantUML integration plugin",
             NotificationDisplayType.BALLOON, true);
 
-
-    public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
+    public static @Nullable
+    BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
         return ImageIO.read(input);
     }
@@ -184,7 +184,7 @@ public class UIUtils {
         PlantUmlToolWindow plantUmlToolWindow = getPlantUmlToolWindow(toolWindow);
 
         if (plantUmlToolWindow != null) {
-            plantUmlToolWindow.renderLater(delay, reason);
+            plantUmlToolWindow.processRequest(delay, reason);
         }
     }
 

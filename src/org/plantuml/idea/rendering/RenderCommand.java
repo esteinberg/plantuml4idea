@@ -97,19 +97,20 @@ public abstract class RenderCommand implements Runnable {
 
     private void initImages(RenderRequest renderRequest, RenderResult result) {
         List<ImageItem> imageItems = result.getImageItems();
-        if (true) {
-            imageItems.parallelStream().forEach(imageItem -> {
-                try {
-                    imageItem.initImage(this.project, renderRequest, result);
-                } catch (Throwable e) {
-                    logger.error(e);
-                }
-            });
-        } else {
-            for (ImageItem imageItem : imageItems) {
+//        if (true) {
+        imageItems.parallelStream().forEach(imageItem -> {
+            try {
                 imageItem.initImage(this.project, renderRequest, result);
+            } catch (Throwable e) {
+                logger.error(e);
             }
-        }
+        });
+
+//        } else {
+//            for (ImageItem imageItem : imageItems) {
+//                imageItem.initImage(this.project, renderRequest, result);
+//            }
+//        }
     }
 
     protected abstract void displayResultOnEDT(RenderCacheItem newItem, long total, RenderResult result);

@@ -24,7 +24,7 @@ public class CopySvgToClipboard extends DumbAwareAction {
         if (data == null) {
             return;
         }
-        byte[] imageBytes = data.getImageWithData().getImageBytes();
+        byte[] imageBytes = data.getImageItem().getImageBytes();
         String s = new String(imageBytes, StandardCharsets.UTF_8);
 
         CopyPasteManager.getInstance().setContents(new Transferable() {

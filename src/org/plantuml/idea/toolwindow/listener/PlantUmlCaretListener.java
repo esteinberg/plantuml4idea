@@ -8,18 +8,15 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
-import org.plantuml.idea.toolwindow.image.links.Highlighter;
 import org.plantuml.idea.util.UIUtils;
 
 public class PlantUmlCaretListener implements CaretListener {
     private static Logger logger = Logger.getInstance(PlantUmlCaretListener.class);
     public FileDocumentManager instance = FileDocumentManager.getInstance();
     private PlantUmlSettings settings;
-    private Highlighter highlighter;
 
     public PlantUmlCaretListener() {
         settings = PlantUmlSettings.getInstance();
-        highlighter = new Highlighter();
     }
 
     @Override
@@ -35,12 +32,12 @@ public class PlantUmlCaretListener implements CaretListener {
 
         if (settings.isAutoRender()) {
             if (plantUmlToolWindow != null) {
-                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+                plantUmlToolWindow.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
             }
         }
 
         if (settings.isHighlightInImages()) {
-            highlighter.highlightImages(plantUmlToolWindow, e.getEditor());
+            plantUmlToolWindow.highlightImages(e.getEditor());
         }
     }
 
@@ -57,11 +54,11 @@ public class PlantUmlCaretListener implements CaretListener {
         }
 
         if (settings.isAutoRender()) {
-            plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+            plantUmlToolWindow.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
         }
 
         if (settings.isHighlightInImages()) {
-            highlighter.highlightImages(plantUmlToolWindow, e.getEditor());
+            plantUmlToolWindow.highlightImages(e.getEditor());
         }
     }
 

@@ -143,8 +143,8 @@
                 <separator/>
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
                         class="org.plantuml.idea.action.DisplaySvgToggleAction"
-                        text="Use New SVG Preview (Disable for Old PNG)"
-                        description="SVG is much faster"
+                        text="New SVG Preview"
+                        description="It should be much faster. Disable for the old PNG one."
                 />
                 />
                 <separator/>

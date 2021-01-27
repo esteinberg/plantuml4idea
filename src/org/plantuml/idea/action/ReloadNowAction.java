@@ -28,7 +28,7 @@ public class ReloadNowAction extends DumbAwareAction {
         if (project != null) {
             PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
             if (plantUmlToolWindow != null) {
-                plantUmlToolWindow.renderLater(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
+                plantUmlToolWindow.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
             }
         }
     }

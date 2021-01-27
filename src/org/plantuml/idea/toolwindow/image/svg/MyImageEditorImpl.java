@@ -19,14 +19,14 @@ import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.vfs.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileEvent;
+import com.intellij.openapi.vfs.VirtualFilePropertyEvent;
 import com.intellij.openapi.vfs.newvfs.RefreshQueue;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
 import com.intellij.util.ImageLoader;
 import org.intellij.images.editor.ImageDocument;
-import org.intellij.images.editor.ImageEditor;
 import org.intellij.images.editor.ImageZoomModel;
 import org.intellij.images.fileTypes.ImageFileTypeManager;
 import org.intellij.images.thumbnail.actionSystem.ThumbnailViewActions;
@@ -50,7 +50,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author <a href="mailto:aefimov.box@gmail.com">Alexey Efimov</a>
  */
-public final class MyImageEditorImpl implements ImageEditor {
+public final class MyImageEditorImpl implements MyImageEditor {
     private static final Logger LOG = Logger.getInstance(MyImageEditorImpl.class);
 
     private final Project project;
@@ -71,19 +71,19 @@ public final class MyImageEditorImpl implements ImageEditor {
         this.file = file;
 
         editorUI = new MyImageEditorUI(this, isEmbedded, zoomModel);
-        Disposer.register(this, editorUI);
+//        Disposer.register(this, editorUI);
 
-        VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {
-            @Override
-            public void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
-                MyImageEditorImpl.this.propertyChanged(event);
-            }
-
-            @Override
-            public void contentsChanged(@NotNull VirtualFileEvent event) {
-                MyImageEditorImpl.this.contentsChanged(event);
-            }
-        }, this);
+//        VirtualFileManager.getInstance().addVirtualFileListener(new VirtualFileListener() {
+//            @Override
+//            public void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
+//                MyImageEditorImpl.this.propertyChanged(event);
+//            }
+//
+//            @Override
+//            public void contentsChanged(@NotNull VirtualFileEvent event) {
+//                MyImageEditorImpl.this.contentsChanged(event);
+//            }
+//        }, this);
 
         setValue(file);
     }
@@ -92,6 +92,7 @@ public final class MyImageEditorImpl implements ImageEditor {
         try {
             //CUSTOM
             editorUI.setImageProvider(new MyScaledImageProvider(file), "svg");
+
 //            editorUI.setImageProvider(IfsUtil.getImageProvider(file), IfsUtil.getFormat(file));
 
         } catch (Exception e) {
@@ -175,20 +176,12 @@ public final class MyImageEditorImpl implements ImageEditor {
         return editorUI.getImageComponent().isGridVisible();
     }
 
-    @Override
-    public boolean isDisposed() {
-        return disposed;
-    }
 
     @Override
     public ImageZoomModel getZoomModel() {
         return editorUI.getZoomModel();
     }
 
-    @Override
-    public void dispose() {
-        disposed = true;
-    }
 
     void propertyChanged(@NotNull VirtualFilePropertyEvent event) {
         if (file.equals(event.getFile())) {
@@ -220,20 +213,20 @@ public final class MyImageEditorImpl implements ImageEditor {
 
         private volatile boolean renderingInProgress;
 
-        private volatile Holder holder = new Holder();
+        private volatile MyImageEditorImpl.Holder holder = new MyImageEditorImpl.Holder();
 
         public MyScaledImageProvider(VirtualFile file) {
             this.file = file;
         }
 
-        public Holder getHolder() {
+        public MyImageEditorImpl.Holder getHolder() {
             return holder;
         }
 
         @Override
         public BufferedImage apply(Double bullshitScale, Component component) {
             double zoom = getZoomModel().getZoomFactor();
-            Holder holder = this.holder;
+            MyImageEditorImpl.Holder holder = this.holder;
             if (holder.isChanged(zoom) && !renderingInProgress) {
                 createImage(component, zoom);
             }
@@ -241,8 +234,8 @@ public final class MyImageEditorImpl implements ImageEditor {
         }
 
         public synchronized void createImage(Component component, double zoom) {
-            Holder holder = this.holder;
-            if (holder.image != null && holder.zoom.equals(zoom)) {
+            MyImageEditorImpl.Holder holder = this.holder;
+            if (holder.image != null && holder.zoom == zoom) {
                 return;
             }
             byte[] buf = null;
@@ -269,62 +262,74 @@ public final class MyImageEditorImpl implements ImageEditor {
 
                 BufferedImage image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
 
-                Holder newHolder = new Holder(image, outSize, zoom);
+                MyImageEditorImpl.Holder newHolder = new MyImageEditorImpl.Holder(image, outSize, zoom, null);
 
                 this.holder = newHolder;
                 LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", newHolder.image.getWidth(), " hight=", newHolder.image.getHeight(), " docWidth=", newHolder.outSize.getWidth(), " docHight=", newHolder.outSize.getHeight());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 String source = null;
                 if (buf != null) {
                     source = new String(buf, StandardCharsets.UTF_8);
                 }
-                throw new RuntimeException(e.getMessage() + ", imageSource: " + source, e);
+                LOG.error(e.getMessage() + " - imageSource: " + source, e);
+                this.holder = new Holder(null, null, -1.0, e);
             } finally {
                 renderingInProgress = false;
             }
         }
 
-        class Holder {
-            private final ImageLoader.Dimension2DDouble outSize;
-            private final Double zoom;
-            private final BufferedImage image;
+    }
 
-            public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, Double zoom) {
-                this.outSize = outSize;
-                this.zoom = zoom;
-                this.image = image;
-            }
+    static class Holder {
+        private final ImageLoader.Dimension2DDouble outSize;
+        private final double zoom;
+        private final BufferedImage image;
+        private Throwable exception;
 
-            public Holder() {
-                this(null, null, -1.0);
-            }
+        public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, double zoom, Throwable exception) {
+            this.outSize = outSize;
+            this.zoom = zoom;
+            this.image = image;
+            this.exception = exception;
+        }
 
-            private boolean isChanged(double zoom) {
-                return image == null || !this.zoom.equals(zoom);
-            }
+        public Holder() {
+            this(null, null, -1.0, null);
+        }
 
-            public ImageLoader.Dimension2DDouble getOutSize() {
-                return outSize;
-            }
+        private boolean isChanged(double zoom) {
+            return image == null || this.zoom != zoom;
+        }
 
-            public Double getZoom() {
-                return zoom;
-            }
+        public ImageLoader.Dimension2DDouble getOutSize() {
+            return outSize;
+        }
 
-            public BufferedImage getImage() {
-                return image;
-            }
+        public double getZoom() {
+            return zoom;
+        }
 
-            @Override
-            public String toString() {
-                return "Holder{" +
-                        "outSize=" + outSize +
-                        ", zoom=" + zoom +
-                        ", image=" + image +
-                        '}';
-            }
+        public BufferedImage getImage() {
+            return image;
+        }
+
+        @Override
+        public String toString() {
+            return "Holder{" +
+                    "outSize=" + outSize +
+                    ", zoom=" + zoom +
+                    ", image=" + image +
+                    ", exception=" + exception +
+                    '}';
+        }
 
 
+        public Throwable getException() {
+            return exception;
+        }
+
+        public void setException(Throwable exception) {
+            this.exception = exception;
         }
     }
 }

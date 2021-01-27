@@ -2,7 +2,6 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.PopupHandler;
 import org.apache.commons.lang.StringUtils;
@@ -50,8 +49,6 @@ public class ImageItem {
     private final String description;
     @NotNull
     private final RenderingType renderingType;
-    @Nullable
-    private BufferedImage image;
     @NotNull
     private final List<LinkData> links;
     @Nullable
@@ -67,8 +64,11 @@ public class ImageItem {
     private final String pageSource;
     @NotNull
     private final String documentSource;
-    private byte[] imageBytes;
-    private MyImageEditorImpl editor;
+    private final byte[] imageBytes;
+
+    @Nullable
+    private volatile BufferedImage image;
+    private volatile MyImageEditorImpl editor;
 
     public ImageItem(@Nullable File baseDir,
                      @NotNull PlantUml.ImageFormat format,
@@ -121,7 +121,7 @@ public class ImageItem {
 
     @Nullable
     public BufferedImage getImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
-        if (image == null && imageBytes != null) {
+        if (image == null && hasImageBytes()) {
             initImage(project, renderRequest, renderResult);
         }
         return image;
@@ -147,7 +147,7 @@ public class ImageItem {
     }
 
     public boolean hasImageBytes() {
-        return imageBytes != null;
+        return imageBytes != null && imageBytes.length > 0;
     }
 
     public byte[] getImageBytes() {
@@ -173,32 +173,32 @@ public class ImageItem {
     }
 
     void initImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
-        long start = System.currentTimeMillis();
-        if (getImageBytes() != null) {
+        if ((editor == null && image == null) && getImageBytes() != null) {
+            long start = System.currentTimeMillis();
             if (format == PlantUml.ImageFormat.PNG) {
                 try {
                     this.image = UIUtils.getBufferedImage(getImageBytes());
+                    if (image == null) {
+                        LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
+                    }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             } else if (format == PlantUml.ImageFormat.SVG) {
                 MyImageEditorImpl init = getEditor(project, renderRequest, renderResult);
             }
+            LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
         }
-        LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
     }
 
     public MyImageEditorImpl getEditor(final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
-        if (editor != null && !editor.isDisposed()) {
+        if (editor != null) {
             return editor;
         }
         long start = System.currentTimeMillis();
 
         LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", new String(getImageBytes(), StandardCharsets.UTF_8));
         this.editor = new MyImageEditorImpl(project, virtualFile, true, renderRequest.getZoom());
-
-        Disposer.register(UIUtils.getPlantUmlToolWindow(project), editor);
-
         ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
         JComponent contentComponent = this.editor.getContentComponent();
 
@@ -231,10 +231,14 @@ public class ImageItem {
         return this.editor;
     }
 
+    /**
+     * items are shared between RenderCacheItem
+     */
+    @Deprecated
     public void dispose() {
-        if (editor != null) {
-            Disposer.dispose(editor);
-        }
+//        if (editor != null) {
+//            Disposer.dispose(editor);
+//        }
     }
 
     public class LinkData {
@@ -385,10 +389,12 @@ public class ImageItem {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("format", format)
+                .append("filename", filename)
                 .append("page", page)
                 .append("description", description)
                 .append("title", title)
-                .append("hasImageBytes", hasImageBytes())
+                .append("imageBytes.length", imageBytes != null ? imageBytes.length : null)
                 .toString();
     }
 
