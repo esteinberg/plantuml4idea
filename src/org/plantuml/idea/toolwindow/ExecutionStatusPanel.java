@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
+import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderResult;
 
@@ -23,6 +24,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
     public static String DESCRIPTION;
     private MyMouseAdapter myMouseAdapter;
     private Runnable mouseOnClickAction;
+    private Alarm alarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
     {
         {
@@ -68,66 +70,67 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
 
     public synchronized void update(State state) {
         this.state = state;
-        updateLabelLater();
+        updateUiLater();
     }
 
     public synchronized void update(int version, State state) {
         if (this.version <= version) {
-            updateState(version, state, message, mouseOnClickAction);
-            updateLabelLater();
+            setState(version, state, message, mouseOnClickAction);
+            updateUiLater();
         }
     }
 
     public synchronized void update(int version, State state, long total, RenderResult result) {
         if (this.version <= version) {
-            updateState(version, state, total, result, null);
-            updateLabelLater();
+            setState(version, state, total, result, null);
+            updateUiLater();
         }
     }
 
     public void updateNow(Integer version, State state, long total, @NotNull RenderResult result, Runnable mouseOnClickAction) {
         if (this.version <= version) {
-            updateState(version, state, total, result, mouseOnClickAction);
-            state.update(label, myMouseAdapter, message, this.mouseOnClickAction);
+            setState(version, state, total, result, mouseOnClickAction);
+            state.updateUi(label, myMouseAdapter, message, this.mouseOnClickAction);
         } else {
-            //something else is already running, update all but color
-            updateState(version, this.state, total, result, mouseOnClickAction);
-            state.update(label, myMouseAdapter, message, this.mouseOnClickAction);
+            //something else is already running, updateUi all but color
+            setState(version, this.state, total, result, mouseOnClickAction);
+            state.updateUi(label, myMouseAdapter, message, this.mouseOnClickAction);
         }
     }
 
     public synchronized void updateNow(Integer version, State state, String message) {
         if (this.version <= version) {
-            updateState(version, state, message, null);
-            state.update(label, myMouseAdapter, message, null);
+            setState(version, state, message, null);
+            state.updateUi(label, myMouseAdapter, message, null);
         }
     }
 
-    protected void updateState(int version, State state, long total, RenderResult result, Runnable mouseOnClickAction) {
+    private void setState(int version, State state, long total, RenderResult result, Runnable mouseOnClickAction) {
         int rendered = result.getRendered();
         int updatedTitles = result.getUpdatedTitles();
         int cached = result.getCached();
-        String message = String.valueOf(total) + "ms ["
+        String message = total + "ms ["
                 + rendered + ","
                 + updatedTitles + ","
                 + cached + "]";
-        updateState(version, state, message, mouseOnClickAction);
+        setState(version, state, message, mouseOnClickAction);
     }
 
 
-    private void updateState(Integer version, State state, String message, Runnable mouseOnClickAction) {
+    private void setState(Integer version, State state, String message, Runnable mouseOnClickAction) {
         this.version = version;
         this.message = message;
         this.state = state;
         this.mouseOnClickAction = mouseOnClickAction;
     }
 
-    private void updateLabelLater() {
-        SwingUtilities.invokeLater(() -> {
+    private void updateUiLater() {
+        int i = alarm.cancelAllRequests();
+        alarm.addRequest(() -> {
             if (state != null) {
-                state.update(label, myMouseAdapter, message, mouseOnClickAction);
+                state.updateUi(label, myMouseAdapter, message, mouseOnClickAction);
             }
-        });
+        }, 0);
     }
 
     public enum State {
@@ -145,8 +148,8 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             this.description = description;
         }
 
-        public void update(JLabel comp, MyMouseAdapter myMouseAdapter, String message, Runnable mouseOnClickAction) {
-            ApplicationManager.getApplication().assertIsDispatchThread();
+        public void updateUi(JLabel comp, MyMouseAdapter myMouseAdapter, String message, Runnable mouseOnClickAction) {
+//            ApplicationManager.getApplication().assertIsDispatchThread();
             if (comp != null) { //strange NPE
                 comp.setText(message);
                 comp.setForeground(this.color);
