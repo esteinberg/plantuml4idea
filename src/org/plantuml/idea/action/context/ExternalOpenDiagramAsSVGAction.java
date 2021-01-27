@@ -1,7 +1,7 @@
 package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 
 /**
  * @author Henady Zakalusky
@@ -9,7 +9,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 public class ExternalOpenDiagramAsSVGAction extends ExternalOpenDiagramAction {
 
     public ExternalOpenDiagramAsSVGAction() {
-        super("Open in external editor as SVG document", AllIcons.ToolbarDecorator.Export, PlantUml.ImageFormat.SVG);
+        super("Open in external editor as SVG document", AllIcons.ToolbarDecorator.Export, ImageFormat.SVG);
     }
 
 }

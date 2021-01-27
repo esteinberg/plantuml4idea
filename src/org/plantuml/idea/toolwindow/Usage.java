@@ -6,13 +6,13 @@ public class Usage extends JTextArea {
     public static final String TEXT =
             "- Open a file, put the cursor inside of the PlantUML code to render it\n"
                     + "- PlantUML code must be inside of @startuml and @enduml tags to be rendered, or their equivalent\n"
-                    + "- Graphviz is now included in PlantUML, install your own if needed and set a path to it\n\n"
+                    + "- Graphviz is now included in PlantUML, you can install your own and set a path to it\n\n"
 
                     + "- A new file can be created from template (File | New | PlantUML File)\n"
                     + "- PlantUML code can be placed anywhere, '*' are ignored for usage in Java comments\n"
                     + "- About screen tests Graphviz installation\n\n"
 
-                    + "- Clicking on the rendered image's text finds it in the editor\n"
+                    + "- Clicking on the rendered image's text finds it in the source\n"
                     + "- Ctrl + Click in the editor navigates between occurrences\n"
                     + "- File Structure displays the first occurrence\n"
                     + "\nIntentions (Alt+Enter):\n"

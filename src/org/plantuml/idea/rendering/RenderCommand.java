@@ -7,7 +7,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 import org.plantuml.idea.toolwindow.Zoom;
 
@@ -65,7 +65,7 @@ public abstract class RenderCommand implements Runnable {
             label.update(version, ExecutionStatusPanel.State.EXECUTING);
 
 
-            PlantUml.ImageFormat imageFormat = PlantUmlSettings.getInstance().isDisplaySvg() ? PlantUml.ImageFormat.SVG : PlantUml.ImageFormat.PNG;
+            ImageFormat imageFormat = PlantUmlSettings.getInstance().isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
 
             final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
             renderRequest.disableSvgZoom();

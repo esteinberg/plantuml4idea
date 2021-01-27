@@ -6,10 +6,15 @@ import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -123,5 +128,11 @@ public class Utils {
         StringWriter errorMsg = new StringWriter();
         e.printStackTrace(new PrintWriter(errorMsg));
         return errorMsg.toString();
+    }
+
+    @Nullable
+    public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
+        ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
+        return ImageIO.read(input);
     }
 }

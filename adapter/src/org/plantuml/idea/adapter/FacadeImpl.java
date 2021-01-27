@@ -7,7 +7,7 @@ import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
@@ -30,7 +30,7 @@ public class FacadeImpl implements PlantUmlFacade {
     }
 
     @Override
-    public void renderAndSave(String source, File sourceFile, PlantUml.ImageFormat format, String path, String pathPrefix, Zoom scaledZoom, int pageNumber) throws IOException {
+    public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom scaledZoom, int pageNumber) throws IOException {
         RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, scaledZoom, -1, false, null);
         PlantUmlRendererUtil.renderAndSave(renderRequest, path, pathPrefix);
     }

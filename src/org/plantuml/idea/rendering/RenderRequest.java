@@ -3,7 +3,7 @@ package org.plantuml.idea.rendering;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.util.UIUtils;
 
@@ -14,7 +14,7 @@ public class RenderRequest {
     @NotNull
     private final String source;
     @NotNull
-    private final PlantUml.ImageFormat format;
+    private final ImageFormat format;
     private final int page;
     @NotNull
     private Zoom zoom;
@@ -26,7 +26,7 @@ public class RenderRequest {
 
     public RenderRequest(String sourceFilePath,
                          @NotNull String source,
-                         @NotNull PlantUml.ImageFormat format,
+                         @NotNull ImageFormat format,
                          int page,
                          @NotNull
                                  Zoom zoom,
@@ -44,7 +44,7 @@ public class RenderRequest {
     }
 
     public RenderRequest(@NotNull RenderRequest renderRequest,
-                         @NotNull PlantUml.ImageFormat format) {
+                         @NotNull ImageFormat format) {
         this.sourceFilePath = renderRequest.sourceFilePath;
         this.source = renderRequest.source;
         this.format = format;
@@ -72,7 +72,7 @@ public class RenderRequest {
     }
 
     @NotNull
-    public PlantUml.ImageFormat getFormat() {
+    public ImageFormat getFormat() {
         return format;
     }
 

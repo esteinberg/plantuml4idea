@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.action.context.*;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
@@ -186,7 +186,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         //        
         //todo can't get it to transform to png
 
-        RenderRequest rr = new RenderRequest(this.renderRequest, PlantUml.ImageFormat.PNG);
+        RenderRequest rr = new RenderRequest(this.renderRequest, ImageFormat.PNG);
         Zoom zoom = UIUtils.getPlantUmlToolWindow(project).getZoom();
         rr.setZoom(zoom);
         RenderResult render = PlantUmlFacade.get().render(rr, null);

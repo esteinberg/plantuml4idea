@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
@@ -24,9 +24,9 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
 
     protected static final Logger logger = Logger.getInstance(ExternalOpenDiagramAction.class);
 
-    private PlantUml.ImageFormat imageFormat;
+    private ImageFormat imageFormat;
 
-    public ExternalOpenDiagramAction(String text, @Nullable Icon icon, PlantUml.ImageFormat imageFormat) {
+    public ExternalOpenDiagramAction(String text, @Nullable Icon icon, ImageFormat imageFormat) {
         super(text, text, icon);
         this.imageFormat = imageFormat;
     }

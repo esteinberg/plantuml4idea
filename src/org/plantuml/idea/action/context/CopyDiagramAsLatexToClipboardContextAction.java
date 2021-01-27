@@ -2,7 +2,7 @@ package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 
 public class CopyDiagramAsLatexToClipboardContextAction extends CopyDiagramAsTxtToClipboardContextAction {
 
@@ -12,8 +12,8 @@ public class CopyDiagramAsLatexToClipboardContextAction extends CopyDiagramAsTxt
 
     @Override
     @NotNull
-    protected PlantUml.ImageFormat getFormat() {
-        return PlantUml.ImageFormat.TEX;
+    protected ImageFormat getFormat() {
+        return ImageFormat.TEX;
     }
 
 }

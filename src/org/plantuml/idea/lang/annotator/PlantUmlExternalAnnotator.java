@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.SourceExtractor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +72,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
         if (plantUmlSettings.isErrorAnnotationEnabled() || plantUmlSettings.isKeywordHighlighting()) {
             String text = file.text;
 
-            Map<Integer, String> sources = PlantUml.extractSources(text);
+            Map<Integer, String> sources = SourceExtractor.extractSources(text);
 
             for (Map.Entry<Integer, String> sourceData : sources.entrySet()) {
                 Integer sourceOffset = sourceData.getKey();

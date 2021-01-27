@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
@@ -47,7 +47,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     Logger logger = Logger.getInstance(SaveDiagramToFileAction.class);
 
     static {
-        PlantUml.ImageFormat[] values = PlantUml.ImageFormat.values();
+        ImageFormat[] values = ImageFormat.values();
         extensions = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             extensions[i] = values[i].toString().toLowerCase();
@@ -121,9 +121,9 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                     }
                 }
 
-                PlantUml.ImageFormat imageFormat;
+                ImageFormat imageFormat;
                 try {
-                    imageFormat = PlantUml.ImageFormat.valueOf(extension.toUpperCase());
+                    imageFormat = ImageFormat.valueOf(extension.toUpperCase());
                 } catch (Exception ex) {
                     throw new IOException("Extension '" + extension + "' is not supported");
                 }

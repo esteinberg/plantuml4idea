@@ -11,12 +11,12 @@ import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorUI;
-import org.plantuml.idea.util.UIUtils;
+import org.plantuml.idea.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -59,7 +59,7 @@ public class ImageItem {
     @Nullable
     private final String filename;
     @NotNull
-    private final PlantUml.ImageFormat format;
+    private final ImageFormat format;
     @Nullable
     private final String pageSource;
     @NotNull
@@ -71,7 +71,7 @@ public class ImageItem {
     private volatile MyImageEditorImpl editor;
 
     public ImageItem(@Nullable File baseDir,
-                     @NotNull PlantUml.ImageFormat format,
+                     @NotNull ImageFormat format,
                      @NotNull String documentSource,
                      @Nullable String pageSource,
                      int page,
@@ -94,7 +94,7 @@ public class ImageItem {
         this.links = this.parseLinks(svgBytes, baseDir);
     }
 
-    public ImageItem(int page, ImageItem item, @NotNull PlantUml.ImageFormat format) {
+    public ImageItem(int page, ImageItem item, @NotNull ImageFormat format) {
         this.page = page;
         this.description = item.description;
         this.pageSource = item.pageSource;
@@ -175,16 +175,16 @@ public class ImageItem {
     void initImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
         if ((editor == null && image == null) && getImageBytes() != null) {
             long start = System.currentTimeMillis();
-            if (format == PlantUml.ImageFormat.PNG) {
+            if (format == ImageFormat.PNG) {
                 try {
-                    this.image = UIUtils.getBufferedImage(getImageBytes());
+                    this.image = Utils.getBufferedImage(getImageBytes());
                     if (image == null) {
                         LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            } else if (format == PlantUml.ImageFormat.SVG) {
+            } else if (format == ImageFormat.SVG) {
                 MyImageEditorImpl init = getEditor(project, renderRequest, renderResult);
             }
             LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");

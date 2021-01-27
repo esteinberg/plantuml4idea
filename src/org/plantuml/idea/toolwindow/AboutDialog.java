@@ -4,7 +4,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.plantuml.SourceExtractor;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -85,7 +86,7 @@ public class AboutDialog extends JDialog {
 
     private void testDot() {
         Zoom zoom = new Zoom(UIUtils.getPlantUmlToolWindow(project), 100, PlantUmlSettings.getInstance());
-        RenderRequest renderRequest = new RenderRequest("", PlantUml.TESTDOT, PlantUml.ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);
         try {
@@ -95,7 +96,7 @@ public class AboutDialog extends JDialog {
                 testDot.setOpaque(false);
             }
         } catch (Exception e) {
-            logger.warn("Exception occurred rendering source = " + PlantUml.TESTDOT + ": " + e);
+            logger.warn("Exception occurred rendering source = " + SourceExtractor.TESTDOT + ": " + e);
         }
     }
 

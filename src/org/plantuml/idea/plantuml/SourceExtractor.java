@@ -10,21 +10,8 @@ import java.util.regex.Pattern;
 /**
  * @author Eugene Steinberg
  */
-public class PlantUml {
+public class SourceExtractor {
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
-
-
-    public enum ImageFormat {
-        PNG,
-        SVG,
-        UTXT,
-        ATXT,
-        EPS,
-        TEX,
-        TIKZ,
-        ;
-
-    }
 
 
     /**

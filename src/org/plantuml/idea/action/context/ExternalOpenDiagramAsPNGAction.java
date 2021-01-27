@@ -1,7 +1,7 @@
 package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 
 /**
  * @author Henady Zakalusky
@@ -9,7 +9,7 @@ import org.plantuml.idea.plantuml.PlantUml;
 public class ExternalOpenDiagramAsPNGAction extends ExternalOpenDiagramAction {
 
     public ExternalOpenDiagramAsPNGAction() {
-        super("Open in external editor as PNG image", AllIcons.ToolbarDecorator.Export, PlantUml.ImageFormat.PNG);
+        super("Open in external editor as PNG image", AllIcons.ToolbarDecorator.Export, ImageFormat.PNG);
     }
 
 }

@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
@@ -155,9 +155,9 @@ public class DiagramFactory {
         LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms");
 
         byte[] svgBytes = new byte[0];
-        if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG) {
+        if (renderRequest.getFormat() == ImageFormat.SVG) {
             svgBytes = bytes;
-        } else if (renderRequest.getFormat() == PlantUml.ImageFormat.PNG && renderRequest.isRenderUrlLinks()) { //todo check if exporting
+        } else if (renderRequest.getFormat() == ImageFormat.PNG && renderRequest.isRenderUrlLinks()) { //todo check if exporting
             svgBytes = generateSvg(page);
         }
 

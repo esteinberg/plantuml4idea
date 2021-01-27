@@ -13,18 +13,14 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.SourceExtractor;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @author Eugene Steinberg
@@ -35,12 +31,6 @@ public class UIUtils {
     public static final NotificationGroup NOTIFICATION = new NotificationGroup("PlantUML integration plugin",
             NotificationDisplayType.BALLOON, true);
 
-    public static @Nullable
-    BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
-        ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
-        return ImageIO.read(input);
-    }
-
     public static String getSelectedSourceWithCaret(FileEditorManager instance) {
         String source = "";
 
@@ -49,7 +39,7 @@ public class UIUtils {
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             int offset = selectedTextEditor.getCaretModel().getOffset();
-            source = PlantUml.extractSource(document.getText(), offset);
+            source = SourceExtractor.extractSource(document.getText(), offset);
         }
         return source;
     }

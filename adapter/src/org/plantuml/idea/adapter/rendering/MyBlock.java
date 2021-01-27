@@ -6,7 +6,7 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderRequest;
 
 import java.util.List;
@@ -77,7 +77,7 @@ public class MyBlock {
 
 
     public void zoomDiagram(RenderRequest renderRequest) {
-        if (renderRequest.getFormat() == PlantUml.ImageFormat.SVG && renderRequest.isDisableSvgZoom()) {
+        if (renderRequest.getFormat() == ImageFormat.SVG && renderRequest.isDisableSvgZoom()) {
             LOG.debug("skipping SVG zooming");
             return;
         }

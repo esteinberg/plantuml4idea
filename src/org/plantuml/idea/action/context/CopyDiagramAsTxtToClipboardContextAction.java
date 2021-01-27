@@ -9,7 +9,7 @@ import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
@@ -50,8 +50,8 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
     }
 
     @NotNull
-    protected PlantUml.ImageFormat getFormat() {
-        return PlantUml.ImageFormat.ATXT;
+    protected ImageFormat getFormat() {
+        return ImageFormat.ATXT;
     }
 
 }

@@ -22,7 +22,7 @@ import org.plantuml.idea.action.NextPageAction;
 import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.action.ZoomAction;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.plantuml.PlantUml;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.toolwindow.image.ImageContainerPng;
@@ -543,7 +543,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
         JComponent component = null;
-        if (cacheItem.getRenderRequest().getFormat() == PlantUml.ImageFormat.SVG) {
+        if (cacheItem.getRenderRequest().getFormat() == ImageFormat.SVG) {
             component = new ImageContainerSvg(project, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         } else {
             component = new ImageContainerPng(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
