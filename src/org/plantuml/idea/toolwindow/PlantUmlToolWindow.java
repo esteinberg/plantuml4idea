@@ -518,6 +518,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     }
 
     private void removeAllImages() {
+        long start = System.currentTimeMillis();
         Component[] children = imagesPanel.getComponents();
         imagesPanel.removeAll();
         for (Component component : children) {
@@ -525,6 +526,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
                 Disposer.dispose((Disposable) component);
             }
         }
+        logger.debug("removeAllImages done in ", System.currentTimeMillis() - start, "ms");
     }
 
     public JScrollPane getScrollPane() {

@@ -168,6 +168,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         }
 
         JPanel errorPanel = new JPanel(new BorderLayout());
+
         this.errorLabel = new JTextArea("Image not loaded");
         errorLabel.setEditable(false);
 
@@ -222,7 +223,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     }
 
     @SuppressWarnings("UnusedDeclaration")
-    JComponent getContentComponent() {
+    public JComponent getContentComponent() {
         return contentPanel;
     }
 
@@ -601,10 +602,11 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //            final double zoom = getZoomModel().getZoomFactor();
 //            imageComponent.setCanvasSize((int) Math.ceil(bounds.width * zoom), (int) Math.ceil(bounds.height * zoom));
 //        }
+        BufferedImage image = null;
         if (imageProvider != null) {
             MyImageEditorImpl.Holder holder = imageProvider.getHolder();
             if (holder.getImage() != null) {
-                BufferedImage image = holder.getImage();
+                image = holder.getImage();
                 double zoom = holder.getZoom();
                 ImageLoader.Dimension2DDouble outSize = holder.getOutSize();
 
@@ -624,6 +626,22 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
                 imageComponent.setCanvasSize(w, h);
             }
         }
+
+
+        CardLayout layout = (CardLayout) contentPanel.getLayout();
+        if (image != null) {
+            layout.show(contentPanel, IMAGE_PANEL);
+        } else {
+            if (imageProvider != null) {
+                Throwable exception = imageProvider.getHolder().getException();
+                if (exception != null) {
+                    errorLabel.setText(Utils.stacktraceToString(exception));
+                } else {
+                    errorLabel.setText("Plugin error");
+                }
+            }
+            layout.show(contentPanel, ERROR_PANEL);
+        }
     }
 
     private class DocumentChangeListener implements ChangeListener {
@@ -637,21 +655,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
             updateImageComponentSize();
 
-
-            CardLayout layout = (CardLayout) contentPanel.getLayout();
-            if (value != null) {
-                layout.show(contentPanel, IMAGE_PANEL);
-            } else {
-                if (imageProvider != null) {
-                    Throwable exception = imageProvider.getHolder().getException();
-                    if (exception != null) {
-                        errorLabel.setText(Utils.stacktraceToString(exception));
-                    } else {
-                        errorLabel.setText("Plugin error");
-                    }
-                }
-                layout.show(contentPanel, ERROR_PANEL);
-            }
 
             updateInfo();
 

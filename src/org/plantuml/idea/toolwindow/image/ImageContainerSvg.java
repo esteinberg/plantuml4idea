@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Alarm;
+import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,15 +69,37 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     private MyImageEditorImpl editor;
 
     public ImageContainerSvg(Project project, ImageItem imageWithData, int i, RenderRequest renderRequest, RenderResult renderResult) {
+        super(new FlowLayout(FlowLayout.LEFT, 0, 0));
         this.project = project;
         this.imageWithData = imageWithData;
         this.renderRequest = renderRequest;
         this.renderResult = renderResult;
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setAlignmentX(LEFT_ALIGNMENT);
+
         zoomAlarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
         setup(this.imageWithData, i, renderRequest);
     }
 
+    @Override
+    public Dimension getPreferredSize() {
+        ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
+        Dimension size = imageComponent.getSize();
+        if (size.height > 0) {
+            return size;
+        }
+        return super.getPreferredSize();
+
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
+        Dimension size = imageComponent.getSize();
+        if (size.height > 0) {
+            return size;
+        }
+        return super.getMaximumSize();
+    }
 
     @Override
     public ImageItem getImageItem() {
@@ -93,26 +116,16 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         return renderRequest;
     }
 
-    public void setup(@NotNull ImageItem imageWithData, int i, RenderRequest renderRequest) {
+    public void setup(@NotNull ImageItem imageItem, int i, RenderRequest renderRequest) {
         setOpaque(true);
         setBackground(JBColor.WHITE);
-        if (imageWithData.hasImageBytes()) {
-            setDiagram(imageWithData);
+        if (imageItem.hasImageBytes()) {
+            editor = imageItem.getEditor(project, this.renderRequest, renderResult);
+            add(this.editor.getComponent());
         } else {
             add(new JLabel("page not rendered, probably plugin error, please report it and try to hit reload"));
         }
         this.renderRequest = renderRequest;
-    }
-
-    /**
-     * Scales the image and sets it to label
-     *
-     * @param imageItem source image and url data
-     */
-    private void setDiagram(@NotNull final ImageItem imageItem) {
-        editor = imageItem.getEditor(project, renderRequest, renderResult);
-
-        add(this.editor.getComponent());
     }
 
     public static void updateLinks(JComponent image, Zoom zoom) {

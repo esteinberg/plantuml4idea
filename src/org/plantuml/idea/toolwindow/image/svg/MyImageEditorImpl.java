@@ -263,7 +263,6 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 BufferedImage image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
 
                 MyImageEditorImpl.Holder newHolder = new MyImageEditorImpl.Holder(image, outSize, zoom, null);
-
                 this.holder = newHolder;
                 LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", newHolder.image.getWidth(), " hight=", newHolder.image.getHeight(), " docWidth=", newHolder.outSize.getWidth(), " docHight=", newHolder.outSize.getHeight());
             } catch (Throwable e) {
