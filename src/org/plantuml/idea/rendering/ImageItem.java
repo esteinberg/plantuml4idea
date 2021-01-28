@@ -108,6 +108,11 @@ public class ImageItem {
         this.format = format;
     }
 
+    @NotNull
+    public ImageFormat getFormat() {
+        return format;
+    }
+
     @Nullable
     public String getTitle() {
         return title;
@@ -299,7 +304,7 @@ public class ImageItem {
             LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
         } catch (Exception e) {
-            logger.debug(e);
+            logger.warn(e);
             return Collections.emptyList();
         }
     }

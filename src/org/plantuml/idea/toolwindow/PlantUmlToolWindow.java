@@ -543,7 +543,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
         JComponent component = null;
-        if (cacheItem.getRenderRequest().getFormat() == ImageFormat.SVG) {
+        if (imageWithData.getFormat() == ImageFormat.SVG) {
             component = new ImageContainerSvg(project, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         } else {
             component = new ImageContainerPng(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());

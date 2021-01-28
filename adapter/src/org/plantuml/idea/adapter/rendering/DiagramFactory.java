@@ -17,10 +17,8 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.plantuml.idea.rendering.RenderingType;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
+import java.io.*;
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.checkCancel;
@@ -126,12 +124,17 @@ public class DiagramFactory {
         return null;
     }
 
-    protected byte[] generateSvg(int i) {
+    protected byte[] generateSvgLinks(int i) {
         long start = System.currentTimeMillis();
         ByteArrayOutputStream svgStream = new ByteArrayOutputStream();
         outputImage(svgStream, i, PlantUmlNormalRenderer.SVG);
         byte[] svgBytes = svgStream.toByteArray();
-        LOG.debug("generated ", PlantUmlNormalRenderer.SVG.getFileFormat(), " for page ", i, " in ", System.currentTimeMillis() - start, "ms");
+        boolean png = isPng(svgBytes);
+        LOG.debug("generated ", PlantUmlNormalRenderer.SVG.getFileFormat(), " for page ", i, " in ", System.currentTimeMillis() - start, "ms, png=", png);
+        if (png) {
+            LOG.debug("generated png instead of svg, no links possible");
+            return new byte[0];
+        }
         return svgBytes;
     }
 
@@ -145,20 +148,25 @@ public class DiagramFactory {
                                           RenderingType renderingType) {
         checkCancel();
         long start = System.currentTimeMillis();
-
+        
+        ImageFormat format = renderRequest.getFormat();
         ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-
+     
         DiagramDescription diagramDescription = outputImage(imageStream, page, formatOption);
 
         byte[] bytes = imageStream.toByteArray();
+        boolean png = isPng(bytes);
+        boolean wrongResultFormat = format == ImageFormat.SVG&& png;
 
-        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms");
+        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=",png);
 
         byte[] svgBytes = new byte[0];
-        if (renderRequest.getFormat() == ImageFormat.SVG) {
-            svgBytes = bytes;
-        } else if (renderRequest.getFormat() == ImageFormat.PNG && renderRequest.isRenderUrlLinks()) { //todo check if exporting
-            svgBytes = generateSvg(page);
+        if (!wrongResultFormat) {
+            if (format == ImageFormat.SVG) {
+                svgBytes = bytes;
+            } else if (format == ImageFormat.PNG && renderRequest.isRenderUrlLinks()) { //todo  do not do that if exporting
+                svgBytes = generateSvgLinks(page);
+            }
         }
 
 
@@ -168,7 +176,19 @@ public class DiagramFactory {
             description = "ok";
         }
 
-        return new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page));
+        ImageFormat resultFormat = format;
+        if (wrongResultFormat) {
+            resultFormat =ImageFormat.PNG;
+        }
+        return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page));
+    }
+
+    private boolean isPng(byte[] bytes) {
+        boolean isPng = false;
+        if (bytes.length > 4) {
+            isPng = "‰PNG".equals(new String(bytes, 0, 4));
+        }
+        return isPng;
     }
 
     @NotNull
