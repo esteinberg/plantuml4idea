@@ -38,7 +38,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
-    private static final int SVG_SIZE = 8192;
+    private static final int SVG_SIZE = 16384;
 
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
@@ -74,7 +74,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     boolean showChessboard = true;
     private boolean highlightInImages = false;
     private String maxSvgSize = String.valueOf(SVG_SIZE);
-    private boolean svgPreviewScaling;
+    private boolean svgPreviewScaling = true;
 
     public static PlantUmlSettings getInstance() {
         if (Classloaders.isUnitTest()) {
