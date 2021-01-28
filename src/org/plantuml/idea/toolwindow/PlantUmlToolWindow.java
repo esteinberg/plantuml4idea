@@ -227,6 +227,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     @Override
     public void dispose() {
         logger.debug("dispose");
+        removeAllImages();
         toolWindow.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
