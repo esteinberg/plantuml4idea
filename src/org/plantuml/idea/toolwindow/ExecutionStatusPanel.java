@@ -34,7 +34,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
                 sb.append("<br>").append(value.description);
             }
             DESCRIPTION = "<html>Last execution time<br>" +
-                    "[rendered, changed, not changed page count]" +
+                    "[rendered, refreshed title, not changed] page count" +
                     "<br><br>Colors:" + sb.toString() + "</html>";
         }
     }
@@ -53,6 +53,7 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
         final JPanel panel = new JPanel();
         this.label = createLabel();
         panel.setToolTipText(DESCRIPTION);
+        label.setToolTipText(DESCRIPTION);
         panel.add(this.label);
         return panel;
     }
