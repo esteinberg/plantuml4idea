@@ -116,4 +116,12 @@ public class ParentLastURLClassLoader extends ClassLoader {
             return super.loadClass(name, resolve);
         }
     }
+
+    public void close() {
+        try {
+            childClassLoader.close();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

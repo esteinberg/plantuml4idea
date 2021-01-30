@@ -65,6 +65,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean switchToBundledAfterUpdate = true;
     private boolean useBundled = true;
     private String lastBundledVersion;
+    private String defaultFileType = "png";
     private boolean usePageTitles = true;
     private boolean useGrammar = true;
     private boolean keywordHighlighting = true;
@@ -91,6 +92,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
             migratedCfg = true;
         }
         return service;
+    }
+
+    public String getDefaultFileType() {
+        return defaultFileType;
+    }
+
+    public void setDefaultFileType(String defaultFileType) {
+        this.defaultFileType = defaultFileType;
     }
 
     public boolean isShowChessboard() {
@@ -194,20 +203,25 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     @Override
     public void loadState(PlantUmlSettings state) {
         XmlSerializerUtil.copyBean(state, this);
+        applyState();
+    }
 
+    public void checkVersion() {
         try {
             PlantUmlFacade bundled = PlantUmlFacade.getBundled();
             String version = bundled.version();
-            if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion != null && !Objects.equals(lastBundledVersion, version)) {
-                useBundled = true;
-                SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
+            if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion != null) {
+                if (Objects.equals(lastBundledVersion, version)) {
+                    Classloaders.disposeBundled();
+                } else {
+                    useBundled = true;
+                    SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
+                }
             }
             lastBundledVersion = version;
         } catch (Throwable e) {
             LOG.error(e);
         }
-
-        applyState();
     }
 
     @Override

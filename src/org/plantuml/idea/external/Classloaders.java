@@ -16,17 +16,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * @see PlantUmlFacade#get()
+ */
 public class Classloaders {
 
     private static final Logger LOG = Logger.getInstance(Classloaders.class);
 
-    private static ClassLoader bundled;
+    private static ParentLastURLClassLoader bundled;
     private static String customPlantumlJarPath;
-    private static ClassLoader custom;
+    private static ParentLastURLClassLoader custom;
 
+    private static volatile boolean checked;
 
-    private static ClassLoader getClassloader() {
+    private static synchronized ParentLastURLClassLoader getClassloader() {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
+        if (!checked) {
+            settings.checkVersion();
+            checked = true;
+        }
+
         String customPlantumlJarPath = settings.getCustomPlantumlJarPath();
         if (settings.isUseBundled() || StringUtils.isBlank(customPlantumlJarPath)) {
             return getBundled();
@@ -35,7 +44,7 @@ public class Classloaders {
         }
     }
 
-    public static ClassLoader getBundled() {
+    static ParentLastURLClassLoader getBundled() {
         if (bundled == null) {
 
             List<File> jarFiles = new ArrayList<>();
@@ -71,7 +80,7 @@ public class Classloaders {
         }
     }
 
-    public static ClassLoader getCustomClassloader(String customPlantumlJarPath) {
+    private static ParentLastURLClassLoader getCustomClassloader(String customPlantumlJarPath) {
         if (Objects.equals(Classloaders.customPlantumlJarPath, customPlantumlJarPath) && custom != null) {
             return custom;
         }
@@ -92,7 +101,7 @@ public class Classloaders {
     }
 
     @NotNull
-    private static ClassLoader classLoader(List<File> jarFiles) {
+    private static ParentLastURLClassLoader classLoader(List<File> jarFiles) {
         URL[] urls = new URL[jarFiles.size()];
         for (int i = 0; i < jarFiles.size(); i++) {
             File jarFile = jarFiles.get(i);
@@ -138,6 +147,9 @@ public class Classloaders {
         return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
 
+    /**
+     * @see PlantUmlFacade#get()
+     */
     @NotNull
     static PlantUmlFacade getFacade() {
         return getFacade(getClassloader());
@@ -152,4 +164,8 @@ public class Classloaders {
         }
     }
 
+    public static void disposeBundled() {
+        bundled.close();
+        bundled = null;
+    }
 }
