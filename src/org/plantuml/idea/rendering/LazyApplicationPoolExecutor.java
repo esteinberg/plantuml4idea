@@ -1,11 +1,11 @@
 package org.plantuml.idea.rendering;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.ConcurrencyUtil;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 
 /**
@@ -18,6 +18,14 @@ import java.util.concurrent.Future;
  */
 public class LazyApplicationPoolExecutor {
     public static final Logger logger = Logger.getInstance(LazyApplicationPoolExecutor.class);
+    private static ExecutorService myService = newExecutor();
+
+    @NotNull
+    private static ThreadPoolExecutor newExecutor() {
+        return new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML integration plugin", true, Thread.NORM_PRIORITY));
+    }
+
+
     protected static final int MILLION = 1000000;
     private final ExecutionStatusPanel executionStatusPanel;
 
@@ -100,7 +108,7 @@ public class LazyApplicationPoolExecutor {
 
 
         if (nextCommand != null) {
-            future = ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
+            future = myService.submit(new Runnable() {
                 @Override
                 public void run() {
                     executionStatusPanel.update(ExecutionStatusPanel.State.WAITING);
