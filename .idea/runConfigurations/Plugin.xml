@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Plugin" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
     <module name="plantuml4idea" />
-    <option name="VM_PARAMETERS" value="-Xmx1024m -Xms256m -ea -Didea.is.internal=true" />
+    <option name="VM_PARAMETERS" value="-Xmx3024m -Xms256m -ea -Didea.is.internal=true" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <alternative-path path="11 JETBRAINS" alternative-path-enabled="false" />
     <predefined_log_file enabled="true" id="idea.log" />

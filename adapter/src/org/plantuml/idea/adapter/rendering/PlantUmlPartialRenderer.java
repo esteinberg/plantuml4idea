@@ -27,7 +27,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     @NotNull
     public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, String[] sourceSplit) {
         try {
-            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest));
+            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()));
 
             RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, sourceSplit.length);
             for (int page = 0; page < sourceSplit.length; page++) {
@@ -112,7 +112,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     protected RenderResult renderError(RenderRequest renderRequest, PartialRenderingException e) {
         RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, 1);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        FileFormat fileFormat = Format.from(renderRequest);
+        FileFormat fileFormat = Format.from(renderRequest.getFormat());
         try {
             LineLocationImpl lineLocation = new LineLocationImpl("", null);
             StringLocated o = new StringLocated("", lineLocation);

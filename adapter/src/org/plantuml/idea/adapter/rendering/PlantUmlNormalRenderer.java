@@ -54,28 +54,29 @@ public class PlantUmlNormalRenderer {
                     net.sourceforge.plantuml.core.Diagram diagram = block.getDiagram();
                     int pages = block.getNbImages();
                     for (int page = 0; page < pages; ++page) {
-                        String fPath;
+                        String resultPath;
                         if (usePageTitles) {
                             String titleOrPageNumber = block.getTitles().getTitleOrPageNumber(page);
-                            if (page == 0 && pathPrefix.endsWith("-" + titleOrPageNumber)) {
-                                pathPrefix = pathPrefix.substring(0, pathPrefix.length() - ("-" + titleOrPageNumber).length());
+                            String pageTitleSuffix = "-" + titleOrPageNumber;
+                            if (page == 0 && pathPrefix.endsWith(pageTitleSuffix)) {
+                                pathPrefix = pathPrefix.substring(0, pathPrefix.length() - pageTitleSuffix.length());
                             }
-                            fPath = pathPrefix + "-" + titleOrPageNumber + fileSuffix;
+                            resultPath = pathPrefix + "-" + titleOrPageNumber + fileSuffix;
                         } else {
                             if (page == 0) {
-                                fPath = pathPrefix + fileSuffix;
+                                resultPath = pathPrefix + fileSuffix;
                             } else {
-                                fPath = pathPrefix + "-" + page + fileSuffix;
+                                resultPath = pathPrefix + "-" + page + fileSuffix;
                             }
                         }
-                        outputStream = new FileOutputStream(fPath);
+                        outputStream = new FileOutputStream(resultPath);
                         try {
 //                            reader.outputImage(outputStream, imageСounter++, new FileFormatOption(pFormat));
-                            diagram.exportDiagram(outputStream, page++, new FileFormatOption(pFormat));
+                            diagram.exportDiagram(outputStream, page, new FileFormatOption(pFormat));
                         } finally {
                             outputStream.close();
                         }
-                        vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, fPath));
+                        vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, resultPath));
                     }
                     break;
                 }
@@ -105,7 +106,7 @@ public class PlantUmlNormalRenderer {
                 renderRequestPage = -1;
             }
 
-            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest));
+            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()));
 
             boolean containsIncludedNewPage = sourceSplit.length != totalPages;
 

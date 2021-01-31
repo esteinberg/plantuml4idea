@@ -1,0 +1,26 @@
+package org.plantuml.idea.action.save;
+
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
+import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.adapter.FacadeImpl;
+import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.plantuml.SourceExtractor;
+import org.plantuml.idea.toolwindow.Zoom;
+
+import java.io.File;
+import java.util.Locale;
+
+public class SaveTestAction extends DumbAwareAction {
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+        for (ImageFormat value : ImageFormat.values()) {
+            try {
+                new FacadeImpl().renderAndSave(SourceExtractor.TESTDOT, new File("testData/version.puml"), value, "F:\\workspace\\_projekty\\plantuml4idea\\out\\" + value.name() + "." + value.name().toLowerCase(Locale.ROOT), null, new Zoom(100), 0);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+}

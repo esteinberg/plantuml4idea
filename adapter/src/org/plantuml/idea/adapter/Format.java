@@ -2,7 +2,6 @@ package org.plantuml.idea.adapter;
 
 import net.sourceforge.plantuml.FileFormat;
 import org.plantuml.idea.plantuml.ImageFormat;
-import org.plantuml.idea.rendering.RenderRequest;
 
 import java.util.Arrays;
 
@@ -58,13 +57,8 @@ public enum Format {
 
     public abstract FileFormat getFormat();
 
-
-    public static FileFormat from(RenderRequest renderRequest) {
-        return from(renderRequest.getFormat());
-    }
-
     public static FileFormat from(ImageFormat format) {
-        return Arrays.stream(values()).filter(exImageFormat -> exImageFormat.format == format).findFirst().orElseThrow(RuntimeException::new).getFormat();
+        return Arrays.stream(values()).filter(f -> f.format.name().equals(format.name())).findFirst().orElseThrow(RuntimeException::new).getFormat();
     }
 
 }

@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
@@ -65,7 +66,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean switchToBundledAfterUpdate = true;
     private boolean useBundled = true;
     private String lastBundledVersion;
-    private String defaultFileType = "png";
+    private String defaultExportFileFormat = "PNG";
     private boolean usePageTitles = true;
     private boolean useGrammar = true;
     private boolean keywordHighlighting = true;
@@ -94,12 +95,23 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         return service;
     }
 
-    public String getDefaultFileType() {
-        return defaultFileType;
+    /**
+     * @see #getDefaultExportFileFormatEnum
+     */
+    @Deprecated
+    public String getDefaultExportFileFormat() {
+        if (this.defaultExportFileFormat == null) {
+            return ImageFormat.PNG.name();
+        }
+        return this.defaultExportFileFormat;
     }
 
-    public void setDefaultFileType(String defaultFileType) {
-        this.defaultFileType = defaultFileType;
+    public ImageFormat getDefaultExportFileFormatEnum() {
+        return ImageFormat.from(defaultExportFileFormat);
+    }
+
+    public void setDefaultExportFileFormat(String defaultExportFileFormat) {
+        this.defaultExportFileFormat = defaultExportFileFormat;
     }
 
     public boolean isShowChessboard() {

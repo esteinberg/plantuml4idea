@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCacheItem;
@@ -32,6 +33,7 @@ import org.plantuml.idea.util.UIUtils;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
 
@@ -40,18 +42,13 @@ import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
  */
 public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
-    public static final String[] extensions;
     public static VirtualFile homeDir = null;
-    private static VirtualFile lastDir = null;
+    //    private static VirtualFile lastDir = null;
     public static final String FILENAME = "diagram";
     Logger logger = Logger.getInstance(SaveDiagramToFileAction.class);
 
     static {
-        ImageFormat[] values = ImageFormat.values();
-        extensions = new String[values.length];
-        for (int i = 0; i < values.length; i++) {
-            extensions[i] = values[i].toString().toLowerCase();
-        }
+
 
         homeDir = LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home"));
     }
@@ -74,11 +71,12 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             Notifications.Bus.notify(NOTIFICATION.createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
+        ImageFormat format = PlantUmlSettings.getInstance().getDefaultExportFileFormatEnum();
+        String defaultExtension = format.name().toLowerCase();
 
-        FileSaverDescriptor fsd = new FileSaverDescriptor("Save diagram", "Please choose where to save diagram", extensions);
+        FileSaverDescriptor fsd = new FileSaverDescriptor("Save Diagram", "Please choose where to save diagram", getExtensions(defaultExtension));
 
-        VirtualFile baseDir = lastDir;
-
+        VirtualFile baseDir = LocalFileSystem.getInstance().findFileByIoFile(sourceFile.getParentFile());
         if (baseDir == null) {
             if (project == null) {
                 baseDir = homeDir;
@@ -86,8 +84,6 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 baseDir = ProjectUtil.guessProjectDir(project);
             }
         }
-
-
         String defaultFileName = getDefaultFileName(e, project);
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
@@ -97,28 +93,21 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             try {
                 File file = wrapper.getFile();
 
-                File parentDir = file.getParentFile();
-                if (parentDir != null && parentDir.exists()) {
-                    lastDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(parentDir);
-                    logger.info("lastDir set to " + lastDir);
-                }
+//                File parentDir = file.getParentFile();
+//                if (parentDir != null && parentDir.exists()) {
+//                    lastDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(parentDir);
+//                    logger.info("lastDir set to " + lastDir);
+//                }
 
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String pathPrefix = tokens[0];
                 String extension;
 
                 if (tokens.length < 2) {
-                    extension = "png";
-                    file = new File(pathPrefix + ".png");
+                    extension = defaultExtension;
+                    file = new File(pathPrefix + "." + defaultExtension);
                 } else {
                     extension = tokens[1];
-                }
-                for (int i = 0; i < extensions.length; i++) {
-                    String s = extensions[i];
-                    if (s.equals(extension)) {
-                        ArrayUtil.swap(extensions, 0, i);
-                        break;
-                    }
                 }
 
                 ImageFormat imageFormat;
@@ -134,7 +123,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                         UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
 
             } catch (IOException e1) {
-                String title = "Error writing diagram";
+                String title = "Error Writing Diagram";
                 String message = title + " to file:" + wrapper.getFile() + " : " + e1.toString();
                 logger.warn(message);
                 Messages.showErrorDialog(message, title);
@@ -142,6 +131,28 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
     }
 
+    @NotNull
+    private String[] getExtensions(String defaultExtension) {
+        String[] extensions;
+        ImageFormat[] values = ImageFormat.values();
+        extensions = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            extensions[i] = values[i].name().toLowerCase();
+        }
+        Arrays.sort(extensions);
+        swapExtensions(extensions, defaultExtension);
+        return extensions;
+    }
+
+    private void swapExtensions(String[] extensions, String extension) {
+        for (int i = 0; i < extensions.length; i++) {
+            String s = extensions[i];
+            if (s.equals(extension)) {
+                ArrayUtil.swap(extensions, 0, i);
+                break;
+            }
+        }
+    }
 
     protected int getPageNumber(AnActionEvent e) {
         return -1;
@@ -151,6 +162,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     private String getDefaultFileName(AnActionEvent e, Project myProject) {
         String filename = null;
 
+        PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         try {
             PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(myProject);
             if (plantUmlToolWindow != null) {
@@ -158,15 +170,17 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 int selectedPage = plantUmlToolWindow.getSelectedPage();
                 ImageItem imageItem = displayedItem.getImageItem(selectedPage < 0 ? 0 : selectedPage);
                 if (imageItem != null) {
-                    filename = imageItem.getFilename();
+                    filename = sanitize(imageItem.getFilename());
+                    if (plantUmlSettings.isUsePageTitles() && getPageNumber(e) >= 0) {
+                        if (imageItem.getTitle() != null) {
+                            filename = filename + "-" + sanitize(imageItem.getTitle());
+                        }
+                    }
                 }
                 if (filename == null) {
                     String sourceFilePath = displayedItem.getSourceFilePath();
                     filename = FileUtilRt.getNameWithoutExtension(PathUtilRt.getFileName(sourceFilePath));
                 }
-            }
-            if (filename != null) {
-                filename = FileUtil.sanitizeFileName(filename);
             }
         } catch (Exception ex) {
             logger.error(ex);
@@ -176,10 +190,19 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             filename = FILENAME;
         }
 
-        if (SystemInfo.isMac && Registry.is("ide.mac.native.save.dialog") && !filename.endsWith(".png")) {
-            filename += ".png";
+        String defaultExtension = plantUmlSettings.getDefaultExportFileFormatEnum().name().toLowerCase();
+        if (SystemInfo.isMac && Registry.is("ide.mac.native.save.dialog") && !filename.endsWith("." + defaultExtension)) {
+            filename += "." + defaultExtension;
         }
         return filename;
+    }
+
+    @Nullable
+    private String sanitize(String filename) {
+        if (filename != null && filename.startsWith("[") && filename.endsWith("]")) {
+            filename = filename.substring(1, filename.length() - 1);
+        }
+        return FileUtil.sanitizeFileName(filename);
     }
 
     protected String getDisplayedSource(Project project) {

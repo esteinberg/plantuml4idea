@@ -17,8 +17,10 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.plantuml.idea.rendering.RenderingType;
 
-import java.io.*;
-import java.math.BigInteger;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
 import java.util.*;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.checkCancel;
@@ -96,7 +98,7 @@ public class DiagramFactory {
         for (MyBlock myBlock : myBlocks) {
             final int nbInSystem = myBlock.getNbImages();
             if (numImage < nbInSystem) {
-                return myBlock.getTitles().getTitle(numImage);
+                return myBlock.getFilename();
             }
             numImage = numImage - nbInSystem;
         }
@@ -148,17 +150,17 @@ public class DiagramFactory {
                                           RenderingType renderingType) {
         checkCancel();
         long start = System.currentTimeMillis();
-        
+
         ImageFormat format = renderRequest.getFormat();
         ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-     
+
         DiagramDescription diagramDescription = outputImage(imageStream, page, formatOption);
 
         byte[] bytes = imageStream.toByteArray();
         boolean png = isPng(bytes);
-        boolean wrongResultFormat = format == ImageFormat.SVG&& png;
+        boolean wrongResultFormat = format == ImageFormat.SVG && png;
 
-        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=",png);
+        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=", png);
 
         byte[] svgBytes = new byte[0];
         if (!wrongResultFormat) {
@@ -178,7 +180,7 @@ public class DiagramFactory {
 
         ImageFormat resultFormat = format;
         if (wrongResultFormat) {
-            resultFormat =ImageFormat.PNG;
+            resultFormat = ImageFormat.PNG;
         }
         return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page));
     }

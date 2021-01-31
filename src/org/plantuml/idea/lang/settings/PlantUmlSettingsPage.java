@@ -1,6 +1,5 @@
 package org.plantuml.idea.lang.settings;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
@@ -11,10 +10,12 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
+import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.plantuml.ImageFormat;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -23,6 +24,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * @author Max Gorbunov
@@ -64,8 +67,16 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox svgPreviewScaling;
     private JButton donate;
     private JLabel svgPreviewLimitLabel;
+    private JComboBox<String> defaultFileExtension;
 
     public PlantUmlSettingsPage() {
+        ArrayList<String> list = new ArrayList<String>();
+        ImageFormat[] values = ImageFormat.values();
+        for (ImageFormat value : values) {
+            list.add(value.name());
+        }
+        defaultFileExtension.setModel(new ListComboBoxModel<>(list));
+
         donate.setIcon(COINS);
         donate.addActionListener(e -> {
 
@@ -182,6 +193,9 @@ public class PlantUmlSettingsPage implements Configurable {
         if (bundledPlantUMLRadioButton.isSelected() != settings.isUseBundled()) {
             return true;
         }
+        if (!Objects.equals(settings.getDefaultExportFileFormat(), defaultFileExtension.getSelectedItem())) {
+            return true;
+        }
 
         return isModified(settings);
     }
@@ -192,7 +206,7 @@ public class PlantUmlSettingsPage implements Configurable {
         getData(settings);
 
         settings.setUseBundled(bundledPlantUMLRadioButton.isSelected());
-
+        settings.setDefaultExportFileFormat((String) defaultFileExtension.getSelectedItem());
         settings.applyState();
     }
 
@@ -201,6 +215,7 @@ public class PlantUmlSettingsPage implements Configurable {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
 
         setData(settings);
+        defaultFileExtension.setSelectedItem(settings.getDefaultExportFileFormat());
         bundledPlantUMLRadioButton.setSelected(settings.isUseBundled());
         customPlantUMLRadioButton.setSelected(!settings.isUseBundled());
 

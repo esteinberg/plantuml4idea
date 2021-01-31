@@ -13,6 +13,7 @@ import net.sourceforge.plantuml.version.Version;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
@@ -101,6 +102,9 @@ public class Utils {
     public static void saveAllDocuments(@Nullable String sourceFilePath) {
         try {
             long start = System.currentTimeMillis();
+            if (Classloaders.isUnitTest()) {
+                return;
+            }
             FileDocumentManager documentManager = FileDocumentManager.getInstance();
             com.intellij.openapi.editor.Document[] unsavedDocuments = documentManager.getUnsavedDocuments();
             if (unsavedDocuments.length > 0 && !onlyCurrentlyDisplayed(documentManager, unsavedDocuments, sourceFilePath)) {
