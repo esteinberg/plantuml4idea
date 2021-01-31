@@ -98,6 +98,10 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
                 transcoder.currentTransform = transform
 
                 val image = render((transcoder.width + 0.5f).toInt(), (transcoder.height + 0.5f).toInt(), transform, gvtRoot)
+
+                val containsBackground = document?.rootElement?.attributes?.getNamedItem("style")?.textContent
+                image.setStyle(containsBackground)
+
                 outDimensions?.setSize(docWidth.toDouble(), docHeight.toDouble())
                 return image
             } catch (e: TranscoderException) {
@@ -269,8 +273,8 @@ private fun computeTransform(document: SVGOMDocument,
     }
 }
 
-private fun render(offScreenWidth: Int, offScreenHeight: Int, usr2dev: AffineTransform, gvtRoot: GraphicsNode): BufferedImage {
-    val image = BufferedImage(offScreenWidth, offScreenHeight, BufferedImage.TYPE_INT_ARGB)
+private fun render(offScreenWidth: Int, offScreenHeight: Int, usr2dev: AffineTransform, gvtRoot: GraphicsNode): MyBufferedImage {
+    val image = MyBufferedImage(offScreenWidth, offScreenHeight, BufferedImage.TYPE_INT_ARGB)
 
     val g = image.createGraphics()
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)

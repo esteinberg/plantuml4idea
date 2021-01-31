@@ -49,6 +49,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.toolwindow.image.svg.batik.MyBufferedImage;
 import org.plantuml.idea.util.Utils;
 
 import javax.swing.*;
@@ -652,6 +653,14 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
             ImageDocument document = imageComponent.getDocument();
             BufferedImage value = document.getValue();
+
+            if (value instanceof MyBufferedImage) {
+                Color background = ((MyBufferedImage) value).getBackground();
+                if (background != null) {
+                    imageComponent.setTransparencyChessboardBlankColor(background);
+                    imageComponent.setTransparencyChessboardWhiteColor(background);
+                }
+            }
 
             updateImageComponentSize();
 
