@@ -1,5 +1,6 @@
 package org.plantuml.idea.util;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.PsiFile;
@@ -134,5 +135,9 @@ public class Utils {
     public static BufferedImage getBufferedImage(@NotNull byte[] imageBytes) throws IOException {
         ByteArrayInputStream input = new ByteArrayInputStream(imageBytes);
         return ImageIO.read(input);
+    }
+
+    public static boolean isUnitTest() {
+        return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
 }

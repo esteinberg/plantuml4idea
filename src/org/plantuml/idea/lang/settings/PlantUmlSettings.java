@@ -79,7 +79,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean svgPreviewScaling = true;
 
     public static PlantUmlSettings getInstance() {
-        if (Classloaders.isUnitTest()) {
+        if (Utils.isUnitTest()) {
             return new PlantUmlSettings();
         }
         PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);

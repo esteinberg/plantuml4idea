@@ -1,11 +1,11 @@
 package org.plantuml.idea.external;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.util.Utils;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -53,7 +53,7 @@ public class Classloaders {
                 validate(jars);
                 jarFiles.addAll(Arrays.asList(jars));
             }
-            if (isUnitTest()) {
+            if (Utils.isUnitTest()) {
                 File file = new File("lib/plantuml");
                 if (!file.exists()) {
                     throw new RuntimeException(file.getAbsolutePath());
@@ -70,8 +70,8 @@ public class Classloaders {
         return bundled;
     }
 
-    public static void validate(File[] jars) {
-        if (!isUnitTest() && jars.length < 2) {
+    private static void validate(File[] jars) {
+        if (!Utils.isUnitTest() && jars.length < 2) {
             throw new RuntimeException("Invalid installation. Should find at least 2 jars, but found: " + Arrays.toString(jars));
         }
         List<File> plantumls = Arrays.stream(jars).filter(file -> file.getName().startsWith("plantuml")).collect(Collectors.toList());
@@ -125,7 +125,7 @@ public class Classloaders {
 
     @NotNull
     private static File getPluginHome() {
-        if (isUnitTest()) {
+        if (Utils.isUnitTest()) {
             return new File("lib/");
         } else {
             File pluginHome = new File(PathManager.getPluginsPath(), "plantuml4idea/lib/");
@@ -141,10 +141,6 @@ public class Classloaders {
             LOG.warn(pluginHome.getAbsolutePath() + " does not exist!");
         }
         throw new RuntimeException("Plugin home not found! Did you install the whole zip file?! (PathManager.getPluginsPath()=" + PathManager.getPluginsPath() + ")");
-    }
-
-    public static boolean isUnitTest() {
-        return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
 
     /**
@@ -164,7 +160,19 @@ public class Classloaders {
         }
     }
 
-    public static void disposeBundled() {
+    public static synchronized void clear() {
+        if (bundled != null) {
+            bundled.close();
+            bundled = null;
+        }
+        if (custom != null) {
+            custom.close();
+            custom = null;
+        }
+        System.gc();
+    }
+
+    public static synchronized void disposeBundled() {
         bundled.close();
         bundled = null;
     }

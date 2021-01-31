@@ -62,7 +62,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private Project project;
     private AtomicInteger sequence = new AtomicInteger();
-    public boolean renderUrlLinks;
     public ExecutionStatusPanel executionStatusPanel;
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
     private FileEditorManager fileEditorManager;
@@ -325,7 +324,7 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
         logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
         int version = sequence.incrementAndGet();
 
-        return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, renderUrlLinks, executionStatusPanel);
+        return new MyRenderCommand(reason, selectedFile, source, page, zoom, cachedItem, version, delay, executionStatusPanel);
     }
 
     public boolean isToolWindowVisible() {
@@ -342,8 +341,8 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
 
     private class MyRenderCommand extends RenderCommand {
 
-        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, boolean renderUrlLinks, ExecutionStatusPanel label) {
-            super(project, reason, selectedFile, source, page, zoom, cachedItem, version, renderUrlLinks, delay, label);
+        public MyRenderCommand(Reason reason, String selectedFile, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+            super(project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, label);
         }
 
         @Override
@@ -559,7 +558,6 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
     public void applyNewSettings(PlantUmlSettings plantUmlSettings) {
         lazyExecutor.setDelay(plantUmlSettings.getRenderDelayAsInt());
         renderCache.setMaxCacheSize(plantUmlSettings.getCacheSizeAsInt());
-        renderUrlLinks = plantUmlSettings.isRenderLinks();
     }
 
     private JSeparator separator() {

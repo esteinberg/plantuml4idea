@@ -27,7 +27,6 @@ public abstract class RenderCommand implements Runnable {
     protected Zoom zoom;
     protected RenderCacheItem cachedItem;
     protected int version;
-    protected boolean renderUrlLinks;
     protected LazyApplicationPoolExecutor.Delay delay;
     protected ExecutionStatusPanel label;
 
@@ -40,7 +39,7 @@ public abstract class RenderCommand implements Runnable {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, boolean renderUrlLinks, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
+    public RenderCommand(Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, ExecutionStatusPanel label) {
         this.project = project;
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
@@ -49,7 +48,6 @@ public abstract class RenderCommand implements Runnable {
         this.zoom = zoom;
         this.cachedItem = cachedItem;
         this.version = version;
-        this.renderUrlLinks = renderUrlLinks;
         this.delay = delay;
         this.label = label;
     }
@@ -65,9 +63,10 @@ public abstract class RenderCommand implements Runnable {
             label.update(version, ExecutionStatusPanel.State.EXECUTING);
 
 
-            ImageFormat imageFormat = PlantUmlSettings.getInstance().isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
+            PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
+            ImageFormat imageFormat = plantUmlSettings.isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
 
-            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, renderUrlLinks, reason);
+            final RenderRequest renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason);
             renderRequest.disableSvgZoom();
             long s1 = System.currentTimeMillis();
             final RenderResult result = PlantUmlFacade.get().render(renderRequest, cachedItem);
