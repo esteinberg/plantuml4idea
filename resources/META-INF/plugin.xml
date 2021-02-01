@@ -140,9 +140,14 @@
                         text="Do not Display Error Images"
                         description="Click on the status label to display the error, click again to return to the last image."
                 />
+                <separator/>
                 <action id="org.plantuml.idea.action.ImageHighlightToggleAction"
                         class="org.plantuml.idea.action.ImageHighlightToggleAction"
                         text="Highlight Text Occurrences in Images"/>
+                />
+                <action id="org.plantuml.idea.action.DisplayLinksBorderToggleAction"
+                        class="org.plantuml.idea.action.DisplayLinksBorderToggleAction"
+                        text="Show Border Around Links"
                 />
                 <separator/>
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
