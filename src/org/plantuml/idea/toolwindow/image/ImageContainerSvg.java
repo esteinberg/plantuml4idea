@@ -3,7 +3,9 @@ package org.plantuml.idea.toolwindow.image;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.PopupHandler;
 import com.intellij.util.Alarm;
 import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NonNls;
@@ -27,6 +29,9 @@ import org.plantuml.idea.util.UIUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -80,6 +85,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         setup(this.imageWithData, i, renderRequest);
     }
 
+
     @Override
     public Dimension getPreferredSize() {
         ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
@@ -126,6 +132,43 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
             add(new JLabel("page not rendered, probably plugin error, please report it and try to hit reload"));
         }
         this.renderRequest = renderRequest;
+    }
+
+    public static MyImageEditorImpl initEditor(ImageItem imageItem, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
+        long start = System.currentTimeMillis();
+        MyImageEditorImpl editor;
+        LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", new String(imageItem.getImageBytes(), StandardCharsets.UTF_8));
+        editor = new MyImageEditorImpl(project, virtualFile, true, renderRequest.getZoom());
+        ImageComponent imageComponent = editor.getComponent().getImageComponent();
+        JComponent contentComponent = editor.getContentComponent();
+
+        editor.setTransparencyChessboardVisible(PlantUmlSettings.getInstance().isShowChessboard());
+
+        if (imageItem.hasError()) {
+            imageComponent.setTransparencyChessboardWhiteColor(Color.BLACK);
+            imageComponent.setTransparencyChessboardBlankColor(Color.BLACK);
+        }
+
+        contentComponent.addPropertyChangeListener(MyImageEditorUI.ZOOM_FACTOR_PROP, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                Double scale = (Double) propertyChangeEvent.getNewValue();
+                Zoom zoom = new Zoom(contentComponent, (int) (scale * 100), PlantUmlSettings.getInstance());
+                updateLinks(contentComponent, zoom);
+            }
+        });
+
+        contentComponent.addMouseListener(new PopupHandler() {
+            @Override
+            public void invokePopup(Component comp, int x, int y) {
+                ACTION_POPUP_MENU.getComponent().show(comp, x, y);
+            }
+        });
+
+        initLinks(project, imageItem, renderRequest, renderResult, contentComponent);
+        LOG.debug("initEditor done in ", System.currentTimeMillis() - start, "ms");
+
+        return editor;
     }
 
     public static void updateLinks(JComponent image, Zoom zoom) {

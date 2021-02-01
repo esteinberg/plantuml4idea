@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
-import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
 import org.plantuml.idea.plantuml.ImageFormat;
@@ -18,7 +17,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 /**
- * @see Classloaders#getFacade(java.lang.ClassLoader)
+ * @see PlantUmlFacade#get()
  */
 public class FacadeImpl implements PlantUmlFacade {
     private static final Logger LOG = Logger.getInstance(FacadeImpl.class);

@@ -14,8 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.external.Classloaders;
-import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
@@ -218,13 +216,11 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         applyState();
     }
 
-    public void checkVersion() {
+    public void checkVersion(String version) {
         try {
-            PlantUmlFacade bundled = PlantUmlFacade.getBundled();
-            String version = bundled.version();
             if (switchToBundledAfterUpdate && !useBundled && lastBundledVersion != null) {
                 if (Objects.equals(lastBundledVersion, version)) {
-                    Classloaders.disposeBundled();
+                    //do nothing
                 } else {
                     useBundled = true;
                     SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));

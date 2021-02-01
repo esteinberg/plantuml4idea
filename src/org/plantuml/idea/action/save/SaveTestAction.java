@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.Locale;
 
 public class SaveTestAction extends DumbAwareAction {
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         for (ImageFormat value : ImageFormat.values()) {

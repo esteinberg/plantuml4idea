@@ -72,11 +72,6 @@ public class DiagramFactory {
         return diagramFactory;
     }
 
-
-    public List<MyBlock> getBlockInfos() {
-        return myBlocks;
-    }
-
     public int getTotalPages() {
         return totalPages;
     }
@@ -86,6 +81,19 @@ public class DiagramFactory {
             final int nbInSystem = myBlock.getNbImages();
             if (numImage < nbInSystem) {
                 return myBlock.getTitles().getTitle(numImage);
+            }
+            numImage = numImage - nbInSystem;
+        }
+
+        Log.error("numImage is too big = " + numImage);
+        return null;
+    }
+
+    public String getTitleOrPageNumber(int numImage) {
+        for (MyBlock myBlock : myBlocks) {
+            final int nbInSystem = myBlock.getNbImages();
+            if (numImage < nbInSystem) {
+                return myBlock.getTitles().getTitleOrPageNumber(numImage);
             }
             numImage = numImage - nbInSystem;
         }

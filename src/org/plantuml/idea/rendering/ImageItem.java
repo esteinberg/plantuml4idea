@@ -2,38 +2,28 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.ui.PopupHandler;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.intellij.images.ui.ImageComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
-import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
 import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
-import org.plantuml.idea.toolwindow.image.svg.MyImageEditorUI;
 import org.plantuml.idea.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -190,50 +180,17 @@ public class ImageItem {
                     throw new RuntimeException(e);
                 }
             } else if (format == ImageFormat.SVG) {
-                MyImageEditorImpl init = getEditor(project, renderRequest, renderResult);
+                editor = ImageContainerSvg.initEditor(this, project, renderRequest, renderResult);
             }
             LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
         }
     }
 
     public MyImageEditorImpl getEditor(final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
-        if (editor != null) {
-            return editor;
+        if (editor == null) {
+            editor = ImageContainerSvg.initEditor(this, project, renderRequest, renderResult);
         }
-        long start = System.currentTimeMillis();
-
-        LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", new String(getImageBytes(), StandardCharsets.UTF_8));
-        this.editor = new MyImageEditorImpl(project, virtualFile, true, renderRequest.getZoom());
-        ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
-        JComponent contentComponent = this.editor.getContentComponent();
-
-        this.editor.setTransparencyChessboardVisible(PlantUmlSettings.getInstance().isShowChessboard());
-
-        if (hasError()) {
-            imageComponent.setTransparencyChessboardWhiteColor(Color.BLACK);
-            imageComponent.setTransparencyChessboardBlankColor(Color.BLACK);
-        }
-
-        contentComponent.addPropertyChangeListener(MyImageEditorUI.ZOOM_FACTOR_PROP, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                Double scale = (Double) propertyChangeEvent.getNewValue();
-                Zoom zoom = new Zoom(contentComponent, (int) (scale * 100), PlantUmlSettings.getInstance());
-                ImageContainerSvg.updateLinks(contentComponent, zoom);
-            }
-        });
-
-        contentComponent.addMouseListener(new PopupHandler() {
-            @Override
-            public void invokePopup(Component comp, int x, int y) {
-                ImageContainerSvg.ACTION_POPUP_MENU.getComponent().show(comp, x, y);
-            }
-        });
-
-        ImageContainerSvg.initLinks(project, this, renderRequest, renderResult, contentComponent);
-        LOG.debug("init getEditor done in ", System.currentTimeMillis() - start, "ms");
-
-        return this.editor;
+        return editor;
     }
 
     /**

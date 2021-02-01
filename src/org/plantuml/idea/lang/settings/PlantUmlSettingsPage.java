@@ -14,7 +14,7 @@ import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.plantuml.ImageFormat;
 
 import javax.swing.*;
@@ -98,7 +98,7 @@ public class PlantUmlSettingsPage implements Configurable {
         });
 
         try {
-            version.setText("v" + PlantUmlFacade.getBundled().version());
+            version.setText("v" + Classloaders.getBundledVersion());
         } catch (Throwable throwable) {
             LOG.error(throwable);
         }

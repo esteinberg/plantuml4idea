@@ -10,10 +10,7 @@ import org.plantuml.idea.util.Utils;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -28,11 +25,12 @@ public class Classloaders {
     private static ParentLastURLClassLoader custom;
 
     private static volatile boolean checked;
+    private static String bundledVersion;
 
     private static synchronized ParentLastURLClassLoader getClassloader() {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
         if (!checked) {
-            settings.checkVersion();
+            settings.checkVersion(getBundledVersion());
             checked = true;
         }
 
@@ -44,9 +42,15 @@ public class Classloaders {
         }
     }
 
-    static ParentLastURLClassLoader getBundled() {
-        if (bundled == null) {
+    public static String getBundledVersion() {
+        if (bundledVersion == null) {
+            bundledVersion = getFacade(getBundled()).version();
+        }
+        return bundledVersion;
+    }
 
+    static synchronized ParentLastURLClassLoader getBundled() {
+        if (bundled == null) {
             List<File> jarFiles = new ArrayList<>();
             File[] jars = getPluginHome().listFiles((dir, name) -> !name.equals("plantuml4idea.jar"));
             if (jars != null) {
@@ -80,7 +84,7 @@ public class Classloaders {
         }
     }
 
-    private static ParentLastURLClassLoader getCustomClassloader(String customPlantumlJarPath) {
+    private synchronized static ParentLastURLClassLoader getCustomClassloader(String customPlantumlJarPath) {
         if (Objects.equals(Classloaders.customPlantumlJarPath, customPlantumlJarPath) && custom != null) {
             return custom;
         }
@@ -91,7 +95,16 @@ public class Classloaders {
                 throw new IllegalArgumentException("Custom PlantUML jar does not exist! path=" + customPlantumlJarPath);
             }
             Classloaders.customPlantumlJarPath = customPlantumlJarPath;
-            jars.add(new File(customPlantumlJarPath));
+
+            File customPath = new File(customPlantumlJarPath);
+            if (customPath.isDirectory()) {
+                File[] files = customPath.listFiles((file, s) -> s.endsWith(".jar"));
+                if (files != null) {
+                    Collections.addAll(jars, files);
+                }
+            } else {
+                jars.add(customPath);
+            }
             jars.add(new File(getPluginHome(), "adapter.jar"));
             custom = classLoader(jars);
             return custom;
@@ -116,6 +129,10 @@ public class Classloaders {
         }
         try {
             LOG.info("Creating classloader for " + Arrays.toString(urls));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(new Exception("trace"));
+            }
+
             //must be parent last, otherwise it would conflict with the plugin's classloader  - it always loads the bundled plantuml
             return new ParentLastURLClassLoader(Classloaders.class.getClassLoader(), urls);
         } catch (Exception e) {
@@ -176,4 +193,5 @@ public class Classloaders {
         bundled.close();
         bundled = null;
     }
+
 }

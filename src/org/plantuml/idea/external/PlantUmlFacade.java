@@ -14,12 +14,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 public interface PlantUmlFacade {
+
     static PlantUmlFacade get() {
         return Classloaders.getFacade();
-    }
-
-    static PlantUmlFacade getBundled() {
-        return Classloaders.getFacade(Classloaders.getBundled());
     }
 
     @Nullable
