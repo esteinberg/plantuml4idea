@@ -24,12 +24,13 @@ public class PlantUmlRendererUtil {
 
     private static final PlantUmlPartialRenderer PARTIAL_RENDERER = new PlantUmlPartialRenderer();
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
+    private static final PlantUmlExporter EXPORTER = new PlantUmlExporter();
 
     public static void renderAndSave(RenderRequest renderRequest, String path, String pathPrefix)
             throws IOException {
         Utils.prepareEnvironment(renderRequest);
 
-        NORMAL_RENDERER.renderAndSave(renderRequest, path, pathPrefix);
+        EXPORTER.renderAndSave(renderRequest, path, pathPrefix);
     }
 
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
