@@ -44,6 +44,11 @@ ProductOfferingPrice -- ProductUsageSpec: ForUsage >
 123 -> [Оалвыалвы]:  Оалвыалвы
 @enduml
 
+       !include ../foo bar/foo.iuml
+       !includeurl google.com
 
    !preproc foo !notProc 
    ==foo bar==
+   
+   
+!include ../foo bar/foo.iuml

@@ -6,30 +6,34 @@ import com.intellij.testFramework.ParsingTestCase;
 
 public class SimpleParsingTest extends ParsingTestCase {
 
-  public SimpleParsingTest() {
-    super("", "puml", new PlantUmlParserDefinition());
-  }
+    public SimpleParsingTest() {
+        super("", "puml", new PlantUmlParserDefinition());
+    }
 
-  public void testParsingTestData() {
-    doTest(true);
-  }
+    public void testParsingTestData() {
+        doTest(true);
+    }
 
-  /**
-   * @return path to test data file directory relative to root of this module.
-   */
-  @Override
-  protected String getTestDataPath() {
-    return "testData";
-  }
+    public void testParsingTestData2() {
+        doTest(true);
+    }
 
-  @Override
-  protected boolean skipSpaces() {
-    return false;
-  }
+    /**
+     * @return path to test data file directory relative to root of this module.
+     */
+    @Override
+    protected String getTestDataPath() {
+        return "testData";
+    }
 
-  @Override
-  protected boolean includeRanges() {
-    return true;
-  }
+    @Override
+    protected boolean skipSpaces() {
+        return false;
+    }
+
+    @Override
+    protected boolean includeRanges() {
+        return true;
+    }
 
 }

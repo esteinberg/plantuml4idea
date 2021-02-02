@@ -614,7 +614,7 @@ public class PumlLexer implements FlexLexer {
             break;
           case 3: {
             yybegin(LINE_START_STATE);
-            return TokenType.WHITE_SPACE;
+            return PumlTypes.NEW_LINE;
           }
           // fall through
           case 9:

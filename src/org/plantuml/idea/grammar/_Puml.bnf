@@ -1,6 +1,6 @@
 {
   parserClass="org.plantuml.idea.grammar.parser.PumlParser"
-//  parserUtilClass="org.plantuml.idea.language.parser.PumlParserUtil"
+  parserUtilClass="org.plantuml.idea.grammar.psi.PumlParserUtil"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
@@ -16,10 +16,19 @@
   psiImplUtilClass="org.plantuml.idea.grammar.psi.impl.PumlPsiImplUtil"
 }
 
-simpleFile ::= (item|COMMENT)*
+simpleFile ::= (include|item|COMMENT|NEW_LINE)*
+
+      
+include ::= '!include'<<notNewLine>>*     {
+//  mixin="org.plantuml.idea.grammar.psi.impl.PumlNamedElementImpl"
+  implements="com.intellij.psi.NavigatablePsiElement"
+  methods=[ getPresentation getReference  toString]
+}
+
 
 item ::= IDENTIFIER|OTHER {
    mixin="org.plantuml.idea.grammar.psi.impl.PumlNamedElementImpl"
    implements="org.plantuml.idea.grammar.psi.PumlNamedElement"
    methods=[ getName setName getNameIdentifier getPresentation getReference  toString]
 }
+

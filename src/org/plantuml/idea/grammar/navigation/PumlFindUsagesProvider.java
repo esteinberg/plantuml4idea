@@ -1,4 +1,4 @@
-package org.plantuml.idea.grammar;
+package org.plantuml.idea.grammar.navigation;
 
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.grammar.PumlLexerAdapter;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 

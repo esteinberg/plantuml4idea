@@ -1,0 +1,3 @@
+ !include foo.puml
+     !include foo.puml
+

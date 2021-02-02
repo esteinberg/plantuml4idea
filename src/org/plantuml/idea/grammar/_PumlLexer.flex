@@ -70,7 +70,7 @@ WHITE_SPACE=[\ \t\f]
 <YYINITIAL, LINE_START_STATE>"'"                                       { yybegin(YYINITIAL);        return PumlTypes.OTHER; }
 <YYINITIAL, LINE_START_STATE>"="                                       { yybegin(YYINITIAL);        return PumlTypes.OTHER; }
 <YYINITIAL, LINE_START_STATE>"!"                                       { yybegin(YYINITIAL);        return PumlTypes.OTHER; }
-<YYINITIAL, LINE_START_STATE>{NEW_LINE}+                               { yybegin(LINE_START_STATE); return TokenType.WHITE_SPACE; }
+<YYINITIAL, LINE_START_STATE>{NEW_LINE}+                               { yybegin(LINE_START_STATE); return PumlTypes.NEW_LINE; }
 <YYINITIAL, LINE_START_STATE>{WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 
 [^] { return TokenType.BAD_CHARACTER; }

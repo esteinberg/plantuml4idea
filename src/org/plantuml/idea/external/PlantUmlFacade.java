@@ -30,4 +30,5 @@ public interface PlantUmlFacade {
     String version();
 
     String encode(String source) throws IOException;
+
 }

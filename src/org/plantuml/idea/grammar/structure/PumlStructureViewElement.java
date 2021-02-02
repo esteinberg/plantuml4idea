@@ -8,8 +8,10 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.NavigatablePsiElement;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.grammar.psi.PumlInclude;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.grammar.psi.impl.PumlItemImpl;
@@ -71,7 +73,10 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
     @Override
     public ItemPresentation getPresentation() {
         if (myElement instanceof PumlItem) {
-            return PumlPsiImplUtil.getPresentation2((PumlItem) myElement, line);
+            return PumlPsiImplUtil.getPresentation2(myElement, line);
+        }
+        if (myElement instanceof PumlInclude) {
+            return PumlPsiImplUtil.getPresentation2(myElement, line);
         }
         ItemPresentation presentation = myElement.getPresentation();
         return presentation != null ? presentation : new PresentationData();
@@ -82,18 +87,20 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
     public TreeElement[] getChildren() {
         if (myElement instanceof PlantUmlFileImpl) {
             List<TreeElement> treeElements = new ArrayList<>();
-            List<PumlItemImpl> list = PsiTreeUtil.getChildrenOfTypeAsList(myElement, PumlItemImpl.class);
+            List<PsiElement> list = PsiTreeUtil.getChildrenOfAnyType(myElement, PumlInclude.class, PumlItem.class);
 
             HashSet<String> strings = new HashSet<>();
-            for (final PumlItemImpl item : list) {
-                if (item.getFirstChild().getNode().getElementType() != PumlTypes.IDENTIFIER) {
-                    continue;
+            for (final PsiElement item : list) {
+                if (item instanceof PumlItemImpl) {
+                    if (item.getFirstChild().getNode().getElementType() != PumlTypes.IDENTIFIER) {
+                        continue;
+                    }
                 }
                 String text = item.getText();
                 if (!strings.contains(text)) {
                     strings.add(text);
                     if (text != null && text.length() > 0) {
-                        treeElements.add(new PumlStructureViewElement(item, document));
+                        treeElements.add(new PumlStructureViewElement((NavigatablePsiElement) item, document));
                     }
                 }
             }

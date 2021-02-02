@@ -1,4 +1,4 @@
-package org.plantuml.idea.grammar;
+package org.plantuml.idea.grammar.navigation;
 
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.completion.InsertionContext;
@@ -9,6 +9,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.AbstractElementManipulator;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -16,6 +17,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.grammar.PumlPsiUtil;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
@@ -39,6 +41,15 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
     @Nullable
     @Override
     public PsiElement resolve() {
+//        if (key.contains(".")) {
+//            PsiElement prevSibling = myElement.getPrevSibling();
+//            System.err.println();
+//            VirtualFile virtualFile = getElement().getContainingFile().getVirtualFile();
+//            VirtualFile fileByRelativePath = virtualFile.getParent().findFileByRelativePath(key);
+//            if (fileByRelativePath != null) {
+//                return PsiManager.getInstance(getElement().getProject()).findFile(fileByRelativePath);
+//            }
+//        }
         return PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
     }
 
@@ -109,5 +120,14 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
         PumlItem element = getElement();
         element.setName(newElementName);
         return element;
+    }
+
+    public static class PumlElementManipulator extends AbstractElementManipulator<PumlItem> {
+        @Override
+        public @Nullable
+        PumlItem handleContentChange(@NotNull PumlItem PumlItem, @NotNull TextRange textRange, String s) throws IncorrectOperationException {
+            PsiElement psiElement = PumlItem.setName(s);
+            return (PumlItem) psiElement;
+        }
     }
 }
