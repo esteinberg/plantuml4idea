@@ -119,7 +119,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             List<StringLocated> data = Collections.singletonList(o);
             UmlSource source = new UmlSource(data, false);
 
-            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), lineLocation);
+            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), 1, lineLocation);
             PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
             pSystemError.exportDiagram(os, 0, new FileFormatOption(fileFormat));
         } catch (IOException e1) {
