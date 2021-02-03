@@ -1,7 +1,6 @@
 // Copyright 2000-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package org.plantuml.idea.toolwindow.image.svg.batik
 
-import com.intellij.openapi.util.JDOMUtil
 import org.apache.batik.anim.dom.SVG12DOMImplementation
 import org.apache.batik.anim.dom.SVGDOMImplementation
 import org.apache.batik.anim.dom.SVGOMDocument
@@ -21,7 +20,7 @@ import javax.xml.stream.XMLStreamReader
 @ApiStatus.Internal
 fun createSvgDocument(uri: String?, reader: Reader): Document {
     val result = reader.use {
-        val xmlStreamReader = JDOMUtil.getXmlInputFactory().createXMLStreamReader(reader)
+        val xmlStreamReader = MyJDOMUtil.getXmlInputFactory().createXMLStreamReader(reader)
         try {
             buildDocument(xmlStreamReader)
         } catch (e: XMLStreamException) {
