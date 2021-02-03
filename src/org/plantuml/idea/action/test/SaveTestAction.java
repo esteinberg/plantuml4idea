@@ -1,4 +1,4 @@
-package org.plantuml.idea.action.save;
+package org.plantuml.idea.action.test;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;

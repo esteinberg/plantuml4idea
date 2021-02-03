@@ -1,9 +1,11 @@
 package org.plantuml.idea.external;
 
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.ui.MessageType;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
@@ -37,6 +39,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
 
     private ChildURLClassLoader childClassLoader;
 
+
     /**
      * This class allows me to call findClass on a classloader
      */
@@ -58,11 +61,18 @@ public class ParentLastURLClassLoader extends ClassLoader {
     private static class ChildURLClassLoader extends URLClassLoader {
         private FindClassClassLoader realParent;
         boolean shownIncompatibleNotification;
+        private transient boolean closed;
 
         public ChildURLClassLoader(URL[] urls, FindClassClassLoader realParent) {
             super(urls, null);
 
             this.realParent = realParent;
+        }
+
+        @Override
+        public void close() throws IOException {
+            closed = true;
+            super.close();
         }
 
         @Override
@@ -82,14 +92,18 @@ public class ParentLastURLClassLoader extends ClassLoader {
             } catch (ClassNotFoundException e) {
                 for (String forbiddenParentPrefixes : neverLoadFromParentWithPrefix) {
                     if (name.startsWith(forbiddenParentPrefixes)) {
-                        if (!shownIncompatibleNotification) {
+                        if (!closed && !shownIncompatibleNotification) {
                             shownIncompatibleNotification = true;
                             SwingUtilities.invokeLater(() -> {
                                 Notifications.Bus.notify(NOTIFICATION.createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
                             });
                         }
-                        throw new IncompatiblePlantUmlVersionException(
-                                name + " not found in child classloader, and cannot be loaded from parent", e);
+                        if (closed) {
+                            throw new ProcessCanceledException();
+                        } else {
+                            throw new IncompatiblePlantUmlVersionException(
+                                    name + " not found in child classloader, and cannot be loaded from parent", e);
+                        }
                     }
                 }
                 // if that fails, we ask our real parent classloader to load the class (we give up)

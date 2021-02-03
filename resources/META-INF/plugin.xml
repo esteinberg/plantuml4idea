@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>4.1.0</version>
+    <version>4.2.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
@@ -10,6 +10,12 @@
 
     <change-notes>
         <![CDATA[        
+            <p>4.2<p>
+            <ul>
+              <li>!include navigation, refactoring support</li>
+              <li>PlantUml library upgrade to v1.2021.1</li>
+              <li>Fixed: background in SVG preview</li>
+            </ul>
             <p>4.1<p>
             <ul>
               <li>Added default export file type settings</li>
@@ -161,8 +167,10 @@
                         text="Open Settings"/>
 
                 <!--                <separator/>-->
-                <!--                <action id="PlantUML.SaveTestAction" class="org.plantuml.idea.action.save.SaveTestAction"-->
+                <!--                <action id="PlantUML.SaveTestAction" class="org.plantuml.idea.action.test.SaveTestAction"-->
                 <!--                        text="SaveTestAction"/>-->
+                <!--                <action id="PlantUML.ClearCacheAction" class="org.plantuml.idea.action.test.ClearCacheAction"-->
+                <!--                        text="ClearCacheAction"/>-->
 
             </group>
 
@@ -210,10 +218,13 @@
                       id="PlantUmlCompletionAutoPopupHandler"/>
 
         <lang.elementManipulator forClass="org.plantuml.idea.grammar.psi.PumlItem"
-                                 implementationClass="org.plantuml.idea.grammar.PumlElementManipulator"/>
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlItemReference$PumlElementManipulator"/>
+        <lang.elementManipulator forClass="org.plantuml.idea.grammar.psi.impl.PumlIncludeImpl"
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlIncludeReference$MyAbstractElementManipulator"/>
+
         <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.grammar.PumlNamesValidator"/>
         <lang.findUsagesProvider language="PUML"
-                                 implementationClass="org.plantuml.idea.grammar.PumlFindUsagesProvider"/>
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlFindUsagesProvider"/>
 
         <lang.psiStructureViewFactory language="PUML"
                                       implementationClass="org.plantuml.idea.grammar.structure.PumlStructureViewFactory"/>
@@ -222,6 +233,8 @@
                               implementationClass="org.plantuml.idea.grammar.PumlSpellcheckingStrategy"/>
         <spellchecker.dictionary.runtimeDictionaryProvider
                 implementation="org.plantuml.idea.grammar.PumlRuntimeDictionaryProvider"/>
+        <lang.refactoringSupport language="PUML"
+                                 implementationClass="org.plantuml.idea.grammar.PumlRefactoringSupportProvider"/>
     </extensions>
 
 </idea-plugin>
