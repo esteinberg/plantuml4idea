@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>4.2.0</version>
+    <version>4.3.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
@@ -10,6 +10,10 @@
 
     <change-notes>
         <![CDATA[        
+            <p>4.3<p>
+            <ul>
+              <li>Suppressed `Non-ASCII characters` inspection</li>
+            </ul> 
             <p>4.2<p>
             <ul>
               <li>!include navigation, refactoring support</li>
@@ -235,6 +239,8 @@
                 implementation="org.plantuml.idea.grammar.PumlRuntimeDictionaryProvider"/>
         <lang.refactoringSupport language="PUML"
                                  implementationClass="org.plantuml.idea.grammar.PumlRefactoringSupportProvider"/>
+        <lang.inspectionSuppressor language="PUML"
+                                   implementationClass="org.plantuml.idea.grammar.PumlInspectionSuppressor"/>
     </extensions>
 
 </idea-plugin>
