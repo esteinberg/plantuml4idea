@@ -3,8 +3,10 @@ package org.plantuml.idea.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.PathUtilRt;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -225,5 +227,15 @@ public class RenderCacheItem {
 
     public boolean differentFormat(RenderRequest renderRequest) {
         return renderRequest.getFormat() != getRenderRequest().getFormat();
+    }
+
+    public String getFileNameWithoutExtension() {
+        String filename = null;
+        String sourceFilePath = getSourceFilePath();
+        if (sourceFilePath != null) {
+            String fileName = PathUtilRt.getFileName(sourceFilePath);
+            filename = FileUtilRt.getNameWithoutExtension(fileName);
+        }
+        return filename;
     }
 }

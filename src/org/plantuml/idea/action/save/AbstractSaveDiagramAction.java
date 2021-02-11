@@ -12,13 +12,11 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.util.ArrayUtil;
-import com.intellij.util.PathUtilRt;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -170,16 +168,22 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 int selectedPage = plantUmlToolWindow.getSelectedPage();
                 ImageItem imageItem = displayedItem.getImageItem(selectedPage < 0 ? 0 : selectedPage);
                 if (imageItem != null) {
-                    filename = sanitize(imageItem.getFilename());
-                    if (plantUmlSettings.isUsePageTitles() && getPageNumber(e) >= 0) {
-                        if (imageItem.getTitle() != null) {
-                            filename = filename + "-" + sanitize(imageItem.getTitle());
+                    String customFileName = imageItem.getCustomFileName();
+                    if (customFileName != null) {
+                        filename = sanitize(customFileName);
+                    }
+                    if (filename == null) {
+                        filename = displayedItem.getFileNameWithoutExtension();
+                    }
+                    if (filename != null && plantUmlSettings.isUsePageTitles() && getPageNumber(e) >= 0) {
+                        String sanitize = sanitize(imageItem.getTitle());
+                        if (sanitize != null) {
+                            filename = filename + "-" + sanitize;
                         }
                     }
                 }
                 if (filename == null) {
-                    String sourceFilePath = displayedItem.getSourceFilePath();
-                    filename = FileUtilRt.getNameWithoutExtension(PathUtilRt.getFileName(sourceFilePath));
+                    filename = displayedItem.getFileNameWithoutExtension();
                 }
             }
         } catch (Exception ex) {
@@ -201,6 +205,9 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     private String sanitize(String filename) {
         if (filename != null && filename.startsWith("[") && filename.endsWith("]")) {
             filename = filename.substring(1, filename.length() - 1);
+        }
+        if (StringUtils.isBlank(filename)) {
+            return null;
         }
         return FileUtil.sanitizeFileName(filename);
     }

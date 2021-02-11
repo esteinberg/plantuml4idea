@@ -43,11 +43,8 @@ public class ImageItem {
     private final List<LinkData> links;
     @Nullable
     private final String title;
-    /**
-     * could have been in RenderResult, since it is currently the same for all pages
-     */
     @Nullable
-    private final String filename;
+    private final String customFileName;
     @NotNull
     private final ImageFormat format;
     @Nullable
@@ -70,7 +67,7 @@ public class ImageItem {
                      @Nullable byte[] svgBytes,
                      @NotNull RenderingType renderingType,
                      @Nullable String title,
-                     @Nullable String filename) {
+                     @Nullable String customFileName) {
         this.format = format;
         this.pageSource = pageSource;
         this.documentSource = documentSource;
@@ -78,7 +75,7 @@ public class ImageItem {
         this.description = description;
         this.renderingType = renderingType;
         this.title = title;
-        this.filename = filename;
+        this.customFileName = customFileName;
         this.imageBytes = imageBytes;
 
         this.links = this.parseLinks(svgBytes, baseDir);
@@ -94,7 +91,7 @@ public class ImageItem {
         this.imageBytes = item.imageBytes;
         this.renderingType = item.renderingType;
         this.title = item.title;
-        this.filename = item.filename;
+        this.customFileName = item.customFileName;
         this.format = format;
     }
 
@@ -128,8 +125,8 @@ public class ImageItem {
     }
 
     @Nullable
-    public String getFilename() {
-        return filename;
+    public String getCustomFileName() {
+        return customFileName;
     }
 
     @Nullable
@@ -352,7 +349,7 @@ public class ImageItem {
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
                 .append("format", format)
-                .append("filename", filename)
+                .append("filename", customFileName)
                 .append("page", page)
                 .append("description", description)
                 .append("title", title)
