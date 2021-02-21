@@ -90,10 +90,10 @@ public class Highlighter {
             if (selectionStart == null || selectionStart == selectionEnd) {
                 LogicalPosition caretPosition = caretsAndSelection.getCaretPosition();
                 int offset = editor.logicalPositionToOffset(caretPosition);
-                if (document.getTextLength() == offset) {
+                if (offset > 0 && document.getTextLength() == offset) {
                     offset = offset - 1;
                 }
-                if (StringUtils.isWhitespace(document.getText(TextRange.from(offset, 1)))) {
+                if (offset > 0 && StringUtils.isWhitespace(document.getText(TextRange.from(offset, 1)))) {
                     offset = offset - 1;
                 }
                 PsiElement elementAtOffset = PsiUtilCore.getElementAtOffset(file, offset);
