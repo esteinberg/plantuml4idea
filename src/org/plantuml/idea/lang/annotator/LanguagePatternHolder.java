@@ -20,7 +20,7 @@ public enum LanguagePatternHolder {
     private final Joiner PipeJoiner = Joiner.on("|");
 
     public Pattern sourcePattern = Pattern.compile("(?:(@start(?:" + TAGS + ")(?s).*?(?:@end(?:" + TAGS + ")|$))(?s).*?)+");
-    public Pattern sourcePatternMarkdown = Pattern.compile("(?:(``` plantuml(?s).*?(?:```))(?s).*?)+");
+    public Pattern sourcePatternMarkdown = Pattern.compile("(?:```plantuml(?s)(.*?```)(?s).*?)+");
 
     public final Pattern pluginSettingsPattern = createPattern(LanguageDescriptor.INSTANCE.pluginSettingsPattern, "");
     public final Pattern keywordsPattern = createPattern(LanguageDescriptor.INSTANCE.keywords, "");

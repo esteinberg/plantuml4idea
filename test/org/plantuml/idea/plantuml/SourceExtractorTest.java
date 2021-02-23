@@ -69,4 +69,25 @@ public class SourceExtractorTest extends TestCase {
                 "@enduml";
         assertEquals(expected, SourceExtractor.extractSource(source, source.length() / 2));
     }
+
+    public void testExtractSourceMarkdown() {
+        String source = "```plantuml\n" +
+                "Object <|-- ArrayList\n" +
+                "\n" +
+                "Object : equals()\n" +
+                "ArrayList : Object[] elementData\n" +
+                "ArrayList : size()\n" +
+                "```";
+        String expected = "@startuml\n" +
+                "\n" +
+                "Object <|-- ArrayList\n" +
+                "\n" +
+                "Object : equals()\n" +
+                "ArrayList : Object[] elementData\n" +
+                "ArrayList : size()\n" +
+                "\n" +
+                "@enduml";
+        assertEquals(expected, SourceExtractor.extractSource(source, source.length() / 2));
+    }
+
 }

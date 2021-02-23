@@ -1,5 +1,6 @@
 package org.plantuml.idea.plantuml;
 
+import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.lang.annotator.LanguagePatternHolder;
 
 import java.util.LinkedHashMap;
@@ -11,6 +12,8 @@ import java.util.regex.Pattern;
  * @author Eugene Steinberg
  */
 public class SourceExtractor {
+    private static final Logger LOG = Logger.getInstance(SourceExtractor.class);
+
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
 
 
@@ -41,6 +44,7 @@ public class SourceExtractor {
     }
 
     public static Map<Integer, String> extractSources(String text) {
+        long start = System.currentTimeMillis();
         LinkedHashMap<Integer, String> result = new LinkedHashMap<Integer, String>();
 
         if (text.contains("@start")) {
@@ -52,19 +56,19 @@ public class SourceExtractor {
             }
         }
 
-        if (text.contains("``` plantuml")) {
+        if (text.contains("```plantuml")) {
             Matcher matcher = LanguagePatternHolder.INSTANCE.sourcePatternMarkdown.matcher(text);
 
             while (matcher.find()) {
-                String group = matcher.group();
-                group = group.substring("``` plantuml".length(), group.length() - 3);
+                String group = matcher.group(1);
+                group = group.substring(0, group.length() - 3);
                 if (!group.trim().startsWith("@startuml")) {
                     group = "@startuml\n" + group + "\n@enduml";
                 }
                 result.put(matcher.start(), group);
             }
         }
-
+        LOG.debug("extractSources done in ", System.currentTimeMillis() - start, "ms");
         return result;
     }
 
