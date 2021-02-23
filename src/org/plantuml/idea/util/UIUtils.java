@@ -1,7 +1,7 @@
 package org.plantuml.idea.util;
 
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationGroup;
+import com.intellij.notification.NotificationGroupManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -28,8 +28,9 @@ import java.io.File;
 public class UIUtils {
     private static Logger logger = Logger.getInstance(UIUtils.class);
 
-    public static final NotificationGroup NOTIFICATION = new NotificationGroup("PlantUML integration plugin",
-            NotificationDisplayType.BALLOON, true);
+    public static NotificationGroup notification() {
+        return NotificationGroupManager.getInstance().getNotificationGroup("PlantUML integration plugin");
+    }
 
     public static String getSelectedSourceWithCaret(FileEditorManager instance) {
         String source = "";

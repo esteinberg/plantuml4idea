@@ -33,7 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
+import static org.plantuml.idea.util.UIUtils.notification;
 
 /**
  * @author Eugene Steinberg
@@ -66,7 +66,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         File sourceFile = getDisplayedSourceFile(project);
 
         if (StringUtils.isBlank(selectedSource)) {
-            Notifications.Bus.notify(NOTIFICATION.createNotification("No PlantUML source code", MessageType.WARNING));
+            Notifications.Bus.notify(notification().createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
         ImageFormat format = PlantUmlSettings.getInstance().getDefaultExportFileFormatEnum();

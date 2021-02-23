@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
+import static org.plantuml.idea.util.UIUtils.notification;
 
 /**
  * @author Max Gorbunov
@@ -223,7 +223,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
                     //do nothing
                 } else {
                     useBundled = true;
-                    SwingUtilities.invokeLater(() -> Notifications.Bus.notify(NOTIFICATION.createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
+                    SwingUtilities.invokeLater(() -> Notifications.Bus.notify(notification().createNotification("Switching to a bundled PlantUML v" + version, MessageType.INFO)));
                 }
             }
             lastBundledVersion = version;

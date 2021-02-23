@@ -11,7 +11,7 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.plantuml.idea.util.UIUtils.NOTIFICATION;
+import static org.plantuml.idea.util.UIUtils.notification;
 
 /**
  * A parent-last classloader that will try the child classloader first and then the parent. This takes a fair bit of
@@ -95,7 +95,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                         if (!closed && !shownIncompatibleNotification) {
                             shownIncompatibleNotification = true;
                             SwingUtilities.invokeLater(() -> {
-                                Notifications.Bus.notify(NOTIFICATION.createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
+                                Notifications.Bus.notify(notification().createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
                             });
                         }
                         if (closed) {

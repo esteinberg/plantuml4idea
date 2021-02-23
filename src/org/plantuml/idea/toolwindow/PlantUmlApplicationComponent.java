@@ -1,5 +1,6 @@
 package org.plantuml.idea.toolwindow;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.CaretListener;
@@ -11,7 +12,7 @@ import org.plantuml.idea.toolwindow.listener.PlantUmlCaretListener;
 import org.plantuml.idea.toolwindow.listener.PlantUmlDocumentListener;
 import org.plantuml.idea.toolwindow.listener.PlantUmlSelectionListener;
 
-public class PlantUmlApplicationComponent implements ApplicationComponent {
+public class PlantUmlApplicationComponent implements ApplicationComponent, Disposable {
     private DocumentListener plantUmlDocumentListener = new PlantUmlDocumentListener();
     private CaretListener plantUmlCaretListener = new PlantUmlCaretListener();
     private SelectionListener selectionListener = new PlantUmlSelectionListener();
@@ -25,7 +26,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
         eventMulticaster.addDocumentListener(plantUmlDocumentListener);
         eventMulticaster.addCaretListener(plantUmlCaretListener);
-        eventMulticaster.addSelectionListener(selectionListener);
+        eventMulticaster.addSelectionListener(selectionListener, this);
     }
 
     @Override
@@ -42,4 +43,7 @@ public class PlantUmlApplicationComponent implements ApplicationComponent {
         return "PlantUmlApplicationComponent";
     }
 
+    @Override
+    public void dispose() {
+    }
 }
