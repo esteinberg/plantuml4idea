@@ -234,7 +234,7 @@ public class ImageItem {
     }
 
     private List<LinkData> parseLinks(byte[] svgData, File baseDir) {
-        if (svgData == null || svgData.length == 0 || baseDir == null) {
+        if (svgData == null || svgData.length == 0) {
             return Collections.emptyList();
         }
         try {

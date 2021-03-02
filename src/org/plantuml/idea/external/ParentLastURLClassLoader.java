@@ -102,7 +102,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                             throw new ProcessCanceledException();
                         } else {
                             throw new IncompatiblePlantUmlVersionException(
-                                    name + " not found in child classloader, and cannot be loaded from parent", e);
+                                    name + " not found in child classloader, and prohibited from loading from parent", e);
                         }
                     }
                 }

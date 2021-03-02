@@ -24,8 +24,8 @@ public class PlantUmlApplicationComponent implements ApplicationComponent, Dispo
     @Override
     public void initComponent() {
         EditorEventMulticaster eventMulticaster = EditorFactory.getInstance().getEventMulticaster();
-        eventMulticaster.addDocumentListener(plantUmlDocumentListener);
-        eventMulticaster.addCaretListener(plantUmlCaretListener);
+        eventMulticaster.addDocumentListener(plantUmlDocumentListener, this);
+        eventMulticaster.addCaretListener(plantUmlCaretListener, this);
         eventMulticaster.addSelectionListener(selectionListener, this);
     }
 

@@ -654,13 +654,13 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             ImageDocument document = imageComponent.getDocument();
             BufferedImage value = document.getValue();
 
-            if (value instanceof MyBufferedImage) {
-                Color background = ((MyBufferedImage) value).getBackground();
-                if (background != null) {
-                    imageComponent.setTransparencyChessboardBlankColor(background);
-                    imageComponent.setTransparencyChessboardWhiteColor(background);
-                }
-            }
+             if (value instanceof MyBufferedImage) {
+                 Color background = ((MyBufferedImage) value).getBackground();
+                 if (background != null) {
+                     imageComponent.setTransparencyChessboardBlankColor(background);
+                     imageComponent.setTransparencyChessboardWhiteColor(background);
+                 }
+             }
 
             updateImageComponentSize();
 

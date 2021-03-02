@@ -40,7 +40,7 @@ public class PlantUmlRendererUtil {
         String source = renderRequest.getSource();
         String[] sourceSplit = NEW_PAGE_PATTERN.split(source);
         logger.debug("split done ", System.currentTimeMillis() - start, "ms");
-
+        
         boolean partialRender = sourceSplit[0].contains(LanguageDescriptor.IDEA_PARTIAL_RENDER);
         logger.debug("partialRender ", partialRender);
 

@@ -144,10 +144,10 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
         editor.setTransparencyChessboardVisible(PlantUmlSettings.getInstance().isShowChessboard());
 
-        if (imageItem.hasError()) {
-            imageComponent.setTransparencyChessboardWhiteColor(Color.BLACK);
-            imageComponent.setTransparencyChessboardBlankColor(Color.BLACK);
-        }
+//        if (imageItem.hasError()) {
+//            imageComponent.setTransparencyChessboardWhiteColor(Color.BLACK);
+//            imageComponent.setTransparencyChessboardBlankColor(Color.BLACK);
+//        }
 
         contentComponent.addPropertyChangeListener(MyImageEditorUI.ZOOM_FACTOR_PROP, new PropertyChangeListener() {
             @Override

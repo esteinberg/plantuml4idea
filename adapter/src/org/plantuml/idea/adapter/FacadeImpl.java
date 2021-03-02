@@ -5,7 +5,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.PlantUmlFacade;
+import org.plantuml.idea.external.RemoteRenderer;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
+import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -15,6 +17,7 @@ import org.plantuml.idea.toolwindow.Zoom;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @see PlantUmlFacade#get()
@@ -25,6 +28,9 @@ public class FacadeImpl implements PlantUmlFacade {
     @Nullable
     @Override
     public Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile) {
+        if (PlantUmlSettings.getInstance().isRemoteRendering()) {
+            return Collections.emptyList();
+        }
         return Annotator.annotateSyntaxErrors(source, virtualFile);
     }
 
@@ -36,7 +42,11 @@ public class FacadeImpl implements PlantUmlFacade {
 
     @Override
     public RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-        return PlantUmlRendererUtil.render(renderRequest, cachedItem);
+        if (PlantUmlSettings.getInstance().isRemoteRendering()) {
+            return RemoteRenderer.render(renderRequest);
+        } else {
+            return PlantUmlRendererUtil.render(renderRequest, cachedItem);
+        } 
     }
 
     @Override

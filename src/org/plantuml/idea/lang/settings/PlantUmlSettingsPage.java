@@ -68,6 +68,10 @@ public class PlantUmlSettingsPage implements Configurable {
     private JButton donate;
     private JLabel svgPreviewLimitLabel;
     private JComboBox<String> defaultFileExtension;
+    private JTextField serverUrl;
+    private JCheckBox remoteRendering;
+    private JCheckBox useProxy;
+    private JButton reset;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -85,6 +89,9 @@ public class PlantUmlSettingsPage implements Configurable {
             } catch (Exception ee) {
                 throw new RuntimeException(ee);
             }
+        });
+        reset.addActionListener(e -> {
+            serverUrl.setText(PlantUmlSettings.DEFAULT_SERVER);
         });
         browse.addActionListener(e -> browseForFile(textFieldDotExecutable));
         browseCustomPlantumlJar.addActionListener(e -> browseForjar(customPlantumlJar));
@@ -231,7 +238,6 @@ public class PlantUmlSettingsPage implements Configurable {
     }
 
     public void setData(PlantUmlSettings data) {
-        encoding.setText(data.getEncoding());
         textFieldDotExecutable.setText(data.getDotExecutable());
         usePreferentiallyGRAPHIZ_DOT.setSelected(data.isUsePreferentiallyGRAPHIZ_DOT());
         config.setText(data.getConfig());
@@ -242,21 +248,24 @@ public class PlantUmlSettingsPage implements Configurable {
         cacheSize.setText(data.getCacheSize());
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         maxSvgSize.setText(data.getMaxSvgSize());
+        encoding.setText(data.getEncoding());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
-        insertPair.setSelected(data.isInsertPair());
         displaySvg.setSelected(data.isDisplaySvg());
-        renderLinksPng.setSelected(data.isRenderLinks());
-        highlightInImages.setSelected(data.isHighlightInImages());
-        showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
-        linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
         plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
         svgPreviewScaling.setSelected(data.isSvgPreviewScaling());
+        renderLinksPng.setSelected(data.isRenderLinks());
+        linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
+        highlightInImages.setSelected(data.isHighlightInImages());
+        showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
+        insertPair.setSelected(data.isInsertPair());
+        serverUrl.setText(data.getServerUrl());
+        remoteRendering.setSelected(data.isRemoteRendering());
+        useProxy.setSelected(data.isUseProxy());
     }
 
     public void getData(PlantUmlSettings data) {
-        data.setEncoding(encoding.getText());
         data.setDotExecutable(textFieldDotExecutable.getText());
         data.setUsePreferentiallyGRAPHIZ_DOT(usePreferentiallyGRAPHIZ_DOT.isSelected());
         data.setConfig(config.getText());
@@ -267,22 +276,24 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setCacheSize(cacheSize.getText());
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setMaxSvgSize(maxSvgSize.getText());
+        data.setEncoding(encoding.getText());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
-        data.setInsertPair(insertPair.isSelected());
         data.setDisplaySvg(displaySvg.isSelected());
-        data.setRenderLinks(renderLinksPng.isSelected());
-        data.setHighlightInImages(highlightInImages.isSelected());
-        data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
-        data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
         data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
         data.setSvgPreviewScaling(svgPreviewScaling.isSelected());
+        data.setRenderLinks(renderLinksPng.isSelected());
+        data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
+        data.setHighlightInImages(highlightInImages.isSelected());
+        data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
+        data.setInsertPair(insertPair.isSelected());
+        data.setServerUrl(serverUrl.getText());
+        data.setRemoteRendering(remoteRendering.isSelected());
+        data.setUseProxy(useProxy.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
-        if (encoding.getText() != null ? !encoding.getText().equals(data.getEncoding()) : data.getEncoding() != null)
-            return true;
         if (textFieldDotExecutable.getText() != null ? !textFieldDotExecutable.getText().equals(data.getDotExecutable()) : data.getDotExecutable() != null)
             return true;
         if (usePreferentiallyGRAPHIZ_DOT.isSelected() != data.isUsePreferentiallyGRAPHIZ_DOT()) return true;
@@ -301,17 +312,23 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (maxSvgSize.getText() != null ? !maxSvgSize.getText().equals(data.getMaxSvgSize()) : data.getMaxSvgSize() != null)
             return true;
+        if (encoding.getText() != null ? !encoding.getText().equals(data.getEncoding()) : data.getEncoding() != null)
+            return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
-        if (insertPair.isSelected() != data.isInsertPair()) return true;
         if (displaySvg.isSelected() != data.isDisplaySvg()) return true;
-        if (renderLinksPng.isSelected() != data.isRenderLinks()) return true;
-        if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
-        if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
-        if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
         if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (svgPreviewScaling.isSelected() != data.isSvgPreviewScaling()) return true;
+        if (renderLinksPng.isSelected() != data.isRenderLinks()) return true;
+        if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
+        if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
+        if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
+        if (insertPair.isSelected() != data.isInsertPair()) return true;
+        if (serverUrl.getText() != null ? !serverUrl.getText().equals(data.getServerUrl()) : data.getServerUrl() != null)
+            return true;
+        if (remoteRendering.isSelected() != data.isRemoteRendering()) return true;
+        if (useProxy.isSelected() != data.isUseProxy()) return true;
         return false;
     }
 }
