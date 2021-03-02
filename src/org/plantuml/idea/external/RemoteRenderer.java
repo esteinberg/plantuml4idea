@@ -44,6 +44,8 @@ public class RemoteRenderer {
             HttpClient.Builder builder = HttpClient.newBuilder();
             if (plantUmlSettings.isUseProxy()) {
                 builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
+            } else {
+                builder.proxy(HttpClient.Builder.NO_PROXY);
             }
             HttpClient client = builder.connectTimeout(Duration.of(5, ChronoUnit.SECONDS)).build();
 
