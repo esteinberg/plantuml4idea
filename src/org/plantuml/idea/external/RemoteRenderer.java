@@ -25,13 +25,12 @@ public class RemoteRenderer {
 
     public static RenderResult render(RenderRequest renderRequest) {
         long start = System.currentTimeMillis();
+        PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
+        String source = renderRequest.getSource();
+        boolean displaySvg = plantUmlSettings.isDisplaySvg();
         try {
-            PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
 
-            String source = renderRequest.getSource();
             String encoded = PlantUmlFacade.get().encode(source);
-
-            boolean displaySvg = plantUmlSettings.isDisplaySvg();
             String type = displaySvg ? "/plantuml/svg/" : "/plantuml/png/";
             String url = plantUmlSettings.getServer() + type + encoded;
             LOG.debug("url: ", url);
@@ -85,7 +84,9 @@ public class RemoteRenderer {
             renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
             return renderResult;
         } catch (Throwable e) {
-            throw new RuntimeException(e);
+            RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, "(Error)", null, null, RenderingType.REMOTE, null, null, e));
+            return renderResult;
         } finally {
             LOG.debug("render done in ", System.currentTimeMillis() - start, "ms");
         }

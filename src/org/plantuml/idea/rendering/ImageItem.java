@@ -52,7 +52,7 @@ public class ImageItem {
     @NotNull
     private final String documentSource;
     private final byte[] imageBytes;
-    private Exception exception;
+    private Throwable exception;
 
     @Nullable
     private volatile BufferedImage image;
@@ -69,7 +69,7 @@ public class ImageItem {
                      @NotNull RenderingType renderingType,
                      @Nullable String title,
                      @Nullable String customFileName,
-                     @Nullable Exception exception) {
+                     @Nullable Throwable exception) {
         this.format = format;
         this.pageSource = pageSource;
         this.documentSource = documentSource;
@@ -146,7 +146,7 @@ public class ImageItem {
         return imageBytes != null && imageBytes.length > 0;
     }
 
-    public Exception getException() {
+    public Throwable getException() {
         return exception;
     }
 
