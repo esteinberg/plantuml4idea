@@ -39,7 +39,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
     private static final int SVG_SIZE = 16384;
-    public static final String DEFAULT_SERVER = "http://www.plantuml.com/plantuml/";
+    public static final String DEFAULT_SERVER = "http://www.plantuml.com";
 
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
@@ -77,7 +77,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean highlightInImages = false;
     private String maxSvgSize = String.valueOf(SVG_SIZE);
     private boolean svgPreviewScaling = true;
-    private String serverUrl = DEFAULT_SERVER;
+    private String server = DEFAULT_SERVER;
     private boolean remoteRendering;
     private boolean useProxy;
 
@@ -416,18 +416,21 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         this.svgPreviewScaling = svgPreviewScaling;
     }
 
-    public String getServerUrl() {
-        if (TextUtils.isBlank(serverUrl)) {
-            serverUrl = DEFAULT_SERVER;
+    public String getServer() {
+        if (TextUtils.isBlank(server)) {
+            server = DEFAULT_SERVER;
         }
-        if (!serverUrl.endsWith("/")) {
-            serverUrl += "/";
+        if (!server.startsWith("http")) {
+            server = "http://" + server;
         }
-        return serverUrl;
+        if (server.endsWith("/")) {
+            server = server.substring(0, server.length() - 1);
+        }
+        return server;
     }
 
-    public void setServerUrl(final String serverUrl) {
-        this.serverUrl = serverUrl;
+    public void setServer(final String server) {
+        this.server = server;
     }
 
     public boolean isRemoteRendering() {

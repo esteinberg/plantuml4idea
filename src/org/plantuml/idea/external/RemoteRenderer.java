@@ -30,8 +30,8 @@ public class RemoteRenderer {
             String encoded = PlantUmlFacade.get().encode(source);
 
             boolean displaySvg = plantUmlSettings.isDisplaySvg();
-            String type = displaySvg ? "svg/" : "png/";
-            String url = plantUmlSettings.getServerUrl() + type + encoded;
+            String type = displaySvg ? "/plantuml/svg/" : "/plantuml/png/";
+            String url = plantUmlSettings.getServer() + type + encoded;
             LOG.debug("url: ", url);
 
             HttpRequest build = HttpRequest.newBuilder()
@@ -40,7 +40,8 @@ public class RemoteRenderer {
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .build();
 
-            HttpClient.Builder builder = HttpClient.newBuilder();
+            HttpClient.Builder builder = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.ALWAYS);
             if (plantUmlSettings.isUseProxy()) {
                 builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
             } else {
@@ -57,6 +58,9 @@ public class RemoteRenderer {
             }
 
             RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
+            if (out.length == 0) {
+                throw new RuntimeException("empty output for: " + response);
+            }
             byte[] bytes;
             byte[] svgBytes;
             if (displaySvg) {
