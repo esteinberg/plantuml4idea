@@ -23,7 +23,7 @@ import org.plantuml.idea.rendering.RenderResult;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LinkNavigator {
 
@@ -91,7 +91,7 @@ public class LinkNavigator {
     }
 
     private boolean navigateToIncludedFile(String text) {
-        LinkedHashMap<File, Long> includedFiles = renderResult.getIncludedFiles();
+        Map<File, Long> includedFiles = renderResult.getIncludedFiles();
         ArrayList<File> files = new ArrayList<>(includedFiles.keySet());
         int from = 0;
         if (lastFile != null) {

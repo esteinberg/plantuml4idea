@@ -6,10 +6,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -25,7 +22,7 @@ public class RenderResult {
     private int rendered;
     private int updatedTitles;
     private int cached;
-    private LinkedHashMap<File, Long> includedFiles;
+    private LinkedHashMap<File, Long> includedFiles = new LinkedHashMap<>();
 
     public RenderResult(RenderingType strategy, int totalPages) {
         this.strategy = strategy;
@@ -37,7 +34,7 @@ public class RenderResult {
         this.pages = totalPages;
     }
 
-    public LinkedHashMap<File, Long> getIncludedFiles() {
+    public Map<File, Long> getIncludedFiles() {
         return includedFiles;
     }
 
@@ -46,9 +43,6 @@ public class RenderResult {
     }
 
     public void addIncludedFiles(LinkedHashMap<File, Long> map) {
-        if (includedFiles == null) {
-            includedFiles = new LinkedHashMap<>();
-        }
         includedFiles.putAll(map);
     }
 
