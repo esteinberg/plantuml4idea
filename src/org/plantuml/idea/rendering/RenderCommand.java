@@ -79,7 +79,7 @@ public abstract class RenderCommand implements Runnable {
             final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
             final long total = System.currentTimeMillis() - start;
 
-            if (!Thread.currentThread().isInterrupted() && hasImages(newItem.getImageItems())) {
+            if (!Thread.currentThread().isInterrupted() && hasImagesOrStacktrace(newItem.getImageItems())) {
                 ApplicationManager.getApplication().invokeLater(logDuration("EDT displayResultOnEDT", () -> displayResultOnEDT(newItem, total, result)));
             } else {
                 logger.debug("no images rendered");
@@ -114,9 +114,9 @@ public abstract class RenderCommand implements Runnable {
 
     protected abstract void displayResultOnEDT(RenderCacheItem newItem, long total, RenderResult result);
 
-    private boolean hasImages(ImageItem[] imageItems) {
+    private boolean hasImagesOrStacktrace(ImageItem[] imageItems) {
         for (ImageItem imageItem : imageItems) {
-            if (imageItem != null && imageItem.hasImageBytes()) {
+            if (imageItem != null && (imageItem.hasImageBytes() || imageItem.getException() != null)) {
                 return true;
             }
         }

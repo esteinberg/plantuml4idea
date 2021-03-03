@@ -79,7 +79,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
         Map<File, Long> includedFiles = diagrams.getIncludedFiles();
         String title = diagrams.getTitle(0);
 
-        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null);
+        ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null, null);
 
         logger.debug("updateTitle " + (System.currentTimeMillis() - start));
 
@@ -127,7 +127,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             throw e;
         }
 
-        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null));
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null, null));
         return renderResult;
     }
 

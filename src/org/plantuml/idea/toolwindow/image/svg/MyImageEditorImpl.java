@@ -243,6 +243,9 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 renderingInProgress = true;
                 long start = System.currentTimeMillis();
                 buf = file.contentsToByteArray();
+                if (buf.length == 0) {
+                    throw new RuntimeException("Empty file");
+                }
 
                 ByteArrayInputStream in = new ByteArrayInputStream(buf);
                 InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);

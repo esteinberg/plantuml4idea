@@ -52,6 +52,7 @@ public class ImageItem {
     @NotNull
     private final String documentSource;
     private final byte[] imageBytes;
+    private Exception exception;
 
     @Nullable
     private volatile BufferedImage image;
@@ -67,7 +68,8 @@ public class ImageItem {
                      @Nullable byte[] svgBytes,
                      @NotNull RenderingType renderingType,
                      @Nullable String title,
-                     @Nullable String customFileName) {
+                     @Nullable String customFileName,
+                     @Nullable Exception exception) {
         this.format = format;
         this.pageSource = pageSource;
         this.documentSource = documentSource;
@@ -77,6 +79,7 @@ public class ImageItem {
         this.title = title;
         this.customFileName = customFileName;
         this.imageBytes = imageBytes;
+        this.exception = exception;
 
         this.links = this.parseLinks(svgBytes, baseDir);
     }
@@ -93,6 +96,7 @@ public class ImageItem {
         this.title = item.title;
         this.customFileName = item.customFileName;
         this.format = format;
+        this.exception = item.exception;
     }
 
     @NotNull
@@ -142,6 +146,10 @@ public class ImageItem {
         return imageBytes != null && imageBytes.length > 0;
     }
 
+    public Exception getException() {
+        return exception;
+    }
+
     public byte[] getImageBytes() {
         return imageBytes;
     }
@@ -165,7 +173,7 @@ public class ImageItem {
     }
 
     void initImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
-        if ((editor == null && image == null) && getImageBytes() != null) {
+        if ((editor == null && image == null) && hasImageBytes()) {
             long start = System.currentTimeMillis();
             if (format == ImageFormat.PNG) {
                 try {

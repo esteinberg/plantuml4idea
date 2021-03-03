@@ -194,7 +194,7 @@ public class DiagramFactory {
         if (wrongResultFormat) {
             resultFormat = ImageFormat.PNG;
         }
-        return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page));
+        return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page), null);
     }
 
     private boolean isPng(byte[] bytes) {

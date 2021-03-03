@@ -72,6 +72,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     private final Project project;
     private ImageItem imageWithData;
     private final RenderResult renderResult;
+    @Nullable
     private MyImageEditorImpl editor;
 
     public ImageContainerSvg(Project project, ImageItem imageWithData, int i, RenderRequest renderRequest, RenderResult renderResult) {
@@ -89,10 +90,12 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     @Override
     public Dimension getPreferredSize() {
-        ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
-        Dimension size = imageComponent.getSize();
-        if (size.height > 0) {
-            return size;
+        if (editor != null) {
+            ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
+            Dimension size = imageComponent.getSize();
+            if (size.height > 0) {
+                return size;
+            }
         }
         return super.getPreferredSize();
 
@@ -100,10 +103,12 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     @Override
     public Dimension getMaximumSize() {
-        ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
-        Dimension size = imageComponent.getSize();
-        if (size.height > 0) {
-            return size;
+        if (editor != null) {
+            ImageComponent imageComponent = this.editor.getComponent().getImageComponent();
+            Dimension size = imageComponent.getSize();
+            if (size.height > 0) {
+                return size;
+            }
         }
         return super.getMaximumSize();
     }
@@ -230,8 +235,10 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
 
     public void setZoomOptimized(int unscaledZoom, Point point) {
-        MyImageEditorUI.ImageZoomModelImpl zoomModel = (MyImageEditorUI.ImageZoomModelImpl) editor.getZoomModel();
-        zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100, point, zoomAlarm);
+        if (editor != null) {
+            MyImageEditorUI.ImageZoomModelImpl zoomModel = (MyImageEditorUI.ImageZoomModelImpl) editor.getZoomModel();
+            zoomModel.setZoomFactorOptimized((double) unscaledZoom / 100, point, zoomAlarm);
+        }
     }
 
     @Override
@@ -255,10 +262,12 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     @Override
     public void highlight(List<String> list) {
-        Component[] components = this.editor.getContentComponent().getComponents();
-        for (Component component : components) {
-            MyJLabel jLabel = (MyJLabel) component;
-            jLabel.highlight(list);
+        if (this.editor != null) {
+            Component[] components = this.editor.getContentComponent().getComponents();
+            for (Component component : components) {
+                MyJLabel jLabel = (MyJLabel) component;
+                jLabel.highlight(list);
+            }
         }
     }
 

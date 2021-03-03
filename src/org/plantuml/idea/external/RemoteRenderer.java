@@ -3,6 +3,7 @@ package org.plantuml.idea.external;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.net.HttpConfigurable;
 import com.intellij.util.net.IdeaWideProxySelector;
+import org.apache.commons.httpclient.HttpStatus;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
@@ -12,6 +13,7 @@ import org.plantuml.idea.rendering.RenderingType;
 
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -40,8 +42,10 @@ public class RemoteRenderer {
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .build();
 
-            HttpClient.Builder builder = HttpClient.newBuilder()
-                    .followRedirects(HttpClient.Redirect.ALWAYS);
+            HttpClient.Builder builder = HttpClient
+                    .newBuilder()
+                    .followRedirects(HttpClient.Redirect.NEVER); //it is slow, better if user fixes the url
+
             if (plantUmlSettings.isUseProxy()) {
                 builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
             } else {
@@ -57,9 +61,14 @@ public class RemoteRenderer {
                 BODY_LOG.debug("body: ", new String(out));
             }
 
-            RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
+            int statusCode = response.statusCode();
+            HttpHeaders headers = response.headers();
+
+            RuntimeException runtimeException = null;
             if (out.length == 0) {
-                throw new RuntimeException("empty output for: " + response);
+                URI uri = response.uri();
+                String statusText = HttpStatus.getStatusText(statusCode);
+                runtimeException = new RuntimeException(statusCode + ": " + statusText + "; uri=" + uri + "\nresponseHheaders=" + headers + "\nResponse Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons.");
             }
             byte[] bytes;
             byte[] svgBytes;
@@ -70,9 +79,10 @@ public class RemoteRenderer {
                 bytes = out;
                 svgBytes = null;
             }
-            String description = response.statusCode() >= 400 ? "(Error)" : "OK";
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null));
+            String description = statusCode >= 400 || runtimeException != null ? "(Error)" : "OK";
 
+            RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
             return renderResult;
         } catch (Throwable e) {
             throw new RuntimeException(e);

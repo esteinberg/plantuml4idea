@@ -468,16 +468,19 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             Component[] children = imagesPanel.getComponents();
             if (incrementalDisplay && children.length == renderResult.getPages() * 2) {
                 for (int i = 0; i < imageItems.length; i++) {
-                    ImageContainer container = (ImageContainer) children[i * 2];
-                    ImageItem imageItem = imageItems[i];
-                    if (container.getImageItem() == imageItem) {
-                        continue;
-                    } else {
-                        Disposer.dispose(container);
-                        imagesPanel.remove(i * 2);
+                    Component child = children[i * 2];
+                    if (child instanceof ImageContainer) {
+                        ImageContainer container = (ImageContainer) child;
+                        ImageItem imageItem = imageItems[i];
+                        if (container.getImageItem() == imageItem) {
+                            continue;
+                        } else {
+                            Disposer.dispose(container);
+                            imagesPanel.remove(i * 2);
 
-                        JComponent component = createImageContainer(cacheItem, i, imageItem);
-                        imagesPanel.add(component, i * 2);
+                            JComponent component = createImageContainer(cacheItem, i, imageItem);
+                            imagesPanel.add(component, i * 2);
+                        }
                     }
                 }
             } else {
@@ -545,7 +548,10 @@ public class PlantUmlToolWindow extends JPanel implements Disposable {
             throw new RuntimeException("trying to display null image. selectedPage=" + selectedPage + ", nullPage=" + pageNumber + ", cacheItem=" + cacheItem);
         }
         JComponent component = null;
-        if (imageWithData.getFormat() == ImageFormat.SVG) {
+
+        if (imageWithData.getException() != null) {
+            component = new JTextArea(Utils.stacktraceToString(imageWithData.getException()));
+        } else if (imageWithData.getFormat() == ImageFormat.SVG) {
             component = new ImageContainerSvg(project, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         } else {
             component = new ImageContainerPng(project, imagesPanel, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());

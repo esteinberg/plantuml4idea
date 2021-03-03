@@ -1,17 +1,12 @@
 package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.ex.VirtualFileManagerEx;
-import com.intellij.util.io.URLUtil;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.*;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 
@@ -85,7 +80,7 @@ public class PlantUmlNormalRenderer {
             renderResult.addRenderedImage(imageItem);
         } else if (obsolete) {
             logger.debug("page ", page, "  title only");
-            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[page], page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page)));
+            renderResult.addUpdatedTitle(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, sourceSplit[page], page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page), null));
         } else {
             logger.debug("page ", page, " cached");
             renderResult.addCachedImage(cachedItem.getImageItem(page));
@@ -99,7 +94,7 @@ public class PlantUmlNormalRenderer {
             renderResult.addRenderedImage(imageItem);
         } else {
             logger.debug("page ", page, "  title only");
-            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page));
+            ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), documentSource, pageSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.NORMAL, factory.getTitle(page), factory.getFilename(page), null);
             renderResult.addUpdatedTitle(imageItem);
         }
     }
