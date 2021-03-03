@@ -25,6 +25,8 @@ import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCacheItem;
+import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 import org.plantuml.idea.util.UIUtils;
 
@@ -62,17 +64,23 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
 
-        String selectedSource = getDisplayedSource(project);
-        File sourceFile = getDisplayedSourceFile(project);
+        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+
+        String selectedSource = displayedItem.getSource();
+        File sourceFile = new File(displayedItem.getSourceFilePath());
+        RenderResult renderResult = displayedItem.getRenderResult();
+        boolean remote = renderResult.getStrategy() == RenderingType.REMOTE;
 
         if (StringUtils.isBlank(selectedSource)) {
             Notifications.Bus.notify(notification().createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
-        ImageFormat format = PlantUmlSettings.getInstance().getDefaultExportFileFormatEnum();
+        ImageFormat format = remote ? displayedItem.getRenderRequest().getFormat() : PlantUmlSettings.getInstance().getDefaultExportFileFormatEnum();
         String defaultExtension = format.name().toLowerCase();
 
-        FileSaverDescriptor fsd = new FileSaverDescriptor("Save Diagram", "Please choose where to save diagram", getExtensions(defaultExtension));
+        String[] extensions = remote ? new String[]{format.name().toLowerCase()} : getExtensions(defaultExtension);
+        FileSaverDescriptor fsd = new FileSaverDescriptor("Save Diagram", "Please choose where to save diagram", extensions);
 
         VirtualFile baseDir = LocalFileSystem.getInstance().findFileByIoFile(sourceFile.getParentFile());
         if (baseDir == null) {
@@ -84,8 +92,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
         String defaultFileName = getDefaultFileName(e, project);
 
-        final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(
-                fsd, project).save(baseDir, defaultFileName);
+        final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(fsd, project).save(baseDir, defaultFileName);
 
         if (wrapper != null) {
             try {
@@ -116,9 +123,23 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 }
 
 
-                PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
-                        imageFormat, file.getAbsolutePath(), pathPrefix,
-                        UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
+                if (remote) {
+                    if (displayedItem.getRenderRequest().getFormat() != imageFormat) {
+                        throw new RuntimeException("wrong format");
+                    }
+                    if (renderResult.getPages() > 1) {
+                        throw new RuntimeException("renderResult.getPages() > 1");
+                    }
+                    ImageItem imageItem = renderResult.getImageItem(0);
+                    byte[] imageBytes = imageItem.getImageBytes();
+                    PlantUmlFacade.get().save(file.getAbsolutePath(), imageBytes);
+                } else {
+                    PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
+                            imageFormat, file.getAbsolutePath(), pathPrefix,
+                            UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
+
+                }
+
 
             } catch (IOException e1) {
                 String title = "Error Writing Diagram";
@@ -210,18 +231,6 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             return null;
         }
         return FileUtil.sanitizeFileName(filename);
-    }
-
-    protected String getDisplayedSource(Project project) {
-        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
-        return displayedItem.getSource();
-    }
-
-    private File getDisplayedSourceFile(Project project) {
-        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
-        return new File(displayedItem.getSourceFilePath());
     }
 
     @Override

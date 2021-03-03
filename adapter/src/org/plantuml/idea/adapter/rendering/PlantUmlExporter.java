@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.ex.VirtualFileManagerEx;
 import com.intellij.util.io.URLUtil;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
+import org.apache.commons.io.IOUtils;
 import org.plantuml.idea.adapter.Format;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -60,5 +61,16 @@ public class PlantUmlExporter {
         }
     }
 
-
+    public static void save(String path, byte[] imageBytes) {
+        try {
+            logger.debug("saving ", path);
+            try (FileOutputStream outputStream = new FileOutputStream(path)) {
+                IOUtils.write(imageBytes, outputStream);
+            }
+            VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
+            vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

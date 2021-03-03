@@ -2,13 +2,15 @@ package org.plantuml.idea.action.context;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
 
@@ -38,6 +40,8 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
         RenderRequest renderRequest = data.getRenderRequest();
         String selectedSource = renderRequest.getSource();
         File sourceFile = renderRequest.getSourceFile();
+        ImageItem imageItem = data.getImageItem();
+        byte[] imageBytes = imageItem.getImageBytes();
 
         String canonicalPath = null;
         try {
@@ -46,9 +50,16 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
             canonicalPath = file.getCanonicalPath();
             file.deleteOnExit();
 
-            PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
-                    imageFormat, file.getAbsolutePath(), null,
-                    UIUtils.getPlantUmlToolWindow(project).getZoom(), getPage(e));
+            if (data.getImageItem().getRenderingType() == RenderingType.REMOTE) {
+                if (imageItem.getFormat() != imageFormat) {
+                    throw new RuntimeException("wrong format");
+                }
+                PlantUmlFacade.get().save(file.getAbsolutePath(), imageBytes);
+            } else {
+                PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
+                        imageFormat, file.getAbsolutePath(), null,
+                        UIUtils.getPlantUmlToolWindow(project).getZoom(), getPage(e));
+            }
 
             Desktop.getDesktop().open(file);
         } catch (IOException ex) {
@@ -61,7 +72,14 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
         return data.getPage();
     }
 
-    private String getSource(Project project) {
-        return UIUtils.getSelectedSourceWithCaret(FileEditorManager.getInstance(project));
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
+            ImageItem imageItem = data.getImageItem();
+            RenderingType renderingType = imageItem.getRenderingType();
+            e.getPresentation().setEnabled(renderingType != RenderingType.REMOTE || imageItem.getFormat() == imageFormat);
+        }
     }
 }

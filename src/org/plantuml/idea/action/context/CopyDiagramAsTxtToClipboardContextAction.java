@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,7 @@ import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 
 import javax.swing.*;
@@ -46,6 +48,15 @@ public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
                 }
             } catch (UnsupportedEncodingException e1) {
             }
+        }
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
+            e.getPresentation().setEnabled(data != null && data.getImageItem().getRenderingType() != RenderingType.REMOTE);
         }
     }
 

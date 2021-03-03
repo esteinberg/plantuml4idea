@@ -3,6 +3,7 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.adapter.rendering.PlantUmlExporter;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.external.RemoteRenderer;
@@ -33,6 +34,11 @@ public class FacadeImpl implements PlantUmlFacade {
         }
         return Annotator.annotateSyntaxErrors(source, virtualFile);
     }
+             
+    @Override
+    public void save(String path, byte[] imageBytes) {
+         PlantUmlExporter.save(path, imageBytes);
+    }
 
     @Override
     public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom scaledZoom, int pageNumber) throws IOException {
@@ -59,4 +65,5 @@ public class FacadeImpl implements PlantUmlFacade {
     public String encode(String source) throws IOException {
         return Utils.encode(source);
     }
+
 }

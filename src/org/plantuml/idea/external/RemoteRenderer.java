@@ -36,7 +36,6 @@ public class RemoteRenderer {
 
             HttpRequest build = HttpRequest.newBuilder()
                     .uri(new URI(url))
-                    .version(HttpClient.Version.HTTP_2)
                     .GET()
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .build();

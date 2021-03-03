@@ -18,6 +18,7 @@ import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.toolwindow.Zoom;
 import org.plantuml.idea.toolwindow.image.links.LinkNavigator;
 import org.plantuml.idea.toolwindow.image.links.MyJLabel;
@@ -241,7 +242,9 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         //            ImageIO.write((BufferedImage)image, "png", new File(path + ".png"));
         //        
         //todo can't get it to transform to png
-
+        if (this.renderResult.getStrategy() == RenderingType.REMOTE) {
+            throw new RuntimeException("not implemented");
+        }
         RenderRequest rr = new RenderRequest(this.renderRequest, ImageFormat.PNG);
         Zoom zoom = UIUtils.getPlantUmlToolWindow(project).getZoom();
         rr.setZoom(zoom);

@@ -57,12 +57,6 @@ public class PlantUmlRendererUtil {
     }
 
 
-    public static void checkCancel() {
-        if (Thread.currentThread().isInterrupted()) {
-            throw new RenderingCancelledException();
-        }
-    }
-
     public static SourceStringReader newSourceStringReader(String source, RenderRequest renderRequest) {
         File file = renderRequest.getSourceFile();
         long start = System.currentTimeMillis();

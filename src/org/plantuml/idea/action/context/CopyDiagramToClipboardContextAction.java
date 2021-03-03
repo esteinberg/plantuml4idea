@@ -4,7 +4,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.toolwindow.image.ImageContainer;
 
 import java.awt.*;
@@ -55,6 +57,16 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
         });
         WindowManager.getInstance().getStatusBar(e.getProject()).setInfo("Image copied to clipboard");
 
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project != null) {
+            ImageContainer data = (ImageContainer) e.getData(ImageContainer.CONTEXT_COMPONENT);
+            boolean enabled = data != null && data.isPngAvailable();
+            e.getPresentation().setEnabled(enabled);
+        }
     }
 
 }

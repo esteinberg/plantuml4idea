@@ -23,8 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.util.*;
 
-import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.checkCancel;
-
 
 public class DiagramFactory {
     private static final Logger LOG = com.intellij.openapi.diagnostic.Logger.getInstance(DiagramFactory.class);
@@ -70,6 +68,12 @@ public class DiagramFactory {
         DiagramFactory diagramFactory = new DiagramFactory(myBlocks, totalPages);
         LOG.debug("diagramFactory done in ", System.currentTimeMillis() - start1, "ms");
         return diagramFactory;
+    }
+
+    public static void checkCancel() {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RenderingCancelledException();
+        }
     }
 
     public int getTotalPages() {
