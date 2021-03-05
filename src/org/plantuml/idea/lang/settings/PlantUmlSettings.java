@@ -80,6 +80,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String server = DEFAULT_SERVER;
     private boolean remoteRendering;
     private boolean useProxy;
+    private String serverClipboardLinkType = "uml";
 
     public static PlantUmlSettings getInstance() {
         if (Utils.isUnitTest()) {
@@ -447,5 +448,13 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setUseProxy(final boolean useProxy) {
         this.useProxy = useProxy;
+    }
+
+    public String getServerClipboardLinkType() {
+        return serverClipboardLinkType;
+    }
+
+    public void setServerClipboardLinkType(final String serverClipboardLinkType) {
+        this.serverClipboardLinkType = serverClipboardLinkType;
     }
 }

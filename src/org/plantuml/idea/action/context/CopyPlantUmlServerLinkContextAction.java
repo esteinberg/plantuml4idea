@@ -40,8 +40,10 @@ public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
 
             try {
                 String encoded = PlantUmlFacade.get().encode(source);
-                String serverUrl = PlantUmlSettings.getInstance().getServer();
-                CopyPasteManager.getInstance().setContents(new TextTransferable(serverUrl + "/plantuml/uml/" + encoded));
+                PlantUmlSettings instance = PlantUmlSettings.getInstance();
+                String serverUrl = instance.getServer();
+                String serverClipboardLinkType = instance.getServerClipboardLinkType();
+                CopyPasteManager.getInstance().setContents(new TextTransferable(serverUrl + "/plantuml/" + serverClipboardLinkType + "/" + encoded));
             } catch (Exception e1) {
                 throw new RuntimeException(e1);
             }

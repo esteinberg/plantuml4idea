@@ -72,6 +72,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox remoteRendering;
     private JCheckBox useProxy;
     private JButton reset;
+    private JTextField clipboardLinkType;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -263,6 +264,7 @@ public class PlantUmlSettingsPage implements Configurable {
         serverUrl.setText(data.getServer());
         remoteRendering.setSelected(data.isRemoteRendering());
         useProxy.setSelected(data.isUseProxy());
+        clipboardLinkType.setText(data.getServerClipboardLinkType());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -291,6 +293,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setServer(serverUrl.getText());
         data.setRemoteRendering(remoteRendering.isSelected());
         data.setUseProxy(useProxy.isSelected());
+        data.setServerClipboardLinkType(clipboardLinkType.getText());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -329,6 +332,8 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (remoteRendering.isSelected() != data.isRemoteRendering()) return true;
         if (useProxy.isSelected() != data.isUseProxy()) return true;
+        if (clipboardLinkType.getText() != null ? !clipboardLinkType.getText().equals(data.getServerClipboardLinkType()) : data.getServerClipboardLinkType() != null)
+            return true;
         return false;
     }
 }
