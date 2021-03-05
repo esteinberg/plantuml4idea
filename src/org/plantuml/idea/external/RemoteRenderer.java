@@ -31,8 +31,8 @@ public class RemoteRenderer {
         try {
 
             String encoded = PlantUmlFacade.get().encode(source);
-            String type = displaySvg ? "/plantuml/svg/" : "/plantuml/png/";
-            String url = plantUmlSettings.getServer() + type + encoded;
+            String type = displaySvg ? "/svg/" : "/png/";
+            String url = plantUmlSettings.getServerPrefix() + type + encoded;
             LOG.debug("url: ", url);
 
             HttpRequest build = HttpRequest.newBuilder()

@@ -39,7 +39,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
     private static final int SVG_SIZE = 16384;
-    public static final String DEFAULT_SERVER = "http://www.plantuml.com";
+    public static final String DEFAULT_SERVER = "http://www.plantuml.com/plantuml";
 
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;
@@ -77,7 +77,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean highlightInImages = false;
     private String maxSvgSize = String.valueOf(SVG_SIZE);
     private boolean svgPreviewScaling = true;
-    private String server = DEFAULT_SERVER;
+    private String serverPrefix = DEFAULT_SERVER;
     private boolean remoteRendering;
     private boolean useProxy;
     private String serverClipboardLinkType = "uml";
@@ -417,21 +417,21 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         this.svgPreviewScaling = svgPreviewScaling;
     }
 
-    public String getServer() {
-        if (TextUtils.isBlank(server)) {
-            server = DEFAULT_SERVER;
+    public String getServerPrefix() {
+        if (TextUtils.isBlank(serverPrefix)) {
+            serverPrefix = DEFAULT_SERVER;
         }
-        if (!server.startsWith("http")) {
-            server = "http://" + server;
+        if (!serverPrefix.startsWith("http")) {
+            serverPrefix = "http://" + serverPrefix;
         }
-        if (server.endsWith("/")) {
-            server = server.substring(0, server.length() - 1);
+        if (serverPrefix.endsWith("/")) {
+            serverPrefix = serverPrefix.substring(0, serverPrefix.length() - 1);
         }
-        return server;
+        return serverPrefix;
     }
 
-    public void setServer(final String server) {
-        this.server = server;
+    public void setServerPrefix(final String serverPrefix) {
+        this.serverPrefix = serverPrefix;
     }
 
     public boolean isRemoteRendering() {

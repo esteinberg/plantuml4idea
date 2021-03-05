@@ -261,7 +261,7 @@ public class PlantUmlSettingsPage implements Configurable {
         highlightInImages.setSelected(data.isHighlightInImages());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         insertPair.setSelected(data.isInsertPair());
-        serverUrl.setText(data.getServer());
+        serverUrl.setText(data.getServerPrefix());
         remoteRendering.setSelected(data.isRemoteRendering());
         useProxy.setSelected(data.isUseProxy());
         clipboardLinkType.setText(data.getServerClipboardLinkType());
@@ -290,7 +290,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setHighlightInImages(highlightInImages.isSelected());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setInsertPair(insertPair.isSelected());
-        data.setServer(serverUrl.getText());
+        data.setServerPrefix(serverUrl.getText());
         data.setRemoteRendering(remoteRendering.isSelected());
         data.setUseProxy(useProxy.isSelected());
         data.setServerClipboardLinkType(clipboardLinkType.getText());
@@ -328,7 +328,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
-        if (serverUrl.getText() != null ? !serverUrl.getText().equals(data.getServer()) : data.getServer() != null)
+        if (serverUrl.getText() != null ? !serverUrl.getText().equals(data.getServerPrefix()) : data.getServerPrefix() != null)
             return true;
         if (remoteRendering.isSelected() != data.isRemoteRendering()) return true;
         if (useProxy.isSelected() != data.isUseProxy()) return true;
