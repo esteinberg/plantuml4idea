@@ -67,7 +67,7 @@ public class RemoteRenderer {
             if (out.length == 0) {
                 URI uri = response.uri();
                 String statusText = HttpStatus.getStatusText(statusCode);
-                runtimeException = new RuntimeException(statusCode + ": " + statusText + "; uri=" + uri + "\nresponseHheaders=" + headers + "\nResponse Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons.");
+                runtimeException = new RuntimeException(statusCode + ": " + statusText + "; uri=" + uri + "\nresponseHeaders=" + headers + "\nResponse Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons.");
             }
             byte[] bytes;
             byte[] svgBytes;
@@ -78,14 +78,15 @@ public class RemoteRenderer {
                 bytes = out;
                 svgBytes = null;
             }
-            String description = statusCode >= 400 || runtimeException != null ? "(Error)" : "OK";
+            String description = statusCode >= 400 || runtimeException != null ? ImageItem.ERROR : "OK";
 
             RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
             renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
             return renderResult;
         } catch (Throwable e) {
+            LOG.warn(e);
             RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, "(Error)", null, null, RenderingType.REMOTE, null, null, e));
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e));
             return renderResult;
         } finally {
             LOG.debug("render done in ", System.currentTimeMillis() - start, "ms");

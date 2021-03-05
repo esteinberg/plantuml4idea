@@ -4,6 +4,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
 import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
+import org.plantuml.idea.rendering.RenderCommand;
+import org.plantuml.idea.util.UIUtils;
 
 public class RemoteRenderingToggleAction extends ToggleAction implements DumbAware {
 
@@ -15,5 +18,6 @@ public class RemoteRenderingToggleAction extends ToggleAction implements DumbAwa
     @Override
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setRemoteRendering(b);
+        UIUtils.renderPlantUmlToolWindowLater(getEventProject(anActionEvent), LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
     }
 }

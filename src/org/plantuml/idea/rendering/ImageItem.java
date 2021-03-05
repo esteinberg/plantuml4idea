@@ -32,6 +32,7 @@ import java.util.List;
 import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
 public class ImageItem {
+    public static final String ERROR = "(Error)";
     private static final Logger LOG = Logger.getInstance(ImageItem.class);
 
     private final int page;
@@ -166,7 +167,7 @@ public class ImageItem {
 
     public boolean hasError() {
         String description = getDescription();
-        if (description == null || description.isEmpty() || "(Error)".equals(description)) {
+        if (description == null || description.isEmpty() || ImageItem.ERROR.equals(description)) {
             return true;
         }
         return false;

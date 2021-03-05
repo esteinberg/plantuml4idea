@@ -42,6 +42,9 @@ public class FacadeImpl implements PlantUmlFacade {
 
     @Override
     public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom scaledZoom, int pageNumber) throws IOException {
+        if (PlantUmlSettings.getInstance().isRemoteRendering()) {
+            throw new RuntimeException("Report this and disable Remote Rendering");
+        }
         RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, scaledZoom, -1, false, null);
         PlantUmlRendererUtil.renderAndSave(renderRequest, path, pathPrefix);
     }

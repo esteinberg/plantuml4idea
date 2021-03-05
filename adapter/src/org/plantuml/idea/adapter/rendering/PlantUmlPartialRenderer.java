@@ -127,7 +127,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             throw e;
         }
 
-        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, "(Error)", os.toByteArray(), null, RenderingType.PARTIAL, null, null, null));
+        renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), null, 0, ImageItem.ERROR, os.toByteArray(), null, RenderingType.PARTIAL, null, null, null));
         return renderResult;
     }
 

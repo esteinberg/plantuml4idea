@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>4.5.0</version>
+    <version>4.5.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
@@ -12,7 +12,7 @@
         <![CDATA[        
             <p>4.5<p>
             <ul>
-              <li>Remote rendering</li>
+              <li>Remote rendering using PlantUML server</li>
             </ul>      
             <p>4.4<p>
             <ul>
