@@ -43,13 +43,10 @@ import static org.plantuml.idea.util.UIUtils.notification;
 public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
     public static VirtualFile homeDir = null;
-    //    private static VirtualFile lastDir = null;
     public static final String FILENAME = "diagram";
     Logger logger = Logger.getInstance(SaveDiagramToFileAction.class);
 
     static {
-
-
         homeDir = LocalFileSystem.getInstance().findFileByPath(System.getProperty("user.home"));
     }
 
@@ -66,6 +63,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
         RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+        PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
 
         String selectedSource = displayedItem.getSource();
         File sourceFile = new File(displayedItem.getSourceFilePath());
@@ -76,13 +74,19 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             Notifications.Bus.notify(notification().createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
-        ImageFormat format = remote ? displayedItem.getRenderRequest().getFormat() : PlantUmlSettings.getInstance().getDefaultExportFileFormatEnum();
+        ImageFormat format = remote ? displayedItem.getRenderRequest().getFormat() : plantUmlSettings.getDefaultExportFileFormatEnum();
         String defaultExtension = format.name().toLowerCase();
 
         String[] extensions = remote ? new String[]{format.name().toLowerCase()} : getExtensions(defaultExtension);
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save Diagram", "Please choose where to save diagram", extensions);
 
-        VirtualFile baseDir = LocalFileSystem.getInstance().findFileByIoFile(sourceFile.getParentFile());
+        VirtualFile baseDir = null;
+        if (plantUmlSettings.isRememberLastExportDir() && plantUmlSettings.getLastExportDir() != null) {
+            baseDir = LocalFileSystem.getInstance().findFileByPath(plantUmlSettings.getLastExportDir());
+        }
+        if (baseDir == null) {
+            baseDir = LocalFileSystem.getInstance().findFileByIoFile(sourceFile.getParentFile());
+        }
         if (baseDir == null) {
             if (project == null) {
                 baseDir = homeDir;
@@ -98,11 +102,15 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             try {
                 File file = wrapper.getFile();
 
-//                File parentDir = file.getParentFile();
-//                if (parentDir != null && parentDir.exists()) {
-//                    lastDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(parentDir);
-//                    logger.info("lastDir set to " + lastDir);
-//                }
+                if (plantUmlSettings.isRememberLastExportDir()) {
+                    File parentDir = file.getParentFile();
+                    if (parentDir != null && parentDir.exists()) {
+                        plantUmlSettings.setLastExportDir(parentDir.getAbsolutePath());
+                        logger.debug("lastDir set to " + parentDir.getAbsolutePath());
+                    }
+                } else {
+                    plantUmlSettings.setLastExportDir(null);
+                }
 
                 String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String pathPrefix = tokens[0];

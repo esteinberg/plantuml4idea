@@ -82,6 +82,9 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean useProxy;
     private String serverClipboardLinkType = "uml";
 
+    private boolean rememberLastExportDir;
+    private String lastExportDir = null;
+
     public static PlantUmlSettings getInstance() {
         if (Utils.isUnitTest()) {
             return new PlantUmlSettings();
@@ -456,5 +459,21 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setServerClipboardLinkType(final String serverClipboardLinkType) {
         this.serverClipboardLinkType = serverClipboardLinkType;
+    }
+
+    public boolean isRememberLastExportDir() {
+        return rememberLastExportDir;
+    }
+
+    public void setRememberLastExportDir(final boolean rememberLastExportDir) {
+        this.rememberLastExportDir = rememberLastExportDir;
+    }
+
+    public String getLastExportDir() {
+        return lastExportDir;
+    }
+
+    public void setLastExportDir(String lastExportDir) {
+        this.lastExportDir = lastExportDir;
     }
 }

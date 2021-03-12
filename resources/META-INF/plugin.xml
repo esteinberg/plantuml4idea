@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>4.5.3</version>
+    <version>4.6.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
@@ -10,6 +10,10 @@
 
     <change-notes>
         <![CDATA[        
+            <p>4.6<p>
+            <ul>
+              <li>Added option: Remember last export directory</li>
+            </ul>    
             <p>4.5<p>
             <ul>
               <li>Remote rendering using PlantUML server</li>

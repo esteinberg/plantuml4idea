@@ -36,8 +36,8 @@ public class PlantUmlSettingsPage implements Configurable {
 
     private JPanel panel;
     private JTextField textFieldDotExecutable;
-    private JCheckBox plantUMLErrorAnnotationExperimentalCheckBox;
-    private JButton browse;
+    private JCheckBox syntaxCheck;
+    private JButton textFieldDotExecutableBrowse;
     private JTextField renderDelay;
     private JTextField cacheSize;
     private JCheckBox renderLinksPng;
@@ -50,7 +50,6 @@ public class PlantUmlSettingsPage implements Configurable {
     private JTextArea includePaths;
     private JTextField customPlantumlJar;
     private JButton browseCustomPlantumlJar;
-    private JLabel plantumlJarLabel;
     private JRadioButton bundledPlantUMLRadioButton;
     private JCheckBox switchToBundledAfterUpdate;
     private JRadioButton customPlantUMLRadioButton;
@@ -73,6 +72,15 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox useProxy;
     private JButton reset;
     private JTextField clipboardLinkType;
+    private JLabel includePathsL1;
+    private JLabel includePathsL2;
+    private JLabel includePathsL3;
+    private JLabel configL1;
+    private JLabel configL2;
+    private JLabel configL3;
+    private JLabel plantumlLimitSizeLabel;
+    private JCheckBox rememberLastExportDir;
+    private JLabel textFieldDotExecutableL;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -94,7 +102,7 @@ public class PlantUmlSettingsPage implements Configurable {
         reset.addActionListener(e -> {
             serverUrl.setText(PlantUmlSettings.DEFAULT_SERVER);
         });
-        browse.addActionListener(e -> browseForFile(textFieldDotExecutable));
+        textFieldDotExecutableBrowse.addActionListener(e -> browseForFile(textFieldDotExecutable));
         browseCustomPlantumlJar.addActionListener(e -> browseForjar(customPlantumlJar));
         web.setVisible(Desktop.isDesktopSupported());
         web.addActionListener(e -> {
@@ -144,6 +152,7 @@ public class PlantUmlSettingsPage implements Configurable {
 
     private void updateComponents() {
         DialogUtils.disableByAny(new JComponent[]{renderLinksPng}, displaySvg);
+        DialogUtils.disableByAny(new JComponent[]{syntaxCheck, textFieldDotExecutableL, textFieldDotExecutableBrowse, plantumlLimitSizeLabel, configL1, configL2, configL3, configExample, includePathsL1, includePathsL2, includePathsL3, includePaths, config, PLANTUML_LIMIT_SIZE, usePreferentiallyGRAPHIZ_DOT, textFieldDotExecutable,}, remoteRendering);
         DialogUtils.enabledByAny(new JComponent[]{svgPreviewScaling, svgPreviewLimitLabel, maxSvgSize}, displaySvg);
         DialogUtils.enabledByAny(new JComponent[]{highlightInImages, linkOpensSearchBar, showUrlLinksBorder}, displaySvg, renderLinksPng);
     }
@@ -254,13 +263,14 @@ public class PlantUmlSettingsPage implements Configurable {
         grammarSupport.setSelected(data.isUseGrammar());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
         displaySvg.setSelected(data.isDisplaySvg());
-        plantUMLErrorAnnotationExperimentalCheckBox.setSelected(data.isErrorAnnotationEnabled());
+        syntaxCheck.setSelected(data.isErrorAnnotationEnabled());
         svgPreviewScaling.setSelected(data.isSvgPreviewScaling());
         renderLinksPng.setSelected(data.isRenderLinks());
         linkOpensSearchBar.setSelected(data.isLinkOpensSearchBar());
         highlightInImages.setSelected(data.isHighlightInImages());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         insertPair.setSelected(data.isInsertPair());
+        rememberLastExportDir.setSelected(data.isRememberLastExportDir());
         serverUrl.setText(data.getServerPrefix());
         remoteRendering.setSelected(data.isRemoteRendering());
         useProxy.setSelected(data.isUseProxy());
@@ -283,13 +293,14 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setUseGrammar(grammarSupport.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
         data.setDisplaySvg(displaySvg.isSelected());
-        data.setErrorAnnotationEnabled(plantUMLErrorAnnotationExperimentalCheckBox.isSelected());
+        data.setErrorAnnotationEnabled(syntaxCheck.isSelected());
         data.setSvgPreviewScaling(svgPreviewScaling.isSelected());
         data.setRenderLinks(renderLinksPng.isSelected());
         data.setLinkOpensSearchBar(linkOpensSearchBar.isSelected());
         data.setHighlightInImages(highlightInImages.isSelected());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setInsertPair(insertPair.isSelected());
+        data.setRememberLastExportDir(rememberLastExportDir.isSelected());
         data.setServerPrefix(serverUrl.getText());
         data.setRemoteRendering(remoteRendering.isSelected());
         data.setUseProxy(useProxy.isSelected());
@@ -321,13 +332,14 @@ public class PlantUmlSettingsPage implements Configurable {
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;
         if (displaySvg.isSelected() != data.isDisplaySvg()) return true;
-        if (plantUMLErrorAnnotationExperimentalCheckBox.isSelected() != data.isErrorAnnotationEnabled()) return true;
+        if (syntaxCheck.isSelected() != data.isErrorAnnotationEnabled()) return true;
         if (svgPreviewScaling.isSelected() != data.isSvgPreviewScaling()) return true;
         if (renderLinksPng.isSelected() != data.isRenderLinks()) return true;
         if (linkOpensSearchBar.isSelected() != data.isLinkOpensSearchBar()) return true;
         if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
+        if (rememberLastExportDir.isSelected() != data.isRememberLastExportDir()) return true;
         if (serverUrl.getText() != null ? !serverUrl.getText().equals(data.getServerPrefix()) : data.getServerPrefix() != null)
             return true;
         if (remoteRendering.isSelected() != data.isRemoteRendering()) return true;
