@@ -153,6 +153,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private void updateComponents() {
         DialogUtils.disableByAny(new JComponent[]{renderLinksPng}, displaySvg);
         DialogUtils.disableByAny(new JComponent[]{syntaxCheck, textFieldDotExecutableL, textFieldDotExecutableBrowse, plantumlLimitSizeLabel, configL1, configL2, configL3, configExample, includePathsL1, includePathsL2, includePathsL3, includePaths, config, PLANTUML_LIMIT_SIZE, usePreferentiallyGRAPHIZ_DOT, textFieldDotExecutable,}, remoteRendering);
+        DialogUtils.enabledByAny(new JComponent[]{useProxy}, remoteRendering);
         DialogUtils.enabledByAny(new JComponent[]{svgPreviewScaling, svgPreviewLimitLabel, maxSvgSize}, displaySvg);
         DialogUtils.enabledByAny(new JComponent[]{highlightInImages, linkOpensSearchBar, showUrlLinksBorder}, displaySvg, renderLinksPng);
     }
