@@ -1,7 +1,10 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.io.IOUtil;
+import net.sourceforge.plantuml.png.MetadataTag;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.rendering.PlantUmlExporter;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
@@ -17,6 +20,7 @@ import org.plantuml.idea.toolwindow.Zoom;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -38,6 +42,24 @@ public class FacadeImpl implements PlantUmlFacade {
     @Override
     public void save(String path, byte[] imageBytes) {
          PlantUmlExporter.save(path, imageBytes);
+    }
+
+    @Override
+    public String extractEmbeddedSourceFromImage(VirtualFile file) {
+        try {
+            // based on https://github.com/plantuml/plantuml-server/blob/f4f6ca5773869c7f77b23f6004bea45e3954600f/src/main/java/net/sourceforge/plantuml/servlet/PlantUmlServlet.java#L79
+            // https://plantuml.com/de/server#metadata
+            File img = VfsUtil.virtualToIoFile(file);
+            MetadataTag metadataTag = new MetadataTag(img, "plantuml");
+            String data = metadataTag.getData();
+            if (data != null) {
+                return data;
+            }
+        } catch (IOException e) {
+            //TODO handle exception
+        }
+
+        return null;
     }
 
     @Override

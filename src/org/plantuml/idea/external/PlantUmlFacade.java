@@ -32,4 +32,6 @@ public interface PlantUmlFacade {
     String encode(String source) throws IOException;
 
     void save(String path, byte[] imageBytes);
+
+    String extractEmbeddedSourceFromImage(VirtualFile file);
 }

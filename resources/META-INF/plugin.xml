@@ -206,6 +206,11 @@
             <action id="NewPlantUMLFile" class="org.plantuml.idea.plantuml.CreatePlantUMLFileAction"/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
         </group>
+        <action id="extractEmbeddedPlantumlSourcesFromPNG"
+                class="org.plantuml.idea.action.context.ExtractEmbeddedSourcesFromPNGAction"
+                text="Extract PlantUML Source" description="Extracts the embedded source code from PlantUML images">
+            <add-to-group group-id="Images.EditorPopupMenu" anchor="first"/>
+        </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
