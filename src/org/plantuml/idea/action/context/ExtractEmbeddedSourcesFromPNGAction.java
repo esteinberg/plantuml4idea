@@ -1,14 +1,17 @@
 package org.plantuml.idea.action.context;
 
 import com.intellij.ide.scratch.ScratchRootType;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.SourceExtractor;
 
-public class ExtractEmbeddedSourcesFromPNGAction extends AnAction {
+public class ExtractEmbeddedSourcesFromPNGAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
@@ -32,6 +35,8 @@ public class ExtractEmbeddedSourcesFromPNGAction extends AnAction {
             if (scratchFile != null) {
                 FileEditorManager.getInstance(project).openFile(scratchFile, true);
             }
+        } else {
+            Messages.showErrorDialog(project, "Image does not contain PlantUML metadata.", "Extract PlantUML Source");
         }
     }
 }

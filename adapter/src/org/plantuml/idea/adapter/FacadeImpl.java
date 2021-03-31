@@ -56,7 +56,7 @@ public class FacadeImpl implements PlantUmlFacade {
                 return data;
             }
         } catch (IOException e) {
-            //TODO handle exception
+            throw new RuntimeException(e);
         }
 
         return null;
