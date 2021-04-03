@@ -55,11 +55,11 @@ public class UIUtils {
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             int offset = selectedTextEditor.getCaretModel().getOffset();
-            source = SourceExtractor.extractSource(document.getText(), offset);
+            source = SourceExtractor.extractSource(document, offset);
         } else {
             Document selectedDocument = getSelectedDocument(instance);
             if (selectedDocument != null) {
-                source = SourceExtractor.extractSource(selectedDocument.getText(), 0);
+                source = SourceExtractor.extractSource(selectedDocument, 0);
             }
         }
         return source;
