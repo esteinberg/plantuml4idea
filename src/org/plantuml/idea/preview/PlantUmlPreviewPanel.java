@@ -99,7 +99,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             @Override
             public void run() {
                 renderCache.clear();
-                if (displayedItem != null && !PlantUmlPreviewPanel.this.isVisible()) {
+                if (displayedItem != null && !PlantUmlPreviewPanel.this.isPreviewVisible()) {
                     displayedItem = null;
                     imagesPanel.removeAll();
                     imagesPanel.add(new JLabel("Low memory detected, cache and images cleared. Go to PlantUML plugin settings and set lower cache size, or increase IDE heap size (-Xmx)."));
@@ -235,7 +235,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private Alarm myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
     public void processRequest(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
-        if (!isVisible()) {
+        if (!isPreviewVisible()) {
             logger.debug("", this, " not visible, aborting");
             return;
         }
@@ -310,6 +310,21 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
         int i = myAlarm.cancelAllRequests();
         myAlarm.addRequest(Utils.logDuration("EDT processRequest", renderRunnable), delay == NOW ? 0 : 10);
+    }
+
+    public boolean isPreviewVisible() {
+        // visible = preview is enabled
+        // displayable = editor window is visible as it is the active editor in a group
+        return isVisible() && isDisplayable();
+    }
+
+    /**
+     * use #isPreviewVisible
+     */
+    @Deprecated
+    @Override
+    public boolean isVisible() {
+        return super.isVisible();
     }
 
     private boolean isDisplayed(RenderCacheItem cachedItem, int page, RenderCacheItem displayedItem) {

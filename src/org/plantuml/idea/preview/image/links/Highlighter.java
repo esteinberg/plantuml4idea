@@ -37,7 +37,7 @@ public class Highlighter {
     }
 
     public void highlightImages(PlantUmlPreviewPanel previewPanel, Editor editor) {
-        if (editor == null || editor.getProject() == null || !previewPanel.isVisible()) {
+        if (editor == null || editor.getProject() == null || !previewPanel.isPreviewVisible()) {
             return;
         }
         myAlarm.cancelAllRequests();

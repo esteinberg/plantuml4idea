@@ -45,10 +45,6 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
         plantUmlPreview.processRequest(delay, reason);
     }
 
-    public boolean isVisible() {
-        return getComponent().isVisible() && getComponent().isDisplayable();
-    }
-
     public PlantUmlPreviewPanel getPlantUmlPreview() {
         return plantUmlPreview;
     }

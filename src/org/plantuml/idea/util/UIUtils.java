@@ -243,10 +243,10 @@ public class UIUtils {
         if (userData != null) {
             plantUmlPreview = userData.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL);
         }
-        if (plantUmlPreview == null || !plantUmlPreview.isVisible()) {
+        if (plantUmlPreview == null || !plantUmlPreview.isPreviewVisible()) {
             plantUmlPreview = getPlantUmlToolWindow(project);
         }
-        if (plantUmlPreview == null || !plantUmlPreview.isVisible()) {
+        if (plantUmlPreview == null || !plantUmlPreview.isPreviewVisible()) {
             return null;
         }
         return plantUmlPreview;
