@@ -55,6 +55,7 @@ public class ImageItem {
     private Throwable exception;
 
     private final Map<PlantUmlPreviewPanel, ImageItemComponent> componentMap = new HashMap<>();
+    private BufferedImage bufferedImage;
 
     public ImageItem(@Nullable File baseDir,
                      @NotNull ImageFormat format,
@@ -180,20 +181,30 @@ public class ImageItem {
         if (imageItemComponent.isNull() && hasImageBytes()) {
             long start = System.currentTimeMillis();
             if (format == ImageFormat.PNG) {
-                try {
-                    imageItemComponent.image = Utils.getBufferedImage(getImageBytes());
-                    if (imageItemComponent.image == null) {
-                        LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                initPng(imageItemComponent);
             } else if (format == ImageFormat.SVG) {
                 imageItemComponent.editor = ImageContainerSvg.initEditor(previewPanel, this, project, renderRequest, renderResult);
             }
             LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
         }
         return imageItemComponent;
+    }
+
+    /**
+     * it seems that BufferedImage can be shared in multiple components
+     */
+    private synchronized void initPng(ImageItemComponent imageItemComponent) {
+        try {
+            if (bufferedImage == null) {
+                bufferedImage = Utils.getBufferedImage(getImageBytes());
+            }
+            imageItemComponent.image = bufferedImage;
+            if (imageItemComponent.image == null) {
+                LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public MyImageEditorImpl getEditor(PlantUmlPreviewPanel previewPanel, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {

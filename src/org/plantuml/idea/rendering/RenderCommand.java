@@ -154,7 +154,7 @@ public class RenderCommand {
                 });
 
                 long totalTime = System.currentTimeMillis() - start;
-                logger.debug("initImages for ", targets.size(), " targets ", (System.currentTimeMillis() - s2), "ms");
+                logger.debug("initImages done in ", (System.currentTimeMillis() - s2), "ms, for: ", target);
 
 
                 SwingUtilities.invokeLater(logDuration("EDT displayResult", () -> {
