@@ -1,11 +1,17 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ConcurrencyUtil;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.ExecutionStatusPanel;
+import org.plantuml.idea.preview.ExecutionStatusPanel;
 
-import java.util.concurrent.*;
+import java.util.Comparator;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -18,139 +24,121 @@ import java.util.concurrent.*;
  */
 public class LazyApplicationPoolExecutor {
     public static final Logger logger = Logger.getInstance(LazyApplicationPoolExecutor.class);
-    private static ExecutorService myService = newExecutor();
 
-    @NotNull
-    private static ThreadPoolExecutor newExecutor() {
-        return new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML integration plugin", true, Thread.NORM_PRIORITY));
-    }
+    private TreeSet<RenderCommand> queue = new TreeSet<>(new Comparator<RenderCommand>() {
+        @Override
+        public int compare(RenderCommand t0, RenderCommand t1) {
+            int compare = Long.compare(t0.getStartAtNanos(), t1.startAtNanos);
+            if (compare == 0) {
+                compare = t0.version - t1.version;
+            }
+            return compare;
+        }
+    });
+    private ExecutorService executor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML deduplicator executor", true, Thread.NORM_PRIORITY));
 
-
-    protected static final int MILLION = 1000000;
-    private final ExecutionStatusPanel executionStatusPanel;
-
-    protected RenderCommand nextCommand;
-    protected long startAfterNanos;
-
-    protected Future<?> future;
-    protected long delayNanos; // delay between command executions
     protected final Object POOL_THREAD_STICK = new Object();
 
-    public LazyApplicationPoolExecutor(int delayMillis, @NotNull ExecutionStatusPanel executionStatusPanel) {
-        this.executionStatusPanel = executionStatusPanel;
-        setDelay(delayMillis);
-        startAfterNanos = 0;
+    @NotNull
+    public static LazyApplicationPoolExecutor getInstance() {
+        return ServiceManager.getService(LazyApplicationPoolExecutor.class);
     }
 
-    public void setDelay(long delayMillis) {
-        this.delayNanos = delayMillis * MILLION;
-        logger.debug("settings delayNanos=", delayNanos);
-        setStartAfter();
-        synchronized (POOL_THREAD_STICK) {
-            POOL_THREAD_STICK.notifyAll();
-        }
-    }
 
     /**
      * Lazily executes the RenderCommand. Command will be queued for execution, but can be swallowed by another command
      * if it will be submitted before this command will be scheduled for execution
      *
-     * @param command command to be executed.
+     * @param newCommand command to be executed.
      */
-    public synchronized void execute(@NotNull final RenderCommand command) {
-        Delay delay = command.delay;
-        logger.debug("#execute ", delay, " ", command);
-        nextCommand = command;
-
-        if (delay == Delay.RESET_DELAY) {
-            setStartAfter();
-        } else if (delay == Delay.NOW) {
-            startAfterNanos = 0;
-            synchronized (POOL_THREAD_STICK) {
-                POOL_THREAD_STICK.notifyAll();
+    public synchronized void submit(@NotNull final RenderCommand newCommand) {
+        logger.debug("#submit ", newCommand);
+        for (RenderCommand command : queue) {
+            if (
+//                    newCommand.reason != RenderCommand.Reason.REFRESH && newCommand.reason != RenderCommand.Reason.INCLUDES &&
+                    command.isSame(newCommand)) {
+                logger.debug("adding targets ", newCommand.getTargets(), " to ", command);
+                command.addTargets(newCommand.getTargets());
+                return;
+            } else if (command.containsTargets(newCommand.getTargets())) {
+                logger.debug("replacing command ", command);
+                newCommand.addTargets(command.getTargets());
+                queue.remove(command);
+                addToQueue(newCommand);
+                return;
             }
         }
+        addToQueue(newCommand);
+    }
 
-        if (future == null || future.isDone()) {
-            scheduleNext(null);
-        } else if (command.reason == RenderCommand.Reason.REFRESH) {
-            // TODO  https://forum.plantuml.net/9921/detecting-stacktrace-illegalstateexception-timeout4-timeout
-//            future.cancel(true);   
+    private void addToQueue(@NotNull RenderCommand newCommand) {
+        logger.debug("adding to queue ", newCommand);
+        boolean add = queue.add(newCommand);
+        newCommand.updateState(ExecutionStatusPanel.State.WAITING);
+        synchronized (POOL_THREAD_STICK) {
+            POOL_THREAD_STICK.notifyAll();
         }
+        scheduleNext();
     }
 
-    private synchronized void setStartAfter() {
-        startAfterNanos = System.nanoTime() + this.delayNanos;
-    }
-
-    private synchronized long getRemainingDelayMillis() {
-        return (startAfterNanos - System.nanoTime()) / MILLION;
-    }
-
-    private synchronized RenderCommand pollCommand() {
-        RenderCommand next = LazyApplicationPoolExecutor.this.nextCommand;
-        LazyApplicationPoolExecutor.this.nextCommand = null;
+    private synchronized RenderCommand next() {
         Thread.interrupted(); //clear flag
-        return next;
+        return queue.first();
     }
 
-    private synchronized void scheduleNext(final RenderCommand previousCommand) {
+    private synchronized void scheduleNext() {
         logger.debug("scheduleNext");
-        if (previousCommand != null && nextCommand != null && nextCommand.reason != RenderCommand.Reason.INCLUDES && nextCommand.reason != RenderCommand.Reason.REFRESH) {
-            if (previousCommand.page == nextCommand.page
-                    && previousCommand.zoom.equals(nextCommand.zoom)
-                    && previousCommand.sourceFilePath.equals(nextCommand.sourceFilePath)
-                    && previousCommand.source.equals(nextCommand.source)) {
-                logger.debug("nextCommand is same as previous, skipping");
-                nextCommand = null;
-            }
-        }
-
-
-        if (nextCommand != null) {
-            future = myService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    executionStatusPanel.update(ExecutionStatusPanel.State.WAITING);
-                    RenderCommand polledCommand = null;
-                    try {
-                        long delayRemaining = getRemainingDelayMillis();
-                        while (delayRemaining - 5 > 0) {//tolerance
-                            logger.debug("waiting ", delayRemaining, "ms");
-                            synchronized (POOL_THREAD_STICK) {
-                                POOL_THREAD_STICK.wait(delayRemaining);
-                            }
-                            delayRemaining = getRemainingDelayMillis();
-                        }
-
-                        polledCommand = pollCommand();
-                        if (polledCommand != null) {
-                            logger.debug("running command ", polledCommand);
-                            long start = System.currentTimeMillis();
-                            polledCommand.run();
-                            logger.debug("command executed in ", System.currentTimeMillis() - start, "ms");
-                            setStartAfter();
-                        }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                    } finally {
-                        scheduleNext(polledCommand); //needed to execute the very last command
-                    }
-                }
-
-            });
-        }
-    }
-
-    public synchronized void cancel() {
-        logger.debug("cancelling rendering: ", future);
-        nextCommand = null;
-        future.cancel(false);
+        executor.submit(new MyRunnable());
     }
 
     public enum Delay {
         RESET_DELAY,
         NOW,
         MAYBE_WITH_DELAY;
+
+    }
+
+    private class MyRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            RenderCommand command = next();
+            while (command != null) {
+                try {
+                    long delayRemaining = command.getRemainingDelayMillis();
+                    if (delayRemaining - 5 > 0) {//tolerance
+                        logger.debug("waiting ", delayRemaining, "ms");
+                        synchronized (POOL_THREAD_STICK) {
+                            POOL_THREAD_STICK.wait(delayRemaining);
+                        }
+                        command = next();
+                        continue;
+                    }
+                } catch (InterruptedException e) {
+                    command = next();
+                    continue;
+                }
+                try {
+                    logger.debug("running command ", command);
+                    long start = System.currentTimeMillis();
+                    command.render();
+                    removeFromQueue(command);
+                    command.displayResult();
+                    logger.debug("command executed in ", System.currentTimeMillis() - start, "ms");
+                } catch (Throwable e) {
+                    logger.error(e);
+                } finally {
+                    queue.remove(command);
+                    command = next();
+                }
+            }
+        }
+
+
+    }
+
+    private synchronized void removeFromQueue(RenderCommand command) {
+        logger.debug("removing from queue ", command);
+        queue.remove(command);
     }
 }

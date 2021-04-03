@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.WindowManager;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
+import org.plantuml.idea.preview.image.ImageContainer;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -31,7 +31,7 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
         if (data == null) {
             return;
         }
-        final Image image = data.getPngImage();
+        final Image image = data.getPngImage(e);
         CopyPasteManager.getInstance().setContents(new Transferable() {
 
             @Override

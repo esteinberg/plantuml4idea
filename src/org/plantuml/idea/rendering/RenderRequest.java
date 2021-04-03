@@ -4,7 +4,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.plantuml.ImageFormat;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;

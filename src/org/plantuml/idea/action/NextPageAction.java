@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.util.UIUtils;
 
 /**
@@ -16,9 +16,9 @@ public class NextPageAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
         if (project != null) {
-            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-            if (plantUmlToolWindow != null)
-                plantUmlToolWindow.nextPage();
+            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(anActionEvent);
+            if (previewPanel != null)
+                previewPanel.nextPage();
         }
     }
 
@@ -26,9 +26,9 @@ public class NextPageAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-            if (plantUmlToolWindow != null)
-                e.getPresentation().setEnabled(plantUmlToolWindow.getNumPages() > 1);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(e);
+            if (previewPanel != null)
+                e.getPresentation().setEnabled(previewPanel.getNumPages() > 1);
         }
     }
 }

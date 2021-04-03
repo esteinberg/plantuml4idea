@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.grammar.PumlLexerAdapter;
 import org.plantuml.idea.grammar.parser.PumlParser;
 import org.plantuml.idea.grammar.psi.PumlTypes;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 /**
  * @author Eugene Steinberg

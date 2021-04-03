@@ -6,8 +6,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
+import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
 public class ImageHighlightToggleAction extends ToggleAction implements DumbAware {
@@ -21,8 +21,8 @@ public class ImageHighlightToggleAction extends ToggleAction implements DumbAwar
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setHighlightInImages(b);
         Project project = anActionEvent.getProject();
-        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(anActionEvent);
         Editor selectedTextEditor = UIUtils.getSelectedTextEditor(FileEditorManager.getInstance(project));
-        plantUmlToolWindow.highlightImages(selectedTextEditor);
+        previewPanel.highlightImages(selectedTextEditor);
     }
 }

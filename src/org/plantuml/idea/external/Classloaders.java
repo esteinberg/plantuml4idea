@@ -4,7 +4,7 @@ import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.Utils;
 
 import java.io.File;

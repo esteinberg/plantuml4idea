@@ -8,7 +8,7 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import org.apache.commons.io.IOUtils;
 import org.plantuml.idea.adapter.Format;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
 
 import java.io.FileOutputStream;

@@ -3,7 +3,6 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.io.IOUtil;
 import net.sourceforge.plantuml.png.MetadataTag;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.rendering.PlantUmlExporter;
@@ -11,16 +10,15 @@ import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.external.RemoteRenderer;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 

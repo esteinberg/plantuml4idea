@@ -3,7 +3,7 @@ package org.plantuml.idea.action.context;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.plantuml.idea.action.save.AbstractSaveDiagramAction;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
+import org.plantuml.idea.preview.image.ImageContainer;
 
 public class SaveDiagramToFileContextAction extends AbstractSaveDiagramAction {
 

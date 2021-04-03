@@ -4,10 +4,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.Zoom;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.toolwindow.Zoom;
 
 import java.io.File;
 import java.io.IOException;

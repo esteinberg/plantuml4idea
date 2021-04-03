@@ -8,10 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
             } else {
                 PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                         imageFormat, file.getAbsolutePath(), null,
-                        UIUtils.getPlantUmlToolWindow(project).getZoom(), getPage(e));
+                        UIUtils.getPlantUmlPreviewPanel(e).getZoom(), getPage(e));
             }
 
             Desktop.getDesktop().open(file);

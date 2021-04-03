@@ -139,4 +139,17 @@ public class RenderResult {
         }
         return false;
     }
+
+    @NotNull
+    public String resultMessage(long totalTime) {
+        int rendered = getRendered();
+        int updatedTitles = getUpdatedTitles();
+        int cached = getCached();
+        String message = totalTime + "ms ["
+                + rendered + ","
+                + updatedTitles + ","
+                + cached + "]";
+        return message;
+    }
+
 }

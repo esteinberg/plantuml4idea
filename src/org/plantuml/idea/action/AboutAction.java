@@ -2,7 +2,7 @@ package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import org.plantuml.idea.toolwindow.AboutDialog;
+import org.plantuml.idea.AboutDialog;
 
 import java.awt.*;
 
@@ -12,7 +12,7 @@ import java.awt.*;
 public class AboutAction extends DumbAwareAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
-        AboutDialog aboutDialog = new AboutDialog(e.getProject());
+        AboutDialog aboutDialog = new AboutDialog(e, e.getProject());
         aboutDialog.pack();
         Point centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
         Point topLeftPoint = new Point((centerPoint.x - aboutDialog.getWidth() / 2),

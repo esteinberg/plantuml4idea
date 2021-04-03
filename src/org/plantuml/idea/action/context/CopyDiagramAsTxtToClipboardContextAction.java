@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
