@@ -40,9 +40,9 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
   @NotNull
   private final MyListenersMultimap myListenersGenerator = new MyListenersMultimap();
 
-  private boolean myVerticalSplitOption;
   private boolean myEditorFirst;
   private JBSplitter mySplitter;
+  private PlantUmlToolbarPanel myToolbarWrapper;
 
   protected SplitFileEditor(@NotNull E1 mainEditor, @NotNull E2 secondEditor) {
     myMainEditor = mainEditor;
@@ -50,7 +50,6 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
 
     PreviewSettings previewSettings = PlantUmlSettings.getInstance().getPreviewSettings();
     mySplitEditorLayout = previewSettings.getSplitEditorLayout();
-    myVerticalSplitOption = previewSettings.isVerticalSplit();
     myEditorFirst = previewSettings.isEditorFirst();
 
     myComponent = createComponent();
@@ -59,7 +58,6 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
 
     PlantUmlSettings.SettingsChangedListener settingsChangedListener =
             settings -> ApplicationManager.getApplication().invokeLater(() -> {
-              triggerSplitOrientationChange(settings.getPreviewSettings().isVerticalSplit());
               triggerEditorFirstChange(settings.getPreviewSettings().isEditorFirst());
               triggerLayoutChange(settings.getPreviewSettings().getSplitEditorLayout(), false);
             });
@@ -82,15 +80,14 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
 
   @NotNull
   private JComponent createComponent() {
-    myVerticalSplitOption = PlantUmlSettings.getInstance().getPreviewSettings().isVerticalSplit();
     myEditorFirst = PlantUmlSettings.getInstance().getPreviewSettings().isEditorFirst();
-    mySplitter = new JBSplitter(!myVerticalSplitOption, 0.5f, 0.15f, 0.85f);
+    mySplitter = new JBSplitter(mySplitEditorLayout == SplitEditorLayout.SPLIT_HORIZONTAL, 0.5f, 0.15f, 0.85f);
     mySplitter.setSplitterProportionKey(MY_PROPORTION_KEY);
     mySplitter.setFirstComponent(myEditorFirst ? myMainEditor.getComponent() : mySecondEditor.getComponent());
     mySplitter.setSecondComponent(myEditorFirst ? mySecondEditor.getComponent() : myMainEditor.getComponent());
 
     PlantUmlPreviewPanel previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(mySecondEditor);
-    PlantUmlToolbarPanel myToolbarWrapper = new PlantUmlToolbarPanel(previewPanel, mySplitter);
+    myToolbarWrapper = new PlantUmlToolbarPanel(previewPanel, mySplitter);
 
     final JPanel result = new JPanel(new BorderLayout());
     result.add(myToolbarWrapper, BorderLayout.NORTH);
@@ -125,28 +122,14 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
 
   }
 
-  public void triggerSplitOrientationChange(boolean isVerticalSplit) {
-    if (myVerticalSplitOption == isVerticalSplit) {
-      return;
-    }
-
-    myVerticalSplitOption = isVerticalSplit;
-
-    mySplitter.setOrientation(!myVerticalSplitOption);
-    myComponent.repaint();
-  }
-
   @NotNull
   public SplitEditorLayout getCurrentEditorLayout() {
     return mySplitEditorLayout;
   }
 
-  public boolean isCurrentVerticalSplitOption() {
-    return myVerticalSplitOption;
-  }
-
   private void invalidateLayout() {
     adjustEditorsVisibility();
+    mySplitter.setOrientation(mySplitEditorLayout == SplitEditorLayout.SPLIT_HORIZONTAL);
     myComponent.repaint();
   }
 
@@ -184,7 +167,7 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
   @NotNull
   @Override
   public FileEditorState getState(@NotNull FileEditorStateLevel level) {
-    return new MyFileEditorState(mySplitEditorLayout.name(), myVerticalSplitOption, myMainEditor.getState(level), mySecondEditor.getState(level));
+    return new MyFileEditorState(mySplitEditorLayout.name(), myMainEditor.getState(level), mySecondEditor.getState(level));
   }
 
   @Override
@@ -201,7 +184,6 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
         mySplitEditorLayout = SplitEditorLayout.valueOf(compositeState.getSplitLayout());
         invalidateLayout();
       }
-      triggerSplitOrientationChange(compositeState.isVerticalSplit());
     }
   }
 
@@ -282,21 +264,15 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
   static class MyFileEditorState implements FileEditorState {
     @Nullable
     private final String mySplitLayout;
-    private final boolean myVerticalSplit;
     @Nullable
     private final FileEditorState myFirstState;
     @Nullable
     private final FileEditorState mySecondState;
 
-    MyFileEditorState(@Nullable String splitLayout, boolean verticalSplit, @Nullable FileEditorState firstState, @Nullable FileEditorState secondState) {
+    MyFileEditorState(@Nullable String splitLayout, @Nullable FileEditorState firstState, @Nullable FileEditorState secondState) {
       mySplitLayout = splitLayout;
-      myVerticalSplit = verticalSplit;
       myFirstState = firstState;
       mySecondState = secondState;
-    }
-
-    public boolean isVerticalSplit() {
-      return myVerticalSplit;
     }
 
     @Nullable
@@ -370,7 +346,8 @@ public abstract class SplitFileEditor<E1 extends TextEditor, E2 extends FileEdit
   public enum SplitEditorLayout {
     FIRST(true, false, "Show editor only"),
     SECOND(false, true, "Show preview only"),
-    SPLIT(true, true, "Show editor and preview");
+    SPLIT(true, true, "Show editor and preview"),
+    SPLIT_HORIZONTAL(true, true, "Show editor and preview - horizontal split");
 
     @SuppressWarnings("checkstyle:visibilitymodifier")
     public final boolean showEditor;

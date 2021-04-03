@@ -20,6 +20,7 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.SelectedPagePersistentStateComponent;
 import org.plantuml.idea.Usage;
 import org.plantuml.idea.action.NextPageAction;
@@ -30,14 +31,12 @@ import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.preview.image.ImageContainerPng;
 import org.plantuml.idea.preview.image.ImageContainerSvg;
 import org.plantuml.idea.preview.image.links.Highlighter;
-import org.plantuml.idea.preview.toolwindow.PlantUmlAncestorListener;
 import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 import org.plantuml.idea.util.Utils;
 
 import javax.swing.*;
-import javax.swing.event.AncestorListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.StringJoiner;
@@ -53,7 +52,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private static Logger logger = Logger.getInstance(PlantUmlPreviewPanel.class);
     private static AtomicInteger sequence = new AtomicInteger();
 
-    private PreviewParentWrapper parentWrapper;
     private JPanel imagesPanel;
     private JScrollPane scrollPane;
 
@@ -62,7 +60,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
     private RenderCache renderCache;
 
-    private AncestorListener plantUmlAncestorListener;
 
     private final LazyApplicationPoolExecutor lazyExecutor;
 
@@ -82,17 +79,15 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private final PlantUmlSettings settings;
     private RenderCacheItem displayedItem;
 
-    public PlantUmlPreviewPanel(@NotNull Project project, final PreviewParentWrapper parentWrapper) {
+    public PlantUmlPreviewPanel(@NotNull Project project, @Nullable JComponent parent) {
         super(new BorderLayout());
         this.project = project;
-        this.parentWrapper = parentWrapper;
         settings = PlantUmlSettings.getInstance();
-        zoom = new Zoom(parentWrapper.getComponent(), 100, settings);
+        zoom = new Zoom(parent, 100, settings);
 
         // Make sure settings are loaded and applied before we start rendering.
         renderCache = RenderCache.getInstance();
         selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
-        plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
         fileManager = VirtualFileManager.getInstance();
@@ -104,7 +99,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             @Override
             public void run() {
                 renderCache.clear();
-                if (displayedItem != null && !parentWrapper.isVisible()) {
+                if (displayedItem != null && !PlantUmlPreviewPanel.this.isVisible()) {
                     displayedItem = null;
                     imagesPanel.removeAll();
                     imagesPanel.add(new JLabel("Low memory detected, cache and images cleared. Go to PlantUML plugin settings and set lower cache size, or increase IDE heap size (-Xmx)."));
@@ -114,14 +109,13 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             }
         }, this);
 
-        //must be last
-        JComponent component = this.parentWrapper.getComponent();
-        if (component != null) {
-            component.addAncestorListener(plantUmlAncestorListener);
-        }
 
         highlighter = new Highlighter();
         backgroundZoomAlarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
+    }
+
+    public PlantUmlPreviewPanel(Project project) {
+        this(project, null);
     }
 
     private void setupUI() {
@@ -236,13 +230,12 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     public void dispose() {
         logger.debug("dispose");
         removeAllImages();
-        parentWrapper.getComponent().removeAncestorListener(plantUmlAncestorListener);
     }
 
     private Alarm myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
 
     public void processRequest(final LazyApplicationPoolExecutor.Delay delay, final RenderCommand.Reason reason) {
-        if (!parentWrapper.isVisible()) {
+        if (!isVisible()) {
             logger.debug("", this, " not visible, aborting");
             return;
         }
@@ -337,10 +330,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         int version = sequence.incrementAndGet();
 
         return new RenderCommand(this, project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, settings);
-    }
-
-    public boolean isPreviewVisible() {
-        return parentWrapper.isVisible();
     }
 
     public void highlightImages(Editor editor) {

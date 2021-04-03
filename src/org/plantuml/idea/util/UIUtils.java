@@ -103,9 +103,11 @@ public class UIUtils {
     public static Document getSelectedDocument(FileEditorManager instance) {
         FileEditor selectedEditor = instance.getSelectedEditor();
         Document document = null;
-        VirtualFile file = selectedEditor.getFile();
-        if (file != null) {
-            document = FileDocumentManager.getInstance().getDocument(file);
+        if (selectedEditor != null) {
+            VirtualFile file = selectedEditor.getFile();
+            if (file != null) {
+                document = FileDocumentManager.getInstance().getDocument(file);
+            }
         }
         return document;
     }

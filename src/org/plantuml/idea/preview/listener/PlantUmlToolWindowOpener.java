@@ -1,21 +1,17 @@
 package org.plantuml.idea.preview.listener;
 
-import com.intellij.lang.Language;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowType;
-import com.intellij.testFramework.LightVirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.lang.PlantUmlLanguage;
-import org.plantuml.idea.preview.editor.PlantUmlPreviewEditor;
+import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.preview.editor.PlantUmlSplitEditor;
+import org.plantuml.idea.preview.editor.SplitFileEditor;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
@@ -35,8 +31,11 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
         VirtualFile oldFile = event.getOldFile();
         FileEditor newEditor = event.getNewEditor();
 
-        if (newEditor instanceof PlantUmlSplitEditor || newEditor instanceof PlantUmlPreviewEditor) {
-            return;
+        if (newEditor instanceof PlantUmlSplitEditor) {
+            SplitFileEditor.SplitEditorLayout currentEditorLayout = ((PlantUmlSplitEditor) newEditor).getCurrentEditorLayout();
+            if (currentEditorLayout != SplitFileEditor.SplitEditorLayout.FIRST) {
+                return;
+            }
         }
 
         ToolWindow window = getToolWindow(event);
@@ -59,19 +58,7 @@ public class PlantUmlToolWindowOpener implements FileEditorManagerListener {
     }
 
     private boolean isPlantUml(VirtualFile file) {
-        return file != null && getFileLanguage(file) == PlantUmlLanguage.INSTANCE;
+        return file != null && PlantUmlFileType.INSTANCE.equals(file.getFileType());
     }
 
-    @Nullable
-    public static Language getFileLanguage(@Nullable VirtualFile file) {
-        if (file == null) return null;
-        Language l = file instanceof LightVirtualFile ? ((LightVirtualFile) file).getLanguage() : null;
-        return l != null ? l : getFileTypeLanguage(file.getFileType());
-    }
-
-    @Nullable
-    public static Language getFileTypeLanguage(@Nullable FileType fileType) {
-        return fileType instanceof LanguageFileType ? ((LanguageFileType) fileType).getLanguage() : null;
-    }
-  
 }

@@ -127,15 +127,15 @@
                     text="Show Editor and Preview"
                     icon="AllIcons.General.LayoutEditorPreview">
             </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    text="Show Editor and Preview - Horizontal Split"
+                    icon="/images/layoutEditorPreview_horizontal.svg">
+            </action>
             <action class="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
                     id="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
                     text="Show Preview Only"
                     icon="AllIcons.General.LayoutPreviewOnly">
-            </action>
-            <action class="org.plantuml.idea.preview.editor.editorLayout.VerticalSplitLayoutChangeAction"
-                    id="org.plantuml.idea.preview.editor.editorLayout.VerticalSplitLayoutChangeAction"
-                    text="Horizontal Split"
-                    icon="AllIcons.Actions.PreviewDetailsVertically">
             </action>
             <separator/>
             <add-to-group group-id="PlantUML.EditorToolbar"/>

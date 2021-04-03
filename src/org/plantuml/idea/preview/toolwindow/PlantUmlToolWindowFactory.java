@@ -12,10 +12,11 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
-import org.plantuml.idea.preview.PreviewParentWrapper;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 
+import javax.swing.*;
+import javax.swing.event.AncestorListener;
 import java.awt.*;
 
 /**
@@ -27,7 +28,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        PlantUmlPreviewPanel previewPanel = new PlantUmlToolWindowPreviewPanel(project, new ToolWindowWrapper(toolWindow));
+        PlantUmlPreviewPanel previewPanel = new PlantUmlToolWindowPreviewPanel(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(previewPanel, "", false);
         toolWindow.getContentManager().addContent(content);
@@ -38,8 +39,18 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     private class PlantUmlToolWindowPreviewPanel extends PlantUmlPreviewPanel {
-        public PlantUmlToolWindowPreviewPanel(Project project, PreviewParentWrapper parentWrapper) {
-            super(project, parentWrapper);
+        private AncestorListener plantUmlAncestorListener;
+        private JComponent parentComponent;
+
+        public PlantUmlToolWindowPreviewPanel(Project project, ToolWindow toolWindow) {
+            super(project, toolWindow.getComponent());
+            plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
+
+            //must be last
+            parentComponent = toolWindow.getComponent();
+            if (parentComponent != null) {
+                parentComponent.addAncestorListener(plantUmlAncestorListener);
+            }
         }
 
         protected void createToolbar() {
@@ -47,6 +58,14 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
             final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, newGroup, true);
             actionToolbar.setTargetComponent(this);
             add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            if (parentComponent != null) {
+                parentComponent.removeAncestorListener(plantUmlAncestorListener);
+            }
         }
 
         @Override

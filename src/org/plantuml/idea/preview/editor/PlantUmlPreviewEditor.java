@@ -57,7 +57,7 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
         this.document = document;
         this.file = file;
         this.project = project;
-        plantUmlPreview = new PlantUmlPreviewPanel(project, new ParentEditorWrapper(this));
+        plantUmlPreview = new PlantUmlPreviewPanel(project);
         putUserData(PLANTUML_PREVIEW_PANEL, plantUmlPreview);
         renderIfVisible(NOW, RenderCommand.Reason.FILE_SWITCHED);
         if (documentListener) {

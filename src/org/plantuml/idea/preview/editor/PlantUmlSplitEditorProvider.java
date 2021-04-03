@@ -11,7 +11,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import org.jdom.Attribute;
-import org.jdom.DataConversionException;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantUmlLanguage;
@@ -149,16 +148,7 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
             layoutName = null;
         }
 
-        final Attribute verticalAttribute = sourceElement.getAttribute(SPLIT_LAYOUT);
-        boolean vertical = true;
-        if (verticalAttribute != null) {
-            try {
-                vertical = verticalAttribute.getBooleanValue();
-            } catch (DataConversionException e) {
-            }
-        }
-
-        return new SplitFileEditor.MyFileEditorState(layoutName, vertical, firstState, secondState);
+        return new SplitFileEditor.MyFileEditorState(layoutName, firstState, secondState);
     }
 
     @Override
@@ -183,7 +173,6 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
         if (compositeState.getSplitLayout() != null) {
             targetElement.setAttribute(SPLIT_LAYOUT, compositeState.getSplitLayout());
         }
-        targetElement.setAttribute(VERTICAL_SPLIT, String.valueOf(compositeState.isVerticalSplit()));
     }
 
     @NotNull
