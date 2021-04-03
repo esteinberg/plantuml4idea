@@ -11,11 +11,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.parser.Parser;
-import org.jsoup.select.NodeFilter;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -26,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -144,27 +138,6 @@ public class DiagramFactory {
         return null;
     }
 
-    // see: http://stackoverflow.com/questions/7541843/how-to-search-for-comments-using-jsoup
-    private void removeComments(Element article) {
-        article.filter(new NodeFilter() {
-            @Override
-            public FilterResult tail(Node node, int depth) {
-                if (node instanceof Comment) {
-                    return FilterResult.REMOVE;
-                }
-                return FilterResult.CONTINUE;
-            }
-
-            @Override
-            public FilterResult head(Node node, int depth) {
-                if (node instanceof Comment) {
-                    return FilterResult.REMOVE;
-                }
-                return FilterResult.CONTINUE;
-            }
-        });
-    }
-
     protected byte[] generateSvgLinks(int i) {
         long start = System.currentTimeMillis();
         ByteArrayOutputStream svgStream = new ByteArrayOutputStream();
@@ -196,7 +169,6 @@ public class DiagramFactory {
         DiagramDescription diagramDescription = outputImage(imageStream, page, formatOption);
 
         byte[] bytes = imageStream.toByteArray();
-        bytes = sanitizeSvg(bytes, format);
         boolean png = isPng(bytes);
         boolean wrongResultFormat = format == ImageFormat.SVG && png;
 
@@ -223,19 +195,6 @@ public class DiagramFactory {
             resultFormat = ImageFormat.PNG;
         }
         return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page), null);
-    }
-
-    private byte[] sanitizeSvg(byte[] bytes, ImageFormat format) {
-        if (format == ImageFormat.SVG) {
-            String html = new String(bytes, StandardCharsets.UTF_8);
-            Parser parser = Parser.xmlParser();
-//                parser.settings(new ParseSettings(true, true)); // tag, attribute preserve case
-            org.jsoup.nodes.Document document = parser.parseInput(html, "");
-            removeComments(document);
-            String s = document.toString();
-            return s.getBytes(StandardCharsets.UTF_8);
-        }
-        return bytes;
     }
 
     private boolean isPng(byte[] bytes) {
