@@ -26,7 +26,7 @@ public class ReloadNowAction extends DumbAwareAction {
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
             if (previewPanel != null) {
                 previewPanel.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
             }

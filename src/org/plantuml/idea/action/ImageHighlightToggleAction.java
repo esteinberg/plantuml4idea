@@ -21,7 +21,7 @@ public class ImageHighlightToggleAction extends ToggleAction implements DumbAwar
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setHighlightInImages(b);
         Project project = anActionEvent.getProject();
-        PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(anActionEvent);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(anActionEvent);
         Editor selectedTextEditor = UIUtils.getSelectedTextEditor(FileEditorManager.getInstance(project));
         previewPanel.highlightImages(selectedTextEditor);
     }

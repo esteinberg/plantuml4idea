@@ -41,7 +41,7 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
         logger.debug("selection changed ", event);
         if (settings.isAutoRender()) {
             FileEditor newEditor = event.getNewEditor();
-            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(newEditor, event.getManager().getProject());
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(newEditor, event.getManager().getProject());
 
             if (previewPanel == null) {
                 return;

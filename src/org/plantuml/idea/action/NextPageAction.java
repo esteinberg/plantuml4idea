@@ -16,7 +16,7 @@ public class NextPageAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         final Project project = anActionEvent.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(anActionEvent);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(anActionEvent);
             if (previewPanel != null)
                 previewPanel.nextPage();
         }
@@ -26,7 +26,7 @@ public class NextPageAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
             if (previewPanel != null)
                 e.getPresentation().setEnabled(previewPanel.getNumPages() > 1);
         }

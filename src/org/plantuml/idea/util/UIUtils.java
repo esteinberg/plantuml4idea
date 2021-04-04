@@ -9,7 +9,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -35,16 +34,6 @@ public class UIUtils {
 
     public static NotificationGroup notification() {
         return NotificationGroupManager.getInstance().getNotificationGroup("PlantUML integration plugin");
-    }
-
-    @Nullable
-    public static SplitFileEditor<?, ?> findSplitEditor(AnActionEvent e) {
-        final FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
-        if (editor instanceof SplitFileEditor) {
-            return (SplitFileEditor<?, ?>) editor;
-        } else {
-            return SplitFileEditor.PARENT_SPLIT_KEY.get(editor);
-        }
     }
 
     public static String getSelectedSourceWithCaret(FileEditorManager instance) {
@@ -125,38 +114,67 @@ public class UIUtils {
         return baseDir;
     }
 
-    public static PlantUmlPreviewPanel getPlantUmlPreviewPanel(AnActionEvent e) {
-        final FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
+    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(AnActionEvent e) {
+        final FileEditor fileEditor = e.getData(PlatformDataKeys.FILE_EDITOR);
+        return getEditorPreviewOrToolWindowPanel(fileEditor, e.getProject());
+    }
+
+
+    @Nullable
+    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(Editor editor) {
+        PlantUmlPreviewEditor userData = editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW);
+        return getEditorPreviewOrToolWindowPanel(userData, editor.getProject());
+    }
+
+    @Nullable
+    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(FileEditor fileEditor, @Nullable Project project) {
         PlantUmlPreviewPanel previewPanel = null;
-        if (editor != null) {
-            previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(editor);
+        if (fileEditor != null) {
+            previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(fileEditor);
         }
         if (previewPanel == null) {
-            SplitFileEditor<?, ?> splitEditor = findSplitEditor(e);
+            SplitFileEditor<?, ?> splitEditor = findSplitEditor(fileEditor);
             previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(splitEditor);
         }
-        if (previewPanel == null) {
-            previewPanel = getPlantUmlToolWindow(e.getProject());
+        if (previewPanel == null || !previewPanel.isPreviewVisible()) {
+            previewPanel = getToolWindowPreviewPanel(project);
+        }
+        if (previewPanel == null || !previewPanel.isPreviewVisible()) {
+            return null;
         }
         return previewPanel;
     }
 
-    @Deprecated
     @Nullable
-    public static PlantUmlPreviewPanel getPlantUmlToolWindow(Project project) {
+    public static SplitFileEditor<?, ?> findSplitEditor(AnActionEvent e) {
+        final FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
+        return findSplitEditor(editor);
+    }
+
+    @Nullable
+    public static SplitFileEditor<? extends TextEditor, ? extends FileEditor> findSplitEditor(FileEditor editor) {
+        if (editor instanceof SplitFileEditor) {
+            return (SplitFileEditor<?, ?>) editor;
+        } else {
+            return SplitFileEditor.PARENT_SPLIT_KEY.get(editor);
+        }
+    }
+
+    @Nullable
+    public static PlantUmlPreviewPanel getToolWindowPreviewPanel(Project project) {
         if (project == null) {
             return null;
         }
         PlantUmlPreviewPanel result = null;
         ToolWindow toolWindow = getToolWindow(project);
-        if (toolWindow != null) {
-            result = getPlantUmlToolWindow(toolWindow);
+        if (toolWindow != null && toolWindow.isVisible()) {
+            result = getToolWindowPreviewPanel(toolWindow);
         }
         return result;
     }
 
     @Nullable
-    public static PlantUmlPreviewPanel getPlantUmlToolWindow(@NotNull ToolWindow toolWindow) {
+    public static PlantUmlPreviewPanel getToolWindowPreviewPanel(@NotNull ToolWindow toolWindow) {
         PlantUmlPreviewPanel result = null;
         Content[] contents = toolWindow.getContentManager().getContents();
         if (contents.length > 0) {
@@ -182,10 +200,10 @@ public class UIUtils {
     public static void renderToolWindowAndEditorPreviewLater(AnActionEvent anActionEvent, @Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         if (project == null) return;
 
-        PlantUmlPreviewPanel toolWindow = renderToolWindowLater(anActionEvent, project, delay, reason);
+        PlantUmlPreviewPanel toolWindow = renderToolWindowLater(project, delay, reason);
 
         if (anActionEvent != null) {
-            PlantUmlPreviewPanel previewPanel = getPlantUmlPreviewPanel(anActionEvent);
+            PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(anActionEvent);
             //noinspection ObjectEquality
             if (previewPanel != null && previewPanel != toolWindow) {
                 previewPanel.processRequest(delay, reason);
@@ -193,15 +211,10 @@ public class UIUtils {
         }
     }
 
-    private static PlantUmlPreviewPanel renderToolWindowLater(AnActionEvent anActionEvent, @Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
+    private static PlantUmlPreviewPanel renderToolWindowLater(@Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         if (project == null) return null;
 
-        ToolWindow toolWindow = getToolWindow(project);
-        if (toolWindow == null || !toolWindow.isVisible()) {
-            return null;
-        }
-
-        PlantUmlPreviewPanel previewPanel = getPlantUmlToolWindow(toolWindow);
+        PlantUmlPreviewPanel previewPanel = getToolWindowPreviewPanel(project);
 
         if (previewPanel != null) {
             previewPanel.processRequest(delay, reason);
@@ -210,7 +223,7 @@ public class UIUtils {
     }
 
     public static boolean hasAnyImage(AnActionEvent actionEvent) {
-        PlantUmlPreviewPanel previewPanel = getPlantUmlPreviewPanel(actionEvent);
+        PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(actionEvent);
         boolean hasAnyImage = false;
         if (previewPanel != null) {
             hasAnyImage = previewPanel.getNumPages() > 0;
@@ -230,25 +243,4 @@ public class UIUtils {
         return null;
     }
 
-
-    @Nullable
-    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(Editor editor) {
-        PlantUmlPreviewEditor userData = editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW);
-        return getPlantUmlPreviewPanel(userData, editor.getProject());
-    }
-
-    @Nullable
-    public static PlantUmlPreviewPanel getPlantUmlPreviewPanel(UserDataHolder userData, @Nullable Project project) {
-        PlantUmlPreviewPanel plantUmlPreview = null;
-        if (userData != null) {
-            plantUmlPreview = userData.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL);
-        }
-        if (plantUmlPreview == null || !plantUmlPreview.isPreviewVisible()) {
-            plantUmlPreview = getPlantUmlToolWindow(project);
-        }
-        if (plantUmlPreview == null || !plantUmlPreview.isPreviewVisible()) {
-            return null;
-        }
-        return plantUmlPreview;
-    }
 }

@@ -58,7 +58,7 @@ public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
             } else {
                 PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                         imageFormat, file.getAbsolutePath(), null,
-                        UIUtils.getPlantUmlPreviewPanel(e).getZoom(), getPage(e));
+                        UIUtils.getEditorPreviewOrToolWindowPanel(e).getZoom(), getPage(e));
             }
 
             Desktop.getDesktop().open(file);

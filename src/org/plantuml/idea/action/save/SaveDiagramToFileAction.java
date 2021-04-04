@@ -16,7 +16,7 @@ public class SaveDiagramToFileAction extends AbstractSaveDiagramAction {
 
     @Override
     protected int getPageNumber(AnActionEvent e) {
-        PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(e);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
         JPanel imagesPanel = previewPanel.getImagesPanel();
         ImageContainer image = (ImageContainer) imagesPanel.getComponent(0);
         return image.getPage();
@@ -26,7 +26,7 @@ public class SaveDiagramToFileAction extends AbstractSaveDiagramAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getPlantUmlPreviewPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
             if (previewPanel != null) {
                 int selectedPage = previewPanel.getSelectedPage();
                 e.getPresentation().setEnabled(previewPanel.getNumPages() == 1 || (previewPanel.getNumPages() > 1 && selectedPage != -1));

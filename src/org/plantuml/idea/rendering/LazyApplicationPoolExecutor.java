@@ -35,7 +35,7 @@ public class LazyApplicationPoolExecutor {
             return compare;
         }
     });
-    private ExecutorService executor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML deduplicator executor", true, Thread.NORM_PRIORITY));
+    private ExecutorService executor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML integration plugin executor", true, Thread.NORM_PRIORITY));
 
     protected final Object POOL_THREAD_STICK = new Object();
 
@@ -71,7 +71,7 @@ public class LazyApplicationPoolExecutor {
         addToQueue(newCommand);
     }
 
-    private void addToQueue(@NotNull RenderCommand newCommand) {
+    protected void addToQueue(@NotNull RenderCommand newCommand) {
         logger.debug("adding to queue ", newCommand);
         boolean add = queue.add(newCommand);
         newCommand.updateState(ExecutionStatusPanel.State.WAITING);
@@ -86,7 +86,7 @@ public class LazyApplicationPoolExecutor {
         return queue.first();
     }
 
-    private synchronized void scheduleNext() {
+    protected synchronized void scheduleNext() {
         logger.debug("scheduleNext");
         executor.submit(new MyRunnable());
     }
