@@ -18,6 +18,6 @@ public class DisplayLinksBorderToggleAction extends ToggleAction implements Dumb
     @Override
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setShowUrlLinksBorder(b);
-        UIUtils.renderToolWindowAndEditorPreviewLater(anActionEvent, getEventProject(anActionEvent), LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
+        UIUtils.renderToolWindowAndEditorPreview(anActionEvent, LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
     }
 }

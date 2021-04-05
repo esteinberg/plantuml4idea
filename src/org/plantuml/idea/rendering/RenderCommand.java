@@ -92,12 +92,10 @@ public class RenderCommand {
         this.cachedItem = cachedItem;
         this.version = version;
         this.delay = delay;
-        synchronized (this) {
-            if (this.delay == LazyApplicationPoolExecutor.Delay.RESET_DELAY) {
-                startAtNanos = System.nanoTime() + (long) settings.getRenderDelayAsInt();
-            } else if (this.delay == LazyApplicationPoolExecutor.Delay.NOW) {
-                startAtNanos = 0;
-            }
+        if (this.delay == LazyApplicationPoolExecutor.Delay.NOW) {
+            startAtNanos = 0;
+        } else {
+            startAtNanos = System.nanoTime() + ((long) settings.getRenderDelayAsInt() * MILLION);
         }
     }
 

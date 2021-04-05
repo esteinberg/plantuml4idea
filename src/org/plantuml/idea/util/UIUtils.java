@@ -122,8 +122,8 @@ public class UIUtils {
 
     @Nullable
     public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(Editor editor) {
-        PlantUmlPreviewEditor userData = editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW);
-        return getEditorPreviewOrToolWindowPanel(userData, editor.getProject());
+        FileEditor fileEditor = editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW);
+        return getEditorPreviewOrToolWindowPanel(fileEditor, editor.getProject());
     }
 
     @Nullable
@@ -197,29 +197,11 @@ public class UIUtils {
         return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 
-    public static void renderToolWindowAndEditorPreviewLater(AnActionEvent anActionEvent, @Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
-        if (project == null) return;
-
-        PlantUmlPreviewPanel toolWindow = renderToolWindowLater(project, delay, reason);
-
-        if (anActionEvent != null) {
-            PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(anActionEvent);
-            //noinspection ObjectEquality
-            if (previewPanel != null && previewPanel != toolWindow) {
-                previewPanel.processRequest(delay, reason);
-            }
-        }
-    }
-
-    private static PlantUmlPreviewPanel renderToolWindowLater(@Nullable Project project, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
-        if (project == null) return null;
-
-        PlantUmlPreviewPanel previewPanel = getToolWindowPreviewPanel(project);
-
+    public static void renderToolWindowAndEditorPreview(AnActionEvent anActionEvent, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
+        PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(anActionEvent);
         if (previewPanel != null) {
             previewPanel.processRequest(delay, reason);
         }
-        return previewPanel;
     }
 
     public static boolean hasAnyImage(AnActionEvent actionEvent) {

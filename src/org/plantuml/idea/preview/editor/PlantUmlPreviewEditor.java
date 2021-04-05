@@ -26,8 +26,8 @@ import org.plantuml.idea.rendering.RenderCommand;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 
-import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY;
 import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.NOW;
+import static org.plantuml.idea.rendering.LazyApplicationPoolExecutor.Delay.RESET_DELAY;
 
 public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEditor {
 
@@ -61,7 +61,7 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
             this.document.addDocumentListener(new DocumentListener() {
                 @Override
                 public void documentChanged(@NotNull DocumentEvent e) {
-                    renderIfVisible(MAYBE_WITH_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+                    renderIfVisible(RESET_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
                 }
             }, this);
 
