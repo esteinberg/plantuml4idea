@@ -13,6 +13,7 @@
             <p>5.0<p>
             <ul>
               <li>Editor preview</li>
+              <li>PlantUML library upgrade to v1.2021.4</li>
               <li>Render *.dot files without plantUML meta tags</li>
             </ul>         
             <p>4.6<p>
