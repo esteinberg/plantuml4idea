@@ -17,12 +17,12 @@ public abstract class ZoomAction extends DumbAwareAction {
     protected static int ZOOM_STEP = 20;
 
     protected int getUnscaledZoom(AnActionEvent event) {
-        PlantUmlPreviewPanel plantUML = UIUtils.getEditorPreviewOrToolWindowPanel(event);
+        PlantUmlPreviewPanel plantUML = UIUtils.getEditorOrToolWindowPreview(event);
         return plantUML.getZoom().getUnscaledZoom();
     }
 
     protected void changeZoom(AnActionEvent e, int unscaledZoom) {
-        PlantUmlPreviewPanel plantUML = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+        PlantUmlPreviewPanel plantUML = UIUtils.getEditorOrToolWindowPreview(e);
         plantUML.changeZoom(unscaledZoom, null);
     }
 

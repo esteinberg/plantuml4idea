@@ -88,7 +88,7 @@ public class AboutDialog extends JDialog {
     }
 
     private void testDot(AnActionEvent e) {
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         Zoom zoom = new Zoom(previewPanel, 100, PlantUmlSettings.getInstance());
         RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);

@@ -24,12 +24,12 @@ public class PlantUmlSelectionListener implements SelectionListener {
         if (settings.isHighlightInImages()) {
             if (!e.getNewRange().equals(e.getOldRange())) {
                 Editor editor = e.getEditor();
-                PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(editor);
-                if (previewPanel == null) {
-                    return;
-                }
 
-                previewPanel.highlightImages(e.getEditor());
+                for (PlantUmlPreviewPanel panel : UIUtils.getEligiblePreviews(editor)) {
+                    if (panel != null) {
+                        panel.highlightImages(e.getEditor());
+                    }
+                }
             }
         }
     }

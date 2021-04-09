@@ -25,6 +25,8 @@ import org.plantuml.idea.rendering.RenderCommand;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Eugene Steinberg
@@ -114,30 +116,45 @@ public class UIUtils {
         return baseDir;
     }
 
-    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(AnActionEvent e) {
+    public static PlantUmlPreviewPanel getEditorOrToolWindowPreview(AnActionEvent e) {
         final FileEditor fileEditor = e.getData(PlatformDataKeys.FILE_EDITOR);
-        return getEditorPreviewOrToolWindowPanel(fileEditor, e.getProject());
-    }
-
-
-    @Nullable
-    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(Editor editor) {
-        FileEditor fileEditor = editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW);
-        return getEditorPreviewOrToolWindowPanel(fileEditor, editor.getProject());
-    }
-
-    @Nullable
-    public static PlantUmlPreviewPanel getEditorPreviewOrToolWindowPanel(FileEditor fileEditor, @Nullable Project project) {
-        PlantUmlPreviewPanel previewPanel = null;
-        if (fileEditor != null) {
-            previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(fileEditor);
+        PlantUmlPreviewPanel panel = getEditorPlantUmlPreviewPanel(fileEditor);
+        if (panel == null || !panel.isPreviewVisible()) {
+            panel = getToolWindowPreview(e.getProject());
         }
+        return panel;
+    }
+
+    public static List<PlantUmlPreviewPanel> getEligiblePreviews(Editor... editors) {
+        List<PlantUmlPreviewPanel> panels = new ArrayList<>();
+        Project project = null;
+        for (Editor editor : editors) {
+            project = editor.getProject();
+            panels.add(getEditorPlantUmlPreviewPanel(editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW)));
+        }
+        if (project != null) {
+            panels.add(getToolWindowPreview(project));
+        }
+        return panels;
+    }
+
+
+    public static List<PlantUmlPreviewPanel> getEligiblePreviews(@Nullable FileEditor fileEditor, @Nullable Project project) {
+        ArrayList<PlantUmlPreviewPanel> panels = new ArrayList<>();
+        panels.add(getEditorPlantUmlPreviewPanel(fileEditor));
+        panels.add(getToolWindowPreview(project));
+        return panels;
+    }
+
+    @Nullable
+    public static PlantUmlPreviewPanel getEditorPlantUmlPreviewPanel(@Nullable FileEditor fileEditor) {
+        if (fileEditor == null) {
+            return null;
+        }
+        PlantUmlPreviewPanel previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(fileEditor);
         if (previewPanel == null) {
             SplitFileEditor<?, ?> splitEditor = findSplitEditor(fileEditor);
             previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(splitEditor);
-        }
-        if (previewPanel == null || !previewPanel.isPreviewVisible()) {
-            previewPanel = getToolWindowPreviewPanel(project);
         }
         if (previewPanel == null || !previewPanel.isPreviewVisible()) {
             return null;
@@ -146,31 +163,18 @@ public class UIUtils {
     }
 
     @Nullable
-    public static SplitFileEditor<?, ?> findSplitEditor(AnActionEvent e) {
-        final FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
-        return findSplitEditor(editor);
-    }
-
-    @Nullable
-    public static SplitFileEditor<? extends TextEditor, ? extends FileEditor> findSplitEditor(FileEditor editor) {
-        if (editor instanceof SplitFileEditor) {
-            return (SplitFileEditor<?, ?>) editor;
-        } else {
-            return SplitFileEditor.PARENT_SPLIT_KEY.get(editor);
+    public static PlantUmlPreviewPanel getToolWindowPreview(@Nullable Project project) {
+        PlantUmlPreviewPanel previewPanel = null;
+        if (project != null) {
+            ToolWindow toolWindow = getToolWindow(project);
+            if (toolWindow != null && toolWindow.isVisible()) {
+                previewPanel = getToolWindowPreviewPanel(toolWindow);
+            }
         }
-    }
-
-    @Nullable
-    public static PlantUmlPreviewPanel getToolWindowPreviewPanel(Project project) {
-        if (project == null) {
+        if (previewPanel == null || !previewPanel.isPreviewVisible()) {
             return null;
         }
-        PlantUmlPreviewPanel result = null;
-        ToolWindow toolWindow = getToolWindow(project);
-        if (toolWindow != null && toolWindow.isVisible()) {
-            result = getToolWindowPreviewPanel(toolWindow);
-        }
-        return result;
+        return previewPanel;
     }
 
     @Nullable
@@ -189,6 +193,22 @@ public class UIUtils {
 
 
     @Nullable
+    public static SplitFileEditor<?, ?> findSplitEditor(AnActionEvent e) {
+        final FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
+        return findSplitEditor(editor);
+    }
+
+    @Nullable
+    public static SplitFileEditor<? extends TextEditor, ? extends FileEditor> findSplitEditor(FileEditor editor) {
+        if (editor instanceof SplitFileEditor) {
+            return (SplitFileEditor<?, ?>) editor;
+        } else {
+            return SplitFileEditor.PARENT_SPLIT_KEY.get(editor);
+        }
+    }
+
+
+    @Nullable
     public static ToolWindow getToolWindow(@NotNull Project project) {
         ToolWindowManager instance = ToolWindowManager.getInstance(project);
         if (instance == null) {
@@ -197,15 +217,18 @@ public class UIUtils {
         return instance.getToolWindow(PlantUmlToolWindowFactory.ID);
     }
 
-    public static void renderToolWindowAndEditorPreview(AnActionEvent anActionEvent, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
-        PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(anActionEvent);
-        if (previewPanel != null) {
-            previewPanel.processRequest(delay, reason);
+    public static void renderToolWindowAndEditorPreview(AnActionEvent e, LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
+        final FileEditor fileEditor = e.getData(PlatformDataKeys.FILE_EDITOR);
+        List<PlantUmlPreviewPanel> panels = getEligiblePreviews(fileEditor, e.getProject());
+        for (PlantUmlPreviewPanel panel : panels) {
+            if (panel != null) {
+                panel.processRequest(delay, reason);
+            }
         }
     }
 
     public static boolean hasAnyImage(AnActionEvent actionEvent) {
-        PlantUmlPreviewPanel previewPanel = getEditorPreviewOrToolWindowPanel(actionEvent);
+        PlantUmlPreviewPanel previewPanel = getEditorOrToolWindowPreview(actionEvent);
         boolean hasAnyImage = false;
         if (previewPanel != null) {
             hasAnyImage = previewPanel.getNumPages() > 0;

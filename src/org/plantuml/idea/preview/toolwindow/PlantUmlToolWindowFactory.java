@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import javax.swing.*;
 import javax.swing.event.AncestorListener;
@@ -33,12 +34,12 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         Content content = contentFactory.createContent(previewPanel, "", false);
         toolWindow.getContentManager().addContent(content);
 
-//        if (PlantUmlSettings.getInstance().isAutoRender()) {
-//            plantUmlPreviewPanel.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
-//        }
+        if (PlantUmlSettings.getInstance().isAutoRender()) {
+            previewPanel.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
+        }
     }
 
-    private class PlantUmlToolWindowPreviewPanel extends PlantUmlPreviewPanel {
+    public static class PlantUmlToolWindowPreviewPanel extends PlantUmlPreviewPanel {
         private AncestorListener plantUmlAncestorListener;
         private JComponent parentComponent;
 

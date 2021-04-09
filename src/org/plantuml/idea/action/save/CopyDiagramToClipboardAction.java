@@ -26,7 +26,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
 
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         JPanel imagesPanel = previewPanel.getImagesPanel();
         ImageContainer component = (ImageContainer) imagesPanel.getComponent(0);
         final Image image = component.getPngImage(e);
@@ -58,7 +58,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
                 int selectedPage = previewPanel.getSelectedPage();
                 JPanel imagesPanel = previewPanel.getImagesPanel();

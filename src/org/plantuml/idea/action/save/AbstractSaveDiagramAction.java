@@ -61,7 +61,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
 
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
 
@@ -144,7 +144,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 } else {
                     PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                             imageFormat, file.getAbsolutePath(), pathPrefix,
-                            UIUtils.getEditorPreviewOrToolWindowPanel(e).getZoom(), getPageNumber(e));
+                            UIUtils.getEditorOrToolWindowPreview(e).getZoom(), getPageNumber(e));
 
                 }
 
@@ -191,7 +191,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         try {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
                 RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
                 int selectedPage = previewPanel.getSelectedPage();

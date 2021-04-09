@@ -43,10 +43,9 @@ public class PlantUmlDocumentListener implements DocumentListener {
             //#18 Strange "IntellijIdeaRulezzz" - filter code completion event.
             if (!DUMMY_IDENTIFIER.equals(event.getNewFragment().toString())) {
                 Editor[] editors = editorFactory.getEditors(event.getDocument());
-                for (Editor editor : editors) {
-                    PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(editor);
-                    if (previewPanel != null) {
-                        previewPanel.processRequest(LazyApplicationPoolExecutor.Delay.RESET_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
+                for (PlantUmlPreviewPanel panel : UIUtils.getEligiblePreviews(editors)) {
+                    if (panel != null) {
+                        panel.processRequest(LazyApplicationPoolExecutor.Delay.RESET_DELAY, RenderCommand.Reason.SOURCE_PAGE_ZOOM);
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package org.plantuml.idea.preview.listener;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
@@ -40,14 +39,11 @@ public class PlantUmlRenderingFileEditorManagerListener implements FileEditorMan
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
         logger.debug("selection changed ", event);
         if (settings.isAutoRender()) {
-            FileEditor newEditor = event.getNewEditor();
-            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(newEditor, event.getManager().getProject());
-
-            if (previewPanel == null) {
-                return;
+            for (PlantUmlPreviewPanel panel : UIUtils.getEligiblePreviews(event.getNewEditor(), event.getManager().getProject())) {
+                if (panel != null) {
+                    panel.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
+                }
             }
-
-            previewPanel.processRequest(LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.FILE_SWITCHED);
         }
     }
 }

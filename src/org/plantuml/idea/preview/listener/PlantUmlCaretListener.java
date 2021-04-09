@@ -26,18 +26,19 @@ public class PlantUmlCaretListener implements CaretListener {
             return;//console            
         }
         logger.debug("caretPositionChanged");
-        PlantUmlPreviewPanel plantUmlPreview = UIUtils.getEditorPreviewOrToolWindowPanel(e.getEditor());
-        if (plantUmlPreview == null) {
-            return;
+
+        for (PlantUmlPreviewPanel panel : UIUtils.getEligiblePreviews(e.getEditor())) {
+            if (panel != null) {
+                if (settings.isAutoRender()) {
+                    panel.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+                }
+
+                if (settings.isHighlightInImages()) {
+                    panel.highlightImages(e.getEditor());
+                }
+            }
         }
 
-        if (settings.isAutoRender()) {
-            plantUmlPreview.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
-        }
-
-        if (settings.isHighlightInImages()) {
-            plantUmlPreview.highlightImages(e.getEditor());
-        }
     }
 
     @Override
@@ -47,18 +48,19 @@ public class PlantUmlCaretListener implements CaretListener {
         }
         logger.debug("caretAdded");
 
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e.getEditor());
-        if (previewPanel == null) {
-            return;
+        for (PlantUmlPreviewPanel panel : UIUtils.getEligiblePreviews(e.getEditor())) {
+            if (panel != null) {
+                if (settings.isAutoRender()) {
+                    panel.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
+                }
+
+                if (settings.isHighlightInImages()) {
+                    panel.highlightImages(e.getEditor());
+                }
+            }
         }
 
-        if (settings.isAutoRender()) {
-            previewPanel.processRequest(LazyApplicationPoolExecutor.Delay.MAYBE_WITH_DELAY, RenderCommand.Reason.CARET);
-        }
 
-        if (settings.isHighlightInImages()) {
-            previewPanel.highlightImages(e.getEditor());
-        }
     }
 
     @Override

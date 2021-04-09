@@ -255,7 +255,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
             throw new RuntimeException("not implemented");
         }
         RenderRequest rr = new RenderRequest(this.renderRequest, ImageFormat.PNG);
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         Zoom zoom = previewPanel.getZoom();
         rr.setZoom(zoom);
         RenderResult render = PlantUmlFacade.get().render(rr, null);

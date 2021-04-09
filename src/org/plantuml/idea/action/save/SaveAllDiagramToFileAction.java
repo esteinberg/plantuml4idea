@@ -15,7 +15,7 @@ public class SaveAllDiagramToFileAction extends AbstractSaveDiagramAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorPreviewOrToolWindowPanel(e);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
                 int selectedPage = previewPanel.getSelectedPage();
                 e.getPresentation().setEnabled(selectedPage != -1 || previewPanel.getNumPages() > 1);
