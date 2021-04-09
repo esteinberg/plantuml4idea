@@ -4,12 +4,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.net.HttpConfigurable;
 import com.intellij.util.net.IdeaWideProxySelector;
 import org.apache.commons.httpclient.HttpStatus;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.rendering.RenderingType;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.net.URI;
 import java.net.http.HttpClient;

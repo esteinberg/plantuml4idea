@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.rendering.RenderCacheItem;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
 
 import javax.swing.*;
 
@@ -16,11 +16,11 @@ import javax.swing.*;
  */
 public class SelectPageAction extends ComboBoxAction {
     private int numPages = 1;
-    private PlantUmlToolWindow plantUmlToolWindow;
+    private PlantUmlPreviewPanel previewPanel;
     private String[] titles;
 
-    public SelectPageAction(PlantUmlToolWindow plantUmlToolWindow) {
-        this.plantUmlToolWindow = plantUmlToolWindow;
+    public SelectPageAction(PlantUmlPreviewPanel previewPanel) {
+        this.previewPanel = previewPanel;
     }
 
     @Override
@@ -59,18 +59,18 @@ public class SelectPageAction extends ComboBoxAction {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-            plantUmlToolWindow.setSelectedPage(page);
+            previewPanel.setSelectedPage(page);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        numPages = plantUmlToolWindow.getNumPages();
-        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+        numPages = previewPanel.getNumPages();
+        RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
         if (displayedItem != null) {
             this.titles = displayedItem.getTitles();
         }
-        e.getPresentation().setText(getDisplayPage(plantUmlToolWindow.getSelectedPage()));
+        e.getPresentation().setText(getDisplayPage(previewPanel.getSelectedPage()));
         e.getPresentation().setEnabled(numPages > 1);
     }
 }

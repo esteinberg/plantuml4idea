@@ -81,7 +81,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
 
         ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), renderRequest.getSource(), partialSource, page, RenderResult.TITLE_ONLY, null, null, RenderingType.PARTIAL, title, null, null);
 
-        logger.debug("updateTitle " + (System.currentTimeMillis() - start));
+        logger.debug("updateTitle " , (System.currentTimeMillis() - start));
 
         return new Pair(imageItem, includedFiles);
     }

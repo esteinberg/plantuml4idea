@@ -1,10 +1,14 @@
 package org.plantuml.idea.plantuml;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.plantuml.idea.lang.annotator.LanguagePatternHolder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +20,22 @@ public class SourceExtractor {
 
     public static final String TESTDOT = "@startuml\ntestdot\n@enduml";
 
+    public static String extractSource(Document selectedDocument, int i) {
+        String text = selectedDocument.getText();
+        String s = extractSource(text, i);
+
+        //Feature request: Render *.dot files without plantUML meta tags #250
+        if ("".equals(s)) {
+            FileDocumentManager fileDocumentManager = FileDocumentManager.getInstance();
+            VirtualFile file = fileDocumentManager.getFile(selectedDocument);
+            if (file != null) {
+                if (Objects.equals(file.getExtension(), "dot")) {
+                    s = "@startuml\n" + text + "\n@enduml";
+                }
+            }
+        }
+        return s;
+    }
 
     /**
      * Extracts plantUML diagram source code from the given string starting from given offset
@@ -91,5 +111,6 @@ public class SourceExtractor {
         Matcher matcher = sourceCommentPattern2.matcher(source);
         return matcher.find();
     }
+
 
 }

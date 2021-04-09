@@ -10,7 +10,7 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,38 +1,55 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
+@Service
 public class RenderCache {
     public static final Logger logger = Logger.getInstance(RenderCache.class);
 
     private ArrayDeque<RenderCacheItem> cacheItems;
     private int maxCacheSize;
-    private RenderCacheItem displayedItem;
 
-    public RenderCache(int maxCacheSize) {
+    public RenderCache() {
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+        this.maxCacheSize = settings.getCacheSizeAsInt();
         cacheItems = new ArrayDeque<RenderCacheItem>(maxCacheSize);
-        this.maxCacheSize = maxCacheSize;
+        ApplicationManager.getApplication().getMessageBus().connect()
+                .subscribe(PlantUmlSettings.SettingsChangedListener.TOPIC, new PlantUmlSettings.SettingsChangedListener() {
+                    @Override
+                    public void onSettingsChange(@NotNull PlantUmlSettings settings) {
+                        setMaxCacheSize(settings.getCacheSizeAsInt());
+                    }
+                });
+    }
+
+    @NotNull
+    public static RenderCache getInstance() {
+        return ServiceManager.getService(RenderCache.class);
     }
 
     public void setMaxCacheSize(int maxCacheSize) {
         this.maxCacheSize = maxCacheSize;
         while (cacheItems.size() > maxCacheSize) {
             RenderCacheItem renderCacheItem = cacheItems.removeFirst();
-            if (renderCacheItem != displayedItem) {
-                renderCacheItem.dispose();
-            }
+//            if (renderCacheItem != displayedItem) {
+//                renderCacheItem.dispose();
+//            }
         }
     }
 
-    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, Zoom zoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager) {
+    public RenderCacheItem getCachedItem(String sourceFilePath, String source, int selectedPage, Zoom zoom, FileDocumentManager fileDocumentManager, VirtualFileManager virtualFileManager, RenderCacheItem displayedItem) {
         RenderCacheItem cacheItem = null;
 
         //error not cached in ArrayDeque
@@ -46,8 +63,7 @@ public class RenderCache {
             return displayedItem;
         }
 
-
-        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.equals(zoom)) {
+        if (displayedItem != null && displayedItem.getSourceFilePath().equals(sourceFilePath) && displayedItem.getZoom().equals(zoom)) {
             cacheItem = displayedItem;
             if (cacheItem.getSource().equals(source)) {
                 logger.debug("returning displayedItem");
@@ -79,24 +95,13 @@ public class RenderCache {
     public void addToCache(RenderCacheItem cacheItem) {
         if (cacheItems.size() > 0 && cacheItems.size() + 1 > maxCacheSize) {
             RenderCacheItem renderCacheItem = cacheItems.removeFirst();
-            renderCacheItem.dispose();
+//            renderCacheItem.dispose();
         }
         cacheItems.add(cacheItem);
     }
 
-    public boolean isDisplayed(RenderCacheItem cachedItem, int page) {
-        return displayedItem == cachedItem && cachedItem.getRequestedPage() == page;
-    }
 
-    public RenderCacheItem getDisplayedItem() {
-        return displayedItem;
-    }
-
-    public void setDisplayedItem(RenderCacheItem displayedItem) {
-        this.displayedItem = displayedItem;
-    }
-
-    public boolean isOlderRequest(RenderCacheItem cachedItem) {
+    public boolean isOlderRequest(RenderCacheItem cachedItem, RenderCacheItem displayedItem) {
         if (displayedItem != null) {
             return displayedItem.getVersion() > cachedItem.getVersion();
         } else {
@@ -106,15 +111,12 @@ public class RenderCache {
 
 
     public void removeFromCache(RenderCacheItem cachedItem) {
-        logger.debug("force removing from cache " + cachedItem);
+        logger.debug("force removing from cache ", cachedItem);
         cacheItems.remove(cachedItem);
-        if (displayedItem == cachedItem) {
-            displayedItem = null;
-        }
-        cachedItem.dispose();
+//        cachedItem.dispose();
     }
 
-    public boolean isSameFile(RenderCacheItem cachedItem) {
+    public boolean isSameFile(RenderCacheItem cachedItem, RenderCacheItem displayedItem) {
         if (displayedItem != null && cachedItem != null) {
             return displayedItem.getSourceFilePath().equals(cachedItem.getSourceFilePath());
         }
@@ -125,7 +127,7 @@ public class RenderCache {
         while (true) {
             RenderCacheItem poll = cacheItems.poll();
             if (poll == null) break;
-            poll.dispose();
+//            poll.dispose();
         }
     }
 

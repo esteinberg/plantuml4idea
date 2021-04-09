@@ -6,7 +6,7 @@ import org.plantuml.idea.rendering.PartialRenderingException;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

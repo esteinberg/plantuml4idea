@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>4.6.1</version>
+    <version>5.0.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203"/>
@@ -10,6 +10,12 @@
 
     <change-notes>
         <![CDATA[        
+            <p>5.0<p>
+            <ul>
+              <li>Editor preview</li>
+              <li>PlantUML library upgrade to v1.2021.4</li>
+              <li>Render *.dot files without plantUML meta tags</li>
+            </ul>         
             <p>4.6<p>
             <ul>
               <li>Added option: Remember last export directory</li>
@@ -97,19 +103,48 @@
     <application-components>
         <!-- Add your application components here -->
         <component>
-            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlApplicationComponent</implementation-class>
+            <implementation-class>org.plantuml.idea.PlantUmlApplicationComponent</implementation-class>
         </component>
     </application-components>
 
     <project-components>
         <!-- Add your project components here -->
         <component>
-            <implementation-class>org.plantuml.idea.toolwindow.PlantUmlProjectComponent</implementation-class>
+            <implementation-class>org.plantuml.idea.PlantUmlProjectComponent</implementation-class>
         </component>
     </project-components>
 
     <actions>
-        <group id="PlantUML.Toolbar" description="PlantUML Toolbar">
+        <group id="PlantUML.EditorToolbar" description="PlantUML editor toolbar">
+        </group>
+        <group id="PlantUML.EditorLayout">
+
+            <action class="org.plantuml.idea.preview.editor.editorLayout.EditorOnlyLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.EditorOnlyLayoutChangeAction"
+                    text="Show Editor Only"
+                    icon="AllIcons.General.LayoutEditorOnly">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.EditorAndPreviewLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.EditorAndPreviewLayoutChangeAction"
+                    text="Show Editor and Preview"
+                    icon="AllIcons.General.LayoutEditorPreview">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    text="Show Editor and Preview - Horizontal Split"
+                    icon="/images/layoutEditorPreview_horizontal.svg">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
+                    text="Show Preview Only"
+                    icon="AllIcons.General.LayoutPreviewOnly">
+            </action>
+            <separator/>
+            <add-to-group group-id="PlantUML.EditorToolbar"/>
+        </group>
+
+        <group id="PlantUML.Toolbar" description="PlantUML toolwindow toolbar">
+            <add-to-group group-id="PlantUML.EditorToolbar"/>
             <action id="PlantUML.Update" description="Update PlantUml Diagrams"
                     class="org.plantuml.idea.action.UpdateDiagramsAction"
                     icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">
@@ -202,6 +237,7 @@
                     class="org.plantuml.idea.action.AboutAction" text="About"/>
         </group>
 
+
         <group id="NewPlantUML" text="PlantUML">
             <action id="NewPlantUMLFile" class="org.plantuml.idea.plantuml.CreatePlantUMLFileAction"/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
@@ -230,17 +266,18 @@
         </intentionAction>
 
         <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
-                    factoryClass="org.plantuml.idea.toolwindow.PlantUmlToolWindowFactory"/>
+                    factoryClass="org.plantuml.idea.preview.toolwindow.PlantUmlToolWindowFactory"/>
         <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
-        <applicationConfigurable instance="org.plantuml.idea.lang.settings.PlantUmlSettingsPage" groupId="language"/>
-        <applicationService serviceImplementation="org.plantuml.idea.lang.settings.PlantUmlSettings"/>
-        <applicationService serviceImplementation="org.plantuml.idea.lang.settings.CfgSettings"/>
+        <applicationConfigurable instance="org.plantuml.idea.settings.PlantUmlSettingsPage" groupId="language"/>
+        <applicationService serviceImplementation="org.plantuml.idea.settings.PlantUmlSettings"/>
+        <applicationService serviceImplementation="org.plantuml.idea.rendering.RenderCache"/>
+        <applicationService serviceImplementation="org.plantuml.idea.rendering.LazyApplicationPoolExecutor"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>
-        <applicationService serviceImplementation="org.plantuml.idea.toolwindow.SelectedPagePersistentStateComponent"/>
+        <applicationService serviceImplementation="org.plantuml.idea.SelectedPagePersistentStateComponent"/>
 
         <completion.contributor language="PUML"
                                 implementationClass="org.plantuml.idea.lang.PlantUmlCompletionContributor"/>
@@ -267,6 +304,10 @@
                                  implementationClass="org.plantuml.idea.grammar.PumlRefactoringSupportProvider"/>
         <lang.inspectionSuppressor language="PUML"
                                    implementationClass="org.plantuml.idea.grammar.PumlInspectionSuppressor"/>
+        <todoIndexer filetype="PlantUML file" implementationClass="org.plantuml.idea.grammar.PumlTodoIndexer"/>
+        <todoIndexer filetype="PlantUML include file" implementationClass="org.plantuml.idea.grammar.PumlTodoIndexer"/>
+
+        <fileEditorProvider implementation="org.plantuml.idea.preview.editor.PlantUmlSplitEditorProvider"/>
     </extensions>
 
 </idea-plugin>

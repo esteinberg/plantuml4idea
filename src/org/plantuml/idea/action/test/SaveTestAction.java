@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.plantuml.SourceExtractor;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 
 import java.io.File;
 import java.util.Locale;

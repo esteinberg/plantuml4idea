@@ -21,13 +21,13 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -61,8 +61,8 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
 
-        PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-        RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
+        RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
 
         String selectedSource = displayedItem.getSource();
@@ -106,7 +106,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                     File parentDir = file.getParentFile();
                     if (parentDir != null && parentDir.exists()) {
                         plantUmlSettings.setLastExportDir(parentDir.getAbsolutePath());
-                        logger.debug("lastDir set to " + parentDir.getAbsolutePath());
+                        logger.debug("lastDir set to ", parentDir.getAbsolutePath());
                     }
                 } else {
                     plantUmlSettings.setLastExportDir(null);
@@ -144,7 +144,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 } else {
                     PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                             imageFormat, file.getAbsolutePath(), pathPrefix,
-                            UIUtils.getPlantUmlToolWindow(project).getZoom(), getPageNumber(e));
+                            UIUtils.getEditorOrToolWindowPreview(e).getZoom(), getPageNumber(e));
 
                 }
 
@@ -191,10 +191,10 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         try {
-            PlantUmlToolWindow plantUmlToolWindow = UIUtils.getPlantUmlToolWindow(myProject);
-            if (plantUmlToolWindow != null) {
-                RenderCacheItem displayedItem = plantUmlToolWindow.getDisplayedItem();
-                int selectedPage = plantUmlToolWindow.getSelectedPage();
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
+            if (previewPanel != null) {
+                RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
+                int selectedPage = previewPanel.getSelectedPage();
                 ImageItem imageItem = displayedItem.getImageItem(selectedPage < 0 ? 0 : selectedPage);
                 if (imageItem != null) {
                     String customFileName = imageItem.getCustomFileName();
@@ -245,7 +245,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            e.getPresentation().setEnabled(UIUtils.hasAnyImage(project));
+            e.getPresentation().setEnabled(UIUtils.hasAnyImage(e));
         }
     }
 }

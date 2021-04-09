@@ -8,8 +8,9 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.ImageFormat;
-import org.plantuml.idea.toolwindow.image.ImageContainerSvg;
-import org.plantuml.idea.toolwindow.image.svg.MyImageEditorImpl;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
+import org.plantuml.idea.preview.image.ImageContainerSvg;
+import org.plantuml.idea.preview.image.svg.MyImageEditorImpl;
 import org.plantuml.idea.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -24,10 +25,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.*;
 
 import static org.plantuml.idea.intentions.ReverseArrowIntention.logger;
 
@@ -41,7 +40,7 @@ public class ImageItem {
     @NotNull
     private final RenderingType renderingType;
     @NotNull
-    private final List<LinkData> links;
+    private List<LinkData> links;
     @Nullable
     private final String title;
     @Nullable
@@ -55,9 +54,8 @@ public class ImageItem {
     private final byte[] imageBytes;
     private Throwable exception;
 
-    @Nullable
-    private volatile BufferedImage image;
-    private volatile MyImageEditorImpl editor;
+    private final Map<PlantUmlPreviewPanel, ImageItemComponent> componentMap = new HashMap<>();
+    private BufferedImage bufferedImage;
 
     public ImageItem(@Nullable File baseDir,
                      @NotNull ImageFormat format,
@@ -90,7 +88,7 @@ public class ImageItem {
         this.description = item.description;
         this.pageSource = item.pageSource;
         this.documentSource = item.documentSource;
-        this.image = item.image;
+        this.componentMap.putAll(item.componentMap);
         this.links = item.links;
         this.imageBytes = item.imageBytes;
         this.renderingType = item.renderingType;
@@ -117,11 +115,15 @@ public class ImageItem {
 
 
     @Nullable
-    public BufferedImage getImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
-        if (image == null && hasImageBytes()) {
-            initImage(project, renderRequest, renderResult);
+    public BufferedImage getImage(PlantUmlPreviewPanel previewPanel, Project project, RenderRequest renderRequest, RenderResult renderResult) {
+        ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);
+        if (imageItemComponent.image == null && hasImageBytes()) {
+            imageItemComponent = initImage(project, renderRequest, renderResult, previewPanel);
         }
-        return image;
+        if (imageItemComponent == null) {
+            return null;
+        }
+        return imageItemComponent.getImage();
     }
 
     @NotNull
@@ -173,30 +175,55 @@ public class ImageItem {
         return false;
     }
 
-    void initImage(Project project, RenderRequest renderRequest, RenderResult renderResult) {
-        if ((editor == null && image == null) && hasImageBytes()) {
+    ImageItemComponent initImage(Project project, RenderRequest renderRequest, RenderResult renderResult, PlantUmlPreviewPanel previewPanel) {
+        ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);
+
+        if (imageItemComponent.isNull() && hasImageBytes()) {
             long start = System.currentTimeMillis();
             if (format == ImageFormat.PNG) {
-                try {
-                    this.image = Utils.getBufferedImage(getImageBytes());
-                    if (image == null) {
-                        LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                initPng(imageItemComponent);
             } else if (format == ImageFormat.SVG) {
-                editor = ImageContainerSvg.initEditor(this, project, renderRequest, renderResult);
+                imageItemComponent.editor = ImageContainerSvg.initEditor(previewPanel, this, project, renderRequest, renderResult);
             }
             LOG.debug("initImage done in ", System.currentTimeMillis() - start, "ms");
         }
+        return imageItemComponent;
     }
 
-    public MyImageEditorImpl getEditor(final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
-        if (editor == null) {
-            editor = ImageContainerSvg.initEditor(this, project, renderRequest, renderResult);
+    /**
+     * it seems that BufferedImage can be shared in multiple components
+     */
+    private synchronized void initPng(ImageItemComponent imageItemComponent) {
+        try {
+            if (bufferedImage == null) {
+                bufferedImage = Utils.getBufferedImage(getImageBytes());
+            }
+            imageItemComponent.image = bufferedImage;
+            if (imageItemComponent.image == null) {
+                LOG.error("image not generated, imageBytes.length :" + getImageBytes().length);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return editor;
+    }
+
+    public MyImageEditorImpl getEditor(PlantUmlPreviewPanel previewPanel, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
+        ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);
+        if (imageItemComponent.editor == null) {
+            imageItemComponent.editor = ImageContainerSvg.initEditor(previewPanel, this, project, renderRequest, renderResult);
+        }
+        return imageItemComponent.editor;
+    }
+
+    private synchronized ImageItemComponent getImageItemComponent(PlantUmlPreviewPanel previewPanel) {
+        ImageItemComponent imageItemComponent = componentMap.get(previewPanel);
+        if (imageItemComponent == null) {
+            imageItemComponent = new ImageItemComponent();
+            if (previewPanel != null) {
+                componentMap.put(previewPanel, imageItemComponent);
+            }
+        }
+        return imageItemComponent;
     }
 
     /**
@@ -266,7 +293,7 @@ public class ImageItem {
 
             LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.warn(e);
             return Collections.emptyList();
         }
@@ -308,7 +335,10 @@ public class ImageItem {
             if (StringUtils.isEmpty(textContent)) {
                 continue;
             }
-            urls.add(textNodeToUrlData(textContent, node, false));
+            LinkData e = textNodeToUrlData(textContent, node, false);
+            if (e != null) {
+                urls.add(e);
+            }
         }
         return urls;
     }
@@ -329,19 +359,25 @@ public class ImageItem {
         for (int i = 0; i < linkNode.getChildNodes().getLength(); i++) {
             Node child = linkNode.getChildNodes().item(i);
             if (child.getNodeName().equals("text")) {
-                urls.add(textNodeToUrlData(nodeValue, child, true));
+                LinkData e = textNodeToUrlData(nodeValue, child, true);
+                if (e != null) {
+                    urls.add(e);
+                }
             }
         }
 
         return urls;
     }
 
-    @NotNull
     private LinkData textNodeToUrlData(String text, Node child, boolean link) {
         NamedNodeMap nodeAttributes = child.getAttributes();
         int x = (int) Float.parseFloat(nodeAttributes.getNamedItem("x").getNodeValue());
         int y = (int) Float.parseFloat(nodeAttributes.getNamedItem("y").getNodeValue());
-        int textLength = (int) Float.parseFloat(nodeAttributes.getNamedItem("textLength").getNodeValue());
+        Node textLength1 = nodeAttributes.getNamedItem("textLength");
+        if (textLength1 == null) {
+            return null;
+        }
+        int textLength = (int) Float.parseFloat(textLength1.getNodeValue());
         int height = (int) Float.parseFloat(nodeAttributes.getNamedItem("font-size").getNodeValue());
 
         Rectangle rect = new Rectangle(

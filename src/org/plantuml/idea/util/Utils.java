@@ -1,8 +1,12 @@
 package org.plantuml.idea.util;
 
+import com.intellij.ide.scratch.ScratchUtil;
+import com.intellij.lang.LanguageUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.IntRange;
@@ -10,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.lang.PlantUmlLanguage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -40,6 +45,19 @@ public class Utils {
     public static boolean isPlantUmlFileType(@NotNull PsiFile file) {
         FileType fileType = file.getFileType();
         return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
+    }
+
+    public static boolean isPlantUmlFileType(Project project, VirtualFile file) {
+        if (file.isDirectory() || !file.exists()) {
+            return false;
+        }
+        // when a project is already disposed due to a slow initialization, reject this file
+        if (project.isDisposed()) {
+            return false;
+        }
+        FileType fileType = file.getFileType();
+        return fileType == PlantUmlFileType.INSTANCE ||
+                (ScratchUtil.isScratch(file) && LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE);
     }
 
     public static boolean containsLettersOrNumbers(CharSequence s) {
@@ -140,4 +158,6 @@ public class Utils {
     public static boolean isUnitTest() {
         return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
+
+
 }

@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.util.UIUtils;
 
 /**
@@ -16,13 +16,13 @@ public abstract class ZoomAction extends DumbAwareAction {
     protected static int MIN_ZOOM = 20;
     protected static int ZOOM_STEP = 20;
 
-    protected int getUnscaledZoom(Project project) {
-        PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
+    protected int getUnscaledZoom(AnActionEvent event) {
+        PlantUmlPreviewPanel plantUML = UIUtils.getEditorOrToolWindowPreview(event);
         return plantUML.getZoom().getUnscaledZoom();
     }
 
-    protected void changeZoom(Project project, int unscaledZoom) {
-        PlantUmlToolWindow plantUML = UIUtils.getPlantUmlToolWindow(project);
+    protected void changeZoom(AnActionEvent e, int unscaledZoom) {
+        PlantUmlPreviewPanel plantUML = UIUtils.getEditorOrToolWindowPreview(e);
         plantUML.changeZoom(unscaledZoom, null);
     }
 
@@ -31,10 +31,10 @@ public abstract class ZoomAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            boolean enabled = UIUtils.hasAnyImage(project);
+            boolean enabled = UIUtils.hasAnyImage(e);
             e.getPresentation().setEnabled(enabled);
             if (enabled) {
-                int zoom = getUnscaledZoom(project);
+                int zoom = getUnscaledZoom(e);
                 e.getPresentation().setDescription("Actual zoom: " + zoom + "%");
             }
         }

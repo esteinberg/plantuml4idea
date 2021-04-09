@@ -14,8 +14,8 @@ import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.SourceExtractor;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.util.ArrayList;
 import java.util.List;

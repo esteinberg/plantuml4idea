@@ -7,11 +7,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
-import org.plantuml.idea.lang.settings.PlantUmlSettings;
+import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingType;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import javax.swing.*;
 

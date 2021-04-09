@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 
 import java.io.File;
 import java.util.Arrays;
@@ -194,17 +194,6 @@ public class RenderCacheItem {
         return false;
     }
 
-    public void dispose() {
-//        LOG.debug("disposing ", this);
-//        try {
-//            for (ImageItem imageItem : imageItems) {
-//                imageItem.dispose();
-//            }
-//        } catch (Throwable e) {
-//            LOG.error(e);
-//        }
-    }
-
     public boolean sourceChanged(String[] sourceSplit, int page) {
         return !sourceSplit[page].equals(getImagesItemPageSource(page));
     }
@@ -237,5 +226,14 @@ public class RenderCacheItem {
             filename = FileUtilRt.getNameWithoutExtension(fileName);
         }
         return filename;
+    }
+
+    public boolean hasImagesOrStacktrace() {
+        for (ImageItem imageItem : getImageItems()) {
+            if (imageItem != null && (imageItem.hasImageBytes() || imageItem.getException() != null)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

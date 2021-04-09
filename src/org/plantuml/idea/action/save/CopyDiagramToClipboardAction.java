@@ -5,8 +5,8 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.plantuml.idea.toolwindow.PlantUmlToolWindow;
-import org.plantuml.idea.toolwindow.image.ImageContainer;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
+import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
@@ -26,10 +26,10 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     public void actionPerformed(AnActionEvent e) {
         final Project project = e.getProject();
 
-        PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(project);
-        JPanel imagesPanel = umlToolWindow.getImagesPanel();
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
+        JPanel imagesPanel = previewPanel.getImagesPanel();
         ImageContainer component = (ImageContainer) imagesPanel.getComponent(0);
-        final Image image = component.getPngImage();
+        final Image image = component.getPngImage(e);
 
         CopyPasteManager.getInstance().setContents(new Transferable() {
             @Override
@@ -58,20 +58,22 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
         if (project != null) {
-            PlantUmlToolWindow umlToolWindow = UIUtils.getPlantUmlToolWindow(e.getProject());
-            if (umlToolWindow != null) {
-                int selectedPage = umlToolWindow.getSelectedPage();
-                JPanel imagesPanel = umlToolWindow.getImagesPanel();
-                Component component1 = imagesPanel.getComponent(0);
-                if (component1 instanceof ImageContainer) {
-                    ImageContainer component = (ImageContainer) component1;
-                    boolean pngAvailable = component.isPngAvailable();
-                    boolean singlePage = umlToolWindow.getNumPages() == 1 || (umlToolWindow.getNumPages() > 1 && selectedPage != -1);
-                    e.getPresentation().setEnabled(pngAvailable && singlePage);
+            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
+            if (previewPanel != null) {
+                int selectedPage = previewPanel.getSelectedPage();
+                JPanel imagesPanel = previewPanel.getImagesPanel();
+                int componentCount = imagesPanel.getComponentCount();
+                if (componentCount > 0) {
+                    Component component1 = imagesPanel.getComponent(0);
+                    if (component1 instanceof ImageContainer) {
+                        ImageContainer component = (ImageContainer) component1;
+                        boolean pngAvailable = component.isPngAvailable();
+                        boolean singlePage = previewPanel.getNumPages() == 1 || (previewPanel.getNumPages() > 1 && selectedPage != -1);
+                        e.getPresentation().setEnabled(pngAvailable && singlePage);
+                    }
                 }
             } else {
                 e.getPresentation().setEnabled(false);
-
             }
         }
     }

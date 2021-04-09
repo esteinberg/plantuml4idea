@@ -7,7 +7,7 @@ import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.toolwindow.Zoom;
+import org.plantuml.idea.preview.Zoom;
 
 import static org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil.NEW_PAGE_PATTERN;
 
