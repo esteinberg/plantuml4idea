@@ -8,9 +8,6 @@ import com.intellij.psi.search.UsageSearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.lang.PlantUmlParserDefinition;
 
-/**
- * TODO
- */
 public class PumlTodoIndexer extends LexerBasedTodoIndexer {
     @NotNull
     @Override
