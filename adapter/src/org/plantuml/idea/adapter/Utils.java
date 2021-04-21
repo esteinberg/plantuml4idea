@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.FileSystem;
+import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
@@ -25,6 +26,7 @@ public class Utils {
 
     @NotNull
     public static void prepareEnvironment(RenderRequest renderRequest) {
+        OptionFlags.getInstance().setVerbose(true);       //TODO
         long start = System.currentTimeMillis();
         File baseDir = renderRequest.getBaseDir();
         if (baseDir != null) {

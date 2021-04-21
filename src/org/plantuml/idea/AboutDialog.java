@@ -22,6 +22,8 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,6 +39,7 @@ public class AboutDialog extends JDialog {
     private JEditorPane aboutEditorPane;
     private ImageContainerPng testDot;
     private Usage usage;
+    private JTextArea debugPane;
 
     public AboutDialog(AnActionEvent e, Project project) {
         this.project = project;
@@ -51,7 +54,26 @@ public class AboutDialog extends JDialog {
         about();
 
         testDot(e);
+
+        try {
+            StringBuilder debug = new StringBuilder("Debug Info:");
+            debugPane.setOpaque(false);
+            debugPane.setEditable(false);
+            TransformerFactory xformFactory = TransformerFactory.newInstance();
+            debug.append("\nTransformerFactory=").append(xformFactory.getClass());
+            debug.append("\nTransformerFactoryClassLoader=").append(xformFactory.getClass().getClassLoader());
+            Transformer transformer = xformFactory.newTransformer();
+            debug.append("\nTransformer=").append(transformer.getClass());
+            debug.append("\nTransformerClassLoader=").append(transformer.getClass().getClassLoader());
+            debug.append("\nTransformerOutputProperties=").append(transformer.getOutputProperties());
+            debugPane.setText(debug.toString());
+        } catch (Throwable t) {
+            logger.warn(t);
+            debugPane.setText(t.toString());
+        }
+
         usage.setText(Usage.TEXT);
+
 
         getRootPane().registerKeyboardAction(new ActionListener() {
             @Override
