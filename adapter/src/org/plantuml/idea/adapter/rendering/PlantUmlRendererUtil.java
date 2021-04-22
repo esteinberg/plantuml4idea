@@ -78,7 +78,7 @@ public class PlantUmlRendererUtil {
             defines = Defines.createEmpty();
         }
         SourceStringReader sourceStringReader = new SourceStringReader(defines, source, encoding, configAsList);
-        logger.debug("newSourceStringReader ", System.currentTimeMillis() - start, "ms");
+        logger.debug("newSourceStringReader ", System.currentTimeMillis() - start, "ms, encoding=", encoding);
         return sourceStringReader;
     }
 

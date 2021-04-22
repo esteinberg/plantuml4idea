@@ -17,10 +17,13 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.plantuml.idea.rendering.RenderingType;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -172,7 +175,7 @@ public class DiagramFactory {
         boolean png = isPng(bytes);
         boolean wrongResultFormat = format == ImageFormat.SVG && png;
 
-        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=", png);
+        LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=", png,", wrongResultFormat=",wrongResultFormat);
 
         byte[] svgBytes = new byte[0];
         if (!wrongResultFormat) {
@@ -182,7 +185,7 @@ public class DiagramFactory {
                 svgBytes = generateSvgLinks(page);
             }
         }
-
+        debugInfo(documentSource, svgBytes);
 
         Objects.requireNonNull(diagramDescription);
         String description = diagramDescription.getDescription();
@@ -195,6 +198,26 @@ public class DiagramFactory {
             resultFormat = ImageFormat.PNG;
         }
         return new ImageItem(renderRequest.getBaseDir(), resultFormat, documentSource, pageSource, page, description, bytes, svgBytes, renderingType, getTitle(page), getFilename(page), null);
+    }
+
+    private void debugInfo(String documentSource, byte[] svgBytes) {
+        if (LOG.isDebugEnabled()) {
+            try {
+                LOG.debug("documentSource=", java.util.Base64.getEncoder().encodeToString(documentSource.getBytes(StandardCharsets.UTF_8)));
+                if (svgBytes.length > 0) {
+                    TransformerFactory factory = TransformerFactory.newInstance();
+                    LOG.debug("TransformerFactory=" + factory.getClass());
+                    LOG.debug("TransformerFactoryClassLoader=" + factory.getClass().getClassLoader());
+                    Transformer transformer = factory.newTransformer();
+                    LOG.debug("Transformer=" + transformer.getClass());
+                    LOG.debug("TransformerClassLoader=" + transformer.getClass().getClassLoader());
+                    LOG.debug("TransformerOutputProperties=" + transformer.getOutputProperties());
+                    LOG.debug("svgBytes=", java.util.Base64.getEncoder().encodeToString(svgBytes));
+                }
+            } catch (Throwable e) {
+                LOG.error(e);
+            }
+        }
     }
 
     private boolean isPng(byte[] bytes) {

@@ -26,7 +26,8 @@ public class Utils {
 
     @NotNull
     public static void prepareEnvironment(RenderRequest renderRequest) {
-        OptionFlags.getInstance().setVerbose(true);       //TODO
+        OptionFlags.getInstance().setVerbose(LOG.isDebugEnabled());
+        
         long start = System.currentTimeMillis();
         File baseDir = renderRequest.getBaseDir();
         if (baseDir != null) {
