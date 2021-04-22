@@ -33,11 +33,17 @@ import org.plantuml.idea.settings.PlantUmlSettings;
 import org.w3c.dom.Document;
 
 import javax.swing.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 /**
  * Image viewer implementation.
@@ -223,6 +229,8 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 ByteArrayInputStream in = new ByteArrayInputStream(buf);
                 InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
                 Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
+                logDocument(svgDocument);
+
                 //it shows what is in png document - unZOOMED values, not limited by px limit
                 ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
 
@@ -253,7 +261,29 @@ public final class MyImageEditorImpl implements MyImageEditor {
             }
         }
 
+        private void logDocument(Document svgDocument) {
+            if (LOG.isDebugEnabled()) {
+                try {
+                    DOMSource domSource = new DOMSource(svgDocument);
+                    StringWriter writer = new StringWriter();
+                    StreamResult result = new StreamResult(writer);
+                    TransformerFactory tf = TransformerFactory.newInstance();
+                    Transformer transformer = tf.newTransformer();
+                    transformer.transform(domSource, result);
+
+                    String stringFromDocument = writer.toString();
+                    if (stringFromDocument != null) {
+                        byte[] bytes = stringFromDocument.getBytes(StandardCharsets.UTF_8);
+                        String s = Base64.getEncoder().encodeToString(bytes);
+                        LOG.debug("svgDocument=" + s);
+                    }
+                } catch (Throwable ex) {
+                    LOG.error(ex);
+                }
+            }
+        }
     }
+
     static class Holder {
         private final ImageLoader.Dimension2DDouble outSize;
         private final double zoom;
