@@ -3,7 +3,7 @@ package org.plantuml.idea.preview.image;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.testFramework.LightVirtualFile;
+import com.intellij.testFramework.BinaryLightVirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.PopupHandler;
 import com.intellij.util.Alarm;
@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -144,8 +143,8 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     public static MyImageEditorImpl initEditor(PlantUmlPreviewPanel previewPanel, ImageItem imageItem, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
         long start = System.currentTimeMillis();
         MyImageEditorImpl editor;
-        String content = new String(imageItem.getImageBytes(), StandardCharsets.UTF_8);
-        LightVirtualFile virtualFile = new LightVirtualFile("svg image.svg", content);
+
+        BinaryLightVirtualFile virtualFile = new BinaryLightVirtualFile("svg image.svg", imageItem.getImageBytes());
         editor = new MyImageEditorImpl(previewPanel, project, virtualFile, true, renderRequest.getZoom());
         ImageComponent imageComponent = editor.getComponent().getImageComponent();
         JComponent contentComponent = editor.getContentComponent();
