@@ -114,6 +114,9 @@ public class RenderCommand {
 
 
             PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
+
+            CompatibilityCheck.checkTransformer(plantUmlSettings);
+
             ImageFormat imageFormat = plantUmlSettings.isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
 
             renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason);

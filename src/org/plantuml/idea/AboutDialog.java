@@ -66,6 +66,7 @@ public class AboutDialog extends JDialog {
             debug.append("\nTransformer=").append(transformer.getClass());
             debug.append("\nTransformerClassLoader=").append(transformer.getClass().getClassLoader());
             debug.append("\nTransformerOutputProperties=").append(transformer.getOutputProperties());
+            debug.append("\njavax.xml.transform.TransformerFactory=").append(System.getProperty("javax.xml.transform.TransformerFactory"));
             debugPane.setText(debug.toString());
         } catch (Throwable t) {
             logger.warn(t);
