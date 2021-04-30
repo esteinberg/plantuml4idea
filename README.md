@@ -5,15 +5,26 @@ IntelliJ [IDEA plugin for PlantUML](http://plugins.intellij.net/plugin/?idea&id=
 
 This plugin provides integration with popular [PlantUML](http://plantuml.sourceforge.net/) diagramming tool
 
-Author: [Eugene Steinberg](https://github.com/esteinberg)
+---
+
+### Sponsored by
+
+<p><a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner"><img src="https://alt-images.codestream.com/codestream_logo_vojta_plantuml.png"></a><br>
+Manage pull requests and conduct code reviews in your IDE with full source-tree context. Comment on any line, not just the diffs. Use jump-to-definition, your favorite keybindings, and code intelligence with more of your workflow.<br>
+<a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner">Learn More</a></p>
+
+---
+
+Author:
+[Eugene Steinberg](https://github.com/esteinberg)
 
 Contributors:
 
- * [Ivan Mamontov](https://github.com/IvanMamontov)
- * [Henady Zakalusky](https://github.com/hza)
- * [Max Gorbunov](https://github.com/6zow)
- * [Vojtěch Krása](https://github.com/krasa)
- * [Andrew Korolev](https://github.com/koroandr)
+* [Ivan Mamontov](https://github.com/IvanMamontov)
+* [Henady Zakalusky](https://github.com/hza)
+* [Max Gorbunov](https://github.com/6zow)
+* [Vojtěch Krása](https://github.com/krasa)
+* [Andrew Korolev](https://github.com/koroandr)
 
 # Features
 * PlantUML tool window renders PlantUML source code under caret in currently selected editor
