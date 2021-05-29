@@ -15,10 +15,15 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[        
+            <p>5.4<p>
+            <ul>
+                 <li>PlantUML library upgrade to v1.2021.7</li>
+                 <li>IJ 2021.2 compatibility</li>
+            </ul>
             <p>5.3<p>
             <ul>
                  <li>PlantUML library upgrade to v1.2021.5</li>
-            </ul>   
+            </ul>
             <p>5.2<p>
             <ul>
               <li>Detection for plugin conflicts - disables SVG preview rendering</li>
