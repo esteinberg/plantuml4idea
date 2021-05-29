@@ -26,6 +26,12 @@ public class PlantUmlFileType extends LanguageFileType {
         return "PlantUML file";
     }
 
+
+    @NotNull
+    @Override
+    public String getDisplayName() {
+        return "PlantUML file";
+    }
     @NotNull
     @Override
     public String getDescription() {

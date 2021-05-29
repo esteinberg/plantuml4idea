@@ -33,6 +33,12 @@ public class PlantIUmlFileType extends LanguageFileType {
 
     @NotNull
     @Override
+    public String getDisplayName() {
+        return "PlantUML include file";
+    }
+
+    @NotNull
+    @Override
     public String getDefaultExtension() {
         return PLANTUML_EXT;
     }
