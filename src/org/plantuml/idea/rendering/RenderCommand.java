@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.ExecutionStatusPanel;
@@ -33,10 +34,10 @@ public class RenderCommand {
     protected LazyApplicationPoolExecutor.Delay delay;
     private ExecutionStatusPanel.State currentState = ExecutionStatusPanel.State.WAITING;
     protected long startAtNanos;
-    private RenderRequest renderRequest;
-    private RenderResult result;
+    protected RenderRequest renderRequest;
+    protected RenderResult result;
     protected static final int MILLION = 1000000;
-    private long start;
+    protected long start;
 
     public long getRemainingDelayMillis() {
         return (startAtNanos - System.nanoTime()) / MILLION;
@@ -141,10 +142,8 @@ public class RenderCommand {
         }
         try {
             long s2 = System.currentTimeMillis();
-            final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
+            final RenderCacheItem newItem = createRenderCacheItem();
 
-            updateCache(newItem);
-//        if (true) {
             targets.parallelStream().forEach(target -> {
                 result.getImageItems().parallelStream().forEach(imageItem -> {
                     try {
@@ -164,17 +163,17 @@ public class RenderCommand {
                 }));
             });
 
-
-//        } else {
-//            for (ImageItem imageItem : imageItems) {
-//                imageItem.initImage(this.project, renderRequest, result);
-//            }
-//        }
-
         } catch (Throwable e) {
             updateState(ExecutionStatusPanel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
+    }
+
+    @NotNull
+    protected RenderCacheItem createRenderCacheItem() {
+        final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
+        updateCache(newItem);
+        return newItem;
     }
 
     private void updateCache(RenderCacheItem newItem) {
@@ -225,4 +224,31 @@ public class RenderCommand {
         return true;
     }
 
+    public static class DisplayExisting extends RenderCommand {
+        private static final Logger logger = Logger.getInstance(RenderCommand.class);
+
+        public DisplayExisting(PlantUmlPreviewPanel previewPanel, Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, PlantUmlSettings settings) {
+            super(previewPanel, project, reason, sourceFilePath, source, page, zoom, cachedItem, version, delay, settings);
+        }
+
+        @Override
+        public void render() {
+            try {
+                start = System.currentTimeMillis();
+                renderRequest = cachedItem.getRenderRequest();
+                result = cachedItem.getRenderResult();
+            } catch (RenderingCancelledException e) {
+                logger.info("command interrupted", e);
+                updateState(ExecutionStatusPanel.State.CANCELLED);
+            } catch (Throwable e) {
+                updateState(ExecutionStatusPanel.State.ERROR);
+                logger.error("Exception occurred rendering " + this, e);
+            }
+        }
+
+        @NotNull
+        protected RenderCacheItem createRenderCacheItem() {
+            return cachedItem;
+        }
+    }
 }

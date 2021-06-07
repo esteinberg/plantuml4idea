@@ -141,9 +141,12 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
     public static MyImageEditorImpl initEditor(PlantUmlPreviewPanel previewPanel, ImageItem imageItem, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            LOG.warn("should not be on EDT");
+        }
+
         long start = System.currentTimeMillis();
         MyImageEditorImpl editor;
-
         BinaryLightVirtualFile virtualFile = new BinaryLightVirtualFile("svg image.svg", imageItem.getImageBytes());
         editor = new MyImageEditorImpl(previewPanel, project, virtualFile, true, renderRequest.getZoom());
         ImageComponent imageComponent = editor.getComponent().getImageComponent();

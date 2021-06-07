@@ -297,7 +297,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     lazyExecutor.submit(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, RESET_DELAY));
                 } else if (!isDisplayed(cachedItem, selectedPage, displayedItem)) {
                     logger.debug("render not required, displaying cached item ", cachedItem);
-                    displayExistingDiagram(cachedItem);
+                    lazyExecutor.submit(displayExistingDiagramCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, NOW));
                 } else {
                     logger.debug("render not required, item already displayed ", cachedItem);
                     if (reason != RenderCommand.Reason.CARET) {
@@ -331,14 +331,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         return displayedItem == cachedItem && cachedItem.getRequestedPage() == page;
     }
 
-    private void displayExistingDiagram(RenderCacheItem last) {
-        last.setVersion(sequence.incrementAndGet());
-        last.setRequestedPage(selectedPage);
-        executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, null, "cached");
-        displayImages(last, false);
-    }
-
-
     @NotNull
     private RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final Zoom zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
@@ -346,6 +338,23 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
         return new RenderCommand(this, project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, settings);
     }
+
+    @NotNull
+    private RenderCommand displayExistingDiagramCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final Zoom zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
+        cachedItem.setVersion(sequence.incrementAndGet());
+        cachedItem.setRequestedPage(selectedPage);
+
+        logger.debug("#displayExistingDiagramCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
+        return new RenderCommand.DisplayExisting(this, project, reason, selectedFile, source, page, zoom, cachedItem, cachedItem.getVersion(), delay, settings);
+    }
+
+//    private void displayExistingDiagram(RenderCacheItem last) {
+//        last.setVersion(sequence.incrementAndGet());
+//        last.setRequestedPage(selectedPage);
+//        executionStatusPanel.updateNow(last.getVersion(), ExecutionStatusPanel.State.DONE, null, "cached");
+//        displayImages(last, false);
+//    }
+
 
     public void highlightImages(Editor editor) {
         if (editor == null) {
