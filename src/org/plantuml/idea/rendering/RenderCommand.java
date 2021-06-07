@@ -233,17 +233,9 @@ public class RenderCommand {
 
         @Override
         public void render() {
-            try {
-                start = System.currentTimeMillis();
-                renderRequest = cachedItem.getRenderRequest();
-                result = cachedItem.getRenderResult();
-            } catch (RenderingCancelledException e) {
-                logger.info("command interrupted", e);
-                updateState(ExecutionStatusPanel.State.CANCELLED);
-            } catch (Throwable e) {
-                updateState(ExecutionStatusPanel.State.ERROR);
-                logger.error("Exception occurred rendering " + this, e);
-            }
+            start = System.currentTimeMillis();
+            renderRequest = cachedItem.getRenderRequest();
+            result = cachedItem.getRenderResult();
         }
 
         @NotNull
