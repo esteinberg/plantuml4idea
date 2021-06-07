@@ -186,6 +186,7 @@ public enum LanguageDescriptor {
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
             "!exit",
             "!include",
+            "!theme",
             "!pragma",
             "!define",
             "!undef",
