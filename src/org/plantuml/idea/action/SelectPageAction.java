@@ -3,6 +3,7 @@ package org.plantuml.idea.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
@@ -14,7 +15,7 @@ import javax.swing.*;
  * Author: Eugene Steinberg
  * Date: 3/3/13
  */
-public class SelectPageAction extends ComboBoxAction {
+public class SelectPageAction extends ComboBoxAction implements DumbAware {
     private int numPages = 1;
     private PlantUmlPreviewPanel previewPanel;
     private String[] titles;

@@ -18,6 +18,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <p>5.5<p>
             <ul>
                  <li>Performance fix</li>
+                 <li>Restored page combobox</li>
             </ul>
             <p>5.4<p>
             <ul>
@@ -141,8 +142,6 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
     </project-components>
 
     <actions>
-        <group id="PlantUML.EditorToolbar" description="PlantUML editor toolbar">
-        </group>
         <group id="PlantUML.EditorLayout">
 
             <action class="org.plantuml.idea.preview.editor.editorLayout.EditorOnlyLayoutChangeAction"
@@ -166,11 +165,9 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
                     icon="AllIcons.General.LayoutPreviewOnly">
             </action>
             <separator/>
-            <add-to-group group-id="PlantUML.EditorToolbar"/>
         </group>
 
         <group id="PlantUML.Toolbar" description="PlantUML toolwindow toolbar">
-            <add-to-group group-id="PlantUML.EditorToolbar"/>
             <action id="PlantUML.Update" description="Update PlantUml Diagrams"
                     class="org.plantuml.idea.action.UpdateDiagramsAction"
                     icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">

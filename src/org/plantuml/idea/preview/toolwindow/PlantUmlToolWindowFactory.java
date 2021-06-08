@@ -1,7 +1,6 @@
 package org.plantuml.idea.preview.toolwindow;
 
 import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAware;
@@ -12,6 +11,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
+import org.plantuml.idea.preview.editor.PlantUmlToolbarPanel;
 import org.plantuml.idea.rendering.LazyApplicationPoolExecutor;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.settings.PlantUmlSettings;
@@ -55,11 +55,13 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         }
 
         protected void createToolbar() {
-            DefaultActionGroup newGroup = getActionGroup();
-            final ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, newGroup, true);
+            ActionManager actionManager = ActionManager.getInstance();
+            DefaultActionGroup newGroup = PlantUmlToolbarPanel.prepareToolbar(this, executionStatusPanel, actionManager);
+            final ActionToolbar actionToolbar = actionManager.createActionToolbar("PlantUmlToolWindow", newGroup, true);
             actionToolbar.setTargetComponent(this);
             add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
         }
+
 
         @Override
         public void dispose() {
