@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.ExecutionStatusPanel;
@@ -35,15 +34,16 @@ public class RenderCommand {
     private ExecutionStatusPanel.State currentState = ExecutionStatusPanel.State.WAITING;
     protected long startAtNanos;
     protected RenderRequest renderRequest;
-    protected RenderResult result;
+    protected volatile RenderResult result;
     protected static final int MILLION = 1000000;
     protected long start;
+    protected volatile RenderCacheItem newRenderCacheItem;
 
     public long getRemainingDelayMillis() {
         return (startAtNanos - System.nanoTime()) / MILLION;
     }
 
-    public synchronized Set<PlantUmlPreviewPanel> getTargets() {
+    public Set<PlantUmlPreviewPanel> getTargets() {
         return targets;
     }
 
@@ -51,25 +51,35 @@ public class RenderCommand {
         return startAtNanos;
     }
 
-    public synchronized void addTargets(Set<PlantUmlPreviewPanel> newTargets) {
+    public RenderResult getResult() {
+        return result;
+    }
+
+    public void addTargets(Set<PlantUmlPreviewPanel> newTargets) {
         this.targets.addAll(newTargets);
         for (PlantUmlPreviewPanel target : newTargets) {
             updateState(target, currentState);
         }
     }
 
-    public synchronized void updateState(ExecutionStatusPanel.State currentState) {
+    public void updateState(ExecutionStatusPanel.State currentState) {
         for (PlantUmlPreviewPanel target : targets) {
             updateState(target, currentState);
         }
     }
 
-    public synchronized boolean containsTargets(Set<PlantUmlPreviewPanel> targets) {
+    public boolean containsTargets(Set<PlantUmlPreviewPanel> targets) {
         return this.targets.containsAll(targets);
     }
 
-    public synchronized void removeTargets(Set<PlantUmlPreviewPanel> targets) {
-        targets.removeAll(targets);
+
+    public synchronized boolean addTargetsIfPossible_blocking(RenderCommand newCommand) {
+        if (result == null) {
+            logger.debug("adding targets ", newCommand.getTargets(), " to ", this);
+            addTargets(newCommand.getTargets());
+            return true;
+        }
+        return false;
     }
 
 
@@ -82,8 +92,8 @@ public class RenderCommand {
         SOURCE_PAGE_ZOOM
     }
 
-    public RenderCommand(PlantUmlPreviewPanel previewPanel, Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, PlantUmlSettings settings) {
-        this.targets.add(previewPanel);
+    public RenderCommand(Set<PlantUmlPreviewPanel> previewPanel, Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, PlantUmlSettings settings) {
+        this.targets.addAll(previewPanel);
         this.project = project;
         this.reason = reason;
         this.sourceFilePath = sourceFilePath;
@@ -110,8 +120,14 @@ public class RenderCommand {
                 logger.debug("no targets");
                 return;
             }
+
             start = System.currentTimeMillis();
             updateState(ExecutionStatusPanel.State.EXECUTING);
+
+            if (result != null) {
+                logger.debug("race condition?, already rendered, skipping");
+                return;
+            }
 
 
             PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
@@ -123,7 +139,10 @@ public class RenderCommand {
             renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason);
             renderRequest.disableSvgZoom();
             long s1 = System.currentTimeMillis();
-            result = PlantUmlFacade.get().render(renderRequest, cachedItem);
+            RenderResult render = PlantUmlFacade.get().render(renderRequest, cachedItem);
+            setResult_blocking(render);
+            newRenderCacheItem = new RenderCacheItem(renderRequest, result, page, version);
+
             logger.debug("render ", (System.currentTimeMillis() - s1), "ms");
 
 
@@ -136,13 +155,16 @@ public class RenderCommand {
         }
     }
 
-    public synchronized void displayResult() {
+    private synchronized void setResult_blocking(RenderResult renderResult) {
+        result = renderResult;
+    }
+
+    public void displayResult() {
         if (result == null) {
             return;
         }
         try {
             long s2 = System.currentTimeMillis();
-            final RenderCacheItem newItem = createRenderCacheItem();
 
             targets.parallelStream().forEach(target -> {
                 result.getImageItems().parallelStream().forEach(imageItem -> {
@@ -159,7 +181,8 @@ public class RenderCommand {
 
                 SwingUtilities.invokeLater(logDuration("EDT displayResult", () -> {
                     String resultMessage = result.resultMessage(totalTime);
-                    target.displayResult(newItem, resultMessage);
+                    target.displayResult(newRenderCacheItem, resultMessage);
+                    updateCache(newRenderCacheItem);
                 }));
             });
 
@@ -169,14 +192,11 @@ public class RenderCommand {
         }
     }
 
-    @NotNull
-    protected RenderCacheItem createRenderCacheItem() {
-        final RenderCacheItem newItem = new RenderCacheItem(renderRequest, result, page, version);
-        updateCache(newItem);
-        return newItem;
-    }
+    protected void updateCache(RenderCacheItem newItem) {
+        if (newItem == cachedItem) {
+            return;
+        }
 
-    private void updateCache(RenderCacheItem newItem) {
         if (newItem.hasImagesOrStacktrace()) {
             RenderCache renderCache = RenderCache.getInstance();
             if (reason == RenderCommand.Reason.REFRESH) {
@@ -198,6 +218,7 @@ public class RenderCommand {
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("hash", hashCode())
                 .append("targets", targets)
                 .append("reason", reason)
                 .append("sourceFilePath", sourceFilePath)
@@ -227,20 +248,18 @@ public class RenderCommand {
     public static class DisplayExisting extends RenderCommand {
         private static final Logger logger = Logger.getInstance(RenderCommand.class);
 
-        public DisplayExisting(PlantUmlPreviewPanel previewPanel, Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, PlantUmlSettings settings) {
+        public DisplayExisting(Set<PlantUmlPreviewPanel> previewPanel, Project project, Reason reason, String sourceFilePath, String source, int page, Zoom zoom, RenderCacheItem cachedItem, int version, LazyApplicationPoolExecutor.Delay delay, PlantUmlSettings settings) {
             super(previewPanel, project, reason, sourceFilePath, source, page, zoom, cachedItem, version, delay, settings);
-        }
-
-        @Override
-        public void render() {
-            start = System.currentTimeMillis();
             renderRequest = cachedItem.getRenderRequest();
             result = cachedItem.getRenderResult();
+            newRenderCacheItem = cachedItem;
         }
 
-        @NotNull
-        protected RenderCacheItem createRenderCacheItem() {
-            return cachedItem;
+        public DisplayExisting(RenderCommand newCommand, RenderCommand oldCommand) {
+            super(newCommand.getTargets(), newCommand.project, newCommand.reason, newCommand.sourceFilePath, newCommand.source, newCommand.page, newCommand.zoom, newCommand.cachedItem, newCommand.version, newCommand.delay, PlantUmlSettings.getInstance());
+            this.result = oldCommand.getResult();
+            this.renderRequest = oldCommand.renderRequest;
+            this.newRenderCacheItem = oldCommand.newRenderCacheItem;
         }
     }
 }

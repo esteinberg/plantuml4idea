@@ -142,7 +142,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     public static MyImageEditorImpl initEditor(PlantUmlPreviewPanel previewPanel, ImageItem imageItem, final Project project, final RenderRequest renderRequest, final RenderResult renderResult) {
         if (SwingUtilities.isEventDispatchThread()) {
-            LOG.warn("should not be on EDT");
+            LOG.warn("should not be on EDT", new Throwable());
         }
 
         long start = System.currentTimeMillis();

@@ -1,10 +1,6 @@
 package org.plantuml.idea.preview;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionStub;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -23,8 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.SelectedPagePersistentStateComponent;
 import org.plantuml.idea.Usage;
-import org.plantuml.idea.action.NextPageAction;
-import org.plantuml.idea.action.SelectPageAction;
 import org.plantuml.idea.action.ZoomAction;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.image.ImageContainer;
@@ -39,6 +33,7 @@ import org.plantuml.idea.util.Utils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Set;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -161,24 +156,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     protected void createToolbar() {
     }
 
-    @NotNull
-    protected DefaultActionGroup getActionGroup() {
-        DefaultActionGroup group = (DefaultActionGroup) ActionManager.getInstance().getAction("PlantUML.Toolbar");
-        DefaultActionGroup newGroup = new DefaultActionGroup();
-        AnAction[] childActionsOrStubs = group.getChildActionsOrStubs();
-        for (int i = 0; i < childActionsOrStubs.length; i++) {
-            AnAction stub = childActionsOrStubs[i];
-            newGroup.add(stub);
-            if (stub instanceof ActionStub) {
-                if (((ActionStub) stub).getClassName().equals(NextPageAction.class.getName())) {
-                    newGroup.add(new SelectPageAction(this));
-                }
-            }
-        }
-        newGroup.add(executionStatusPanel);
-        return newGroup;
-    }
-
     private void addScrollBarListeners(JComponent panel) {
         MouseWheelListener l = new MouseWheelListener() {
             @Override
@@ -297,6 +274,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     lazyExecutor.submit(getCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, RESET_DELAY));
                 } else if (!isDisplayed(cachedItem, selectedPage, displayedItem)) {
                     logger.debug("render not required, displaying cached item ", cachedItem);
+//                    displayExistingDiagram(cachedItem);
                     lazyExecutor.submit(displayExistingDiagramCommand(RenderCommand.Reason.SOURCE_PAGE_ZOOM, sourceFilePath, source, selectedPage, zoom, cachedItem, NOW));
                 } else {
                     logger.debug("render not required, item already displayed ", cachedItem);
@@ -336,7 +314,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
         int version = sequence.incrementAndGet();
 
-        return new RenderCommand(this, project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, settings);
+        return new RenderCommand(Set.of(this), project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, settings);
     }
 
     @NotNull
@@ -345,9 +323,9 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         cachedItem.setRequestedPage(selectedPage);
 
         logger.debug("#displayExistingDiagramCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
-        return new RenderCommand.DisplayExisting(this, project, reason, selectedFile, source, page, zoom, cachedItem, cachedItem.getVersion(), delay, settings);
+        return new RenderCommand.DisplayExisting(Set.of(this), project, reason, selectedFile, source, page, zoom, cachedItem, cachedItem.getVersion(), delay, settings);
     }
-
+//@Deprecated
 //    private void displayExistingDiagram(RenderCacheItem last) {
 //        last.setVersion(sequence.incrementAndGet());
 //        last.setRequestedPage(selectedPage);

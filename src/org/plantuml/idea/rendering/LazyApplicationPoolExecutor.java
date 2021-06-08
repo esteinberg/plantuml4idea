@@ -57,13 +57,19 @@ public class LazyApplicationPoolExecutor {
             if (
 //                    newCommand.reason != RenderCommand.Reason.REFRESH && newCommand.reason != RenderCommand.Reason.INCLUDES &&
                     command.isSame(newCommand)) {
-                logger.debug("adding targets ", newCommand.getTargets(), " to ", command);
-                command.addTargets(newCommand.getTargets());
+                if (command.containsTargets(newCommand.getTargets())) {
+                    logger.debug("skipping duplicate ", command);
+                    return;
+                } else if (command.addTargetsIfPossible_blocking(newCommand)) {
+                    logger.debug("targets added to ", command);
+                } else {
+                    addToQueue(new RenderCommand.DisplayExisting(newCommand, command));
+                }
                 return;
             } else if (command.containsTargets(newCommand.getTargets())) {
                 logger.debug("replacing command ", command);
                 newCommand.addTargets(command.getTargets());
-                queue.remove(command);
+                queue.remove(command);//todo there could be more of them
                 addToQueue(newCommand);
                 return;
             }
@@ -122,8 +128,8 @@ public class LazyApplicationPoolExecutor {
                     logger.debug("running command ", command);
                     long start = System.currentTimeMillis();
                     command.render();
-                    removeFromQueue(command);
                     command.displayResult();
+                    removeFromQueue(command);
                     logger.debug("command executed in ", System.currentTimeMillis() - start, "ms");
                 } catch (Throwable e) {
                     logger.error(e);
