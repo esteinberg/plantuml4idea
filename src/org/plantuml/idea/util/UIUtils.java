@@ -38,10 +38,10 @@ public class UIUtils {
         return NotificationGroupManager.getInstance().getNotificationGroup("PlantUML integration plugin");
     }
 
-    public static String getSelectedSourceWithCaret(FileEditorManager instance) {
+    public static String getSelectedSourceWithCaret(FileEditorManager instance, PlantUmlPreviewEditor fileEditor) {
         String source = "";
 
-        Editor selectedTextEditor = getSelectedTextEditor(instance);
+        Editor selectedTextEditor = getSelectedTextEditor(instance, fileEditor);
 
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
@@ -60,8 +60,15 @@ public class UIUtils {
      * FileEditorManager#getSelectedTextEditor is not good enough, returns null for *.rst in PyCharm (TextEditorWithPreview)
      */
     @Nullable
-    public static Editor getSelectedTextEditor(FileEditorManager instance) {
-        Editor selectedTextEditor = instance.getSelectedTextEditor();
+    public static Editor getSelectedTextEditor(FileEditorManager instance, PlantUmlPreviewEditor plantUmlPreviewEditor) {
+        Editor selectedTextEditor = null;
+        if (plantUmlPreviewEditor != null) {
+            selectedTextEditor = plantUmlPreviewEditor.getEditor();
+        }
+
+        if (selectedTextEditor == null) {
+            selectedTextEditor = instance.getSelectedTextEditor();
+        }
 
         if (selectedTextEditor == null) {
             FileEditor selectedEditor = instance.getSelectedEditor();

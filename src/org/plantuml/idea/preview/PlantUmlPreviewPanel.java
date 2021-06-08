@@ -21,6 +21,7 @@ import org.plantuml.idea.SelectedPagePersistentStateComponent;
 import org.plantuml.idea.Usage;
 import org.plantuml.idea.action.ZoomAction;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.editor.PlantUmlPreviewEditor;
 import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.preview.image.ImageContainerPng;
 import org.plantuml.idea.preview.image.ImageContainerSvg;
@@ -59,6 +60,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private final LazyApplicationPoolExecutor lazyExecutor;
 
     private Project project;
+    private PlantUmlPreviewEditor fileEditor;
     public ExecutionStatusPanel executionStatusPanel;
     private SelectedPagePersistentStateComponent selectedPagePersistentStateComponent;
     private FileEditorManager fileEditorManager;
@@ -74,9 +76,10 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private final PlantUmlSettings settings;
     private RenderCacheItem displayedItem;
 
-    public PlantUmlPreviewPanel(@NotNull Project project, @Nullable JComponent parent) {
+    public PlantUmlPreviewPanel(@NotNull Project project, PlantUmlPreviewEditor fileEditor, @Nullable JComponent parent) {
         super(new BorderLayout());
         this.project = project;
+        this.fileEditor = fileEditor;
         settings = PlantUmlSettings.getInstance();
         zoom = new Zoom(parent, 100, settings);
 
@@ -87,7 +90,10 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         fileDocumentManager = FileDocumentManager.getInstance();
         fileManager = VirtualFileManager.getInstance();
         localFileSystem = LocalFileSystem.getInstance();
-
+        if (fileEditor != null) {
+            selectedPage = selectedPagePersistentStateComponent.getPage(fileEditor.getFile().getPath());
+            logger.debug("setting selected page from storage ", selectedPage);
+        }
         setupUI();
         lazyExecutor = LazyApplicationPoolExecutor.getInstance();
         LowMemoryWatcher.register(new Runnable() {
@@ -109,8 +115,8 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         backgroundZoomAlarm = new Alarm(Alarm.ThreadToUse.POOLED_THREAD, this);
     }
 
-    public PlantUmlPreviewPanel(Project project) {
-        this(project, null);
+    public PlantUmlPreviewPanel(Project project, PlantUmlPreviewEditor editor) {
+        this(project, editor, null);
     }
 
     private void setupUI() {
@@ -220,7 +226,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             logger.debug("", this, " processRequest ", project.getName(), " ", delay, " ", reason);
             if (isProjectValid(project)) {
 
-                String source = UIUtils.getSelectedSourceWithCaret(fileEditorManager);
+                String source = getSelectedSourceWithCaret();
                 String sourceFilePath = null;
                 RenderCacheItem cachedItem = null;
 
@@ -235,18 +241,19 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     source = cachedItem.getSource();
                     sourceFilePath = cachedItem.getSourceFilePath();
                 } else {
-                    VirtualFile selectedFile = UIUtils.getSelectedFile(fileEditorManager);
+                    VirtualFile selectedFile = getSelectedFile();
                     if (selectedFile != null) {
                         sourceFilePath = selectedFile.getPath();
                     } else {
                         sourceFilePath = "DUMMY_NO_PATH";
                     }
                 }
-
-                selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                if (fileEditor == null) {
+                    selectedPage = selectedPagePersistentStateComponent.getPage(sourceFilePath);
+                    logger.debug("setting selected page from storage ", selectedPage);
+                }
                 zoom = zoom.refresh(this, this.settings);
 
-                logger.debug("setting selected page from storage ", selectedPage);
 
                 if (reason == RenderCommand.Reason.REFRESH) {
                     logger.debug("executing command, reason=", reason);
@@ -288,6 +295,18 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
         int i = myAlarm.cancelAllRequests();
         myAlarm.addRequest(Utils.logDuration("EDT processRequest", renderRunnable), delay == NOW ? 0 : 10);
+    }
+
+    @Nullable
+    private VirtualFile getSelectedFile() {
+        if (fileEditor != null) {
+            return fileEditor.getFile();
+        }
+        return UIUtils.getSelectedFile(fileEditorManager);
+    }
+
+    private String getSelectedSourceWithCaret() {
+        return UIUtils.getSelectedSourceWithCaret(fileEditorManager, fileEditor);
     }
 
     public boolean isPreviewVisible() {
@@ -486,7 +505,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         }
 
         if (settings.isHighlightInImages()) {
-            highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager));
+            highlighter.highlightImages(this, UIUtils.getSelectedTextEditor(fileEditorManager, fileEditor));
         }
 
         imagesPanel.revalidate();

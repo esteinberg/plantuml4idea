@@ -40,6 +40,7 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
     private final Project project;
 
     private PlantUmlPreviewPanel plantUmlPreview;
+    private Editor editor;
 
     void renderIfVisible(LazyApplicationPoolExecutor.Delay delay, RenderCommand.Reason reason) {
         plantUmlPreview.processRequest(delay, reason);
@@ -53,7 +54,7 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
         this.document = document;
         this.file = file;
         this.project = project;
-        plantUmlPreview = new PlantUmlPreviewPanel(project);
+        plantUmlPreview = new PlantUmlPreviewPanel(project, this);
         putUserData(PLANTUML_PREVIEW_PANEL, plantUmlPreview);
         renderIfVisible(NOW, RenderCommand.Reason.FILE_SWITCHED);
         if (documentListener) {
@@ -69,7 +70,12 @@ public class PlantUmlPreviewEditor extends UserDataHolderBase implements FileEdi
     }
 
     public void setEditor(Editor editor) {
+        this.editor = editor;
         editor.putUserData(PLANTUML_PREVIEW, this);
+    }
+
+    public Editor getEditor() {
+        return editor;
     }
 
     @Override

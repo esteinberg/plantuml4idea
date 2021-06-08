@@ -160,4 +160,18 @@ public class ExecutionStatusPanel extends DumbAwareAction implements CustomCompo
             return runnable;
         }
     }
+
+    @Override
+    public String toString() {
+        return "ExecutionStatusPanel{" +
+                "hash()=" + hashCode() +
+                ", label=" + label +
+                ", version=" + version +
+                ", state=" + state +
+                ", message='" + message + '\'' +
+                ", myMouseAdapter=" + myMouseAdapter +
+                ", mouseOnClickAction=" + mouseOnClickAction +
+                ", alarm=" + alarm +
+                '}';
+    }
 }

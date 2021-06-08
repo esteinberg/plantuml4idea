@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.ExecutionStatusPanel;
@@ -180,7 +181,7 @@ public class RenderCommand {
 
 
                 SwingUtilities.invokeLater(logDuration("EDT displayResult", () -> {
-                    String resultMessage = result.resultMessage(totalTime);
+                    String resultMessage = getResultMessage(totalTime);
                     target.displayResult(newRenderCacheItem, resultMessage);
                     updateCache(newRenderCacheItem);
                 }));
@@ -190,6 +191,11 @@ public class RenderCommand {
             updateState(ExecutionStatusPanel.State.ERROR);
             logger.error("Exception occurred rendering " + this, e);
         }
+    }
+
+    @NotNull
+    protected String getResultMessage(long totalTime) {
+        return result.resultMessage(totalTime, version);
     }
 
     protected void updateCache(RenderCacheItem newItem) {
@@ -260,6 +266,11 @@ public class RenderCommand {
             this.result = oldCommand.getResult();
             this.renderRequest = oldCommand.renderRequest;
             this.newRenderCacheItem = oldCommand.newRenderCacheItem;
+        }
+
+        @Override
+        protected String getResultMessage(long totalTime) {
+            return "cached";
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -13,6 +14,7 @@ import java.util.*;
  * @author Eugene Steinberg
  */
 public class RenderResult {
+    private static Logger logger = Logger.getInstance(RenderResult.class);
 
     public static final String TITLE_ONLY = "TITLE ONLY";
 
@@ -141,7 +143,7 @@ public class RenderResult {
     }
 
     @NotNull
-    public String resultMessage(long totalTime) {
+    public String resultMessage(long totalTime, int version) {
         int rendered = getRendered();
         int updatedTitles = getUpdatedTitles();
         int cached = getCached();
@@ -149,6 +151,9 @@ public class RenderResult {
                 + rendered + ","
                 + updatedTitles + ","
                 + cached + "]";
+        if (logger.isDebugEnabled()) {
+            message += "-id:" + version;
+        }
         return message;
     }
 

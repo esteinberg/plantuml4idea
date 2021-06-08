@@ -44,7 +44,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         private JComponent parentComponent;
 
         public PlantUmlToolWindowPreviewPanel(Project project, ToolWindow toolWindow) {
-            super(project, toolWindow.getComponent());
+            super(project, null, toolWindow.getComponent());
             plantUmlAncestorListener = new PlantUmlAncestorListener(this, project);
 
             //must be last
