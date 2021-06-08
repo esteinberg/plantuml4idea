@@ -42,7 +42,7 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
             Separator.getInstance(),
             new CopyPlantUmlServerLinkContextAction()
     };
-    private static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
+    private static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerPng", new ActionGroup() {
 
         @NotNull
         @Override

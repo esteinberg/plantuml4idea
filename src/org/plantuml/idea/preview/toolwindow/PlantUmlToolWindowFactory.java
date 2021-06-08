@@ -57,7 +57,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
         protected void createToolbar() {
             ActionManager actionManager = ActionManager.getInstance();
             DefaultActionGroup newGroup = PlantUmlToolbarPanel.prepareToolbar(this, executionStatusPanel, actionManager);
-            final ActionToolbar actionToolbar = actionManager.createActionToolbar("PlantUmlToolWindow", newGroup, true);
+            final ActionToolbar actionToolbar = actionManager.createActionToolbar("plantuml4idea-ToolWindow", newGroup, true);
             actionToolbar.setTargetComponent(this);
             add(actionToolbar.getComponent(), BorderLayout.PAGE_START);
         }

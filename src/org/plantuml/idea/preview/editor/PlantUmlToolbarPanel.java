@@ -42,7 +42,7 @@ public class PlantUmlToolbarPanel extends JPanel {
 		newGroup.add(actionManager.getAction("PlantUML.EditorLayout"));
 		newGroup.add(prepareToolbar(editorPlantUmlPreviewPanel, editorPlantUmlPreviewPanel.executionStatusPanel, actionManager));
 
-		ActionToolbar actionToolbar = actionManager.createActionToolbar("PlantUmlPreview", newGroup, true);
+		ActionToolbar actionToolbar = actionManager.createActionToolbar("plantuml4idea-editorPreview", newGroup, true);
 		final ActionToolbarImpl editorToolbar = ((ActionToolbarImpl) actionToolbar);
 		editorToolbar.setOpaque(false);
 		editorToolbar.setBorder(new JBEmptyBorder(0, 2, 0, 2));

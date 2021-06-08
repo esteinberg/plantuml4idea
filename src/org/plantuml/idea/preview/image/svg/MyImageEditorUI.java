@@ -155,7 +155,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         if (!isEmbedded) {
             ActionManager actionManager = ActionManager.getInstance();
             ActionGroup actionGroup = (ActionGroup) actionManager.getAction(ImageEditorActions.GROUP_TOOLBAR);
-            ActionToolbar actionToolbar = actionManager.createActionToolbar("PlantUmlPreview", actionGroup, true);
+            ActionToolbar actionToolbar = actionManager.createActionToolbar("plantuml4idea-MyImageEditorUI", actionGroup, true);
 
             // Make sure toolbar is 'ready' before it's added to component hierarchy
             // to prevent ActionToolbarImpl.updateActionsImpl(boolean, boolean) from increasing popup size unnecessarily

@@ -56,7 +56,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
             Separator.getInstance(),
             new CopyPlantUmlServerLinkContextAction(),
     };
-    public static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.UNKNOWN, new ActionGroup() {
+    public static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerSvg", new ActionGroup() {
 
         @NotNull
         @Override
