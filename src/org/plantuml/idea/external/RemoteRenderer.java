@@ -27,7 +27,7 @@ public class RemoteRenderer {
         long start = System.currentTimeMillis();
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         String source = renderRequest.getSource();
-        boolean displaySvg = plantUmlSettings.isDisplaySvg();
+        boolean displaySvg = renderRequest.getFormat() == ImageFormat.SVG;
         try {
 
             String encoded = PlantUmlFacade.get().encode(source);

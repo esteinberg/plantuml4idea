@@ -8,7 +8,9 @@ import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.plantuml.SourceExtractor;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.preview.image.ImageContainerPng;
+import org.plantuml.idea.preview.image.ImageContainerSvg;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderCommand;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -37,9 +39,10 @@ public class AboutDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JEditorPane aboutEditorPane;
-    private ImageContainerPng testDot;
+    private JPanel testDot;
     private Usage usage;
     private JTextArea debugPane;
+    private ImageContainer imageContainer;
 
     public AboutDialog(AnActionEvent e, Project project) {
         this.project = project;
@@ -108,28 +111,40 @@ public class AboutDialog extends JDialog {
     private void onOK() {
 // add your code here
         dispose();
+        if (imageContainer != null) {
+            imageContainer.dispose();
+        }
     }
 
     private void testDot(AnActionEvent e) {
         PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         Zoom zoom = new Zoom(previewPanel, 100, PlantUmlSettings.getInstance());
-        RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, PlantUmlSettings.getInstance().isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);
         try {
-            final ImageItem imageItem = result.getImageItem(0);
+            ImageItem imageItem = result.getImageItem(0);
             if (imageItem != null) {
-                testDot.init(previewPanel, e.getProject(), contentPane, imageItem, 0, renderRequest, result);
-                testDot.setOpaque(false);
+                if (imageItem.getFormat() == ImageFormat.PNG) {
+                    imageContainer = new ImageContainerPng(previewPanel, project, testDot, imageItem, 0, renderRequest, result);
+                    testDot.add((Component) imageContainer);
+                    testDot.setOpaque(false);
+                } else {
+                    imageContainer = new ImageContainerSvg(previewPanel, project, imageItem, 0, renderRequest, result);
+                    testDot.add((Component) imageContainer);
+                    testDot.setOpaque(false);
+                }
+            } else {
+                testDot.add(new JLabel("page not rendered, probably plugin error, please report it"));
             }
         } catch (Throwable ex) {
+            testDot.add(new JLabel("page not rendered, probably plugin error, please report it"));
             logger.error("Exception occurred rendering source = " + SourceExtractor.TESTDOT, ex);
         }
     }
 
     private void createUIComponents() {
         usage = new Usage();
-        testDot = new ImageContainerPng();
     }
 
     private class BrowseHyperlinkListener implements HyperlinkListener {
