@@ -129,6 +129,10 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
     public void setup(PlantUmlPreviewPanel previewPanel, @NotNull ImageItem imageItem, int i, RenderRequest renderRequest) {
+        if (project.isDisposed()) {
+            return;
+        }
+
         setOpaque(true);
         setBackground(JBColor.WHITE);
         if (imageItem.hasImageBytes()) {
@@ -191,11 +195,13 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
     }
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image) {
+        if (project.isDisposed()) {
+            return;
+        }
         long start = System.currentTimeMillis();
         //probably not needed if initting on background
         //https://stackoverflow.com/a/28048290/685796
         image.setVisible(false);
-
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
         Zoom zoom = renderRequest.getZoom();

@@ -72,15 +72,22 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
         this.imageWithData = imageWithData;
         this.project = project;
         this.renderResult = renderResult;
+        this.renderRequest = renderRequest;
         setOpaque(true);
         setBackground(JBColor.WHITE);
+        setup(previewPanel, parent, renderRequest);
+    }
+
+    private void setup(PlantUmlPreviewPanel previewPanel, JPanel parent, RenderRequest renderRequest) {
+        if (project.isDisposed()) {
+            return;
+        }
         originalImage = this.imageWithData.getImage(previewPanel, this.project, renderRequest, this.renderResult);
         if (originalImage != null) {
             setDiagram(parent, this.imageWithData, renderRequest, this);
         } else {
             setText("page not rendered, probably plugin error, please report it and try to hit reload");
         }
-        this.renderRequest = renderRequest;
     }
 
     @Override
@@ -129,6 +136,9 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
     }
 
     public static void initLinks(Project project, @NotNull ImageItem imageItem, RenderRequest renderRequest, RenderResult renderResult, JComponent image) {
+        if (project.isDisposed()) {
+            return;
+        }
         long start = System.currentTimeMillis();
         LinkNavigator navigator = new LinkNavigator(renderRequest, renderResult, project);
         boolean showUrlLinksBorder = PlantUmlSettings.getInstance().isShowUrlLinksBorder();
