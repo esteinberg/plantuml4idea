@@ -18,6 +18,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <p>5.6<p>
             <ul>
                  <li>Disabled OS scaling for export, added option to enable it</li>
+                 <li>PlantUML library upgrade to v1.2021.11</li>
             </ul>
             <p>5.5<p>
             <ul>
