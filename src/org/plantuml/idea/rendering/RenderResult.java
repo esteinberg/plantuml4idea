@@ -147,11 +147,12 @@ public class RenderResult {
         int rendered = getRendered();
         int updatedTitles = getUpdatedTitles();
         int cached = getCached();
-        String message = totalTime + "ms ["
-                + rendered + ","
-                + updatedTitles + ","
-                + cached + "]";
+        String message = totalTime + "ms";
         if (logger.isDebugEnabled()) {
+            message += " ["
+                    + rendered + ","
+                    + updatedTitles + ","
+                    + cached + "]";
             message += "-id:" + version;
         }
         return message;

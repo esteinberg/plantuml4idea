@@ -270,7 +270,12 @@ public class RenderCommand {
 
         @Override
         protected String getResultMessage(long totalTime) {
-            return "cached";
+            String message = "cached";
+            if (logger.isDebugEnabled()) {
+                message += totalTime + "ms";
+                message += " id:" + version;
+            }
+            return message;
         }
     }
 }
