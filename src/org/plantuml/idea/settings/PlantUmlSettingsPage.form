@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="panel" layout-manager="GridLayoutManager" row-count="19" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="898" height="897"/>
+      <xy x="20" y="20" width="935" height="897"/>
     </constraints>
     <properties>
       <opaque value="true"/>
@@ -477,7 +477,7 @@
               <text value="Insert paired (), [] , {}, &quot;&quot;"/>
             </properties>
           </component>
-          <grid id="e9f3e" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="e9f3e" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
               <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -499,6 +499,14 @@
                 </constraints>
                 <properties>
                   <text value="Default export format:"/>
+                </properties>
+              </component>
+              <component id="3b952" class="javax.swing.JCheckBox" binding="scaleExport">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Scale export"/>
                 </properties>
               </component>
             </children>

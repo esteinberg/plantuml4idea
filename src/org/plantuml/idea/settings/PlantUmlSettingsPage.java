@@ -82,6 +82,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JLabel plantumlLimitSizeLabel;
     private JCheckBox rememberLastExportDir;
     private JLabel textFieldDotExecutableL;
+    private JCheckBox scaleExport;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -272,6 +273,7 @@ public class PlantUmlSettingsPage implements Configurable {
         highlightInImages.setSelected(data.isHighlightInImages());
         showUrlLinksBorder.setSelected(data.isShowUrlLinksBorder());
         insertPair.setSelected(data.isInsertPair());
+        scaleExport.setSelected(data.isScaleExport());
         rememberLastExportDir.setSelected(data.isRememberLastExportDir());
         serverUrl.setText(data.getServerPrefix());
         remoteRendering.setSelected(data.isRemoteRendering());
@@ -302,6 +304,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setHighlightInImages(highlightInImages.isSelected());
         data.setShowUrlLinksBorder(showUrlLinksBorder.isSelected());
         data.setInsertPair(insertPair.isSelected());
+        data.setScaleExport(scaleExport.isSelected());
         data.setRememberLastExportDir(rememberLastExportDir.isSelected());
         data.setServerPrefix(serverUrl.getText());
         data.setRemoteRendering(remoteRendering.isSelected());
@@ -341,6 +344,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (highlightInImages.isSelected() != data.isHighlightInImages()) return true;
         if (showUrlLinksBorder.isSelected() != data.isShowUrlLinksBorder()) return true;
         if (insertPair.isSelected() != data.isInsertPair()) return true;
+        if (scaleExport.isSelected() != data.isScaleExport()) return true;
         if (rememberLastExportDir.isSelected() != data.isRememberLastExportDir()) return true;
         if (serverUrl.getText() != null ? !serverUrl.getText().equals(data.getServerPrefix()) : data.getServerPrefix() != null)
             return true;

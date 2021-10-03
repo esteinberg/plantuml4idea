@@ -22,12 +22,12 @@ public class Zoom {
     /**
      * use a component in hierarchy
      */
-    public Zoom(@Nullable JComponent context, int unscaledZoom, PlantUmlSettings instance) {
+    public Zoom(@Nullable JComponent context, int unscaledZoom, PlantUmlSettings settings) {
         this.unscaledZoom = unscaledZoom;
         systemScale = getSystemScale(context);
         LOG.debug("systemScale=", systemScale);
         scaledZoom = (int) (unscaledZoom * systemScale);
-        displaySvg = instance.isDisplaySvg();
+        displaySvg = settings.isDisplaySvg();
     }
 
     @NotNull
@@ -39,8 +39,11 @@ public class Zoom {
         return systemScale;
     }
 
-    public Zoom(int unscaledZoom) {
-        this(null, unscaledZoom, PlantUmlSettings.getInstance());
+    public Zoom(int unscaledZoom, PlantUmlSettings settings) {
+        this.unscaledZoom = unscaledZoom;
+        systemScale = 1;
+        scaledZoom = unscaledZoom;
+        displaySvg = settings.isDisplaySvg();
     }
 
     public int getUnscaledZoom() {
@@ -95,5 +98,9 @@ public class Zoom {
                 .append("displaySvg", displaySvg)
                 .append("systemScale", systemScale)
                 .toString();
+    }
+
+    public Zoom unscaled(PlantUmlSettings settings) {
+        return new Zoom(unscaledZoom, settings);
     }
 }

@@ -10,12 +10,12 @@ import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.external.RemoteRenderer;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
-import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.plantuml.ImageFormat;
+import org.plantuml.idea.preview.Zoom;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,11 +61,17 @@ public class FacadeImpl implements PlantUmlFacade {
     }
 
     @Override
-    public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom scaledZoom, int pageNumber) throws IOException {
-        if (PlantUmlSettings.getInstance().isRemoteRendering()) {
+    public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber) throws IOException {
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+        if (settings.isRemoteRendering()) {
             throw new RuntimeException("Report this and disable Remote Rendering");
         }
-        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, scaledZoom, -1, false, null);
+
+        if (!settings.isScaleExport()) {
+            zoom = zoom.unscaled(settings);
+        }
+
+        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, zoom, -1, false, null);
         PlantUmlRendererUtil.renderAndSave(renderRequest, path, pathPrefix);
     }
 

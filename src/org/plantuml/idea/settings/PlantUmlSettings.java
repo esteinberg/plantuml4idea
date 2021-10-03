@@ -84,6 +84,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean rememberLastExportDir;
     private String lastExportDir = null;
     private PreviewSettings previewSettings = new PreviewSettings();
+    private boolean scaleExport;
 
     public static PlantUmlSettings getInstance() {
         if (Utils.isUnitTest()) {
@@ -465,6 +466,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setPreviewSettings(PreviewSettings previewSettings) {
         this.previewSettings = previewSettings;
+    }
+
+    public boolean isScaleExport() {
+        return scaleExport;
+    }
+
+    public void setScaleExport(final boolean scaleExport) {
+        this.scaleExport = scaleExport;
     }
 
 
