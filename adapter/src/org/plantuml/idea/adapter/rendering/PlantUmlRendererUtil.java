@@ -3,12 +3,13 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
+import org.apache.commons.lang.StringUtils;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
-import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderCacheItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,9 @@ public class PlantUmlRendererUtil {
         if (renderRequest.isUseSettings()) {
             PlantUmlSettings settings = PlantUmlSettings.getInstance();
             encoding = settings.getEncoding();
+            if (StringUtils.isBlank(encoding)) {
+                encoding = null;
+            }
             configAsList = settings.getConfigAsList();
         } else {
             encoding = "UTF-8";
