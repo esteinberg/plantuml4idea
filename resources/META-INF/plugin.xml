@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>5.6.0</version>
+    <version>5.6.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203.3646"/>
@@ -15,6 +15,10 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[        
+            <p>5.6.1<p>
+            <ul>
+                 <li>Small bugfixes</li>
+            </ul>
             <p>5.6<p>
             <ul>
                  <li>Disabled OS scaling for export, added option to enable it</li>
