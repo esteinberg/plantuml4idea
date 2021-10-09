@@ -2,6 +2,7 @@ package org.plantuml.idea.lang;
 
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate;
 import com.intellij.codeInsight.editorActions.smartEnter.SmartEnterProcessor;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -51,8 +52,11 @@ public class PlantUmlTypedHandlerDelegate extends TypedHandlerDelegate {
         SmartEnterProcessor.commitDocument(editor);
         int offset = editor.getCaretModel().getOffset();
 
-        CharSequence sequence = editor.getDocument().getCharsSequence();
-        if (!isWhitespace(sequence.charAt(offset))) return;
+        Document document = editor.getDocument();
+        CharSequence sequence = document.getCharsSequence();
+        int textLength = document.getTextLength();
+
+        if (textLength < offset && !isWhitespace(sequence.charAt(offset))) return;
         if (offset - 2 >= 0 && !isWhitespace(sequence.charAt(offset - 2))) return;
 
         PsiElement element = file.findElementAt(offset - 1);
@@ -60,6 +64,6 @@ public class PlantUmlTypedHandlerDelegate extends TypedHandlerDelegate {
         if (element.getNode().getElementType() == PumlTypes.IDENTIFIER) {
             return;
         }
-        editor.getDocument().insertString(offset, insert);
+        document.insertString(offset, insert);
     }
 }
