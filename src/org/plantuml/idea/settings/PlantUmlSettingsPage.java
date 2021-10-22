@@ -105,7 +105,10 @@ public class PlantUmlSettingsPage implements Configurable {
             serverUrl.setText(PlantUmlSettings.DEFAULT_SERVER);
         });
         textFieldDotExecutableBrowse.addActionListener(e -> browseForFile(textFieldDotExecutable));
-        browseCustomPlantumlJar.addActionListener(e -> browseForjar(customPlantumlJar));
+        browseCustomPlantumlJar.addActionListener(e -> {
+            browseForjarOrFolder(customPlantumlJar);
+            customPlantUMLRadioButton.setSelected(true);
+        });
         web.setVisible(Desktop.isDesktopSupported());
         web.addActionListener(e -> {
             try {
@@ -161,8 +164,8 @@ public class PlantUmlSettingsPage implements Configurable {
     }
 
 
-    private void browseForjar(@NotNull final JTextField target) {
-        final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, false, true, true, false, false);
+    private void browseForjarOrFolder(@NotNull final JTextField target) {
+        final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, true, true, false, false);
 
         descriptor.setTitle("Select path to plantuml.jar");
         String text = target.getText();

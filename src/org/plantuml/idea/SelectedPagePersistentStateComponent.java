@@ -1,5 +1,6 @@
 package org.plantuml.idea;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -19,6 +20,10 @@ public class SelectedPagePersistentStateComponent implements PersistentStateComp
     private SelectedPages state = new SelectedPages();
 
     public SelectedPagePersistentStateComponent() {
+    }
+
+    public static SelectedPagePersistentStateComponent getInstance() {
+        return ApplicationManager.getApplication().getService(SelectedPagePersistentStateComponent.class);
     }
 
     @Override

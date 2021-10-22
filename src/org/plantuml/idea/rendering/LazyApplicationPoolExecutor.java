@@ -1,6 +1,6 @@
 package org.plantuml.idea.rendering;
 
-import com.intellij.openapi.components.ServiceManager;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ConcurrencyUtil;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +41,7 @@ public class LazyApplicationPoolExecutor {
 
     @NotNull
     public static LazyApplicationPoolExecutor getInstance() {
-        return ServiceManager.getService(LazyApplicationPoolExecutor.class);
+        return ApplicationManager.getApplication().getService(LazyApplicationPoolExecutor.class);
     }
 
 

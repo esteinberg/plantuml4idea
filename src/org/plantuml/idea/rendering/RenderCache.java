@@ -2,7 +2,6 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -36,7 +35,7 @@ public class RenderCache {
 
     @NotNull
     public static RenderCache getInstance() {
-        return ServiceManager.getService(RenderCache.class);
+        return ApplicationManager.getApplication().getService(RenderCache.class);
     }
 
     public void setMaxCacheSize(int maxCacheSize) {

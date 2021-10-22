@@ -3,7 +3,6 @@ package org.plantuml.idea.settings;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
@@ -90,8 +89,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
         if (Utils.isUnitTest()) {
             return new PlantUmlSettings();
         }
-        PlantUmlSettings service = ServiceManager.getService(PlantUmlSettings.class);
-        return service;
+        return ApplicationManager.getApplication().getService(PlantUmlSettings.class);
     }
 
     /**

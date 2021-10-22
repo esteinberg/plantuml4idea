@@ -4,6 +4,7 @@ import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.PlantUmlApplicationComponent;
 
 import javax.swing.*;
 
@@ -13,7 +14,7 @@ public class PlantIUmlFileType extends LanguageFileType {
 
     public static final String PLANTUML_EXT = "iuml";
 
-    public static final Icon PLANTUML_ICON = IconLoader.getIcon("/images/uml.png");
+    public static final Icon PLANTUML_ICON = IconLoader.getIcon("/images/uml.png", PlantUmlApplicationComponent.class);
 
     private PlantIUmlFileType() {
         super(PlantUmlLanguage.INSTANCE);

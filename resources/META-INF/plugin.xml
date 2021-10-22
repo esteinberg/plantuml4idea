@@ -244,7 +244,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
                 <separator/>
                 <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
                         class="org.plantuml.idea.action.DisplaySvgToggleAction"
-                        text="New SVG Preview"
+                        text="SVG Preview"
                         description="It should be much faster. Disable for the old PNG one."
                 />
                 <action id="org.plantuml.idea.action.RemoteRenderingToggleAction"

@@ -1,7 +1,6 @@
 package org.plantuml.idea.preview;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -56,7 +55,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
     private RenderCache renderCache;
 
-
     private final LazyApplicationPoolExecutor lazyExecutor;
 
     private Project project;
@@ -85,7 +83,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
         // Make sure settings are loaded and applied before we start rendering.
         renderCache = RenderCache.getInstance();
-        selectedPagePersistentStateComponent = ServiceManager.getService(SelectedPagePersistentStateComponent.class);
+        selectedPagePersistentStateComponent = SelectedPagePersistentStateComponent.getInstance();
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
         fileManager = VirtualFileManager.getInstance();
