@@ -107,7 +107,12 @@ public class PlantUmlSettingsPage implements Configurable {
         textFieldDotExecutableBrowse.addActionListener(e -> browseForFile(textFieldDotExecutable));
         browseCustomPlantumlJar.addActionListener(e -> {
             browseForjarOrFolder(customPlantumlJar);
-            customPlantUMLRadioButton.setSelected(true);
+        });
+        customPlantumlJar.getDocument().addDocumentListener(new DocumentAdapter() {
+            @Override
+            protected void textChanged(@NotNull DocumentEvent documentEvent) {
+                customPlantUMLRadioButton.setSelected(true);
+            }
         });
         web.setVisible(Desktop.isDesktopSupported());
         web.addActionListener(e -> {
