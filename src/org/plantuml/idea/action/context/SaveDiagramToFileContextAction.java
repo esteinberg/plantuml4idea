@@ -8,7 +8,7 @@ import org.plantuml.idea.preview.image.ImageContainer;
 public class SaveDiagramToFileContextAction extends AbstractSaveDiagramAction {
 
     public SaveDiagramToFileContextAction() {
-        super("Save Diagram", null, AllIcons.Actions.Menu_saveall);
+        super("Save Diagram", null, AllIcons.Actions.MenuSaveall);
     }
 
     @Override

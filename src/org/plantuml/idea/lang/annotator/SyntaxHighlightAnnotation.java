@@ -1,7 +1,7 @@
 package org.plantuml.idea.lang.annotator;
 
-import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.TextRange;
@@ -32,7 +32,6 @@ public class SyntaxHighlightAnnotation implements SourceAnnotation {
     @Override
     public void annotate(AnnotationHolder holder, Document document, int sourceOffset) {
         TextRange fileRange = TextRange.create(startSourceOffset + sourceOffset, endSourceOffset + sourceOffset);
-        Annotation infoAnnotation = holder.createInfoAnnotation(fileRange, null);
-        infoAnnotation.setTextAttributes(textAttributesKey);
+        holder.newAnnotation(HighlightSeverity.INFORMATION, "").range(fileRange).textAttributes(textAttributesKey).create();
     }
 }

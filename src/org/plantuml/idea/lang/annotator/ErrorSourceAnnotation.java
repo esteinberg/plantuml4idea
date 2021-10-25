@@ -2,8 +2,9 @@ package org.plantuml.idea.lang.annotator;
 
 import com.google.common.base.Joiner;
 import com.intellij.codeInsight.intention.IntentionAction;
-import com.intellij.lang.annotation.Annotation;
+import com.intellij.lang.annotation.AnnotationBuilder;
 import com.intellij.lang.annotation.AnnotationHolder;
+import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
@@ -49,12 +50,11 @@ public class ErrorSourceAnnotation implements SourceAnnotation {
         int endoffset = document.getLineEndOffset(errorLineNumber);
         TextRange range = TextRange.create(startoffset, endoffset);
         String errMessage = Joiner.on("\n").join(errorMessage);
-        Annotation errorAnnotation = holder.createErrorAnnotation(range,
-                errMessage);
+        AnnotationBuilder builder = holder.newAnnotation(HighlightSeverity.ERROR, errMessage).range(range);
         for (String s : cleanupSuggestions(suggestion)) {
-            errorAnnotation.registerFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
+            builder = builder.withFix(new PlantUmlIntentionAction(startoffset, endoffset, s));
         }
-
+        builder.create();
     }
 
     private List<String> cleanupSuggestions(Collection<String> suggest) {

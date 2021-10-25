@@ -163,7 +163,6 @@ public class PlantUmlSettingsPage implements Configurable {
         DialogUtils.enabledByAny(new JComponent[]{highlightInImages, linkOpensSearchBar, showUrlLinksBorder}, displaySvg, renderLinksPng);
     }
 
-
     private void browseForjarOrFolder(@NotNull final JTextField target) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, true, true, false, false);
 
