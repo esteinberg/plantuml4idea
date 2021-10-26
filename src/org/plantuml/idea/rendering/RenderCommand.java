@@ -172,7 +172,7 @@ public class RenderCommand {
                     try {
                         imageItem.initImage(this.project, renderRequest, result, target);
                     } catch (Throwable e) {
-                        logger.error(e);
+                        logger.error(RenderCommand.this.toString(), e);
                     }
                 });
 

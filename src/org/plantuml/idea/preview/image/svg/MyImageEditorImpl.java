@@ -96,7 +96,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
 
 //            editorUI.setImageProvider(IfsUtil.getImageProvider(file), IfsUtil.getFormat(file));
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error(e);
             //     Error loading image file
             editorUI.setImageProvider(null, null);

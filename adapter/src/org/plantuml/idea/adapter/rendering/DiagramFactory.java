@@ -16,6 +16,7 @@ import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.plantuml.idea.rendering.RenderingType;
+import org.plantuml.idea.util.Utils;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -146,7 +147,7 @@ public class DiagramFactory {
         ByteArrayOutputStream svgStream = new ByteArrayOutputStream();
         outputImage(svgStream, i, PlantUmlNormalRenderer.SVG);
         byte[] svgBytes = svgStream.toByteArray();
-        boolean png = isPng(svgBytes);
+        boolean png = Utils.isPng(svgBytes);
         LOG.debug("generated ", PlantUmlNormalRenderer.SVG.getFileFormat(), " for page ", i, " in ", System.currentTimeMillis() - start, "ms, png=", png);
         if (png) {
             LOG.debug("generated png instead of svg, no links possible");
@@ -172,7 +173,7 @@ public class DiagramFactory {
         DiagramDescription diagramDescription = outputImage(imageStream, page, formatOption);
 
         byte[] bytes = imageStream.toByteArray();
-        boolean png = isPng(bytes);
+        boolean png = Utils.isPng(bytes);
         boolean wrongResultFormat = format == ImageFormat.SVG && png;
 
         LOG.debug("generated ", formatOption.getFileFormat(), " for page ", logPage, " in ", System.currentTimeMillis() - start, "ms, png=", png,", wrongResultFormat=",wrongResultFormat);
@@ -218,14 +219,6 @@ public class DiagramFactory {
                 LOG.error(e);
             }
         }
-    }
-
-    private boolean isPng(byte[] bytes) {
-        boolean isPng = false;
-        if (bytes.length > 4) {
-            isPng = "‰PNG".equals(new String(bytes, 0, 4));
-        }
-        return isPng;
     }
 
     @NotNull

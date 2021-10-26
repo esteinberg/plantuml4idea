@@ -10,6 +10,7 @@ import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.rendering.RenderingType;
 import org.plantuml.idea.settings.PlantUmlSettings;
+import org.plantuml.idea.util.Utils;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -27,7 +28,8 @@ public class RemoteRenderer {
         long start = System.currentTimeMillis();
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         String source = renderRequest.getSource();
-        boolean displaySvg = renderRequest.getFormat() == ImageFormat.SVG;
+        ImageFormat format = renderRequest.getFormat();
+        boolean displaySvg = format == ImageFormat.SVG;
         try {
 
             String encoded = PlantUmlFacade.get().encode(source);
@@ -69,9 +71,12 @@ public class RemoteRenderer {
                 String statusText = HttpStatus.getStatusText(statusCode);
                 runtimeException = new RuntimeException(statusCode + ": " + statusText + "; uri=" + uri + "\nresponseHeaders=" + headers + "\nResponse Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons.");
             }
+
+            ImageFormat actualFormat = Utils.isPng(out) ? ImageFormat.PNG : format;
+
             byte[] bytes;
             byte[] svgBytes;
-            if (displaySvg) {
+            if (actualFormat == ImageFormat.SVG) {
                 bytes = out;
                 svgBytes = bytes;
             } else {
@@ -81,12 +86,12 @@ public class RemoteRenderer {
             String description = statusCode >= 400 || runtimeException != null ? ImageItem.ERROR : "OK";
 
             RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), actualFormat, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
             return renderResult;
         } catch (Throwable e) {
             LOG.warn(e);
             RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), displaySvg ? ImageFormat.SVG : ImageFormat.PNG, source, source, 0, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e));
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), format, source, source, 0, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e));
             return renderResult;
         } finally {
             LOG.debug("render done in ", System.currentTimeMillis() - start, "ms");

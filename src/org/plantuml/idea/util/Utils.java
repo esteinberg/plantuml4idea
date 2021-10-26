@@ -160,4 +160,11 @@ public class Utils {
     }
 
 
+    public static boolean isPng(byte[] bytes) {
+        boolean isPng = false;
+        if (bytes.length > 4) {
+            isPng = "‰PNG".equals(new String(bytes, 0, 4));
+        }
+        return isPng;
+    }
 }
