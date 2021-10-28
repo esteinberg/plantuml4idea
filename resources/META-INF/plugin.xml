@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>5.7.0</version>
+    <version>5.7.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203.5981.155"/>
@@ -18,6 +18,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <p>5.7.0<p>
             <ul>
                  <li>Ditaa fix for remote rendering + SVG</li>
+                 <li>Browser buttons fix</li>
             </ul>
             <p>5.6.1<p>
             <ul>

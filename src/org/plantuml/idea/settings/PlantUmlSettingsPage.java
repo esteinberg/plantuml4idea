@@ -1,5 +1,6 @@
 package org.plantuml.idea.settings;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooser;
@@ -20,11 +21,9 @@ import org.plantuml.idea.plantuml.ImageFormat;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -94,12 +93,7 @@ public class PlantUmlSettingsPage implements Configurable {
 
         donate.setIcon(COINS);
         donate.addActionListener(e -> {
-
-            try {
-                Desktop.getDesktop().browse(new URI("https://www.paypal.com/donate/?business=75YN7U7H7D7XU&item_name=PlantUML+integration+-+IntelliJ+plugin&currency_code=EUR"));
-            } catch (Exception ee) {
-                throw new RuntimeException(ee);
-            }
+            BrowserUtil.browse("https://www.paypal.com/donate/?business=75YN7U7H7D7XU&item_name=PlantUML+integration+-+IntelliJ+plugin&currency_code=EUR");
         });
         reset.addActionListener(e -> {
             serverUrl.setText(PlantUmlSettings.DEFAULT_SERVER);
@@ -114,13 +108,8 @@ public class PlantUmlSettingsPage implements Configurable {
                 customPlantUMLRadioButton.setSelected(true);
             }
         });
-        web.setVisible(Desktop.isDesktopSupported());
         web.addActionListener(e -> {
-            try {
-                Desktop.getDesktop().browse(new URI("https://plantuml.com/news"));
-            } catch (Exception ee) {
-                throw new RuntimeException(ee);
-            }
+            BrowserUtil.browse("https://plantuml.com/news");
         });
 
         try {

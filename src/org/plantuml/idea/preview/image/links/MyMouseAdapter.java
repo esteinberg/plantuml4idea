@@ -1,14 +1,13 @@
 package org.plantuml.idea.preview.image.links;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URI;
 
 public class MyMouseAdapter extends MouseAdapter {
     private static final Logger LOG = Logger.getInstance(MyMouseAdapter.class);
@@ -34,7 +33,7 @@ public class MyMouseAdapter extends MouseAdapter {
         try {
             if (linkData.isLink()) {
                 if (isWebReferenceUrl(text)) {
-                    Desktop.getDesktop().browse(URI.create(text));
+                    BrowserUtil.browse(text);
                 } else {
                     if (navigator.openFile(new File(renderRequest.getBaseDir(), text))) return;
                     navigator.findNextSourceAndNavigate(text);

@@ -1,5 +1,6 @@
 package org.plantuml.idea;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -30,8 +31,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 public class AboutDialog extends JDialog {
     private final Project project;
@@ -151,17 +150,8 @@ public class AboutDialog extends JDialog {
         @Override
         public void hyperlinkUpdate(HyperlinkEvent e) {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                if (Desktop.isDesktopSupported()) {
-                    try {
-                        Desktop.getDesktop().browse(e.getURL().toURI());
-                    } catch (IOException e1) {
-                        logger.warn("Exception browsing to " + e.getURL().toExternalForm() + " : " + e1);
-                    } catch (URISyntaxException e1) {
-                        logger.warn("Incorrect URI syntax " + e.getURL().toExternalForm() + " : " + e1);
-                    }
-                }
+                BrowserUtil.browse(e.getURL());
             }
-
         }
     }
 }
