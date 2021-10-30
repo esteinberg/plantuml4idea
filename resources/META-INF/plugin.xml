@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>5.7.1</version>
+    <version>5.7.2</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203.5981.155"/>
@@ -200,7 +200,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             />
             <action id="PlantUML.SaveToFile" description="Save Current Diagram Only"
                     class="org.plantuml.idea.action.save.SaveDiagramToFileAction"
-                    icon="com.intellij.icons.AllIcons.Actions.MenuSaveall" text="Save Current Diagram Only"/>
+                    icon="/images/menu-saveall.svg" text="Save Current Diagram Only"/>
             <action id="PlantUML.SaveAllToFile" description="Save All Diagrams"
                     class="org.plantuml.idea.action.save.SaveAllDiagramToFileAction"
                     icon="AllIcons.ToolbarDecorator.Export" text="Save All Diagrams"/>
