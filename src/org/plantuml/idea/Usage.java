@@ -6,7 +6,7 @@ public class Usage extends JTextArea {
     public static final String TEXT =
             "- Open a file, put the cursor inside of the PlantUML code to render it\n"
                     + "- PlantUML code must be inside of @startuml and @enduml tags to be rendered, or their equivalent\n"
-                    + "- Graphviz is now included in PlantUML, you can install your own and set a path to it\n\n"
+                    + "- You might need to install Graphviz and set a path to it (not needed for Windows, it is embedded in PlantUML) \n\n"
 
                     + "- A new file can be created from template (File | New | PlantUML File)\n"
                     + "- PlantUML code can be placed anywhere, '*' are ignored for usage in Java comments\n"
