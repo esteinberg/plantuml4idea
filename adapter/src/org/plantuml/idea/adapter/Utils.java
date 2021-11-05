@@ -14,9 +14,9 @@ import net.sourceforge.plantuml.version.Version;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class Utils {
         boolean propertySet = !blank || !blank1;
 
         if (propertyNotSet || (propertySet && !plantUmlSettings.isUsePreferentiallyGRAPHIZ_DOT())) {
-            if (String.valueOf(plantUmlSettings.getDotExecutable()).isEmpty()) {
+            if (StringUtils.isBlank(plantUmlSettings.getDotExecutable())) {
                 GraphvizUtils.setDotExecutable(null);
             } else {
                 GraphvizUtils.setDotExecutable(plantUmlSettings.getDotExecutable());
