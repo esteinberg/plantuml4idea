@@ -57,6 +57,7 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
+        boolean enabled = false;
         if (project != null) {
             PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
@@ -69,12 +70,11 @@ public class CopyDiagramToClipboardAction extends DumbAwareAction {
                         ImageContainer component = (ImageContainer) component1;
                         boolean pngAvailable = component.isPngAvailable();
                         boolean singlePage = previewPanel.getNumPages() == 1 || (previewPanel.getNumPages() > 1 && selectedPage != -1);
-                        e.getPresentation().setEnabled(pngAvailable && singlePage);
+                        enabled = pngAvailable && singlePage;
                     }
                 }
-            } else {
-                e.getPresentation().setEnabled(false);
             }
         }
+        e.getPresentation().setEnabled(enabled);
     }
 }
