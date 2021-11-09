@@ -25,15 +25,15 @@ public class SaveDiagramToFileAction extends AbstractSaveDiagramAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
+        boolean enabled = false;
         if (project != null) {
             PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
                 int selectedPage = previewPanel.getSelectedPage();
-                e.getPresentation().setEnabled(previewPanel.getNumPages() == 1 || (previewPanel.getNumPages() > 1 && selectedPage != -1));
-            } else {
-                e.getPresentation().setEnabled(false);
+                enabled = previewPanel.getNumPages() == 1 || (previewPanel.getNumPages() > 1 && selectedPage != -1);
             }
         }
+        e.getPresentation().setEnabled(enabled);
     }
 
 

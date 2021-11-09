@@ -244,8 +244,10 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
+        boolean enabled = false;
         if (project != null) {
-            e.getPresentation().setEnabled(UIUtils.hasAnyImage(e));
+            enabled = UIUtils.hasAnyImage(e);
         }
+        e.getPresentation().setEnabled(enabled);
     }
 }
