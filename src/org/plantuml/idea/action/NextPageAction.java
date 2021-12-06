@@ -25,10 +25,13 @@ public class NextPageAction extends DumbAwareAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         final Project project = e.getProject();
+        boolean enabled = false;
         if (project != null) {
             PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
-            if (previewPanel != null)
-                e.getPresentation().setEnabled(previewPanel.getNumPages() > 1);
+            if (previewPanel != null) {
+                enabled = previewPanel.getNumPages() > 1;
+            }
         }
+        e.getPresentation().setEnabled(enabled);
     }
 }
