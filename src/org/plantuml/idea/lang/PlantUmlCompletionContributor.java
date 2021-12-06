@@ -31,6 +31,10 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
                 CompletionType.BASIC,
                 PlatformPatterns.psiElement(),
                 new SimpleProvider(LanguageDescriptor.INSTANCE.keywords2));
+        extend(
+                CompletionType.BASIC,
+                PlatformPatterns.psiElement(),
+                new SimpleProvider(LanguageDescriptor.INSTANCE.functions));
 
     }
 
@@ -43,11 +47,15 @@ public class PlantUmlCompletionContributor extends CompletionContributor impleme
 
         if (text.matches("\\s*!\\w*$")) {
             for (String s : LanguageDescriptor.INSTANCE.preproc) {
-                result.addElement(LookupElementBuilder.create(s.substring(1)).withPresentableText(s).withCaseSensitivity(true).bold());
+                result.addElement(LookupElementBuilder.create(s).withPresentableText(s).withCaseSensitivity(true).bold());
+            }
+        } else if (text.matches(".*%\\w*$")) {
+            for (String s : LanguageDescriptor.INSTANCE.functions) {
+                result.addElement(LookupElementBuilder.create(s).withPresentableText(s).withCaseSensitivity(true).bold().appendTailText("(...)", true));
             }
         } else if (text.matches("\\s*@\\w*$")) {
             for (String s : LanguageDescriptor.INSTANCE.tags) {
-                result.addElement(LookupElementBuilder.create(s.substring(1)).withPresentableText(s).withCaseSensitivity(true).bold());
+                result.addElement(LookupElementBuilder.create(s).withPresentableText(s).withCaseSensitivity(true).bold());
             }
         } else {
             if (text.endsWith("!")) {

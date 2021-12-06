@@ -86,7 +86,45 @@ public enum LanguageDescriptor {
             "on",
             "is"
     ));
-    
+
+    public final List<String> functions = Collections.unmodifiableList(Arrays.asList(
+            "%chr",
+            "%darken",
+            "%date",
+            "%dec2hex",
+            "%dirpath",
+            "%feature",
+            "%false",
+            "%file_exists",
+            "%filename",
+            "%function_exists",
+            "%get_variable_value",
+            "%getenv",
+            "%hex2dec",
+            "%hsl_color",
+            "%intval",
+            "%is_dark",
+            "%is_light",
+            "%lighten",
+            "%loadJSON",
+            "%lower",
+            "%newline",
+            "%not",
+            "%lighten",
+            "%reverse_color",
+            "%reverse_hsluv_color",
+            "%set_variable_value",
+            "%size",
+            "%string",
+            "%strlen",
+            "%strpos",
+            "%substr",
+            "%true",
+            "%upper",
+            "%variable_exists",
+            "%version"
+    ));
+
     public final List<String> keywords = Collections.unmodifiableList(Arrays.asList(
             "autonumber",
             "caption",
