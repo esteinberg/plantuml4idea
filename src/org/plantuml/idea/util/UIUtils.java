@@ -38,11 +38,12 @@ public class UIUtils {
         return NotificationGroupManager.getInstance().getNotificationGroup("PlantUML integration plugin");
     }
 
-    public static String getSelectedSourceWithCaret(FileEditorManager instance, PlantUmlPreviewEditor fileEditor) {
+    public static String getSelectedSourceWithCaret(FileEditorManager instance, @Nullable PlantUmlPreviewEditor fileEditor) {
+        return getSelectedSourceWithCaret(instance, getSelectedTextEditor(instance, fileEditor));
+    }
+
+    public static String getSelectedSourceWithCaret(FileEditorManager instance, @Nullable Editor selectedTextEditor) {
         String source = "";
-
-        Editor selectedTextEditor = getSelectedTextEditor(instance, fileEditor);
-
         if (selectedTextEditor != null) {
             final Document document = selectedTextEditor.getDocument();
             int offset = selectedTextEditor.getCaretModel().getOffset();
@@ -60,7 +61,7 @@ public class UIUtils {
      * FileEditorManager#getSelectedTextEditor is not good enough, returns null for *.rst in PyCharm (TextEditorWithPreview)
      */
     @Nullable
-    public static Editor getSelectedTextEditor(FileEditorManager instance, PlantUmlPreviewEditor plantUmlPreviewEditor) {
+    public static Editor getSelectedTextEditor(FileEditorManager instance, @Nullable PlantUmlPreviewEditor plantUmlPreviewEditor) {
         Editor selectedTextEditor = null;
         if (plantUmlPreviewEditor != null) {
             selectedTextEditor = plantUmlPreviewEditor.getEditor();
@@ -125,7 +126,7 @@ public class UIUtils {
 
     public static PlantUmlPreviewPanel getEditorOrToolWindowPreview(AnActionEvent e) {
         final FileEditor fileEditor = e.getData(PlatformDataKeys.FILE_EDITOR);
-        PlantUmlPreviewPanel panel = getEditorPlantUmlPreviewPanel(fileEditor);
+        PlantUmlPreviewPanel panel = getEditorPlantUmlPreviewPanel(fileEditor, true);
         if (panel == null || !panel.isPreviewVisible()) {
             panel = getToolWindowPreview(e.getProject());
         }
@@ -137,7 +138,7 @@ public class UIUtils {
         Project project = null;
         for (Editor editor : editors) {
             project = editor.getProject();
-            panels.add(getEditorPlantUmlPreviewPanel(editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW)));
+            panels.add(getEditorPlantUmlPreviewPanel(editor.getUserData(PlantUmlPreviewEditor.PLANTUML_PREVIEW), true));
         }
         if (project != null) {
             panels.add(getToolWindowPreview(project));
@@ -148,13 +149,13 @@ public class UIUtils {
 
     public static List<PlantUmlPreviewPanel> getEligiblePreviews(@Nullable FileEditor fileEditor, @Nullable Project project) {
         ArrayList<PlantUmlPreviewPanel> panels = new ArrayList<>();
-        panels.add(getEditorPlantUmlPreviewPanel(fileEditor));
+        panels.add(getEditorPlantUmlPreviewPanel(fileEditor, true));
         panels.add(getToolWindowPreview(project));
         return panels;
     }
 
     @Nullable
-    public static PlantUmlPreviewPanel getEditorPlantUmlPreviewPanel(@Nullable FileEditor fileEditor) {
+    public static PlantUmlPreviewPanel getEditorPlantUmlPreviewPanel(@Nullable FileEditor fileEditor, boolean onlyVisiblePreview) {
         if (fileEditor == null) {
             return null;
         }
@@ -163,7 +164,7 @@ public class UIUtils {
             SplitFileEditor<?, ?> splitEditor = findSplitEditor(fileEditor);
             previewPanel = PlantUmlPreviewEditor.PLANTUML_PREVIEW_PANEL.get(splitEditor);
         }
-        if (previewPanel == null || !previewPanel.isPreviewVisible()) {
+        if (previewPanel == null || (onlyVisiblePreview && !previewPanel.isPreviewVisible())) {
             return null;
         }
         return previewPanel;

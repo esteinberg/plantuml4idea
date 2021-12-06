@@ -2,9 +2,12 @@ package org.plantuml.idea.action.save;
 
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
@@ -23,10 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
-import org.plantuml.idea.rendering.ImageItem;
-import org.plantuml.idea.rendering.RenderCacheItem;
-import org.plantuml.idea.rendering.RenderResult;
-import org.plantuml.idea.rendering.RenderingType;
+import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.preview.editor.PlantUmlSplitEditor;
+import org.plantuml.idea.rendering.*;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
@@ -35,7 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.plantuml.idea.util.UIUtils.notification;
+import static org.plantuml.idea.util.UIUtils.*;
 
 /**
  * @author Eugene Steinberg
@@ -59,25 +61,56 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        String selectedSource;
+        File sourceFile;
+        boolean remote;
+        ImageFormat format;
+        RenderResult renderResult = null;
+        Zoom zoom;
+        String defaultFileName;
+
         Project project = e.getProject();
+        if (project == null) {
+            return;
+        }
 
-        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
-        RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
+        PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
 
-        String selectedSource = displayedItem.getSource();
-        File sourceFile = new File(displayedItem.getSourceFilePath());
-        RenderResult renderResult = displayedItem.getRenderResult();
-        boolean remote = renderResult.getStrategy() == RenderingType.REMOTE;
+        if (previewPanel == null) {
+            FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
+            if (!(editor instanceof PlantUmlSplitEditor)) {
+                throw new RuntimeException("invalid editor " + editor);
+            }
+            final PlantUmlSplitEditor fileEditor = (PlantUmlSplitEditor) editor;
+            VirtualFile file = editor.getFile();
+            sourceFile = new File(file.getPath());
+            selectedSource = getSelectedSourceWithCaret(FileEditorManager.getInstance(project), fileEditor.getEditor());
+            remote = plantUmlSettings.isRemoteRendering();
+            format = plantUmlSettings.getDefaultExportFileFormatEnum();
+            zoom = new Zoom(100, plantUmlSettings);
+            String filename = PlantUmlFacade.get().getFilename(selectedSource, file);
+            defaultFileName = getDefaultFileName(e, project, null, editor, filename);
+        } else {
+            RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
+            renderResult = displayedItem.getRenderResult();
+
+            selectedSource = displayedItem.getSource();
+            sourceFile = new File(displayedItem.getSourceFilePath());
+            remote = renderResult.getStrategy() == RenderingType.REMOTE;
+            format = remote ? displayedItem.getRenderResult().getImageItem(0).getFormat() : plantUmlSettings.getDefaultExportFileFormatEnum();
+            zoom = getEditorOrToolWindowPreview(e).getZoom();
+            defaultFileName = getDefaultFileName(e, project, previewPanel, null, null);
+        }
+
+        String defaultExtension = format.name().toLowerCase();
+        String[] extensions = remote ? new String[]{format.name().toLowerCase()} : getExtensions(defaultExtension);
 
         if (StringUtils.isBlank(selectedSource)) {
             Notifications.Bus.notify(notification().createNotification("No PlantUML source code", MessageType.WARNING));
             return;
         }
-        ImageFormat format = remote ? displayedItem.getRenderRequest().getFormat() : plantUmlSettings.getDefaultExportFileFormatEnum();
-        String defaultExtension = format.name().toLowerCase();
 
-        String[] extensions = remote ? new String[]{format.name().toLowerCase()} : getExtensions(defaultExtension);
         FileSaverDescriptor fsd = new FileSaverDescriptor("Save Diagram", "Please choose where to save diagram", extensions);
 
         VirtualFile baseDir = null;
@@ -94,7 +127,6 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 baseDir = ProjectUtil.guessProjectDir(project);
             }
         }
-        String defaultFileName = getDefaultFileName(e, project);
 
         final VirtualFileWrapper wrapper = FileChooserFactory.getInstance().createSaveFileDialog(fsd, project).save(baseDir, defaultFileName);
 
@@ -132,19 +164,22 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
 
                 if (remote) {
-                    if (displayedItem.getRenderRequest().getFormat() != imageFormat) {
-                        throw new RuntimeException("wrong format");
+                    if (renderResult == null) {
+                        renderResult = PlantUmlFacade.get().render(new RenderRequest(sourceFile.getAbsolutePath(), selectedSource, format, 0, zoom, -1, false, RenderCommand.Reason.REFRESH), null);
                     }
                     if (renderResult.getPages() > 1) {
                         throw new RuntimeException("renderResult.getPages() > 1");
                     }
                     ImageItem imageItem = renderResult.getImageItem(0);
+                    if (imageItem.getFormat() != imageFormat) {
+                        throw new RuntimeException("wrong format, rendered: " + imageItem.getFormat());
+                    }
                     byte[] imageBytes = imageItem.getImageBytes();
                     PlantUmlFacade.get().save(file.getAbsolutePath(), imageBytes);
                 } else {
                     PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
                             imageFormat, file.getAbsolutePath(), pathPrefix,
-                            UIUtils.getEditorOrToolWindowPreview(e).getZoom(), getPageNumber(e));
+                            zoom, getPageNumber(e));
 
                 }
 
@@ -186,12 +221,11 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
     }
 
 
-    private String getDefaultFileName(AnActionEvent e, Project myProject) {
+    private String getDefaultFileName(AnActionEvent e, Project myProject, PlantUmlPreviewPanel previewPanel, FileEditor editor, String customFilename) {
         String filename = null;
 
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         try {
-            PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
             if (previewPanel != null) {
                 RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
                 int selectedPage = previewPanel.getSelectedPage();
@@ -213,6 +247,11 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 }
                 if (filename == null) {
                     filename = displayedItem.getFileNameWithoutExtension();
+                }
+            } else if (editor != null) {
+                filename = customFilename;
+                if (filename == null) {
+                    filename = editor.getFile().getNameWithoutExtension();
                 }
             }
         } catch (Exception ex) {

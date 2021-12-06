@@ -3,8 +3,10 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.png.MetadataTag;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.adapter.rendering.DiagramFactory;
 import org.plantuml.idea.adapter.rendering.PlantUmlExporter;
 import org.plantuml.idea.adapter.rendering.PlantUmlRendererUtil;
 import org.plantuml.idea.external.PlantUmlFacade;
@@ -58,6 +60,13 @@ public class FacadeImpl implements PlantUmlFacade {
         }
 
         return null;
+    }
+
+    @Override
+    public String getFilename(String source, VirtualFile virtualFile) {
+        Utils.prepareEnvironment(virtualFile.getPath());
+        DiagramFactory diagramFactory = DiagramFactory.create(new SourceStringReader(source), null);
+        return diagramFactory.getFilename(0);
     }
 
     @Override

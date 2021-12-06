@@ -34,4 +34,6 @@ public interface PlantUmlFacade {
     void save(String path, byte[] imageBytes);
 
     String extractEmbeddedSourceFromImage(VirtualFile file);
+
+    String getFilename(String source, VirtualFile virtualFile);
 }

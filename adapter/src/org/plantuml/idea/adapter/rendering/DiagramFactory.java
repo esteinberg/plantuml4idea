@@ -48,7 +48,7 @@ public class DiagramFactory {
         return create(reader, renderRequest);
     }
 
-    public static DiagramFactory create(SourceStringReader reader, RenderRequest renderRequest) {
+    public static DiagramFactory create(SourceStringReader reader, @Nullable RenderRequest renderRequest) {
         long start1 = System.currentTimeMillis();
         int totalPages = 0;
         List<MyBlock> myBlocks = new ArrayList<>();

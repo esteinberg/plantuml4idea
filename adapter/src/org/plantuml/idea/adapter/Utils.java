@@ -14,9 +14,9 @@ import net.sourceforge.plantuml.version.Version;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderingCancelledException;
 import org.plantuml.idea.settings.PlantUmlSettings;
+import org.plantuml.idea.util.UIUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,18 +25,18 @@ public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
 
     @NotNull
-    public static void prepareEnvironment(RenderRequest renderRequest) {
+    public static void prepareEnvironment(String sourceFilePath) {
         OptionFlags.getInstance().setVerbose(LOG.isDebugEnabled());
-        
+
         long start = System.currentTimeMillis();
-        File baseDir = renderRequest.getBaseDir();
+        File baseDir = UIUtils.getParent(new File(sourceFilePath));
         if (baseDir != null) {
             setPlantUmlDir(baseDir);
         } else {
             resetPlantUmlDir();
         }
 
-        saveAllDocuments(renderRequest.getSourceFilePath());
+        saveAllDocuments(sourceFilePath);
         applyPlantumlOptions(PlantUmlSettings.getInstance());
         LOG.debug("prepareEnvironment done ", System.currentTimeMillis() - start, "ms");
     }
