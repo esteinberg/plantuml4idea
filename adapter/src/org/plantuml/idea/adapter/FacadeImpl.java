@@ -1,7 +1,6 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.png.MetadataTag;
@@ -45,12 +44,11 @@ public class FacadeImpl implements PlantUmlFacade {
     }
 
     @Override
-    public String extractEmbeddedSourceFromImage(VirtualFile file) {
+    public String extractEmbeddedSourceFromImage(File file) {
         try {
             // based on https://github.com/plantuml/plantuml-server/blob/f4f6ca5773869c7f77b23f6004bea45e3954600f/src/main/java/net/sourceforge/plantuml/servlet/PlantUmlServlet.java#L79
             // https://plantuml.com/de/server#metadata
-            File img = VfsUtil.virtualToIoFile(file);
-            MetadataTag metadataTag = new MetadataTag(img, "plantuml");
+            MetadataTag metadataTag = new MetadataTag(file, "plantuml");
             String data = metadataTag.getData();
             if (data != null) {
                 return data;

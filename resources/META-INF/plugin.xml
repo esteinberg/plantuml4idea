@@ -280,12 +280,12 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
         </group>
 
 
-        <group id="NewPlantUML" text="PlantUML">
+        <group id="PlantUML.NewPlantUML" text="PlantUML">
             <action id="NewPlantUMLFile" class="org.plantuml.idea.plantuml.CreatePlantUMLFileAction"/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
         </group>
-        <action id="extractEmbeddedPlantumlSourcesFromPNG"
-                class="org.plantuml.idea.action.context.ExtractEmbeddedSourcesFromPNGAction"
+        <action id="PlantUML.extractEmbeddedPlantumlSources"
+                class="org.plantuml.idea.action.context.ExtractEmbeddedSourcesAction"
                 text="Extract PlantUML Source" description="Extracts the embedded source code from PlantUML images">
             <add-to-group group-id="Images.EditorPopupMenu" anchor="first"/>
         </action>
