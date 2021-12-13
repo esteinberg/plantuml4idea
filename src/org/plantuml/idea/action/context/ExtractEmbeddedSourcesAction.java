@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.SourceExtractor;
 
-public class ExtractEmbeddedSourcesFromPNGAction extends DumbAwareAction {
+public class ExtractEmbeddedSourcesAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {
