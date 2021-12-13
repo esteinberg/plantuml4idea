@@ -5,7 +5,7 @@ import net.sourceforge.plantuml.NewpagedDiagram;
 import net.sourceforge.plantuml.TitledDiagram;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
+import net.sourceforge.plantuml.cucadiagram.DisplayPositioned;
 import net.sourceforge.plantuml.error.PSystemError;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
@@ -43,15 +43,15 @@ public class Titles {
             List<net.sourceforge.plantuml.core.Diagram> diagrams = newpagedDiagram.getDiagrams();
             for (net.sourceforge.plantuml.core.Diagram diagram1 : diagrams) {
                 if (diagram1 instanceof UmlDiagram) {
-                    DisplayPositionned title = ((UmlDiagram) diagram1).getTitle();
+                    DisplayPositioned title = (DisplayPositioned) ((UmlDiagram) diagram1).getTitle();
                     MyBlock.addTitle(titles, title.getDisplay());
                 }
             }
         } else if (diagram instanceof UmlDiagram) {
-            DisplayPositionned title = ((UmlDiagram) diagram).getTitle();
+            DisplayPositioned title = (DisplayPositioned) ((UmlDiagram) diagram).getTitle();
             MyBlock.addTitle(titles, title.getDisplay());
         } else if (diagram instanceof PSystemError) {
-            DisplayPositionned title = ((PSystemError) diagram).getTitle();
+            DisplayPositioned title = (DisplayPositioned) ((PSystemError) diagram).getTitle();
             if (title == null) {
                 titles.add(null);
             } else {
