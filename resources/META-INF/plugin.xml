@@ -7,14 +7,14 @@
 
     <description><![CDATA[PlantUML diagramming tool integration. Now better and faster, with code navigation and highlighting.
         <br><br>
-        Sponsored by:<br> 
+        Sponsored by:<br>
 <p><a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner"><img src="https://alt-images.codestream.com/codestream_logo_vojta_plantuml.png"></a><br>
 Manage pull requests and conduct code reviews in your IDE with full source-tree context. Comment on any line, not just the diffs. Use jump-to-definition, your favorite keybindings, and code intelligence with more of your workflow.<br>
 <a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner">Learn More</a></p>
       ]]></description>
 
     <change-notes>
-        <![CDATA[        
+        <![CDATA[
             <p>5.8.0<p>
             <ul>
                  <li>PlantUML library upgrade to v1.2021.15</li>
@@ -51,36 +51,36 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <p>5.2<p>
             <ul>
               <li>Detection for plugin conflicts - disables SVG preview rendering</li>
-            </ul>        
+            </ul>
             <p>5.1<p>
             <ul>
               <li>TODOs support in comments</li>
-            </ul>         
+            </ul>
             <p>5.0<p>
             <ul>
               <li>Editor preview</li>
               <li>PlantUML library upgrade to v1.2021.4</li>
               <li>Render *.dot files without plantUML meta tags</li>
-            </ul>         
+            </ul>
             <p>4.6<p>
             <ul>
               <li>Added option: Remember last export directory</li>
               <li>PlantUML library upgrade to v1.2021.2</li>
-            </ul>    
+            </ul>
             <p>4.5<p>
             <ul>
               <li>Remote rendering using PlantUML server</li>
               <li>Copy as PlantUML Server link configuration</li>
-            </ul>      
+            </ul>
             <p>4.4<p>
             <ul>
               <li>Fixed source extracting for Markdown</li>
-            </ul>     
+            </ul>
             <p>4.3<p>
             <ul>
               <li>Suppressed `Non-ASCII characters` inspection</li>
               <li>Fixed default export filename</li>
-            </ul> 
+            </ul>
             <p>4.2<p>
             <ul>
               <li>!include navigation, refactoring support</li>
@@ -97,42 +97,42 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
               <li>Switched to a much faster SVG preview</li>
               <li>Other performance optimizations</li>
               <li>Highlighting of the selected text in images - disabled by default</li>
-            </ul>        
+            </ul>
             <p>3.6</p>
             <ul>
               <li>Image text links into the source code - by text matching, repeated clicks cycles occurrences</li>
               <li>Fixed regression - unnecessary image rendering</li>
               <li>Little improved grammar</li>
-            </ul>       
+            </ul>
             <p>3.5</p>
             <ul>
               <li>Added: Grazie grammar check - must be enabled in File | Settings | Editor | Proofreading | Grammar</li>
               <li>Fixed code navigation for non-ascii words</li>
-            </ul>        
+            </ul>
             <p>3.4</p>
             <ul>
               <li>Fixed Spellchecking inspection</li>
               <li>Added: Insert paired (), [] , {}, "" - can be disabled in settings</li>
-            </ul>   
+            </ul>
             <p>3.3</p>
             <ul>
               <li>Find Usages performance optimization</li>
               <li>Small fixes</li>
-            </ul>   
+            </ul>
             <p>3.2</p>
             <ul>
               <li>Added: ctrl+click - Go to Declaration/Usages, Rename...</li>
               <li>Added: Structure view - shows the first occurrence of a word</li>
               <li>Better keyword highlighting + settings to disable it</li>
               <li>Updated file templates</li>
-            </ul> 
+            </ul>
             <p>3.1</p>
             <ul>
               <li>Performance optimization when !includeurl is used</li>
               <li>PlantUML library upgrade to v1.2021.0</li>
               <li>YAML Data Diagram support</li>
               <li>Syntax annotator bugfixes</li>
-            </ul> 
+            </ul>
             <p>3.0</p>
             <ul>
              <li>Option to use an external PlantUML jar</li>
@@ -143,7 +143,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
        ]]>
     </change-notes>
     <depends>com.intellij.modules.platform</depends>
-    <depends optional="true">com.intellij.platform.images</depends>
+    <depends optional="true" config-file="images-puml.xml">com.intellij.platform.images</depends>
     <depends optional="true" config-file="grazie-puml.xml">tanvd.grazi</depends>
 
     <application-components>
@@ -284,11 +284,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <action id="NewPlantUMLFile" class="org.plantuml.idea.plantuml.CreatePlantUMLFileAction"/>
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
         </group>
-        <action id="PlantUML.extractEmbeddedPlantumlSources"
-                class="org.plantuml.idea.action.context.ExtractEmbeddedSourcesAction"
-                text="Extract PlantUML Source" description="Extracts the embedded source code from PlantUML images">
-            <add-to-group group-id="Images.EditorPopupMenu" anchor="first"/>
-        </action>
+
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">

@@ -1,0 +1,11 @@
+<idea-plugin>
+    <actions>
+        <action id="PlantUML.extractEmbeddedPlantumlSources"
+                class="org.plantuml.idea.action.context.ExtractEmbeddedSourcesAction"
+                text="Extract PlantUML Source" description="Extracts the embedded source code from PlantUML images">
+            <add-to-group group-id="Images.EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
+    <depends>com.intellij.platform.images</depends>
+</idea-plugin>
+
