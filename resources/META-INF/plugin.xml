@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>5.8.1</version>
+    <version>5.9.0</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203.5981.155"/>
@@ -15,13 +15,16 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[
+            <p>5.9.0<p>
+            <ul>
+                 <li>PlantUML library upgrade to v1.2021.16</li>
+                 <li>Minor fixes</li>
+            </ul>
             <p>5.8.0<p>
             <ul>
                  <li>PlantUML library upgrade to v1.2021.15</li>
                  <li>Exporting button fix</li>
                  <li>Fixed preprocessor autocomplete, added functions autocomplete</li>
-            </ul>
-            <ul>
                  <li>Ditaa fix for remote rendering + SVG</li>
                  <li>Browser buttons fix</li>
             </ul>
