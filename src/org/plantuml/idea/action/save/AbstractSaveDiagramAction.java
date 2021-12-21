@@ -104,7 +104,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
         }
 
         String defaultExtension = format.name().toLowerCase();
-        String[] extensions = remote ? new String[]{format.name().toLowerCase()} : getExtensions(defaultExtension);
+        String[] extensions = remote ? getRemoteExtensions(format.name().toLowerCase()) : getExtensions(defaultExtension);
 
         if (StringUtils.isBlank(selectedSource)) {
             Notifications.Bus.notify(notification().createNotification("No PlantUML source code", MessageType.WARNING));
@@ -132,10 +132,10 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         if (wrapper != null) {
             try {
-                File file = wrapper.getFile();
+                File saveTo = wrapper.getFile();
 
                 if (plantUmlSettings.isRememberLastExportDir()) {
-                    File parentDir = file.getParentFile();
+                    File parentDir = saveTo.getParentFile();
                     if (parentDir != null && parentDir.exists()) {
                         plantUmlSettings.setLastExportDir(parentDir.getAbsolutePath());
                         logger.debug("lastDir set to ", parentDir.getAbsolutePath());
@@ -144,13 +144,13 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                     plantUmlSettings.setLastExportDir(null);
                 }
 
-                String[] tokens = file.getAbsolutePath().split("\\.(?=[^\\.]+$)");
+                String[] tokens = saveTo.getAbsolutePath().split("\\.(?=[^\\.]+$)");
                 String pathPrefix = tokens[0];
                 String extension;
 
                 if (tokens.length < 2) {
                     extension = defaultExtension;
-                    file = new File(pathPrefix + "." + defaultExtension);
+                    saveTo = new File(pathPrefix + "." + defaultExtension);
                 } else {
                     extension = tokens[1];
                 }
@@ -164,21 +164,25 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
 
                 if (remote) {
-                    if (renderResult == null) {
-                        renderResult = PlantUmlFacade.get().render(new RenderRequest(sourceFile.getAbsolutePath(), selectedSource, format, 0, zoom, -1, false, RenderCommand.Reason.REFRESH), null);
+                    if (renderResult == null || renderResult.getImageItem(0).getFormat() != imageFormat) {
+                        renderResult = PlantUmlFacade.get().render(new RenderRequest(sourceFile.getAbsolutePath(), selectedSource, imageFormat, 0, zoom, -1, false, RenderCommand.Reason.REFRESH), null);
                     }
+
+                    String path = saveTo.getAbsolutePath();
+
                     if (renderResult.getPages() > 1) {
                         throw new RuntimeException("renderResult.getPages() > 1");
                     }
-                    ImageItem imageItem = renderResult.getImageItem(0);
-                    if (imageItem.getFormat() != imageFormat) {
-                        throw new RuntimeException("wrong format, rendered: " + imageItem.getFormat());
+                    ImageFormat realFormat = renderResult.getImageItem(0).getFormat();
+                    if (realFormat != imageFormat) {
+                        path = path + "." + realFormat.name().toLowerCase();
                     }
-                    byte[] imageBytes = imageItem.getImageBytes();
-                    PlantUmlFacade.get().save(file.getAbsolutePath(), imageBytes);
+                    byte[] imageBytes = renderResult.getImageItem(0).getImageBytes();
+
+                    PlantUmlFacade.get().save(path, imageBytes);
                 } else {
                     PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
-                            imageFormat, file.getAbsolutePath(), pathPrefix,
+                            imageFormat, saveTo.getAbsolutePath(), pathPrefix,
                             zoom, getPageNumber(e));
 
                 }
@@ -191,6 +195,18 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
                 Messages.showErrorDialog(message, title);
             }
         }
+    }
+
+    private String[] getRemoteExtensions(String defaultExtension) {
+        String[] extensions;
+        ImageFormat[] values = new ImageFormat[]{ImageFormat.PNG, ImageFormat.SVG};
+        extensions = new String[values.length];
+        for (int i = 0; i < values.length; i++) {
+            extensions[i] = values[i].name().toLowerCase();
+        }
+        Arrays.sort(extensions);
+        swapExtensions(extensions, defaultExtension);
+        return extensions;
     }
 
     @NotNull
