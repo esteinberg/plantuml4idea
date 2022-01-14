@@ -212,7 +212,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             />
             <action id="PlantUML.SaveToFile" description="Save Current Diagram Only"
                     class="org.plantuml.idea.action.save.SaveDiagramToFileAction"
-                    icon="/images/menu-saveall.svg" text="Save Current Diagram Only"/>
+                    icon="/actions/menu-saveall.svg" text="Save Current Diagram Only"/>
             <action id="PlantUML.SaveAllToFile" description="Save All Pages"
                     class="org.plantuml.idea.action.save.SaveAllDiagramToFileAction"
                     icon="AllIcons.ToolbarDecorator.Export" text="Save All Pages"/>

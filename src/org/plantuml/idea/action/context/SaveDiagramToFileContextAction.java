@@ -8,7 +8,7 @@ import org.plantuml.idea.preview.image.ImageContainer;
 import javax.swing.*;
 
 public class SaveDiagramToFileContextAction extends AbstractSaveDiagramAction {
-    public static final Icon ICON = IconLoader.getIcon("/images/menu-saveall.svg", SaveDiagramToFileContextAction.class);
+    public static final Icon ICON = IconLoader.getIcon("/actions/menu-saveall.svg", SaveDiagramToFileContextAction.class);
 
     public SaveDiagramToFileContextAction() {
         super("Save Diagram", null, ICON);
