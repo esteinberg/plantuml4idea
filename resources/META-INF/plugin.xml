@@ -17,7 +17,8 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
         <![CDATA[
             <p>5.10.0<p>
             <ul>
-                 <li>Added Live Template context</li>
+                <li>PlantUML library upgrade to v1.2022.0</li>
+                <li>Added Live Template context</li>
             </ul>
             <p>5.9.0<p>
             <ul>
