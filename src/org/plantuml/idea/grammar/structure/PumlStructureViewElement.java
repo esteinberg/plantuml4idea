@@ -34,7 +34,7 @@ public class PumlStructureViewElement implements StructureViewTreeElement, Sorta
         this.document = document;
         try {
             if (element.isValid()) {
-                line = "line: " + document.getLineNumber(element.getTextOffset());
+                line = "line: " + document.getLineNumber(element.getTextOffset()) + 1;
             }
         } catch (Throwable e) {
             //old document, ignore, (maybe #isValid solves it, dunno)
