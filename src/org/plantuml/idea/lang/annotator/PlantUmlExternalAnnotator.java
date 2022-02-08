@@ -5,7 +5,9 @@ import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
@@ -40,23 +42,26 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 
     public static class Info {
 
+        @Nullable
+        private final Project project;
         private final String text;
         private final VirtualFile virtualFile;
 
-        public Info(String text, VirtualFile virtualFile) {
+        public Info(@Nullable Project project, String text, VirtualFile virtualFile) {
+            this.project = project;
             this.text = text;
             this.virtualFile = virtualFile;
         }
 
         public Info(PsiFile file) {
-            this(file.getText(), file.getVirtualFile());
+            this(null, file.getText(), file.getVirtualFile());
         }
     }
 
-    @Nullable
+
     @Override
-    public Info collectInformation(@NotNull PsiFile file) {
-        return new Info(file.getText(), file.getVirtualFile());
+    public @Nullable Info collectInformation(@NotNull PsiFile file, @NotNull Editor editor, boolean hasErrors) {
+        return new Info(editor.getProject(), file.getText(), file.getVirtualFile());
     }
 
     @Nullable
@@ -80,7 +85,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
                 String source = sourceData.getValue();
 
                 if (plantUmlSettings.isErrorAnnotationEnabled()) {
-                    sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(source, file.virtualFile));
+                    sourceAnnotationResult.addAll(PlantUmlFacade.get().annotateSyntaxErrors(file.project, source, file.virtualFile));
                     List<SyntaxHighlightAnnotation> blockComments = annotateBlockComments(source);
                     sourceAnnotationResult.addBlockComments(blockComments);
                 }

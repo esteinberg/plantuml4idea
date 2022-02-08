@@ -17,7 +17,7 @@ public class PlantUmlRendererUtilTest {
     public void render() throws Exception {
         RenderResult render = new FacadeImpl().render(new RenderRequest("sourceFilePath", "@startuml\n" +
                 "xxx->yyy\n" +
-                "@enduml", ImageFormat.PNG, 0, new Zoom(100, new PlantUmlSettings()), null, false, RenderCommand.Reason.REFRESH), null);
+                "@enduml", ImageFormat.PNG, 0, new Zoom(100, new PlantUmlSettings()), null, false, RenderCommand.Reason.REFRESH, null), null);
         Assert.assertNotNull(render);
         Assert.assertNotNull(render.getFirstDiagramBytes());
         Assert.assertNotNull(render.getImageItems().get(0));
@@ -27,7 +27,7 @@ public class PlantUmlRendererUtilTest {
     public void renderBrokenImage() throws Exception {
         RenderResult render = new FacadeImpl().render(new RenderRequest("sourceFilePath", "@startuml\n" +
                 "xxx\n" +
-                "@enduml", ImageFormat.PNG, 0, new Zoom(0, new PlantUmlSettings()), null, false, RenderCommand.Reason.REFRESH), null);
+                "@enduml", ImageFormat.PNG, 0, new Zoom(0, new PlantUmlSettings()), null, false, RenderCommand.Reason.REFRESH, null), null);
         Assert.assertNotNull(render);
         Assert.assertNotNull(render.getImageItems().get(0));
         Assert.assertTrue(render.hasError());

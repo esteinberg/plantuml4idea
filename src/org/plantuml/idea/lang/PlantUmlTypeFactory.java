@@ -18,7 +18,7 @@ public class PlantUmlTypeFactory extends FileTypeFactory {
                 PlantUmlFileType.INSTANCE,
                 PlantUmlFileType.PLANTUML_EXT_2);
         consumer.consume(
-                PlantIUmlFileType.PLANTUML_FILE_TYPE,
+                PlantIUmlFileType.INSTANCE,
                 PlantIUmlFileType.PLANTUML_EXT);
     }
 }

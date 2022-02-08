@@ -1,6 +1,7 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.png.MetadataTag;
@@ -31,11 +32,11 @@ public class FacadeImpl implements PlantUmlFacade {
 
     @Nullable
     @Override
-    public Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile) {
+    public Collection<SourceAnnotation> annotateSyntaxErrors(Project project, String source, VirtualFile virtualFile) {
         if (PlantUmlSettings.getInstance().isRemoteRendering()) {
             return Collections.emptyList();
         }
-        return Annotator.annotateSyntaxErrors(source, virtualFile);
+        return Annotator.annotateSyntaxErrors(project, source, virtualFile);
     }
              
     @Override
@@ -61,14 +62,14 @@ public class FacadeImpl implements PlantUmlFacade {
     }
 
     @Override
-    public String getFilename(String source, VirtualFile virtualFile) {
-        Utils.prepareEnvironment(virtualFile.getPath());
+    public String getFilename(Project project, String source, VirtualFile virtualFile) {
+        Utils.prepareEnvironment(project, virtualFile.getPath());
         DiagramFactory diagramFactory = DiagramFactory.create(new SourceStringReader(source), null);
         return diagramFactory.getFilename(0);
     }
 
     @Override
-    public void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber) throws IOException {
+    public void renderAndSave(Project project, String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber) throws IOException {
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
         if (settings.isRemoteRendering()) {
             throw new RuntimeException("Report this and disable Remote Rendering");
@@ -78,7 +79,7 @@ public class FacadeImpl implements PlantUmlFacade {
             zoom = zoom.unscaled(settings);
         }
 
-        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, zoom, -1, false, null);
+        RenderRequest renderRequest = new RenderRequest(sourceFile.getAbsolutePath(), source, format, pageNumber, zoom, -1, false, null, project);
         PlantUmlRendererUtil.renderAndSave(renderRequest, path, pathPrefix);
     }
 

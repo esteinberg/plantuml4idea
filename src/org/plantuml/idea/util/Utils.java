@@ -44,7 +44,7 @@ public class Utils {
 
     public static boolean isPlantUmlFileType(@NotNull PsiFile file) {
         FileType fileType = file.getFileType();
-        return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.PLANTUML_FILE_TYPE);
+        return fileType.equals(PlantUmlFileType.INSTANCE) || fileType.equals(PlantIUmlFileType.INSTANCE);
     }
 
     public static boolean isPlantUmlFileType(Project project, VirtualFile file) {
@@ -52,12 +52,25 @@ public class Utils {
             return false;
         }
         // when a project is already disposed due to a slow initialization, reject this file
-        if (project.isDisposed()) {
+        if (project != null && project.isDisposed()) {
             return false;
         }
         FileType fileType = file.getFileType();
         return fileType == PlantUmlFileType.INSTANCE ||
-                (ScratchUtil.isScratch(file) && LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE);
+                (ScratchUtil.isScratch(file) && project != null && LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE);
+    }
+
+    public static boolean isPlantUmlOrIUmlFileType(Project project, VirtualFile file) {
+        if (file.isDirectory() || !file.exists()) {
+            return false;
+        }
+        // when a project is already disposed due to a slow initialization, reject this file
+        if (project != null && project.isDisposed()) {
+            return false;
+        }
+        FileType fileType = file.getFileType();
+        return fileType == PlantUmlFileType.INSTANCE || fileType == PlantIUmlFileType.INSTANCE ||
+                (ScratchUtil.isScratch(file) && project != null && (LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE));
     }
 
     public static boolean containsLettersOrNumbers(CharSequence s) {

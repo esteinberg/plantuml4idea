@@ -89,7 +89,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
             remote = plantUmlSettings.isRemoteRendering();
             format = plantUmlSettings.getDefaultExportFileFormatEnum();
             zoom = new Zoom(100, plantUmlSettings);
-            String filename = PlantUmlFacade.get().getFilename(selectedSource, file);
+            String filename = PlantUmlFacade.get().getFilename(project, selectedSource, file);
             defaultFileName = getDefaultFileName(e, project, null, editor, filename);
         } else {
             RenderCacheItem displayedItem = previewPanel.getDisplayedItem();
@@ -165,7 +165,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                 if (remote) {
                     if (renderResult == null || renderResult.getImageItem(0).getFormat() != imageFormat) {
-                        renderResult = PlantUmlFacade.get().render(new RenderRequest(sourceFile.getAbsolutePath(), selectedSource, imageFormat, 0, zoom, -1, false, RenderCommand.Reason.REFRESH), null);
+                        renderResult = PlantUmlFacade.get().render(new RenderRequest(sourceFile.getAbsolutePath(), selectedSource, imageFormat, 0, zoom, -1, false, RenderCommand.Reason.REFRESH, project), null);
                     }
 
                     String path = saveTo.getAbsolutePath();
@@ -181,7 +181,7 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
                     PlantUmlFacade.get().save(path, imageBytes);
                 } else {
-                    PlantUmlFacade.get().renderAndSave(selectedSource, sourceFile,
+                    PlantUmlFacade.get().renderAndSave(project, selectedSource, sourceFile,
                             imageFormat, saveTo.getAbsolutePath(), pathPrefix,
                             zoom, getPageNumber(e));
 

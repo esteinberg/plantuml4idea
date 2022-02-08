@@ -1,5 +1,6 @@
 package org.plantuml.idea.external;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;
@@ -20,9 +21,9 @@ public interface PlantUmlFacade {
     }
 
     @Nullable
-    Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile);
+    Collection<SourceAnnotation> annotateSyntaxErrors(Project project, String source, VirtualFile virtualFile);
 
-    void renderAndSave(String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber)
+    void renderAndSave(Project project, String source, File sourceFile, ImageFormat format, String path, String pathPrefix, Zoom zoom, int pageNumber)
             throws IOException;
 
     RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem);
@@ -35,5 +36,5 @@ public interface PlantUmlFacade {
 
     String extractEmbeddedSourceFromImage(File file);
 
-    String getFilename(String source, VirtualFile virtualFile);
+    String getFilename(Project project, String source, VirtualFile virtualFile);
 }

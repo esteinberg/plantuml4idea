@@ -1,6 +1,7 @@
 package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
@@ -23,13 +24,13 @@ public class Annotator {
     private static final Logger logger = Logger.getInstance(Annotator.class);
 
     @Nullable
-    public static Collection<SourceAnnotation> annotateSyntaxErrors(String source, VirtualFile virtualFile) {
+    public static Collection<SourceAnnotation> annotateSyntaxErrors(Project project, String source, VirtualFile virtualFile) {
         if (source.contains(IDEA_DISABLE_SYNTAX_CHECK)) {
             return Collections.emptyList();
         }
         Collection<SourceAnnotation> result = new ArrayList<SourceAnnotation>();
         long start = currentTimeMillis();
-        SyntaxResult syntaxResult = checkSyntax(source, virtualFile);
+        SyntaxResult syntaxResult = checkSyntax(project, source, virtualFile);
         logger.debug("syntax checked in ", currentTimeMillis() - start, "ms");
 
         if (syntaxResult.isError()) {
@@ -48,12 +49,12 @@ public class Annotator {
         return result;
     }
 
-    private static SyntaxResult checkSyntax(String source, VirtualFile virtualFile) {
+    private static SyntaxResult checkSyntax(Project project, String source, VirtualFile virtualFile) {
         File baseDir = UIUtils.getParent(virtualFile);
         if (baseDir != null) {
             Utils.setPlantUmlDir(baseDir);
 
-            Utils.saveAllDocuments(virtualFile==null?null:virtualFile.getPath());
+            Utils.saveAllDocuments(project, virtualFile == null ? null : virtualFile.getPath());
         } else {
             Utils.resetPlantUmlDir();
         }

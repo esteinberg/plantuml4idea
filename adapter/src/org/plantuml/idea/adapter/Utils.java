@@ -3,6 +3,7 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.OptionFlags;
@@ -25,7 +26,7 @@ public class Utils {
     private static final Logger LOG = Logger.getInstance(Utils.class);
 
     @NotNull
-    public static void prepareEnvironment(String sourceFilePath) {
+    public static void prepareEnvironment(Project project, String sourceFilePath) {
         OptionFlags.getInstance().setVerbose(LOG.isDebugEnabled());
 
         long start = System.currentTimeMillis();
@@ -36,7 +37,7 @@ public class Utils {
             resetPlantUmlDir();
         }
 
-        saveAllDocuments(sourceFilePath);
+        saveAllDocuments(project, sourceFilePath);
         applyPlantumlOptions(PlantUmlSettings.getInstance());
         LOG.debug("prepareEnvironment done ", System.currentTimeMillis() - start, "ms");
     }
@@ -101,7 +102,7 @@ public class Utils {
         return defaultTranscoder.encode(source);
     }
 
-    public static void saveAllDocuments(@Nullable String sourceFilePath) {
+    public static void saveAllDocuments(Project project, @Nullable String sourceFilePath) {
         try {
             long start = System.currentTimeMillis();
             if (org.plantuml.idea.util.Utils.isUnitTest()) {
@@ -110,7 +111,12 @@ public class Utils {
             FileDocumentManager documentManager = FileDocumentManager.getInstance();
             com.intellij.openapi.editor.Document[] unsavedDocuments = documentManager.getUnsavedDocuments();
             if (unsavedDocuments.length > 0 && !onlyCurrentlyDisplayed(documentManager, unsavedDocuments, sourceFilePath)) {
-                ApplicationManager.getApplication().invokeAndWait(documentManager::saveAllDocuments);
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    documentManager.saveDocuments(document -> {
+                        VirtualFile file = documentManager.getFile(document);
+                        return file != null && org.plantuml.idea.util.Utils.isPlantUmlOrIUmlFileType(project, file);
+                    });
+                });
             }
 
             LOG.debug("saveAllDocuments ", (System.currentTimeMillis() - start), "ms");

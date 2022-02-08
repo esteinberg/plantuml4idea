@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.project.Project;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
@@ -23,16 +24,17 @@ public class RenderRequest {
     private RenderCommand.Reason reason;
     protected boolean useSettings = true;
     private boolean disableSvgZoom;
+    private Project project;
 
     public RenderRequest(String sourceFilePath,
                          @NotNull String source,
                          @NotNull ImageFormat format,
                          int page,
                          @NotNull
-                                 Zoom zoom,
+                         Zoom zoom,
                          Integer version,
                          boolean renderUrlLinks,
-                         RenderCommand.Reason reason) {
+                         RenderCommand.Reason reason, Project project) {
         this.sourceFilePath = sourceFilePath;
         this.source = source;
         this.format = format;
@@ -41,10 +43,12 @@ public class RenderRequest {
         this.version = version;
         this.renderUrlLinks = renderUrlLinks;
         this.reason = reason;
+        this.project = project;
     }
 
     public RenderRequest(@NotNull RenderRequest renderRequest,
                          @NotNull ImageFormat format) {
+        this.project = renderRequest.project;
         this.sourceFilePath = renderRequest.sourceFilePath;
         this.source = renderRequest.source;
         this.format = format;
@@ -56,6 +60,10 @@ public class RenderRequest {
 
     public void setZoom(@NotNull Zoom zoom) {
         this.zoom = zoom;
+    }
+
+    public Project getProject() {
+        return project;
     }
 
     @NotNull

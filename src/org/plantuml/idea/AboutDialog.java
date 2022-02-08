@@ -118,7 +118,7 @@ public class AboutDialog extends JDialog {
     private void testDot(AnActionEvent e) {
         PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
         Zoom zoom = new Zoom(previewPanel, 100, PlantUmlSettings.getInstance());
-        RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, PlantUmlSettings.getInstance().isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH);
+        RenderRequest renderRequest = new RenderRequest("", SourceExtractor.TESTDOT, PlantUmlSettings.getInstance().isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG, 0, zoom, null, false, RenderCommand.Reason.REFRESH, project);
         renderRequest.setUseSettings(false);
         RenderResult result = PlantUmlFacade.get().render(renderRequest, null);
         try {

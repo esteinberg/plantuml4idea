@@ -137,7 +137,7 @@ public class RenderCommand {
 
             ImageFormat imageFormat = plantUmlSettings.isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
 
-            renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason);
+            renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason, project);
             renderRequest.disableSvgZoom();
             long s1 = System.currentTimeMillis();
             RenderResult render = PlantUmlFacade.get().render(renderRequest, cachedItem);

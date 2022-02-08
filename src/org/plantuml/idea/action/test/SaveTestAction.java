@@ -18,7 +18,7 @@ public class SaveTestAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         for (ImageFormat value : ImageFormat.values()) {
             try {
-                PlantUmlFacade.get().renderAndSave(SourceExtractor.TESTDOT, new File("testData/version.puml"), value, "F:\\workspace\\_projekty\\plantuml4idea\\out\\" + value.name() + "." + value.name().toLowerCase(Locale.ROOT), null, new Zoom(100, PlantUmlSettings.getInstance()), 0);
+                PlantUmlFacade.get().renderAndSave(null, SourceExtractor.TESTDOT, new File("testData/version.puml"), value, "F:\\workspace\\_projekty\\plantuml4idea\\out\\" + value.name() + "." + value.name().toLowerCase(Locale.ROOT), null, new Zoom(100, PlantUmlSettings.getInstance()), 0);
             } catch (Throwable e) {
                 e.printStackTrace();
             }

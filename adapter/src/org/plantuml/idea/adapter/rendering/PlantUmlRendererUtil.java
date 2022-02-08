@@ -28,13 +28,13 @@ public class PlantUmlRendererUtil {
 
     public static void renderAndSave(RenderRequest renderRequest, String path, String pathPrefix)
             throws IOException {
-        Utils.prepareEnvironment(renderRequest.getSourceFilePath());
+        Utils.prepareEnvironment(renderRequest.getProject(), renderRequest.getSourceFilePath());
 
         EXPORTER.renderAndSave(renderRequest, path, pathPrefix);
     }
 
     public static RenderResult render(RenderRequest renderRequest, RenderCacheItem cachedItem) {
-        Utils.prepareEnvironment(renderRequest.getSourceFilePath());
+        Utils.prepareEnvironment(renderRequest.getProject(), renderRequest.getSourceFilePath());
 
         long start = System.currentTimeMillis();
         String source = renderRequest.getSource();
