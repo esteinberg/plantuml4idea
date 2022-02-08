@@ -633,9 +633,10 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             layout.show(contentPanel, IMAGE_PANEL);
         } else {
             if (imageProvider != null) {
-                Throwable exception = imageProvider.getHolder().getException();
+                MyImageEditorImpl.Holder holder = imageProvider.getHolder();
+                Throwable exception = holder.getException();
                 if (exception != null) {
-                    errorLabel.setText(Utils.stacktraceToString(exception));
+                    errorLabel.setText(holder.getSource() + "\n\n" + Utils.stacktraceToString(exception));
                 } else {
                     errorLabel.setText("Plugin error");
                 }

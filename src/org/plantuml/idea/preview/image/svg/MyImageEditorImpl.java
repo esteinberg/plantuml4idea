@@ -246,7 +246,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
 
                 BufferedImage image = MySvgTranscoder.createImage((float) scaledZoom, svgDocument, outSize);
 
-                MyImageEditorImpl.Holder newHolder = new MyImageEditorImpl.Holder(image, outSize, zoom, null);
+                MyImageEditorImpl.Holder newHolder = new MyImageEditorImpl.Holder(image, outSize, zoom, null, null);
                 this.holder = newHolder;
                 LOG.debug("image created in ", System.currentTimeMillis() - start, "ms", " zoom=", zoom, " scale=", scale, " width=", newHolder.image.getWidth(), " hight=", newHolder.image.getHeight(), " docWidth=", newHolder.outSize.getWidth(), " docHight=", newHolder.outSize.getHeight());
             } catch (Throwable e) {
@@ -255,7 +255,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
                     source = new String(buf, StandardCharsets.UTF_8);
                 }
                 LOG.error(e.getMessage() + " - imageSource: " + source, e);
-                this.holder = new Holder(null, null, -1.0, e);
+                this.holder = new Holder(null, null, -1.0, source, e);
             } finally {
                 renderingInProgress = false;
             }
@@ -288,17 +288,19 @@ public final class MyImageEditorImpl implements MyImageEditor {
         private final ImageLoader.Dimension2DDouble outSize;
         private final double zoom;
         private final BufferedImage image;
+        private String source;
         private Throwable exception;
 
-        public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, double zoom, Throwable exception) {
+        public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, double zoom, String source, Throwable exception) {
             this.outSize = outSize;
             this.zoom = zoom;
             this.image = image;
+            this.source = source;
             this.exception = exception;
         }
 
         public Holder() {
-            this(null, null, -1.0, null);
+            this(null, null, -1.0, null, null);
         }
 
         private boolean isChanged(double zoom) {
@@ -330,6 +332,10 @@ public final class MyImageEditorImpl implements MyImageEditor {
 
         public Throwable getException() {
             return exception;
+        }
+
+        public String getSource() {
+            return source;
         }
 
         public void setException(Throwable exception) {
