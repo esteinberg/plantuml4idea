@@ -95,21 +95,25 @@ public class SourceExtractor {
     private static Pattern sourceCommentPattern =
             Pattern.compile("^\\s*\\*\\s", Pattern.MULTILINE);
 
+    private static Pattern sourceCommentPatternEnd =
+            Pattern.compile("^\\s*\\*\\s*@end", Pattern.MULTILINE);
+
+    private static Pattern sourceCommentPatternHash =
+            Pattern.compile("^\\s*#\\s?", Pattern.MULTILINE);
+
+    private static Pattern sourceCommentPatternHashEnd =
+            Pattern.compile("^\\s*#\\s?@end", Pattern.MULTILINE);
+
     private static String stripComments(String source) {
-        if (isCommented(source)) {
+        if (sourceCommentPatternEnd.matcher(source).find()) {
             Matcher matcher = sourceCommentPattern.matcher(source);
+            return matcher.replaceAll("");
+        } else if (sourceCommentPatternHashEnd.matcher(source).find()) {
+            Matcher matcher = sourceCommentPatternHash.matcher(source);
             return matcher.replaceAll("");
         } else {
             return source;
         }
-    }
-
-    private static Pattern sourceCommentPattern2 =
-            Pattern.compile("^\\s*\\*\\s*@end", Pattern.MULTILINE);
-
-    private static boolean isCommented(String source) {
-        Matcher matcher = sourceCommentPattern2.matcher(source);
-        return matcher.find();
     }
 
 

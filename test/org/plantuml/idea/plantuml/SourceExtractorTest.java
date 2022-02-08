@@ -70,6 +70,25 @@ public class SourceExtractorTest extends TestCase {
         assertEquals(expected, SourceExtractor.extractSource(source, source.length() / 2));
     }
 
+    public void testExtractSourceWithHashComments() {
+        String source =
+                "# @startuml\n" +
+                        "# Bob -> Alice: hello\n" +
+                        "# @enduml";
+        String expected = "@startuml\n" +
+                "Bob -> Alice: hello\n" +
+                "@enduml";
+        assertEquals(expected, SourceExtractor.extractSource(source, source.length() / 2));
+
+        source = " #@startuml\n" +
+                " #(*) -> Init\n" +
+                " #@enduml\n";
+        expected = "@startuml\n" +
+                "(*) -> Init\n" +
+                "@enduml";
+        assertEquals(expected, SourceExtractor.extractSource(source, source.length() / 2));
+    }
+
     public void testExtractSourceMarkdown() {
         String source = "```plantuml\n" +
                 "Object <|-- ArrayList\n" +
