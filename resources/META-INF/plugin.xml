@@ -1,6 +1,6 @@
 <idea-plugin version="2">
     <name>PlantUML integration</name>
-    <version>5.11.0</version>
+    <version>5.11.1</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="203.5981.155"/>
@@ -15,11 +15,12 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[
-            <p>5.11.0<p>
+            <p>5.11.1<p>
             <ul>
                 <li>PlantUML library upgrade to v1.2022.1</li>
                 <li>Support for PlantUml code commented using #</li>
                 <li>Fixed auto saving</li>
+                <li>Default live templates</li>
             </ul>
             <p>5.10.0<p>
             <ul>
@@ -363,6 +364,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
         <fileEditorProvider implementation="org.plantuml.idea.preview.editor.PlantUmlSplitEditorProvider"/>
         <liveTemplateContext implementation="org.plantuml.idea.template.PumlTemplateContextType"/>
+        <defaultLiveTemplates file="/liveTemplates/PlantUml.xml"/>
     </extensions>
 
 </idea-plugin>
