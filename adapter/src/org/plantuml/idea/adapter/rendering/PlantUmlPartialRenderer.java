@@ -117,7 +117,7 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             LineLocationImpl lineLocation = new LineLocationImpl("", null);
             StringLocated o = new StringLocated("", lineLocation);
             List<StringLocated> data = Collections.singletonList(o);
-            UmlSource source = new UmlSource(data, false);
+            UmlSource source = UmlSource.create(data, false);
 
             ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), 1, lineLocation);
             PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
