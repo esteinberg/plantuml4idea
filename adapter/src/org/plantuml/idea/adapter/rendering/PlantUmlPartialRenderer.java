@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,7 +28,8 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
     @NotNull
     public RenderResult partialRender(RenderRequest renderRequest, @Nullable RenderCacheItem cachedItem, String[] sourceSplit) {
         try {
-            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()));
+            PlantUmlSettings settings = PlantUmlSettings.getInstance();
+            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()), settings.isGenerateMetadata());
 
             RenderResult renderResult = new RenderResult(RenderingType.PARTIAL, sourceSplit.length);
             for (int page = 0; page < sourceSplit.length; page++) {

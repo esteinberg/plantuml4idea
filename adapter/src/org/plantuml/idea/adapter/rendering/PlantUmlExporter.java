@@ -8,8 +8,8 @@ import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import org.apache.commons.io.IOUtils;
 import org.plantuml.idea.adapter.Format;
-import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.rendering.RenderRequest;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class PlantUmlExporter {
         VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
         if (requestedPageNumber >= 0) {
             try (FileOutputStream outputStream = new FileOutputStream(path)) {
-                diagramFactory.outputImage(outputStream, requestedPageNumber, new FileFormatOption(pFormat));
+                diagramFactory.outputImage(outputStream, requestedPageNumber, new FileFormatOption(pFormat, settings.isGenerateMetadata()));
             }
             vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, path));
         } else {
@@ -54,7 +54,7 @@ public class PlantUmlExporter {
                     }
                 }
                 try (FileOutputStream outputStream = new FileOutputStream(resultPath)) {
-                    diagramFactory.outputImage(outputStream, page, new FileFormatOption(pFormat));
+                    diagramFactory.outputImage(outputStream, page, new FileFormatOption(pFormat, settings.isGenerateMetadata()));
                 }
                 vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, resultPath));
             }

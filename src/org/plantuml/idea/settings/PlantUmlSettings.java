@@ -84,6 +84,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private String lastExportDir = null;
     private PreviewSettings previewSettings = new PreviewSettings();
     private boolean scaleExport;
+    private boolean generateMetadata = true;
 
     public static PlantUmlSettings getInstance() {
         if (Utils.isUnitTest()) {
@@ -472,6 +473,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setScaleExport(final boolean scaleExport) {
         this.scaleExport = scaleExport;
+    }
+
+    public boolean isGenerateMetadata() {
+        return generateMetadata;
+    }
+
+    public void setGenerateMetadata(final boolean generateMetadata) {
+        this.generateMetadata = generateMetadata;
     }
 
 

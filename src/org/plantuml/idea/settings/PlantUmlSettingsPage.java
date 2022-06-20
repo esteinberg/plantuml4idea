@@ -82,6 +82,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox rememberLastExportDir;
     private JLabel textFieldDotExecutableL;
     private JCheckBox scaleExport;
+    private JCheckBox generateMetadata;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -258,6 +259,7 @@ public class PlantUmlSettingsPage implements Configurable {
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         maxSvgSize.setText(data.getMaxSvgSize());
         encoding.setText(data.getEncoding());
+        generateMetadata.setSelected(data.isGenerateMetadata());
         usePageTitles.setSelected(data.isUsePageTitles());
         grammarSupport.setSelected(data.isUseGrammar());
         keywordHighlighting.setSelected(data.isKeywordHighlighting());
@@ -289,6 +291,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setMaxSvgSize(maxSvgSize.getText());
         data.setEncoding(encoding.getText());
+        data.setGenerateMetadata(generateMetadata.isSelected());
         data.setUsePageTitles(usePageTitles.isSelected());
         data.setUseGrammar(grammarSupport.isSelected());
         data.setKeywordHighlighting(keywordHighlighting.isSelected());
@@ -329,6 +332,7 @@ public class PlantUmlSettingsPage implements Configurable {
             return true;
         if (encoding.getText() != null ? !encoding.getText().equals(data.getEncoding()) : data.getEncoding() != null)
             return true;
+        if (generateMetadata.isSelected() != data.isGenerateMetadata()) return true;
         if (usePageTitles.isSelected() != data.isUsePageTitles()) return true;
         if (grammarSupport.isSelected() != data.isUseGrammar()) return true;
         if (keywordHighlighting.isSelected() != data.isKeywordHighlighting()) return true;

@@ -6,6 +6,7 @@ import net.sourceforge.plantuml.FileFormatOption;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;
 import org.plantuml.idea.rendering.*;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.IOException;
 
@@ -18,6 +19,7 @@ public class PlantUmlNormalRenderer {
         try {
             long start = System.currentTimeMillis();
             DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, renderRequest.getSource());
+            PlantUmlSettings settings = PlantUmlSettings.getInstance();
 
             int totalPages = diagramFactory.getTotalPages();
 
@@ -31,7 +33,7 @@ public class PlantUmlNormalRenderer {
                 renderRequestPage = -1;
             }
 
-            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()));
+            FileFormatOption formatOption = new FileFormatOption(Format.from(renderRequest.getFormat()), settings.isGenerateMetadata());
 
             boolean containsIncludedNewPage = sourceSplit.length != totalPages;
 
