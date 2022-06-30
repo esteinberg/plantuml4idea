@@ -2,6 +2,11 @@ package org.plantuml.idea.preview.image.links;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 
@@ -36,6 +41,18 @@ public class MyMouseAdapter extends MouseAdapter {
                     BrowserUtil.browse(text);
                 } else {
                     if (navigator.openFile(new File(renderRequest.getBaseDir(), text))) return;
+                    if (navigator.openFile(new File(text))) return;
+
+                    VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(renderRequest.getSourceFilePath());
+                    if (sourceFile != null) {
+                        Module module = ModuleUtilCore.findModuleForFile(sourceFile, renderRequest.getProject());
+                        if (module != null) {
+                            VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                            for (VirtualFile contentRoot : contentRoots) {
+                                if (navigator.openFile(new File(contentRoot.getPath(), text))) return;
+                            }
+                        }
+                    }
                     navigator.findNextSourceAndNavigate(text);
                 }
             } else {
