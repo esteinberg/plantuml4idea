@@ -17,6 +17,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.settings.PlantUmlSettings;
@@ -156,16 +157,41 @@ public class LinkNavigator {
         return true;
     }
 
-    public boolean openFile(File file) {
+    public boolean openFile(File file, String method) {
         if (file.exists()) {
             VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
             if (virtualFile == null) {
                 return false;
             }
             FileEditor[] fileEditors = fileEditorManager.openFile(virtualFile, true, true);
-            return fileEditors.length > 0;
+
+            boolean b = fileEditors.length > 0;
+            if (b) {
+                navigateToElement(method, fileEditors);
+            }
+            return b;
         }
         return false;
+    }
+
+    private static void navigateToElement(String method, FileEditor[] fileEditors) {
+        FileEditor fileEditor = fileEditors[0];
+        if (fileEditor instanceof TextEditor) {
+            Editor editor = ((TextEditor) fileEditor).getEditor();
+            Project project = editor.getProject();
+            PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+            if (psiFile != null) {
+                for (PsiNameIdentifierOwner call : SyntaxTraverser.psiTraverser().withRoot(psiFile).filter(PsiNameIdentifierOwner.class)) {
+                    PsiElement nameIdentifier = call.getNameIdentifier();
+                    if (nameIdentifier != null && nameIdentifier.textMatches(method)) {
+                        int textOffset = call.getTextOffset();
+                        editor.getCaretModel().moveToOffset(textOffset);
+                        editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     @Override
