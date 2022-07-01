@@ -1,6 +1,7 @@
 package org.plantuml.idea.external;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.util.ConcurrencyUtil;
 import com.intellij.util.net.HttpConfigurable;
 import com.intellij.util.net.IdeaWideProxySelector;
 import org.apache.commons.httpclient.HttpStatus;
@@ -21,10 +22,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +30,7 @@ public class RemoteRenderer {
     private static final Logger LOG = Logger.getInstance(RemoteRenderer.class);
     private static final Logger BODY_LOG = Logger.getInstance("#org.plantuml.idea.external.RemoteRenderer.body");
     public static final int MAX_PAGES = 100;
+    private static final ExecutorService executor = new ThreadPoolExecutor(10, 10, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), ConcurrencyUtil.newNamedThreadFactory("PlantUML integration plugin - RemoteRenderer", true, Thread.NORM_PRIORITY));
 
     public static RenderResult render(RenderRequest renderRequest) {
         long start = System.currentTimeMillis();
@@ -54,11 +53,10 @@ public class RemoteRenderer {
                 tasks.add(() -> renderPage(renderRequest, plantUmlSettings, source, format, renderResult, client, encoded, type, finalI));
             }
 
-            List<Future<ImageItem>> futures = ForkJoinPool.commonPool().invokeAll(tasks, 30, TimeUnit.SECONDS);
+            List<Future<ImageItem>> futures = executor.invokeAll(tasks, 30, TimeUnit.SECONDS);
             for (Future<ImageItem> future : futures) {
                 renderResult.addRenderedImage(future.get());
             }
-
             return renderResult;
         } catch (Throwable e) {
             LOG.warn(e);
