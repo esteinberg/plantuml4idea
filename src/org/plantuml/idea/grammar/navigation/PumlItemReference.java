@@ -77,6 +77,7 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
             if (targetFilePath.endsWith("]")) {
                 targetFilePath = targetFilePath.substring(0, targetFilePath.length() - 1);
             }
+            targetFilePath = StringUtils.substringBefore(targetFilePath, " ");
 
             String[] split = targetFilePath.split("#");
             targetFilePath = split[0];

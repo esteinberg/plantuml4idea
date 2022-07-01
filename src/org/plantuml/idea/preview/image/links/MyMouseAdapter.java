@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.grammar.navigation.PumlItemReference;
 import org.plantuml.idea.rendering.ImageItem;
@@ -63,7 +64,7 @@ public class MyMouseAdapter extends MouseAdapter {
         Project project = renderRequest.getProject();
         File baseDir = renderRequest.getBaseDir();
 
-        String[] split = text.split("#");
+        String[] split = StringUtils.substringBefore(text, " ").split("#");
         text = split[0];
         String element = split.length >= 2 ? split[1] : null;
 
