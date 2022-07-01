@@ -19,10 +19,19 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RemoteRenderer {
     private static final Logger LOG = Logger.getInstance(RemoteRenderer.class);
     private static final Logger BODY_LOG = Logger.getInstance("#org.plantuml.idea.external.RemoteRenderer.body");
+    public static final int MAX_PAGES = 100;
 
     public static RenderResult render(RenderRequest renderRequest) {
         long start = System.currentTimeMillis();
@@ -30,11 +39,40 @@ public class RemoteRenderer {
         String source = renderRequest.getSource();
         ImageFormat format = renderRequest.getFormat();
         boolean displaySvg = format == ImageFormat.SVG;
-        try {
 
+        int pages = countPages(source);
+        RenderResult renderResult = new RenderResult(RenderingType.REMOTE, pages);
+
+        try {
+            HttpClient client = getHttpClient(plantUmlSettings);
             String encoded = PlantUmlFacade.get().encode(source);
             String type = displaySvg ? "/svg/" : "/png/";
-            String url = plantUmlSettings.getServerPrefix() + type + encoded;
+
+            ArrayList<Callable<ImageItem>> tasks = new ArrayList<>();
+            for (int i = 0; i < pages; i++) {
+                int finalI = i;
+                tasks.add(() -> renderPage(renderRequest, plantUmlSettings, source, format, renderResult, client, encoded, type, finalI));
+            }
+
+            List<Future<ImageItem>> futures = ForkJoinPool.commonPool().invokeAll(tasks, 30, TimeUnit.SECONDS);
+            for (Future<ImageItem> future : futures) {
+                renderResult.addRenderedImage(future.get());
+            }
+
+            return renderResult;
+        } catch (Throwable e) {
+            LOG.warn(e);
+            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), format, source, source, 0, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e));
+            return renderResult;
+        } finally {
+            LOG.debug("render done in ", System.currentTimeMillis() - start, "ms");
+        }
+    }
+
+    private static ImageItem renderPage(RenderRequest renderRequest, PlantUmlSettings plantUmlSettings, String source, ImageFormat format, RenderResult renderResult, HttpClient client, String encoded, String type, int i) {
+        try {
+            String page = i + "/";
+            String url = plantUmlSettings.getServerPrefix() + type + page + encoded;
             LOG.debug("url: ", url);
 
             HttpRequest build = HttpRequest.newBuilder()
@@ -43,19 +81,7 @@ public class RemoteRenderer {
                     .timeout(Duration.of(30, ChronoUnit.SECONDS))
                     .build();
 
-            HttpClient.Builder builder = HttpClient
-                    .newBuilder()
-                    .followRedirects(HttpClient.Redirect.NEVER); //it is slow, better if user fixes the url
-
-            if (plantUmlSettings.isUseProxy()) {
-                builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
-            } else {
-                builder.proxy(HttpClient.Builder.NO_PROXY);
-            }
-            HttpClient client = builder.connectTimeout(Duration.of(5, ChronoUnit.SECONDS)).build();
-
-            HttpResponse.BodyHandler<byte[]> bodyHandler = HttpResponse.BodyHandlers.ofByteArray();
-            HttpResponse<byte[]> response = client.send(build, bodyHandler);
+            HttpResponse<byte[]> response = client.send(build, HttpResponse.BodyHandlers.ofByteArray());
             byte[] out = response.body();
             LOG.debug("", response);
             if (BODY_LOG.isDebugEnabled()) {
@@ -85,16 +111,34 @@ public class RemoteRenderer {
             }
             String description = statusCode >= 400 || runtimeException != null ? ImageItem.ERROR : "OK";
 
-            RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), actualFormat, source, source, 0, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException));
-            return renderResult;
+            return new ImageItem(renderRequest.getBaseDir(), actualFormat, source, source, i, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException);
         } catch (Throwable e) {
             LOG.warn(e);
-            RenderResult renderResult = new RenderResult(RenderingType.REMOTE, 1);
-            renderResult.addRenderedImage(new ImageItem(renderRequest.getBaseDir(), format, source, source, 0, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e));
-            return renderResult;
-        } finally {
-            LOG.debug("render done in ", System.currentTimeMillis() - start, "ms");
+            return new ImageItem(renderRequest.getBaseDir(), format, source, source, i, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e);
         }
+    }
+
+    private static HttpClient getHttpClient(PlantUmlSettings plantUmlSettings) {
+        HttpClient.Builder builder = HttpClient
+                .newBuilder()
+                .followRedirects(HttpClient.Redirect.NEVER); //it is slow, better if user fixes the url
+
+        if (plantUmlSettings.isUseProxy()) {
+            builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
+        } else {
+            builder.proxy(HttpClient.Builder.NO_PROXY);
+        }
+        HttpClient client = builder.connectTimeout(Duration.of(5, ChronoUnit.SECONDS)).build();
+        return client;
+    }
+
+    private static int countPages(String source) {
+        int pages = 1;
+        Pattern pattern = Pattern.compile("^[ \t]*newpage.*$", Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(source);
+        while (matcher.find() && pages < MAX_PAGES) {
+            pages++;
+        }
+        return pages;
     }
 }

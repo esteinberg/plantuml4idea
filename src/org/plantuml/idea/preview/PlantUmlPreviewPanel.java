@@ -12,7 +12,9 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -555,7 +557,8 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         }
         JComponent component = null;
         if (imageWithData.getException() != null) {
-            component = new JTextArea(Utils.stacktraceToString(imageWithData.getException()));
+            component = new JBTextArea(Utils.stacktraceToString(imageWithData.getException()));
+            component = ScrollPaneFactory.createScrollPane(component);
         } else if (imageWithData.getFormat() == ImageFormat.SVG) {
             component = new ImageContainerSvg(this, project, imageWithData, pageNumber, cacheItem.getRenderRequest(), cacheItem.getRenderResult());
         } else {

@@ -19,6 +19,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
             <p>5.15<p>
             <ul>
                 <li>PlantUML library upgrade to v1.2022.6</li>
+                <li>Added newpage support for Remote rendering</li>
                 <li>Added navigation from diagram preview and source code to: methods, fields and other identifiers - referenced by suffix, e.g. file.java#methodName, using absolute or relative paths to the plantuml source file or module roots.</li>
             </ul>
             <p>5.14<p>
