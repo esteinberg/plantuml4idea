@@ -41,11 +41,11 @@ public class MyMouseAdapter extends MouseAdapter {
                     BrowserUtil.browse(text);
                 } else {
                     String[] split = text.split("#");
-                    text = split[0];
-                    String method = split.length == 2 ? split[1] : null;
+                    text = split.length == 2 ? split[0] : text;
+                    String element = split.length == 2 ? split[1] : null;
 
-                    if (navigator.openFile(new File(renderRequest.getBaseDir(), text), method)) return;
-                    if (navigator.openFile(new File(text), method)) return;
+                    if (navigator.openFile(new File(renderRequest.getBaseDir(), text), element)) return;
+                    if (navigator.openFile(new File(text), element)) return;
 
                     VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(renderRequest.getSourceFilePath());
                     if (sourceFile != null) {
@@ -53,7 +53,7 @@ public class MyMouseAdapter extends MouseAdapter {
                         if (module != null) {
                             VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
                             for (VirtualFile contentRoot : contentRoots) {
-                                if (navigator.openFile(new File(contentRoot.getPath(), text), method)) return;
+                                if (navigator.openFile(new File(contentRoot.getPath(), text), element)) return;
                             }
                         }
                     }

@@ -157,7 +157,7 @@ public class LinkNavigator {
         return true;
     }
 
-    public boolean openFile(File file, String method) {
+    public boolean openFile(File file, String element) {
         if (file.exists()) {
             VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
             if (virtualFile == null) {
@@ -167,14 +167,14 @@ public class LinkNavigator {
 
             boolean b = fileEditors.length > 0;
             if (b) {
-                navigateToElement(method, fileEditors);
+                navigateToElement(element, fileEditors);
             }
             return b;
         }
         return false;
     }
 
-    private static void navigateToElement(String method, FileEditor[] fileEditors) {
+    private static void navigateToElement(String element, FileEditor[] fileEditors) {
         FileEditor fileEditor = fileEditors[0];
         if (fileEditor instanceof TextEditor) {
             Editor editor = ((TextEditor) fileEditor).getEditor();
@@ -183,7 +183,7 @@ public class LinkNavigator {
             if (psiFile != null) {
                 for (PsiNameIdentifierOwner call : SyntaxTraverser.psiTraverser().withRoot(psiFile).filter(PsiNameIdentifierOwner.class)) {
                     PsiElement nameIdentifier = call.getNameIdentifier();
-                    if (nameIdentifier != null && nameIdentifier.textMatches(method)) {
+                    if (nameIdentifier != null && nameIdentifier.textMatches(element)) {
                         int textOffset = call.getTextOffset();
                         editor.getCaretModel().moveToOffset(textOffset);
                         editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
