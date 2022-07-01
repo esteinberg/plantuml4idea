@@ -17,10 +17,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.settings.PlantUmlSettings;
+import org.plantuml.idea.util.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -180,15 +183,12 @@ public class LinkNavigator {
             Editor editor = ((TextEditor) fileEditor).getEditor();
             Project project = editor.getProject();
             PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-            if (psiFile != null) {
-                for (PsiNameIdentifierOwner call : SyntaxTraverser.psiTraverser().withRoot(psiFile).filter(PsiNameIdentifierOwner.class)) {
-                    PsiElement nameIdentifier = call.getNameIdentifier();
-                    if (nameIdentifier != null && nameIdentifier.textMatches(element)) {
-                        int textOffset = call.getTextOffset();
-                        editor.getCaretModel().moveToOffset(textOffset);
-                        editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-                        return;
-                    }
+            if (psiFile != null && element != null) {
+                PsiElement target = Utils.findPsiElement(psiFile, element);
+                if (target != null) {
+                    int textOffset = target.getTextOffset();
+                    editor.getCaretModel().moveToOffset(textOffset);
+                    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
                 }
             }
         }

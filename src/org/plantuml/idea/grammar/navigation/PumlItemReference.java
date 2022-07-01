@@ -8,11 +8,16 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.AbstractElementManipulator;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReferenceBase;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +26,10 @@ import org.plantuml.idea.grammar.PumlPsiUtil;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.preview.image.links.MyMouseAdapter;
+import org.plantuml.idea.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,7 +58,74 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
 //                return PsiManager.getInstance(getElement().getProject()).findFile(fileByRelativePath);
 //            }
 //        }
-        return PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
+        PumlItem declarationInFile = PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
+
+        if (declarationInFile == null) {
+            return resolveFile();
+        }
+
+        return declarationInFile;
+    }
+
+    /**
+     * just like {@link MyMouseAdapter#openFile(String)}
+     */
+    private PsiElement resolveFile() {
+        PsiElement target = null;
+        if (key.startsWith("[[") && key.endsWith("]")) {
+            String targetFilePath = key.substring(2);
+            if (targetFilePath.endsWith("]")) {
+                targetFilePath = targetFilePath.substring(0, targetFilePath.length() - 1);
+            }
+
+            String[] split = targetFilePath.split("#");
+            targetFilePath = split[0];
+            String element = split.length >= 2 ? split[1] : null;
+
+            Project project = PsiUtil.getProjectInReadAction(myElement);
+            PsiFile containingFile = myElement.getContainingFile();
+            VirtualFile sourceFile = PsiUtil.getVirtualFile(containingFile);
+
+            PsiManager psiManager = PsiManager.getInstance(project);
+            LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
+
+            if (sourceFile != null) {
+                target = resolveFile(new File(sourceFile.getParent().getPath(), targetFilePath), localFileSystem, psiManager);
+            }
+            if (target == null) {
+                target = resolveFile(new File(targetFilePath), localFileSystem, psiManager);
+            }
+
+            if (target == null) {
+                Module module = ModuleUtilCore.findModuleForFile(containingFile);
+                if (module != null) {
+                    VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                    for (VirtualFile contentRoot : contentRoots) {
+                        target = resolveFile(new File(contentRoot.getPath(), targetFilePath), localFileSystem, psiManager);
+                        if (target != null) {
+                            break;
+                        }
+                    }
+                }
+            }
+            if (target != null && element != null) {
+                PsiElement psiElement = Utils.findPsiElement(target, element);
+                if (psiElement != null) {
+                    target = psiElement;
+                }
+            }
+        }
+        return target;
+    }
+
+    @Nullable
+    private static PsiFile resolveFile(File file, LocalFileSystem localFileSystem, @NotNull PsiManager psiManager) {
+        PsiFile simpleFile = null;
+        VirtualFile sourceFile = localFileSystem.findFileByPath(file.getPath());
+        if (sourceFile != null && sourceFile.exists()) {
+            simpleFile = psiManager.findFile(sourceFile);
+        }
+        return simpleFile;
     }
 
     @NotNull

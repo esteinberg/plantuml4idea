@@ -22,7 +22,7 @@ public class Usage extends JTextArea {
                     + " - enable partial rendering - renders each page on it's own, useful for big sequence diagram files\n"
                     + "\nDiagram Links:\n"
                     + "- supported paths: relative to the source code file, relative to module content roots, absolute\n"
-                    + "- methods, fields and other identifiers can be referenced by suffix, e.g. file.java#methodName\n"
+                    + "- methods, fields, variables and other identifiers can be referenced by suffix, e.g. file.java#methodName\n"
                     + "\nPerformance tips:\n"
                     + "- disable automatic rendering and use Update (Ctrl Alt Shift F) or Reload (Ctrl Alt Shift G) buttons\n"
                     + "- do not put @newpage into included files (it prohibits incremental and partial rendering)\n"

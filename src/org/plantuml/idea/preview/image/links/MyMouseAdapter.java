@@ -4,9 +4,12 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.grammar.navigation.PumlItemReference;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
 
@@ -39,34 +42,45 @@ public class MyMouseAdapter extends MouseAdapter {
             if (linkData.isLink()) {
                 if (isWebReferenceUrl(text)) {
                     BrowserUtil.browse(text);
+                    return;
                 } else {
-                    String[] split = text.split("#");
-                    text = split.length == 2 ? split[0] : text;
-                    String element = split.length == 2 ? split[1] : null;
-
-                    if (navigator.openFile(new File(renderRequest.getBaseDir(), text), element)) return;
-                    if (navigator.openFile(new File(text), element)) return;
-
-                    VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(renderRequest.getSourceFilePath());
-                    if (sourceFile != null) {
-                        Module module = ModuleUtilCore.findModuleForFile(sourceFile, renderRequest.getProject());
-                        if (module != null) {
-                            VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
-                            for (VirtualFile contentRoot : contentRoots) {
-                                if (navigator.openFile(new File(contentRoot.getPath(), text), element)) return;
-                            }
-                        }
-                    }
-                    navigator.findNextSourceAndNavigate(text);
+                    if (openFile(text)) return;
                 }
-            } else {
-                navigator.findNextSourceAndNavigate(text);
             }
-        } catch (
-                Exception ex) {
+            navigator.findNextSourceAndNavigate(text);
+        } catch (Exception ex) {
             LOG.warn(ex);
         }
         LOG.debug("mousePressed ", (System.currentTimeMillis() - start), "ms");
+    }
+
+    /**
+     * just like {@link PumlItemReference#resolveFile())}
+     */
+    @Nullable
+    private boolean openFile(String text) {
+        String sourceFilePath = renderRequest.getSourceFilePath();
+        Project project = renderRequest.getProject();
+        File baseDir = renderRequest.getBaseDir();
+
+        String[] split = text.split("#");
+        text = split[0];
+        String element = split.length >= 2 ? split[1] : null;
+
+        if (navigator.openFile(new File(baseDir, text), element)) return true;
+        if (navigator.openFile(new File(text), element)) return true;
+
+        VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(sourceFilePath);
+        if (sourceFile != null) {
+            Module module = ModuleUtilCore.findModuleForFile(sourceFile, project);
+            if (module != null) {
+                VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+                for (VirtualFile contentRoot : contentRoots) {
+                    if (navigator.openFile(new File(contentRoot.getPath(), text), element)) return true;
+                }
+            }
+        }
+        return true;
     }
 
 }
