@@ -31,7 +31,6 @@ import com.intellij.ui.components.JBLayeredPane;
 import com.intellij.ui.components.Magnificator;
 import com.intellij.util.Alarm;
 import com.intellij.util.ImageLoader;
-import com.intellij.util.LazyInitializer.NotNullValue;
 import com.intellij.util.ui.JBUI;
 import org.intellij.images.ImagesBundle;
 import org.intellij.images.editor.ImageDocument;
@@ -81,6 +80,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     private static final String ERROR_PANEL = "error";
     @NonNls
     public static final String ZOOM_FACTOR_PROP = "ImageEditor.zoomFactor";
+    public static final double IMAGE_MAX_ZOOM_FACTOR = 4.0;
 
     @Nullable
     private final MyImageEditor editor;
@@ -390,27 +390,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
     public class ImageZoomModelImpl implements ImageZoomModel {
         private boolean myZoomLevelChanged;
-        private final NotNullValue<Double> IMAGE_MAX_ZOOM_FACTOR = new NotNullValue<Double>() {
-            @NotNull
-            @Override
-            public Double initialize() {
-//        if (editor == null) return Double.MAX_VALUE;
-                //CUSTOM
-//        VirtualFile file = editor.getFile();
-
-//        if (IfsUtil.isSVG(file)) {
-//          try {
-//            return Math.max(1, SVGLoader.getMaxZoomFactor(file.getPath(), new ByteArrayInputStream(file.contentsToByteArray()),
-//                                                          ScaleContext.create(editor.getComponent())));
-//          }
-//          catch (Throwable t) {
-//            Logger.getInstance(MyImageEditorUI.class).warn(t);
-//          }
-//        }
-//        return Double.MAX_VALUE;
-                return 4.0;
-            }
-        };
         private double zoomFactor = 0.0d;
 
 
@@ -477,7 +456,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         }
 
         private double getMaximumZoomFactor() {
-            double factor = IMAGE_MAX_ZOOM_FACTOR.get();
+            double factor = IMAGE_MAX_ZOOM_FACTOR;
             return Math.min(factor, MACRO_ZOOM_LIMIT);
         }
 

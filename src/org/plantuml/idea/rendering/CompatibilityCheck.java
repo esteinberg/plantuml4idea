@@ -27,7 +27,7 @@ public class CompatibilityCheck {
             plantUmlSettings.setDisplaySvg(false);
 
             SwingUtilities.invokeLater(() -> {
-                Notifications.Bus.notify(notification().createNotification("PlantUML integration plugin", "Conflict detected with '" + clName + "'. Switching to PNG rendering.", NotificationType.WARNING, null));
+                Notifications.Bus.notify(notification().createNotification("Conflict detected with '" + clName + "'. Switching to PNG rendering.", NotificationType.WARNING));
             });
         }
     }
