@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RemoteRenderer {
+    public static final Pattern NEWPAGE_PATTERN = Pattern.compile("^[ \t]*newpage.*$", Pattern.MULTILINE);
     private static final Logger LOG = Logger.getInstance(RemoteRenderer.class);
     private static final Logger BODY_LOG = Logger.getInstance("#org.plantuml.idea.external.RemoteRenderer.body");
     public static final int MAX_PAGES = 100;
@@ -40,6 +41,12 @@ public class RemoteRenderer {
         boolean displaySvg = format == ImageFormat.SVG;
 
         int pages = countPages(source);
+
+        int requestedPage = renderRequest.getPage();
+        if (requestedPage >= pages) {
+            requestedPage = -1;
+        }
+
         RenderResult renderResult = new RenderResult(RenderingType.REMOTE, pages);
 
         try {
@@ -47,10 +54,16 @@ public class RemoteRenderer {
             String encoded = PlantUmlFacade.get().encode(source);
             String type = displaySvg ? "/svg/" : "/png/";
 
+
             ArrayList<Callable<ImageItem>> tasks = new ArrayList<>();
             for (int i = 0; i < pages; i++) {
                 int finalI = i;
-                tasks.add(() -> renderPage(renderRequest, plantUmlSettings, source, format, renderResult, client, encoded, type, finalI));
+                if (requestedPage != -1 && requestedPage != i) {
+                    ImageItem imageItem = new ImageItem(renderRequest.getBaseDir(), renderRequest.getFormat(), source, source, i, RenderResult.TITLE_ONLY, null, null, RenderingType.REMOTE, null, null, null);
+                    tasks.add(() -> imageItem);
+                } else {
+                    tasks.add(() -> renderPage(renderRequest, plantUmlSettings, source, format, client, encoded, type, finalI));
+                }
             }
 
             List<Future<ImageItem>> futures = executor.invokeAll(tasks, 30, TimeUnit.SECONDS);
@@ -67,7 +80,7 @@ public class RemoteRenderer {
         }
     }
 
-    private static ImageItem renderPage(RenderRequest renderRequest, PlantUmlSettings plantUmlSettings, String source, ImageFormat format, RenderResult renderResult, HttpClient client, String encoded, String type, int i) {
+    private static ImageItem renderPage(RenderRequest renderRequest, PlantUmlSettings plantUmlSettings, String source, ImageFormat format, HttpClient client, String encoded, String type, int i) {
         try {
             String page = i + "/";
             String url = plantUmlSettings.getServerPrefix() + type + page + encoded;
@@ -132,8 +145,7 @@ public class RemoteRenderer {
 
     private static int countPages(String source) {
         int pages = 1;
-        Pattern pattern = Pattern.compile("^[ \t]*newpage.*$", Pattern.MULTILINE);
-        Matcher matcher = pattern.matcher(source);
+        Matcher matcher = NEWPAGE_PATTERN.matcher(source);
         while (matcher.find() && pages < MAX_PAGES) {
             pages++;
         }
