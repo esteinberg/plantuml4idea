@@ -58,6 +58,10 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
 //                return PsiManager.getInstance(getElement().getProject()).findFile(fileByRelativePath);
 //            }
 //        }
+        if ("[[]".equals(key)) {
+            return null;
+        }
+
         PumlItem declarationInFile = PumlPsiUtil.findDeclarationInFile(getElement().getContainingFile(), getElement(), key);
 
         if (declarationInFile == null) {
@@ -77,8 +81,10 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
             if (targetFilePath.endsWith("]")) {
                 targetFilePath = targetFilePath.substring(0, targetFilePath.length() - 1);
             }
+            if (StringUtils.isEmpty(targetFilePath)) {
+                return null;
+            }
             targetFilePath = StringUtils.substringBefore(targetFilePath, " ");
-
             String[] split = targetFilePath.split("#");
             targetFilePath = split[0];
             String element = split.length >= 2 ? split[1] : null;
