@@ -23,7 +23,7 @@ import com.intellij.psi.PsiFile;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.settings.PlantUmlSettings;
-import org.plantuml.idea.util.Utils;
+import org.plantuml.idea.util.PsiUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -184,7 +184,7 @@ public class LinkNavigator {
             Project project = editor.getProject();
             PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
             if (psiFile != null && element != null) {
-                PsiElement target = Utils.findPsiElement(psiFile, element);
+                PsiElement target = PsiUtil.findPsiElement(psiFile, element);
                 if (target != null) {
                     int textOffset = target.getTextOffset();
                     editor.getCaretModel().moveToOffset(textOffset);

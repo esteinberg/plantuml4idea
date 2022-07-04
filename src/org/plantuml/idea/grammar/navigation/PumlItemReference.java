@@ -17,7 +17,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,7 @@ import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
 import org.plantuml.idea.preview.image.links.MyMouseAdapter;
-import org.plantuml.idea.util.Utils;
+import org.plantuml.idea.util.PsiUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -116,7 +115,7 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
                 }
             }
             if (target != null && element != null) {
-                PsiElement psiElement = Utils.findPsiElement(target, element);
+                PsiElement psiElement = PsiUtil.findPsiElement(target, element);
                 if (psiElement != null) {
                     target = psiElement;
                 }

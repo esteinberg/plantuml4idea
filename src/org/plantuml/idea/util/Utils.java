@@ -7,10 +7,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.SyntaxTraverser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
@@ -184,15 +181,4 @@ public class Utils {
         return isPng;
     }
 
-    public static PsiElement findPsiElement(@NotNull PsiElement root, @NotNull String element) {
-        PsiElement target = null;
-        for (PsiNameIdentifierOwner call : SyntaxTraverser.psiTraverser().withRoot(root).filter(PsiNameIdentifierOwner.class)) {
-            PsiElement nameIdentifier = call.getNameIdentifier();
-            if (nameIdentifier != null && nameIdentifier.textMatches(element)) {
-                target = call;
-                break;
-            }
-        }
-        return target;
-    }
 }
