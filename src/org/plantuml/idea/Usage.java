@@ -32,9 +32,10 @@ public class Usage extends JTextArea {
                     + "- disable syntax checking - add to the first page: 'idea.disableSyntaxCheck\n"
                     + "- reduce limits and disable 'SVG preview scaling'\n"
                     + "- tune cache size in settings, make sure you have enough heap memory (enable Memory Indicator)\n"
-                    + "\nOther supported PlantUML features:\n"
+                    + "\nOther features:\n"
                     + "- @startuml <filename> - changes default filename when saving/exporting\n"
-                    + "- Settings | PlantUML config - useful for global 'skinparam' command\n"
+                    + "- newpage <title> - changes filename suffix when exporting, can be disabled at settings\n"
+                    + "- Settings | PlantUML config - useful for reverting to the old theme: 'skin rose'\n"
                     + "";
 
     public Usage() {
