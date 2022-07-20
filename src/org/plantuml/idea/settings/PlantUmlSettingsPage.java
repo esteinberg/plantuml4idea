@@ -83,6 +83,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JLabel textFieldDotExecutableL;
     private JCheckBox scaleExport;
     private JCheckBox generateMetadata;
+    private JCheckBox remoteRenderingSinglePage;
 
     public PlantUmlSettingsPage() {
         ArrayList<String> list = new ArrayList<String>();
@@ -277,6 +278,7 @@ public class PlantUmlSettingsPage implements Configurable {
         remoteRendering.setSelected(data.isRemoteRendering());
         useProxy.setSelected(data.isUseProxy());
         clipboardLinkType.setText(data.getServerClipboardLinkType());
+        remoteRenderingSinglePage.setSelected(data.isRemoteRenderingSinglePage());
     }
 
     public void getData(PlantUmlSettings data) {
@@ -309,6 +311,7 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setRemoteRendering(remoteRendering.isSelected());
         data.setUseProxy(useProxy.isSelected());
         data.setServerClipboardLinkType(clipboardLinkType.getText());
+        data.setRemoteRenderingSinglePage(remoteRenderingSinglePage.isSelected());
     }
 
     public boolean isModified(PlantUmlSettings data) {
@@ -352,6 +355,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (useProxy.isSelected() != data.isUseProxy()) return true;
         if (clipboardLinkType.getText() != null ? !clipboardLinkType.getText().equals(data.getServerClipboardLinkType()) : data.getServerClipboardLinkType() != null)
             return true;
+        if (remoteRenderingSinglePage.isSelected() != data.isRemoteRenderingSinglePage()) return true;
         return false;
     }
 }

@@ -5,6 +5,7 @@ import com.intellij.util.ConcurrencyUtil;
 import com.intellij.util.net.HttpConfigurable;
 import com.intellij.util.net.IdeaWideProxySelector;
 import org.apache.commons.httpclient.HttpStatus;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
 import org.plantuml.idea.rendering.RenderRequest;
@@ -18,10 +19,12 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,11 +45,14 @@ public class RemoteRenderer {
 
         int pages = countPages(source);
 
+        if (plantUmlSettings.isRemoteRenderingSinglePage()) {
+            pages = 1;
+        }
+
         int requestedPage = renderRequest.getPage();
         if (requestedPage >= pages) {
             requestedPage = -1;
         }
-
         RenderResult renderResult = new RenderResult(RenderingType.REMOTE, pages);
 
         try {
@@ -82,7 +88,13 @@ public class RemoteRenderer {
 
     private static ImageItem renderPage(RenderRequest renderRequest, PlantUmlSettings plantUmlSettings, String source, ImageFormat format, HttpClient client, String encoded, String type, int i) {
         try {
-            String page = i + "/";
+            String page;
+            if (plantUmlSettings.isRemoteRenderingSinglePage()) {
+                page = "";
+            } else {
+                page = i + "/";
+            }
+
             String url = plantUmlSettings.getServerPrefix() + type + page + encoded;
             LOG.debug("url: ", url);
 
@@ -96,18 +108,10 @@ public class RemoteRenderer {
             byte[] out = response.body();
             LOG.debug("", response);
             if (BODY_LOG.isDebugEnabled()) {
-                BODY_LOG.debug("body: ", new String(out));
+                BODY_LOG.debug("body: ", new String(out, StandardCharsets.UTF_8));
             }
 
-            int statusCode = response.statusCode();
-            HttpHeaders headers = response.headers();
-
-            RuntimeException runtimeException = null;
-            if (out.length == 0) {
-                URI uri = response.uri();
-                String statusText = HttpStatus.getStatusText(statusCode);
-                runtimeException = new RuntimeException(statusCode + ": " + statusText + "; uri=" + uri + "\nresponseHeaders=" + headers + "\nResponse Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons.");
-            }
+            RuntimeException runtimeException = checkErrors(plantUmlSettings, response, out);
 
             ImageFormat actualFormat = Utils.isPng(out) ? ImageFormat.PNG : format;
 
@@ -120,13 +124,54 @@ public class RemoteRenderer {
                 bytes = out;
                 svgBytes = null;
             }
-            String description = statusCode >= 400 || runtimeException != null ? ImageItem.ERROR : "OK";
+            String description = response.statusCode() > 299 || runtimeException != null ? ImageItem.ERROR : "OK";
 
             return new ImageItem(renderRequest.getBaseDir(), actualFormat, source, source, i, description, bytes, svgBytes, RenderingType.REMOTE, null, null, runtimeException);
         } catch (Throwable e) {
             LOG.warn(e);
             return new ImageItem(renderRequest.getBaseDir(), format, source, source, i, ImageItem.ERROR, null, null, RenderingType.REMOTE, null, null, e);
         }
+    }
+
+    @Nullable
+    private static RuntimeException checkErrors(PlantUmlSettings plantUmlSettings, HttpResponse<byte[]> response, byte[] out) {
+        int statusCode = response.statusCode();
+        HttpHeaders headers = response.headers();
+
+        RuntimeException runtimeException = null;
+        if (statusCode < 200 || statusCode > 299) {
+            URI uri = response.uri();
+            String statusText = HttpStatus.getStatusText(statusCode);
+
+            String s = "";
+            if (!plantUmlSettings.isRemoteRenderingSinglePage()) {
+                s = "Try to enable 'Single page' rendering, some providers do not support multiple pages.\n\n";
+            }
+            runtimeException = new RuntimeException(
+                    +statusCode + ": " + statusText + "\n\n" + new String(out, StandardCharsets.UTF_8) + "\n\n" + s + "uri=" + uri + headers(headers));
+        }
+
+        if (out.length == 0) {
+            String s = "";
+            if (!plantUmlSettings.isRemoteRenderingSinglePage()) {
+                s = "Try to enable 'Single page' rendering, some providers do not support multiple pages.\n\n";
+            }
+            URI uri = response.uri();
+            String statusText = HttpStatus.getStatusText(statusCode);
+            runtimeException = new RuntimeException(statusCode + ": " + statusText + "\n\nuri=" + uri + headers(headers) + "Response Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons." + "\n\n" + s + "\n\n");
+        }
+        return runtimeException;
+    }
+
+    private static String headers(HttpHeaders headers) {
+        StringBuilder sb = new StringBuilder("\n\nresponseHeaders=");
+        Map<String, List<String>> map = headers.map();
+        sb.append("{");
+        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+            sb.append("\n").append(entry);
+        }
+        sb.append("}\n\n");
+        return sb.toString();
     }
 
     private static HttpClient getHttpClient(PlantUmlSettings plantUmlSettings) {

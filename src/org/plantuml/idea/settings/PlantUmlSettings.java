@@ -85,6 +85,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private PreviewSettings previewSettings = new PreviewSettings();
     private boolean scaleExport;
     private boolean generateMetadata = true;
+    private boolean remoteRenderingSinglePage;
 
     public static PlantUmlSettings getInstance() {
         if (Utils.isUnitTest()) {
@@ -481,6 +482,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setGenerateMetadata(final boolean generateMetadata) {
         this.generateMetadata = generateMetadata;
+    }
+
+    public boolean isRemoteRenderingSinglePage() {
+        return remoteRenderingSinglePage;
+    }
+
+    public void setRemoteRenderingSinglePage(final boolean remoteRenderingSinglePage) {
+        this.remoteRenderingSinglePage = remoteRenderingSinglePage;
     }
 
 

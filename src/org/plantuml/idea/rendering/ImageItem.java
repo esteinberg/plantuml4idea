@@ -178,7 +178,7 @@ public class ImageItem {
     ImageItemComponent initImage(Project project, RenderRequest renderRequest, RenderResult renderResult, PlantUmlPreviewPanel previewPanel) {
         ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);
 
-        if (imageItemComponent.isNull() && hasImageBytes()) {
+        if (imageItemComponent.isNull() && hasImageBytes() && getException() != null) {
             long start = System.currentTimeMillis();
             if (format == ImageFormat.PNG) {
                 initPng(imageItemComponent);
