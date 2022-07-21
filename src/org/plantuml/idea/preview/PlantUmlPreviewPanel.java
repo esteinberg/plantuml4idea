@@ -550,6 +550,9 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         imagesPanel.add(separator());
     }
 
+    /**
+     * @see ImageItem#initImage(Project, RenderRequest, RenderResult, PlantUmlPreviewPanel)
+     */
     @NotNull
     private JComponent createImageContainer(RenderCacheItem cacheItem, int pageNumber, ImageItem imageWithData) {
         if (imageWithData == null) {
