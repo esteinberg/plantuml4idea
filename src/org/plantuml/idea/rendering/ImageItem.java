@@ -175,10 +175,13 @@ public class ImageItem {
         return false;
     }
 
+    /**
+     * @see PlantUmlPreviewPanel#createImageContainer(RenderCacheItem, int, ImageItem)
+     */
     ImageItemComponent initImage(Project project, RenderRequest renderRequest, RenderResult renderResult, PlantUmlPreviewPanel previewPanel) {
         ImageItemComponent imageItemComponent = getImageItemComponent(previewPanel);
 
-        if (imageItemComponent.isNull() && hasImageBytes() && getException() != null) {
+        if (imageItemComponent.isNull() && hasImageBytes() && getException() == null) {
             long start = System.currentTimeMillis();
             if (format == ImageFormat.PNG) {
                 initPng(imageItemComponent);

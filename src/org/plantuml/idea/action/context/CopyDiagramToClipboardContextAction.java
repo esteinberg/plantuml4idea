@@ -1,10 +1,12 @@
 package org.plantuml.idea.action.context;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.WindowManager;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.image.ImageContainer;
@@ -14,6 +16,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+
+import static org.plantuml.idea.util.UIUtils.notification;
 
 /**
  * @author Eugene Steinberg
@@ -32,6 +36,10 @@ public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
             return;
         }
         final Image image = data.getPngImage(e);
+        if (image == null) {
+            Notifications.Bus.notify(notification().createNotification("Failed to copy image", MessageType.WARNING));
+            return;
+        }
         CopyPasteManager.getInstance().setContents(new Transferable() {
 
             @Override
