@@ -3,6 +3,7 @@ package org.plantuml.idea.adapter;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import net.sourceforge.plantuml.SkinParam;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.png.MetadataTag;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +30,7 @@ import java.util.Collections;
  */
 public class FacadeImpl implements PlantUmlFacade {
     private static final Logger LOG = Logger.getInstance(FacadeImpl.class);
+    private Collection<String> skinParams;
 
     @Nullable
     @Override
@@ -89,12 +91,20 @@ public class FacadeImpl implements PlantUmlFacade {
             return RemoteRenderer.render(renderRequest);
         } else {
             return PlantUmlRendererUtil.render(renderRequest, cachedItem);
-        } 
+        }
     }
 
     @Override
     public String version() {
         return Utils.version();
+    }
+
+    @Override
+    public Collection<String> getSkinParams() {
+        if (skinParams == null) {
+            skinParams = SkinParam.getPossibleValues();
+        }
+        return skinParams;
     }
 
 

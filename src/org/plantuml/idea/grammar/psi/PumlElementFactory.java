@@ -13,6 +13,15 @@ public class PumlElementFactory {
         return (PumlItem) file.getFirstChild();
     }
 
+    /**
+     * this one works better
+     */
+    public static PsiElement createWord2(Project project, String name) {
+        String name1 = "dummy.puml";
+        final PlantUmlFileImpl file = (PlantUmlFileImpl) PsiFileFactory.getInstance(project).createFileFromText(name1, PlantUmlFileType.INSTANCE, "@start\n" + name + "\n@end");
+        return (PsiElement) file.findElementAt(8);
+    }
+
     public static PlantUmlFileImpl createFile(Project project, String text) {
         String name = "dummy.puml";
         return (PlantUmlFileImpl) PsiFileFactory.getInstance(project).createFileFromText(name, PlantUmlFileType.INSTANCE, text);
