@@ -1,9 +1,12 @@
 package org.plantuml.idea.util;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.tree.IElementType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,5 +50,18 @@ public class PsiUtil {
             }
         }
         return target;
+    }
+
+    @Contract("null -> null;!null -> !null")
+    public static IElementType getElementType(@Nullable ASTNode node) {
+        return node == null ? null : node.getElementType();
+    }
+
+    @Contract("null -> null")
+    public static IElementType getElementType(@Nullable PsiElement element) {
+        return element == null ? null :
+                element instanceof StubBasedPsiElement ? ((StubBasedPsiElement<?>) element).getElementType() :
+                        element instanceof PsiFile ? ((PsiFile) element).getFileElementType() :
+                                getElementType(element.getNode());
     }
 }

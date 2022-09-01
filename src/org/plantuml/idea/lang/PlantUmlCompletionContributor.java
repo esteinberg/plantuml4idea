@@ -13,7 +13,6 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
@@ -21,6 +20,7 @@ import org.plantuml.idea.grammar.psi.PumlElementFactory;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.settings.PlantUmlSettings;
+import org.plantuml.idea.util.PsiUtil;
 
 import java.util.Collection;
 import java.util.Collections;
