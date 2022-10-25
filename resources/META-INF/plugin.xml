@@ -18,6 +18,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
         <![CDATA[
             <p>5.18<p>
             <ul>
+                <li>PlantUML library upgrade to v1.2022.12</li>
                 <li>NPE fix</li>
             </ul>
             <p>5.17<p>
