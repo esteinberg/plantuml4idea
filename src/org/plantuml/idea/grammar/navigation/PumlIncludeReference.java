@@ -50,9 +50,14 @@ public class PumlIncludeReference extends PsiReferenceBase<PumlInclude> {
         if (i > 0) {
             String path = text.substring(i).trim();
             VirtualFile virtualFile = getElement().getContainingFile().getVirtualFile();
-            VirtualFile fileByRelativePath = virtualFile.getParent().findFileByRelativePath(path);
-            if (fileByRelativePath != null) {
-                return PsiManager.getInstance(getElement().getProject()).findFile(fileByRelativePath);
+            if (virtualFile != null) {
+                VirtualFile parent = virtualFile.getParent();
+                if (parent != null) {
+                    VirtualFile fileByRelativePath = parent.findFileByRelativePath(path);
+                    if (fileByRelativePath != null) {
+                        return PsiManager.getInstance(getElement().getProject()).findFile(fileByRelativePath);
+                    }
+                }
             }
         }
         return null;
