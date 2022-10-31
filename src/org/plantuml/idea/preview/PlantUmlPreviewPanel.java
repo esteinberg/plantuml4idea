@@ -261,10 +261,14 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     return;
                 }
 
-                RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager, displayedItem);
-                logger.debug("cacheItem ", betterItem);
-                if (betterItem != null) {
-                    cachedItem = betterItem;
+                if (settings.getCacheSizeAsInt() == 0) {
+                    cachedItem = null;
+                } else {
+                    RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager, displayedItem);
+                    logger.debug("cacheItem ", betterItem);
+                    if (betterItem != null) {
+                        cachedItem = betterItem;
+                    }
                 }
 
                 if (cachedItem == null) {
