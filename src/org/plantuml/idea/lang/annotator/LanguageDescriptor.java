@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * {@link net.sourceforge.plantuml.syntax.LanguageDescriptor}
+ *
  * Author: Eugene Steinberg
  * Date: 9/27/14
  */

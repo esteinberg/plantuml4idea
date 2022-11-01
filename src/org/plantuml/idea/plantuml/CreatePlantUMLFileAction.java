@@ -37,6 +37,7 @@ public class CreatePlantUMLFileAction extends CreateFileFromTemplateAction imple
                 .addKind("Wireframe", PlantUmlFileType.PLANTUML_ICON, "Salt Wireframe")
                 .addKind("Work Breakdown Structure", PlantUmlFileType.PLANTUML_ICON, "Work Breakdown Structure")
                 .addKind("YAML Data", PlantUmlFileType.PLANTUML_ICON, "UML YAML Data")
+                .addKind("EBNF", PlantUmlFileType.PLANTUML_ICON, "EBNF")
                 .setValidator(new NonEmptyInputValidator())
         ;
     }
