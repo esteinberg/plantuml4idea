@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * {@link net.sourceforge.plantuml.syntax.LanguageDescriptor}
- * 
+ *
  * Author: Eugene Steinberg
  * Date: 9/27/14
  */
@@ -16,8 +16,8 @@ public enum LanguageDescriptor {
     public static final String IDEA_PARTIAL_RENDER = "idea.partialRender";
     public static final String IDEA_DISABLE_SYNTAX_CHECK = "idea.disableSyntaxCheck";
 
-    public static final String TAGS = "uml|json|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs|yaml";
-    
+    public static final String TAGS = "uml|json|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs|yaml|ebnf";
+
     public final List<String> types = Collections.unmodifiableList(Arrays.asList(
             "actor",
             "participant",
@@ -47,10 +47,10 @@ public enum LanguageDescriptor {
             "package",
             "queue",
             "archimate",
-            "diamond" ,
+            "diamond",
             "detach"
-
     ));
+
     public final List<String> tags = Collections.unmodifiableList(Arrays.asList(
             "@startuml",
             "@startdot",
@@ -62,6 +62,8 @@ public enum LanguageDescriptor {
             "@startlatex",
             "@startmindmap",
             "@startgantt",
+            "@startyaml",
+            "@startebnf",
             "@startwbs",
             "@enduml",
             "@enddot",
@@ -73,10 +75,9 @@ public enum LanguageDescriptor {
             "@endlatex",
             "@endmindmap",
             "@endgantt",
-            "@startyaml",
             "@endyaml",
-            "@endwbs"
-
+            "@endwbs",
+            "@endebnf"
     ));
 
     public final List<String> keywords2 = Collections.unmodifiableList(Arrays.asList(
@@ -189,12 +190,12 @@ public enum LanguageDescriptor {
             "order",
             "allow_mixing",
             "allowmixing",
-            "mainframe" ,
+            "mainframe",
             "across",
             "stereotype",
             "split",
             "style",
-            "sprite",		
+            "sprite",
             "circle",
             "empty",
             "members",
@@ -210,16 +211,12 @@ public enum LanguageDescriptor {
             "dashed",
             "bold",
             "map"
-            
-            
     ));
 
     public final List<String> pluginSettingsPattern = Collections.unmodifiableList(Arrays.asList(
             IDEA_PARTIAL_RENDER,
             IDEA_DISABLE_SYNTAX_CHECK
     ));
-
-
 
     public final List<String> preproc = Collections.unmodifiableList(Arrays.asList(
             "!exit",
@@ -234,7 +231,7 @@ public enum LanguageDescriptor {
             "!ifndef",
             "!else",
             "!definelong",
-            "!enddefinelong" ,
+            "!enddefinelong",
             "!function",
             "!procedure",
             "!endfunction",
@@ -249,7 +246,4 @@ public enum LanguageDescriptor {
             "!dump_memory",
             "!import"
     ));
-
-
-
 }
