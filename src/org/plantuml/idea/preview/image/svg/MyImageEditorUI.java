@@ -633,13 +633,13 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             ImageDocument document = imageComponent.getDocument();
             BufferedImage value = document.getValue();
 
-             if (value instanceof MyBufferedImage) {
-                 Color background = ((MyBufferedImage) value).getBackground();
-                 if (background != null) {
-                     imageComponent.setTransparencyChessboardBlankColor(background);
-                     imageComponent.setTransparencyChessboardWhiteColor(background);
-                 }
-             }
+            if (value instanceof MyBufferedImage) {
+                Color background = ((MyBufferedImage) value).getBackground();
+                if (background != null) {
+                    imageComponent.setTransparencyChessboardBlankColor(background);
+                    imageComponent.setTransparencyChessboardWhiteColor(background);
+                }
+            }
 
             updateImageComponentSize();
 
@@ -681,21 +681,32 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             return editor != null ? editor.getFile() : null;
         } else if (CommonDataKeys.VIRTUAL_FILE_ARRAY.is(dataId)) {
             return editor != null ? new VirtualFile[]{editor.getFile()} : VirtualFile.EMPTY_ARRAY;
-        } else if (CommonDataKeys.PSI_FILE.is(dataId)) {
+        }
+//    else if (PlatformDataKeys.COPY_PROVIDER.is(dataId)) {
+//      return this;
+//    }
+//    else if (PlatformDataKeys.CUT_PROVIDER.is(dataId) && copyPasteSupport != null) {
+//      return copyPasteSupport.getCutProvider();
+//    }
+//    else if (PlatformDataKeys.DELETE_ELEMENT_PROVIDER.is(dataId)) {
+//      return deleteProvider;
+//    }
+        else if (ImageComponentDecorator.DATA_KEY.is(dataId)) {
+            return editor != null ? editor : this;
+        } else if (PlatformCoreDataKeys.BGT_DATA_PROVIDER.is(dataId)) {
+            return (DataProvider) slowId -> getSlowData(slowId);
+        }
+        return null;
+    }
+
+    private @Nullable Object getSlowData(@NotNull String dataId) {
+        if (CommonDataKeys.PSI_FILE.is(dataId)) {
             return findPsiFile();
         } else if (CommonDataKeys.PSI_ELEMENT.is(dataId)) {
             return findPsiFile();
-        } else if (LangDataKeys.PSI_ELEMENT_ARRAY.is(dataId)) {
+        } else if (PlatformCoreDataKeys.PSI_ELEMENT_ARRAY.is(dataId)) {
             PsiElement psi = findPsiFile();
             return psi != null ? new PsiElement[]{psi} : PsiElement.EMPTY_ARRAY;
-//        } else if (PlatformDataKeys.COPY_PROVIDER.is(dataId) && copyPasteSupport != null) {
-//            return this;
-//        } else if (PlatformDataKeys.CUT_PROVIDER.is(dataId) && copyPasteSupport != null) {
-//            return copyPasteSupport.getCutProvider();
-//        } else if (PlatformDataKeys.DELETE_ELEMENT_PROVIDER.is(dataId)) {
-//            return deleteProvider;
-        } else if (ImageComponentDecorator.DATA_KEY.is(dataId)) {
-            return editor != null ? editor : this;
         }
 
         return null;
@@ -712,6 +723,11 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         ImageDocument document = imageComponent.getDocument();
         BufferedImage image = document.getValue();
         CopyPasteManager.getInstance().setContents(new ImageTransferable(image));
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

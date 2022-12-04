@@ -1,10 +1,10 @@
 <idea-plugin version="2">
     <id>PlantUML integration</id>
     <name>PlantUML Integration</name>
-    <version>5.19</version>
+    <version>5.20</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
-    <idea-version since-build="203.5981.155"/>
+    <idea-version since-build="222.4167.9"/>
 
     <description><![CDATA[PlantUML diagramming tool integration. Now better and faster, with code navigation and highlighting.
         <br><br>
@@ -16,6 +16,11 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[
+            <p>5.19<p>
+            <ul>
+                <li>IntelliJ 2022.3 compatibility</li>
+                <li>Bugfixes</li>
+            </ul>
             <p>5.19<p>
             <ul>
                 <li>'Cache size' = 0 - disables multipage rendering optimizations</li>
