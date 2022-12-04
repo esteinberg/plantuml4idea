@@ -96,7 +96,10 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
             LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
 
             if (sourceFile != null) {
-                target = resolveFile(new File(sourceFile.getParent().getPath(), targetFilePath), localFileSystem, psiManager);
+                VirtualFile parent = sourceFile.getParent();
+                if (parent != null) {
+                    target = resolveFile(new File(parent.getPath(), targetFilePath), localFileSystem, psiManager);
+                }
             }
             if (target == null) {
                 target = resolveFile(new File(targetFilePath), localFileSystem, psiManager);

@@ -34,8 +34,11 @@ public class PumlIncludeReference extends PsiReferenceBase<PumlInclude> {
     @Override
     public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
         VirtualFile elementDir = getElement().getContainingFile().getVirtualFile().getParent();
-        VirtualFile changedFile = element.getContainingFile().getVirtualFile();
-        String relativePath = FileUtilRt.getRelativePath(elementDir.getPath(), changedFile.getPath(), '/');
+        String relativePath = null;
+        if (elementDir != null) {
+            VirtualFile changedFile = element.getContainingFile().getVirtualFile();
+            relativePath = FileUtilRt.getRelativePath(elementDir.getPath(), changedFile.getPath(), '/');
+        }
         if (relativePath == null) {
             return null;
         }
