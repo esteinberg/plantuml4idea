@@ -76,6 +76,11 @@ public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
 
         PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
         PlantUmlPreviewPanel previewPanel = UIUtils.getEditorOrToolWindowPreview(e);
+        if (previewPanel != null) {
+            if (previewPanel.getDisplayedItem() == null) {
+                previewPanel = null;
+            }
+        }
 
         if (previewPanel == null) {
             FileEditor editor = e.getData(PlatformDataKeys.FILE_EDITOR);
