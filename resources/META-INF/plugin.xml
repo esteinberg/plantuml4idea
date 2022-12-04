@@ -18,6 +18,7 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
         <![CDATA[
             <p>5.19<p>
             <ul>
+                <li>PlantUML library upgrade to v1.2022.13</li>
                 <li>IntelliJ 2022.3 compatibility</li>
                 <li>Bugfixes</li>
             </ul>
