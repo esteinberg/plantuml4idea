@@ -22,7 +22,6 @@ public class PlantUmlRendererUtil {
 
     public static final Pattern NEW_PAGE_PATTERN = Pattern.compile("\\n\\s*@?(?i)(newpage)(\\p{Blank}+[^\\n]+|\\p{Blank}*)(?=\\n)");
 
-    private static final PlantUmlPartialRenderer PARTIAL_RENDERER = new PlantUmlPartialRenderer();
     private static final PlantUmlNormalRenderer NORMAL_RENDERER = new PlantUmlNormalRenderer();
     private static final PlantUmlExporter EXPORTER = new PlantUmlExporter();
 
@@ -47,7 +46,8 @@ public class PlantUmlRendererUtil {
         start = System.currentTimeMillis();
         RenderResult renderResult;
         if (partialRender) {
-            renderResult = PARTIAL_RENDERER.partialRender(renderRequest, cachedItem, sourceSplit);
+            //uses internal plantuml classes, must not be a field
+            renderResult = new PlantUmlPartialRenderer().partialRender(renderRequest, cachedItem, sourceSplit);
         } else {
             renderResult = NORMAL_RENDERER.doRender(renderRequest, cachedItem, sourceSplit);
         }
