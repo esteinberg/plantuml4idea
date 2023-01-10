@@ -3,7 +3,6 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.preproc.FileWithSuffix;
@@ -93,7 +92,7 @@ public class DiagramFactory {
             numImage = numImage - nbInSystem;
         }
 
-        Log.error("numImage is too big = " + numImage);
+        LOG.error("numImage is too big = " + numImage);
         return null;
     }
 
@@ -106,7 +105,7 @@ public class DiagramFactory {
             numImage = numImage - nbInSystem;
         }
 
-        Log.error("numImage is too big = " + numImage);
+        LOG.error("numImage is too big = " + numImage);
         return null;
     }
 
@@ -119,7 +118,7 @@ public class DiagramFactory {
             numImage = numImage - nbInSystem;
         }
 
-        Log.error("numImage is too big = " + numImage);
+        LOG.error("numImage is too big = " + numImage);
         return null;
     }
 
@@ -138,7 +137,7 @@ public class DiagramFactory {
         } catch (Exception e) {
             throw new RenderingCancelledException(e);
         }
-        Log.error("numImage is too big = " + numImage);
+        LOG.error("numImage is too big = " + numImage);
         return null;
     }
 

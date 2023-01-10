@@ -6,6 +6,8 @@ import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.error.PSystemError;
 import net.sourceforge.plantuml.error.PSystemErrorV2;
+import net.sourceforge.plantuml.utils.LineLocationImpl;
+import net.sourceforge.plantuml.utils.StringLocated;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.adapter.Format;

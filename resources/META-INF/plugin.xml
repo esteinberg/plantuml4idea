@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>PlantUML integration</id>
     <name>PlantUML Integration</name>
-    <version>5.20</version>
+    <version>5.21</version>
     <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
     <!-- IJ 12+ -->
     <idea-version since-build="222.4167.9"/>
@@ -16,7 +16,11 @@ Manage pull requests and conduct code reviews in your IDE with full source-tree 
 
     <change-notes>
         <![CDATA[
-            <p>5.19<p>
+            <p>5.21<p>
+            <ul>
+                <li>PlantUML library upgrade to v1.2023.00</li>
+            </ul>
+            <p>5.20<p>
             <ul>
                 <li>PlantUML library upgrade to v1.2022.13</li>
                 <li>IntelliJ 2022.3 compatibility</li>
