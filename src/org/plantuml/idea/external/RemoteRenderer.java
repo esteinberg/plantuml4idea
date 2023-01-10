@@ -4,7 +4,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ConcurrencyUtil;
 import com.intellij.util.net.HttpConfigurable;
 import com.intellij.util.net.IdeaWideProxySelector;
-import org.apache.commons.httpclient.HttpStatus;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
@@ -141,14 +140,13 @@ public class RemoteRenderer {
         RuntimeException runtimeException = null;
         if (statusCode < 200 || statusCode > 299) {
             URI uri = response.uri();
-            String statusText = HttpStatus.getStatusText(statusCode);
 
             String s = "";
             if (!plantUmlSettings.isRemoteRenderingSinglePage()) {
                 s = "Try to enable 'Single page' rendering, some providers do not support multiple pages.\n\n";
             }
             runtimeException = new RuntimeException(
-                    +statusCode + ": " + statusText + "\n\n" + new String(out, StandardCharsets.UTF_8) + "\n\n" + s + "uri=" + uri + headers(headers));
+                    "statusCode=" + statusCode + "\n\n" + new String(out, StandardCharsets.UTF_8) + "\n\n" + s + "uri=" + uri + headers(headers));
         }
 
         if (out.length == 0) {
@@ -157,8 +155,7 @@ public class RemoteRenderer {
                 s = "Try to enable 'Single page' rendering, some providers do not support multiple pages.\n\n";
             }
             URI uri = response.uri();
-            String statusText = HttpStatus.getStatusText(statusCode);
-            runtimeException = new RuntimeException(statusCode + ": " + statusText + "\n\nuri=" + uri + headers(headers) + "Response Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons." + "\n\n" + s + "\n\n");
+            runtimeException = new RuntimeException("statusCode=" + statusCode + "\n\nuri=" + uri + headers(headers) + "Response Body was empty, check the configured url or proxy, redirects are prohibited for performance reasons." + "\n\n" + s + "\n\n");
         }
         return runtimeException;
     }
