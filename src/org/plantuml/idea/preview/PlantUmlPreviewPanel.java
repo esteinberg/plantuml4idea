@@ -261,14 +261,10 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     return;
                 }
 
-                if (settings.getCacheSizeAsInt() == 0) {
-                    cachedItem = null;
-                } else {
-                    RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager, displayedItem);
-                    logger.debug("cacheItem ", betterItem);
-                    if (betterItem != null) {
-                        cachedItem = betterItem;
-                    }
+                RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager, displayedItem);
+                logger.debug("cacheItem ", betterItem);
+                if (betterItem != null) {
+                    cachedItem = betterItem;
                 }
 
                 if (cachedItem == null) {
@@ -336,6 +332,10 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private RenderCommand getCommand(RenderCommand.Reason reason, String selectedFile, final String source, final int page, final Zoom zoom, RenderCacheItem cachedItem, LazyApplicationPoolExecutor.Delay delay) {
         logger.debug("#getCommand selectedFile='", selectedFile, "', page=", page, ", scaledZoom=", zoom);
         int version = sequence.incrementAndGet();
+
+        if (settings.getCacheSizeAsInt() == 0) {
+            cachedItem = null;
+        }
 
         return new RenderCommand(Set.of(this), project, reason, selectedFile, source, page, zoom, cachedItem, version, delay, settings);
     }

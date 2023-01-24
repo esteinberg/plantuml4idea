@@ -96,7 +96,10 @@ public class RenderCache {
             RenderCacheItem renderCacheItem = cacheItems.removeFirst();
 //            renderCacheItem.dispose();
         }
-        cacheItems.add(cacheItem);
+
+        if (maxCacheSize > 0) {
+            cacheItems.add(cacheItem);
+        }
     }
 
 
