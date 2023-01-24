@@ -2,6 +2,7 @@ package org.plantuml.idea.adapter;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -110,12 +111,15 @@ public class Utils {
             }
             FileDocumentManager documentManager = FileDocumentManager.getInstance();
             com.intellij.openapi.editor.Document[] unsavedDocuments = documentManager.getUnsavedDocuments();
-            if (unsavedDocuments.length > 0 && !onlyCurrentlyDisplayed(documentManager, unsavedDocuments, sourceFilePath)) {
+            if (unsavedDocuments.length > 0 && !isOnlyCurrentUnsaved(documentManager, unsavedDocuments, sourceFilePath)) {
                 ApplicationManager.getApplication().invokeAndWait(() -> {
-                    documentManager.saveDocuments(document -> {
-                        VirtualFile file = documentManager.getFile(document);
-                        return file != null && org.plantuml.idea.util.Utils.isPlantUmlOrIUmlFileType(project, file);
-                    });
+                    for (Document unsavedDocument : unsavedDocuments) {
+                        VirtualFile file = documentManager.getFile(unsavedDocument);
+                        if (file != null && org.plantuml.idea.util.Utils.isPlantUmlOrIUmlFileType(project, file)) {
+                            LOG.debug("saveAllDocuments - ", file);
+                            documentManager.saveDocument(unsavedDocument);
+                        }
+                    }
                 });
             }
 
@@ -129,7 +133,7 @@ public class Utils {
         }
     }
 
-    private static boolean onlyCurrentlyDisplayed(FileDocumentManager documentManager, com.intellij.openapi.editor.Document[] unsavedDocuments, @Nullable String sourceFile) {
+    private static boolean isOnlyCurrentUnsaved(FileDocumentManager documentManager, com.intellij.openapi.editor.Document[] unsavedDocuments, @Nullable String sourceFile) {
         if (unsavedDocuments.length == 1 && sourceFile != null) {
             com.intellij.openapi.editor.Document unsavedDocument = unsavedDocuments[0];
             VirtualFile file = documentManager.getFile(unsavedDocument);
