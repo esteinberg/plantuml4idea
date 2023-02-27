@@ -10,7 +10,7 @@ import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
 import org.apache.commons.lang.StringUtils;

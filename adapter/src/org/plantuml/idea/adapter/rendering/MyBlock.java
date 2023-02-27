@@ -2,7 +2,7 @@ package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
-import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.klimt.creole.Display;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
