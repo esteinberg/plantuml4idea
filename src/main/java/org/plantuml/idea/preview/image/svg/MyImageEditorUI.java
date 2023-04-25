@@ -725,10 +725,10 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         CopyPasteManager.getInstance().setContents(new ImageTransferable(image));
     }
 
-//    @Override
-//    public @NotNull ActionUpdateThread getActionUpdateThread() {
-//        return ActionUpdateThread.BGT;
-//    }
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
 
     @Override
     public boolean isCopyEnabled(@NotNull DataContext dataContext) {
