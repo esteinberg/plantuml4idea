@@ -1,0 +1,224 @@
+<idea-plugin version="2">
+    <id>PlantUML integration</id>
+    <name>PlantUML Integration</name>
+    <vendor url="https://github.com/esteinberg/plantuml4idea/">Eugene Steinberg, Vojtech Krasa</vendor>
+
+    <description><![CDATA[PlantUML diagramming tool integration. Now better and faster, with code navigation and highlighting.
+        <br><br>
+        Sponsored by:<br>
+<p><a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner"><img src="https://alt-images.codestream.com/codestream_logo_vojta_plantuml.png"></a><br>
+Manage pull requests and conduct code reviews in your IDE with full source-tree context. Comment on any line, not just the diffs. Use jump-to-definition, your favorite keybindings, and code intelligence with more of your workflow.<br>
+<a title="Try CodeStream" href="https://sponsorlink.codestream.com/?utm_source=jbmarket&amp;utm_campaign=vojta_plantuml&amp;utm_medium=banner">Learn More</a></p>
+      ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="images-puml.xml">com.intellij.platform.images</depends>
+    <depends optional="true" config-file="grazie-puml.xml">tanvd.grazi</depends>
+
+    <application-components>
+        <!-- Add your application components here -->
+        <component>
+            <implementation-class>org.plantuml.idea.PlantUmlApplicationComponent</implementation-class>
+        </component>
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+        <component>
+            <implementation-class>org.plantuml.idea.PlantUmlProjectComponent</implementation-class>
+        </component>
+    </project-components>
+
+    <actions>
+        <group id="PlantUML.EditorLayout">
+
+            <action class="org.plantuml.idea.preview.editor.editorLayout.EditorOnlyLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.EditorOnlyLayoutChangeAction"
+                    text="Show Editor Only"
+                    icon="AllIcons.General.LayoutEditorOnly">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.EditorAndPreviewLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.EditorAndPreviewLayoutChangeAction"
+                    text="Show Editor and Preview"
+                    icon="AllIcons.General.LayoutEditorPreview">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.HorizontalSplitLayoutChangeAction"
+                    text="Show Editor and Preview - Horizontal Split"
+                    icon="/images/layoutEditorPreview_horizontal.svg">
+            </action>
+            <action class="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
+                    id="org.plantuml.idea.preview.editor.editorLayout.PreviewOnlyLayoutChangeAction"
+                    text="Show Preview Only"
+                    icon="AllIcons.General.LayoutPreviewOnly">
+            </action>
+            <separator/>
+        </group>
+
+        <group id="PlantUML.Toolbar" description="PlantUML toolwindow toolbar">
+            <action id="PlantUML.Update" description="Update PlantUml Diagrams"
+                    class="org.plantuml.idea.action.UpdateDiagramsAction"
+                    icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift F"/>
+            </action>
+            <action id="PlantUML.Reload" description="Reload PlantUml Diagrams"
+                    class="org.plantuml.idea.action.ReloadNowAction"
+                    icon="AllIcons.Actions.Refresh" text="Reload PlantUml Diagrams">
+                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift G"/>
+            </action>
+
+            <separator/>
+            <action id="PlantUML.CopyToClipboard" description="Copy Current Diagram to Clipboard"
+                    class="org.plantuml.idea.action.save.CopyDiagramToClipboardAction"
+                    icon="AllIcons.Actions.Copy" text="Copy Current Diagram to Clipboard"
+            />
+            <action id="PlantUML.SaveToFile" description="Save Current Diagram Only"
+                    class="org.plantuml.idea.action.save.SaveDiagramToFileAction"
+                    icon="/actions/menu-saveall.svg" text="Save Current Diagram Only"/>
+            <action id="PlantUML.SaveAllToFile" description="Save All Pages"
+                    class="org.plantuml.idea.action.save.SaveAllDiagramToFileAction"
+                    icon="AllIcons.ToolbarDecorator.Export" text="Save All Pages"/>
+            <separator/>
+
+            <action id="PlantUML.ZoomIn" description="Zoom In" class="org.plantuml.idea.action.ZoomInAction"
+                    icon="AllIcons.Graph.ZoomIn" text="Zoom In"/>
+            <action id="PlantUML.ZoomOut" description="Zoom In" class="org.plantuml.idea.action.ZoomOutAction"
+                    icon="AllIcons.Graph.ZoomOut" text="Zoom Out"/>
+            <action id="PlantUML.ZoomActual" description="Actual Zoom" class="org.plantuml.idea.action.ZoomActualAction"
+                    icon="AllIcons.Graph.ActualZoom" text="Actual Zoom"/>
+            <separator/>
+
+            <action id="PlantUML.PrevPage" description="Prev Page" class="org.plantuml.idea.action.PrevPageAction"
+                    icon="AllIcons.Actions.Back" text="Previous Page"/>
+            <action id="PlantUML.NextPage" description="Next Page" class="org.plantuml.idea.action.NextPageAction"
+                    icon="AllIcons.Actions.Forward" text="Next Page"/>
+
+            <separator/>
+
+            <group id="PlantUML.Settings" icon="AllIcons.General.Settings" popup="true">
+                <action id="PlantUML.AutoPoup"
+                        class="org.plantuml.idea.action.AutoPopupToggleAction"
+                        text="Automatic Code Completion Popup"
+                        description="'Settings | Editor | General | Code Completion | Show suggestions as you type' must also be enabled"/>
+                <action id="PlantUML.AutoRender"
+                        class="org.plantuml.idea.action.AutoRenderToggleAction"
+                        text="Automatically Render"/>
+                <action id="PlantUML.AutoHideToolWindowToggle"
+                        class="org.plantuml.idea.action.AutoHideToolWindowToggleAction"
+                        text="Automatically Show/Hide Tool Window"/>
+                <action id="PlantUML.DoNotDisplayErrorsToggle"
+                        class="org.plantuml.idea.action.DoNotDisplayErrorsToggleAction"
+                        text="Do not Display Error Images"
+                        description="Click on the status label to display the error, click again to return to the last image."
+                />
+                <separator/>
+                <action id="org.plantuml.idea.action.ImageHighlightToggleAction"
+                        class="org.plantuml.idea.action.ImageHighlightToggleAction"
+                        text="Highlight Text Occurrences in Images"/>
+                />
+                <action id="org.plantuml.idea.action.DisplayLinksBorderToggleAction"
+                        class="org.plantuml.idea.action.DisplayLinksBorderToggleAction"
+                        text="Show Border Around Links"
+                />
+                <separator/>
+                <action id="org.plantuml.idea.action.DisplaySvgToggleAction"
+                        class="org.plantuml.idea.action.DisplaySvgToggleAction"
+                        text="SVG Preview"
+                        description="It should be much faster. Disable for the old PNG one."
+                />
+                <action id="org.plantuml.idea.action.RemoteRenderingToggleAction"
+                        class="org.plantuml.idea.action.RemoteRenderingToggleAction"
+                        text="Remote Rendering"
+                />
+                />
+                <separator/>
+                <action id="PlantUML.ShowSettings" class="org.plantuml.idea.action.ShowSettingsAction"
+                        text="Open Settings"/>
+
+                <!--                <separator/>-->
+                <!--                <action id="PlantUML.SaveTestAction" class="org.plantuml.idea.action.test.SaveTestAction"-->
+                <!--                        text="SaveTestAction"/>-->
+                <!--                <action id="PlantUML.ClearCacheAction" class="org.plantuml.idea.action.test.ClearCacheAction"-->
+                <!--                        text="ClearCacheAction"/>-->
+
+            </group>
+
+            <separator/>
+            <action id="PlantUML.About" description="About" icon="AllIcons.Actions.Help"
+                    class="org.plantuml.idea.action.AboutAction" text="About"/>
+        </group>
+
+
+        <group id="PlantUML.NewPlantUML" text="PlantUML">
+            <action id="NewPlantUMLFile" class="org.plantuml.idea.plantuml.CreatePlantUMLFileAction"/>
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+        </group>
+
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="PlantUML integration plugin" displayType="BALLOON" isLogByDefault="true"/>
+
+        <intentionAction>
+            <className>org.plantuml.idea.intentions.ReverseArrowIntention</className>
+            <category>plantuml4idea plugin</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.plantuml.idea.intentions.AddPartialRenderOptionIntention</className>
+            <category>plantuml4idea plugin</category>
+        </intentionAction>
+        <intentionAction>
+            <className>org.plantuml.idea.intentions.AddNoSyntaxCheckOptionIntention</className>
+            <category>plantuml4idea plugin</category>
+        </intentionAction>
+
+        <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
+                    factoryClass="org.plantuml.idea.preview.toolwindow.PlantUmlToolWindowFactory"/>
+        <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
+        <lang.parserDefinition language="PUML"
+                               implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
+        <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
+        <applicationConfigurable instance="org.plantuml.idea.settings.PlantUmlSettingsPage" groupId="language"/>
+        <applicationService serviceImplementation="org.plantuml.idea.settings.PlantUmlSettings"/>
+        <applicationService serviceImplementation="org.plantuml.idea.rendering.RenderCache"/>
+        <applicationService serviceImplementation="org.plantuml.idea.rendering.LazyApplicationPoolExecutor"/>
+        <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
+                           language="PUML"/>
+        <applicationService serviceImplementation="org.plantuml.idea.SelectedPagePersistentStateComponent"/>
+
+        <completion.contributor language="PUML"
+                                implementationClass="org.plantuml.idea.lang.PlantUmlCompletionContributor"/>
+        <typedHandler implementation="org.plantuml.idea.lang.PlantUmlCompletionAutoPopupHandler"
+                      id="PlantUmlCompletionAutoPopupHandler"/>
+
+        <lang.elementManipulator forClass="org.plantuml.idea.grammar.psi.PumlItem"
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlItemReference$PumlElementManipulator"/>
+        <lang.elementManipulator forClass="org.plantuml.idea.grammar.psi.impl.PumlIncludeImpl"
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlIncludeReference$MyAbstractElementManipulator"/>
+
+        <lang.namesValidator language="PUML" implementationClass="org.plantuml.idea.grammar.PumlNamesValidator"/>
+        <lang.findUsagesProvider language="PUML"
+                                 implementationClass="org.plantuml.idea.grammar.navigation.PumlFindUsagesProvider"/>
+
+        <lang.psiStructureViewFactory language="PUML"
+                                      implementationClass="org.plantuml.idea.grammar.structure.PumlStructureViewFactory"/>
+        <typedHandler implementation="org.plantuml.idea.lang.PlantUmlTypedHandlerDelegate"/>
+        <spellchecker.support language="PUML"
+                              implementationClass="org.plantuml.idea.grammar.PumlSpellcheckingStrategy"/>
+        <spellchecker.dictionary.runtimeDictionaryProvider
+                implementation="org.plantuml.idea.grammar.PumlRuntimeDictionaryProvider"/>
+        <lang.refactoringSupport language="PUML"
+                                 implementationClass="org.plantuml.idea.grammar.PumlRefactoringSupportProvider"/>
+        <lang.inspectionSuppressor language="PUML"
+                                   implementationClass="org.plantuml.idea.grammar.PumlInspectionSuppressor"/>
+
+        <todoIndexer filetype="PlantUML file" implementationClass="org.plantuml.idea.grammar.PumlTodoIndexer"/>
+        <todoIndexer filetype="PlantUML include file" implementationClass="org.plantuml.idea.grammar.PumlTodoIndexer"/>
+        <indexPatternBuilder implementation="org.plantuml.idea.grammar.PumlIndexPatternBuilder"/>
+
+        <fileEditorProvider implementation="org.plantuml.idea.preview.editor.PlantUmlSplitEditorProvider"/>
+        <liveTemplateContext implementation="org.plantuml.idea.template.PumlTemplateContextType"/>
+        <defaultLiveTemplates file="/liveTemplates/PlantUml.xml"/>
+    </extensions>
+
+</idea-plugin>

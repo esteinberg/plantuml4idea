@@ -11,3 +11,8 @@ out
 .DS_Store
 target/
 plantuml4idea.zip
+
+.gradle
+.idea
+.qodana
+build

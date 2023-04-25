@@ -32,22 +32,26 @@ Contributors:
 * Supports multiple sources per file
 * Supports pagination and zoom
 * Can copy diagram to clipboard or export as PNG, EPS or SVG, ASCII Art
-* Caching and incremental rendering 
+* Caching and incremental rendering
 
 # Tips
 
 * PlantUML code must be inside @startuml and @enduml tags to be rendered.
 * To be able to generate many diagram types, you must have [Graphviz](https://www.graphviz.org/download/)
- installed on your machine. For Windows, use [Development version](https://ci.appveyor.com/project/ellson/graphviz-pl238), not Stable 2.38 - that one is very old. You have to select your OS/Release and then go in `Artefact` tab to get .exe file or zip. About screen tests your installation.
+  installed on your machine. For Windows,
+  use [Development version](https://ci.appveyor.com/project/ellson/graphviz-pl238), not Stable 2.38 - that one is very
+  old. You have to select your OS/Release and then go in `Artefact` tab to get .exe file or zip. About screen tests your
+  installation.
+
+# [AsciiMath installation](https://plantuml.com/ascii-math)
+
+1. Download PlantUML jar - https://plantuml.com/download
+2. Download JLatexMath libs - https://jar-download.com/artifacts/org.scilab.forge/jlatexmath -
+   use `Download jlatexmath.jar (xxx)` button, unzip `jar_files.zip`
+3. Go to setting in IntelliJ for PlantUML
+4. Set PlantUML JAR to the folder containing jars you downloaded
 
 # Developer notes
-
-* Project
-  setup: [gif](https://user-images.githubusercontent.com/1160875/55478653-7dbb2300-561c-11e9-8a58-66f5a66b5dc1.gif) [mp4](https://mega.nz/#!66oTUIgA!ckkAdLZNHtXjIwyoSlN6BwA-vEWh_034vTRqtWZr9AM)
-  <br />+ add `plugins\platform-images\lib\platform-images.jar` to the SDK. <br />Protip:
-  use https://plugins.jetbrains.com/plugin/6844-useful-actions
-
-- `Tools | Add Dependant Bundled Plugins to IntelliJ Platform Plugin SDK` instead, then reopen project if needed.
 
 * debug logs can be enabled by adding '#org.plantuml' and 'org.plantuml' to [Help | Debug Log Settings]
 * use [Jetbrains JDK](https://confluence.jetbrains.com/display/JBR/JetBrains+Runtime) if normal JDK produces UI bugs
@@ -55,9 +59,11 @@ Contributors:
 ## There are following branches:
 
 ### master
+
 * Current production branch
 
 ### grammar
+
 * old experimental syntax support - never finished
 * Grammar classes can be generated using tools/grammar-gen.sh
 * This script can run automatically when you run the plugin using "Plugin" Run/Debug configuration. Just add the script
