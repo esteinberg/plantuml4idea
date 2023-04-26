@@ -1,9 +1,10 @@
-plantuml4idea
+PlantUML plugin for IntelliJ platform
 =============
 
-IntelliJ [IDEA plugin for PlantUML](http://plugins.intellij.net/plugin/?idea&id=7017)
+[![JetBrains plugins][plugin-version-svg]][plugin-repo]
+[![JetBrains plugins][plugin-downloads-svg]][plugin-repo]
 
-This plugin provides integration with popular [PlantUML](http://plantuml.sourceforge.net/) diagramming tool
+This [plugin][plugin-repo] provides integration with popular [PlantUML](http://plantuml.sourceforge.net/) diagramming tool
 
 ---
 
@@ -65,3 +66,10 @@ Contributors:
 * Grammar classes can be generated using tools/grammar-gen.sh
 * This script can run automatically when you run the plugin using "Plugin" Run/Debug configuration. Just add the script
 above as an external tool and make it run before the "Make" step.
+
+
+
+<!-- Badges -->
+[plugin-repo]: https://plugins.jetbrains.com/plugin/7017-plantuml-integration
+[plugin-version-svg]: https://img.shields.io/jetbrains/plugin/v/7017-plantuml-integration.svg
+[plugin-downloads-svg]: https://img.shields.io/jetbrains/plugin/d/7017-plantuml-integration.svg
