@@ -38,10 +38,7 @@ Contributors:
 
 * PlantUML code must be inside @startuml and @enduml tags to be rendered.
 * To be able to generate many diagram types, you must have [Graphviz](https://www.graphviz.org/download/)
-  installed on your machine. For Windows,
-  use [Development version](https://ci.appveyor.com/project/ellson/graphviz-pl238), not Stable 2.38 - that one is very
-  old. You have to select your OS/Release and then go in `Artefact` tab to get .exe file or zip. About screen tests your
-  installation.
+  installed on your machine (not needed for Windows, it is bundled in the PlantUML jar). 
 
 # [AsciiMath installation](https://plantuml.com/ascii-math)
 
