@@ -1,9 +1,11 @@
-<!-- Keep a Changelog guide -> https://keepachangelog.com -->
+# Changelog
 
-## [Unreleased]
+## Unreleased
 
-## [6.0.0-IJ2020.3]
+## 6.0.0-IJ2020.3 - 2023-04-27
 
-- IntelliJ 2020.3 compatibility
+### Changed
+
+- IntelliJ 2020.3 - 2022.1.4 compatibility
 - PlantUML library upgrade to v1.2023.6
 - Bugfixes
