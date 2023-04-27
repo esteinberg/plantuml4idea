@@ -88,7 +88,8 @@ tasks {
                 renderItem(
                         (getOrNull(pluginVersion) ?: getUnreleased())
                                 .withHeader(false)
-                                .withEmptySections(false),
+                                .withEmptySections(false)
+                                .withLinks(false),
                         Changelog.OutputType.HTML,
                 )
             }
