@@ -30,7 +30,7 @@ public class PlantUmlToolWindowFactory implements ToolWindowFactory, DumbAware {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         PlantUmlPreviewPanel previewPanel = new PlantUmlToolWindowPreviewPanel(project, toolWindow);
-        ContentFactory contentFactory = ContentFactory.getInstance();
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         Content content = contentFactory.createContent(previewPanel, "", false);
         toolWindow.getContentManager().addContent(content);
 

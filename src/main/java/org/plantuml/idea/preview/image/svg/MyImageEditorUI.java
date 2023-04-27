@@ -693,8 +693,6 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 //    }
         else if (ImageComponentDecorator.DATA_KEY.is(dataId)) {
             return editor != null ? editor : this;
-        } else if (PlatformCoreDataKeys.BGT_DATA_PROVIDER.is(dataId)) {
-            return (DataProvider) slowId -> getSlowData(slowId);
         }
         return null;
     }
@@ -704,9 +702,11 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             return findPsiFile();
         } else if (CommonDataKeys.PSI_ELEMENT.is(dataId)) {
             return findPsiFile();
-        } else if (PlatformCoreDataKeys.PSI_ELEMENT_ARRAY.is(dataId)) {
+        } else if (LangDataKeys.PSI_ELEMENT_ARRAY.is(dataId)) {
             PsiElement psi = findPsiFile();
             return psi != null ? new PsiElement[]{psi} : PsiElement.EMPTY_ARRAY;
+        } else if (ImageComponentDecorator.DATA_KEY.is(dataId)) {
+            return editor != null ? editor : this;
         }
 
         return null;
@@ -725,10 +725,10 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
         CopyPasteManager.getInstance().setContents(new ImageTransferable(image));
     }
 
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
-    }
+//    @Override
+//    public @NotNull ActionUpdateThread getActionUpdateThread() {
+//        return ActionUpdateThread.BGT;
+//    }
 
     @Override
     public boolean isCopyEnabled(@NotNull DataContext dataContext) {
