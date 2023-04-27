@@ -1,12 +1,5 @@
-<!-- Keep a Changelog guide -> https://keepachangelog.com -->
+# Changelog
 
 ## [Unreleased]
 
-## [6.0.0]
-
-### Added
-
-### Changed
-
-- Gradle Build
-
+- PlantUML library upgrade to v1.2023.6
