@@ -54,6 +54,7 @@ intellij {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.empty()
+    repositoryUrl.set("https://github.com/esteinberg/plantuml4idea")
 }
 
 
@@ -61,6 +62,10 @@ tasks {
     wrapper {
         gradleVersion = properties("gradleVersion").get()
     }
+
+//    buildSearchableOptions {
+//        enabled = false
+//    }
 
     patchPluginXml {
         version = properties("pluginVersion")
@@ -87,8 +92,7 @@ tasks {
                 renderItem(
                         (getOrNull(pluginVersion) ?: getUnreleased())
                                 .withHeader(false)
-                                .withEmptySections(false)
-                                .withLinks(false),
+                                .withEmptySections(false),
                         Changelog.OutputType.HTML,
                 )
             }
