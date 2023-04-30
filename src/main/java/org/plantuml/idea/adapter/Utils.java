@@ -116,7 +116,7 @@ public class Utils {
                     for (Document unsavedDocument : unsavedDocuments) {
                         VirtualFile file = documentManager.getFile(unsavedDocument);
                         if (file != null && org.plantuml.idea.util.Utils.isPlantUmlOrIUmlFileType(project, file)) {
-                            LOG.debug("saveAllDocuments - ", file);
+                            LOG.debug("saveDocument - ", file);
                             documentManager.saveDocument(unsavedDocument);
                         }
                     }
