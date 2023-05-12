@@ -225,7 +225,9 @@ public enum LanguageDescriptor {
 			"dotted",
 			"dashed",
 			"bold",
-			"map"
+			"map",
+			"function",
+			"procedure"
 	));
 
 	public final List<String> pluginSettingsPattern = Collections.unmodifiableList(Arrays.asList(

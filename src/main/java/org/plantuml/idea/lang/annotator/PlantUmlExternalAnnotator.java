@@ -35,7 +35,8 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 	private static final Logger logger = Logger.getInstance(PlantUmlExternalAnnotator.class);
 	public static final Pattern VARIABLES = Pattern.compile("!?\\$\\w+");
 	public static final Pattern ALL_PROCS = Pattern.compile("!\\w+");
-	public static final Pattern CUSTOM_PROCEDURE = Pattern.compile("!procedure (\\w+)");
+	public static final Pattern CUSTOM_PROCEDURE = Pattern.compile("procedure (\\w+)");
+	public static final Pattern CUSTOM_FUNCTION = Pattern.compile("function (\\w+)");
 	private PlantUmlSettings plantUmlSettings;
 
 	public PlantUmlExternalAnnotator() {
@@ -110,6 +111,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 		Matcher tags = LanguagePatternHolder.INSTANCE.tagsPattern.matcher("");
 		Matcher commentMatcher = LanguagePatternHolder.INSTANCE.lineCommentPattern.matcher("");
 		Matcher procedures = CUSTOM_PROCEDURE.matcher("");
+		Matcher customFunctions = CUSTOM_FUNCTION.matcher("");
 		Set<String> proceduresSet = new HashSet<>();
 
 
@@ -124,6 +126,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 				if (plantUmlSettings.isKeywordHighlighting()) {
 					highlightKeywords(result, keywords, types, keywords2, offset, line);
 					highlightCustomProcedureDefinitions(result, offset, line, procedures, proceduresSet);
+					highlightCustomProcedureDefinitions(result, offset, line, customFunctions, proceduresSet);
 				}
 				annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, pluginSettings);
 //                annotate(result, line, offset, null, DefaultLanguageHighlighterColors.KEYWORD, preproc); //not needed
