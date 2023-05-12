@@ -2,8 +2,9 @@
 
 ## [Unreleased]
 
-## [6.0.0-IJ2022.2] - 2023-04-27
+- highlighting of functions and variables  [#389](../../issues/389)
 
+## [6.0.0-IJ2022.2] - 2023-04-27
 - PlantUML library upgrade to v1.2023.6
 
 [Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v6.0.0-IJ2022.2...HEAD

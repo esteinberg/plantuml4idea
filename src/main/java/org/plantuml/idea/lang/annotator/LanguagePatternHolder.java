@@ -17,8 +17,6 @@ import static org.plantuml.idea.lang.annotator.LanguageDescriptor.TAGS;
 public enum LanguagePatternHolder {
     INSTANCE;
 
-    private final Joiner PipeJoiner = Joiner.on("|");
-
     public Pattern sourcePattern = Pattern.compile("(?:(@start(?:" + TAGS + ")(?s).*?(?:@end(?:" + TAGS + ")|$))(?s).*?)+");
     public Pattern sourcePatternMarkdown = Pattern.compile("(?:```plantuml(?s)(.*?```)(?s).*?)+");
 
@@ -27,19 +25,20 @@ public enum LanguagePatternHolder {
     public final Pattern keywords2Pattern = createPattern(LanguageDescriptor.INSTANCE.keywords2, "");
     public final Pattern typesPattern = createPattern(LanguageDescriptor.INSTANCE.types, "");
     public final Pattern preprocPattern = createPattern2(LanguageDescriptor.INSTANCE.preproc, "");
+    public final Pattern functionsPattern = createPattern2(LanguageDescriptor.INSTANCE.functions, "");
     public final Pattern tagsPattern = Pattern.compile("@(start|end)(" + addWordStop(TAGS) + ")");
     public final Pattern lineCommentPattern = Pattern.compile("^\\s*('.*)");
     public final Pattern startBlockComment = Pattern.compile("/'");
     public final Pattern endBlockComment = Pattern.compile("'/");
 
-    private Pattern createPattern(Collection<String> tokens, final String patternPrefix) {
+    public static Pattern createPattern(Collection<String> tokens, final String patternPrefix) {
         Collection<String> tokensAsWords = Collections2.transform(tokens, s -> "\\b" + s + "\\b");
-        return Pattern.compile("(" + patternPrefix + PipeJoiner.join(tokensAsWords) + ")");
+        return Pattern.compile("(" + patternPrefix + Joiner.on("|").join(tokensAsWords) + ")");
     }
 
-    public Pattern createPattern2(Collection<String> tokens, final String patternPrefix) {
+    public static Pattern createPattern2(Collection<String> tokens, final String patternPrefix) {
         Collection<String> tokensAsWords = Collections2.transform(tokens, s -> s + "\\b");
-        return Pattern.compile("(" + patternPrefix + PipeJoiner.join(tokensAsWords) + ")");
+        return Pattern.compile("(" + patternPrefix + Joiner.on("|").join(tokensAsWords) + ")");
     }
 
 
