@@ -16,7 +16,7 @@ public enum LanguageDescriptor {
 	public static final String IDEA_PARTIAL_RENDER = "idea.partialRender";
 	public static final String IDEA_DISABLE_SYNTAX_CHECK = "idea.disableSyntaxCheck";
 
-	public static final String TAGS = "uml|json|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs|yaml|ebnf";
+	public static final String TAGS = "uml|json|dot|jcckit|ditaa|salt|math|latex|mindmap|gantt|wbs|yaml|ebnf|def";
 
 	public final List<String> types = Collections.unmodifiableList(Arrays.asList(
 			"actor",
@@ -77,7 +77,9 @@ public enum LanguageDescriptor {
 			"@endgantt",
 			"@endyaml",
 			"@endwbs",
-			"@endebnf"
+			"@endebnf",
+			"@startdef",
+			"@enddef"
 	));
 
 	public final List<String> keywords2 = Collections.unmodifiableList(Arrays.asList(

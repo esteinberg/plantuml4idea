@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- support for @startdef
 - bugfix
 
 ## 6.1.0-IJ2022.2 - 2023-05-15
