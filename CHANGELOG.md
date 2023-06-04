@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- IntelliJ 2023.2 compatibility
 - support for @startdef
 - bugfix
 

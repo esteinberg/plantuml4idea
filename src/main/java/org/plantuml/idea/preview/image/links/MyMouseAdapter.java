@@ -50,7 +50,7 @@ public class MyMouseAdapter extends MouseAdapter {
             }
             navigator.findNextSourceAndNavigate(text);
         } catch (Exception ex) {
-            LOG.warn(ex);
+            LOG.error(ex);
         }
         LOG.debug("mousePressed ", (System.currentTimeMillis() - start), "ms");
     }

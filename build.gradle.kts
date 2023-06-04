@@ -17,6 +17,9 @@ version = properties("pluginVersion").get()
 // Configure project's dependencies
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://cache-redirector.jetbrains.com/intellij-dependencies")
+    }
 }
 
 java.sourceSets["main"].java {
@@ -25,14 +28,20 @@ java.sourceSets["main"].java {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+    // https://mvnrepository.com/artifact/org.jetbrains.intellij.deps.batik/batik-transcoder
+    implementation("org.jetbrains.intellij.deps.batik:batik-transcoder:1.14.0-24")
+
+    // https://mvnrepository.com/artifact/xerces/xercesImpl
+    implementation("xerces:xercesImpl:2.12.2")
+
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(
-            fileTree(
-                    "lib/plantuml/",
-            )
+        fileTree(
+            "lib/plantuml/",
+        )
     )
 }
 
@@ -63,9 +72,9 @@ tasks {
         gradleVersion = properties("gradleVersion").get()
     }
 
-//    buildSearchableOptions {
-//        enabled = false
-//    }
+    buildSearchableOptions {
+        enabled = false
+    }
 
     patchPluginXml {
         version = properties("pluginVersion")
@@ -90,10 +99,10 @@ tasks {
         changeNotes = properties("pluginVersion").map { pluginVersion ->
             with(changelog) {
                 renderItem(
-                        (getOrNull(pluginVersion) ?: getUnreleased())
-                                .withHeader(false)
-                                .withEmptySections(false),
-                        Changelog.OutputType.HTML,
+                    (getOrNull(pluginVersion) ?: getUnreleased())
+                        .withHeader(false)
+                        .withEmptySections(false),
+                    Changelog.OutputType.HTML,
                 )
             }
         }

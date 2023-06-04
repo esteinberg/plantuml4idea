@@ -14,7 +14,7 @@ import java.io.File;
 public class ReverseArrowIntentionTest extends LightIntentionActionTestCase {
 
     public void test() throws Exception {
-        doAllTests();
+        doAllTests(createWrapper());
     }
 
     @NotNull
