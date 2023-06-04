@@ -40,7 +40,6 @@ public class AboutDialog extends JDialog {
     private JEditorPane aboutEditorPane;
     private JPanel testDot;
     private Usage usage;
-    private JTextArea debugPane;
     private ImageContainer imageContainer;
 
     public AboutDialog(AnActionEvent e, Project project) {
@@ -58,9 +57,7 @@ public class AboutDialog extends JDialog {
         testDot(e);
 
         try {
-            StringBuilder debug = new StringBuilder("Debug Info:");
-            debugPane.setOpaque(false);
-            debugPane.setEditable(false);
+			StringBuilder debug = new StringBuilder("SVG parsing info:");
             TransformerFactory xformFactory = TransformerFactory.newInstance();
             debug.append("\nTransformerFactory=").append(xformFactory.getClass());
             debug.append("\nTransformerFactoryClassLoader=").append(xformFactory.getClass().getClassLoader());
@@ -69,10 +66,10 @@ public class AboutDialog extends JDialog {
             debug.append("\nTransformerClassLoader=").append(transformer.getClass().getClassLoader());
             debug.append("\nTransformerOutputProperties=").append(transformer.getOutputProperties());
             debug.append("\njavax.xml.transform.TransformerFactory=").append(System.getProperty("javax.xml.transform.TransformerFactory"));
-            debugPane.setText(debug.toString());
+			String string = debug.toString();
+			logger.info(string);
         } catch (Throwable t) {
             logger.warn(t);
-            debugPane.setText(t.toString());
         }
 
         usage.setText(Usage.TEXT);
