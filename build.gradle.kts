@@ -28,12 +28,6 @@ java.sourceSets["main"].java {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
-    // https://mvnrepository.com/artifact/org.jetbrains.intellij.deps.batik/batik-transcoder
-    implementation("org.jetbrains.intellij.deps.batik:batik-transcoder:1.14.0-24")
-
-    // https://mvnrepository.com/artifact/xerces/xercesImpl
-    implementation("xerces:xercesImpl:2.12.2")
-
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -41,6 +35,11 @@ dependencies {
     implementation(
         fileTree(
             "lib/plantuml/",
+        )
+    )
+    implementation(
+        fileTree(
+            "lib/",
         )
     )
 }

@@ -24,6 +24,8 @@ public class CompatibilityCheck {
 
         if (classLoader instanceof PluginAwareClassLoader) {
             String clName = ((PluginAwareClassLoader) classLoader).getPluginDescriptor().getName();
+
+
             plantUmlSettings.setDisplaySvg(false);
 
             SwingUtilities.invokeLater(() -> {

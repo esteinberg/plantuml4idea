@@ -36,6 +36,7 @@ public final class MyJDOMUtil {
             try {
                 //its fine
                 factory = XMLInputFactory.newFactory();
+
             } finally {
                 if (property != null) {
                     System.setProperty(XML_INPUT_FACTORY_KEY, property);
