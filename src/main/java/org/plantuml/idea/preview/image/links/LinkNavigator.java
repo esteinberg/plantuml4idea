@@ -2,10 +2,7 @@ package org.plantuml.idea.preview.image.links;
 
 import com.intellij.find.EditorSearchSession;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ScrollType;
@@ -146,8 +143,12 @@ public class LinkNavigator {
                     } else {
                         AnAction find = ActionManager.getInstance().getAction("Find");
                         if (find != null) {
+                            Presentation presentation = new Presentation();
+                            Presentation templatePresentation = find.getTemplatePresentation();
+                            presentation.copyFrom(templatePresentation);
+
                             DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-                            AnActionEvent anActionEvent = AnActionEvent.createFromDataContext("plantuml image", find.getTemplatePresentation(), dataContext);
+                            AnActionEvent anActionEvent = AnActionEvent.createFromDataContext("plantuml image", presentation, dataContext);
                             find.actionPerformed(anActionEvent);
                         }
                     }
