@@ -62,11 +62,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("org.jetbrains.intellij.deps.batik:batik-transcoder:1.16.0-33") {
-        exclude("xml-apis:xml-apis")
-        exclude("xml-apis:xml-apis-ext")
-        exclude("it.unimi.dsi:fastutil")
-        exclude("commons-io:commons-io")
-        exclude("commons-logging:commons-logging")
+        exclude(group = "it.unimi.dsi", module = "fastutil")
+//        exclude(group = "xml-apis", module = "xml-apis")
+//        exclude(group = "xml-apis", module = "xml-apis-ext")
+        exclude(group = "commons-io", module = "commons-io")
+        exclude(group = "commons-logging", module = "commons-logging")
     }
 
 //    implementation("io.sf.carte:echosvg-all:0.3")
