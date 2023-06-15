@@ -27,7 +27,8 @@ public class Classloaders {
     private static volatile boolean checked;
     private static String bundledVersion;
 
-    private static synchronized ParentLastURLClassLoader getClassloader() {
+    private static synchronized ClassLoader getClassloader() {
+
         PlantUmlSettings settings = PlantUmlSettings.getInstance();
         if (!checked) {
             try {
@@ -171,6 +172,9 @@ public class Classloaders {
      */
     @NotNull
     static PlantUmlFacade getFacade() {
+//        if (true) {
+//            return new FacadeImpl();
+//        }
         return getFacade(getClassloader());
     }
 

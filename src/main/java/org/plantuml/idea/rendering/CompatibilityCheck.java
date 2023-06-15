@@ -11,12 +11,12 @@ import javax.xml.transform.TransformerFactory;
 import static org.plantuml.idea.util.UIUtils.notification;
 
 public class CompatibilityCheck {
-    public static void checkTransformer(PlantUmlSettings plantUmlSettings) {
+    public static boolean checkTransformer(PlantUmlSettings plantUmlSettings) {
         if (!plantUmlSettings.isDisplaySvg()) {
-            return;
+            return false;
         }
         if (plantUmlSettings.isRemoteRendering()) {
-            return;
+            return false;
         }
 
         TransformerFactory factory = TransformerFactory.newInstance();
@@ -31,6 +31,8 @@ public class CompatibilityCheck {
             SwingUtilities.invokeLater(() -> {
                 Notifications.Bus.notify(notification().createNotification("Conflict detected with '" + clName + "'. Switching to PNG rendering.", NotificationType.WARNING));
             });
+            return false;
         }
+        return true;
     }
 }

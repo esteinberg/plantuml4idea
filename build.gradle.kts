@@ -13,18 +13,17 @@ plugins {
 
 group = properties("pluginGroup").get()
 
-version = "6.2.2-IJ2022.2"
+version = "6.3.0-IJ2023.2"
 
 tasks {
     patchPluginXml {
         // https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
-        sinceBuild.set("222.4167.9")
+        sinceBuild.set("232.6734.9")
         untilBuild.set("")
         changeNotes.set(
             """
-            - IntelliJ 2023.2 compatibility
-            - support for @startdef
-            - bugfix
+            - PlantUML library upgrade to v1.2023.9
+            - SVG rendering fixed
             """.trimIndent()
         )
     }
@@ -56,20 +55,43 @@ java.sourceSets["main"].java {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+// https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
+    implementation("net.sourceforge.plantuml:plantuml:1.2023.9")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    implementation(
-        fileTree(
-            "lib/plantuml/",
-        )
-    )
-    implementation(
-        fileTree(
-            "lib/",
-        )
-    )
+    implementation("org.jetbrains.intellij.deps.batik:batik-transcoder:1.16.0-33") {
+        exclude("xml-apis:xml-apis")
+        exclude("xml-apis:xml-apis-ext")
+        exclude("it.unimi.dsi:fastutil")
+        exclude("commons-io:commons-io")
+        exclude("commons-logging:commons-logging")
+    }
+
+//    implementation("io.sf.carte:echosvg-all:0.3")
+
+//    2.7.3 breaks org.plantuml.idea.rendering.ImageItem.parseLinks
+    implementation("xalan:xalan:2.7.0")
+
+
+// https://mvnrepository.com/artifact/xerces/xercesImpl
+    implementation("xerces:xercesImpl:2.12.2")
+// https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
+    implementation("net.sf.saxon:Saxon-HE:12.2")
+
+}
+
+repositories {
+    maven {
+        url = uri("https://css4j.github.io/maven/")
+        content {
+            // this repository *only* contains artifacts with group "my.company"
+            includeGroup("com.github.css4j")
+            includeGroup("io.sf.carte")
+            includeGroup("io.sf.jclf")
+        }
+    }
 }
 
 //// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
@@ -111,7 +133,7 @@ tasks {
     }
 
     publishPlugin {
-        dependsOn("patchChangelog")
+//        dependsOn("patchChangelog")
         token = environment("PUBLISH_TOKEN")
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:

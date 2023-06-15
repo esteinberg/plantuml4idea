@@ -99,7 +99,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
 
                 val image = render((transcoder.width + 0.5f).toInt(), (transcoder.height + 0.5f).toInt(), transform, gvtRoot)
 
-                val style = document?.rootElement?.attributes?.getNamedItem("style")?.textContent
+                val style = document.rootElement?.attributes?.getNamedItem("style")?.textContent
                 image.setStyle(style)
 
                 outDimensions?.setSize(docWidth.toDouble(), docHeight.toDouble())

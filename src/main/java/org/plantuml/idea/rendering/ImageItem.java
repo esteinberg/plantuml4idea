@@ -297,7 +297,7 @@ public class ImageItem {
             LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
         } catch (Throwable e) {
-            logger.warn(e);
+            logger.error(e);
             return Collections.emptyList();
         }
     }
