@@ -13,18 +13,16 @@ plugins {
 
 group = properties("pluginGroup").get()
 
-version = "6.2.2-IJ2022.2"
+version = "6.3.0-IJ2022.2"
 
 tasks {
     patchPluginXml {
         // https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html
         sinceBuild.set("222.4167.9")
-        untilBuild.set("")
+        untilBuild.set("232.6734.9")
         changeNotes.set(
             """
-            - IntelliJ 2023.2 compatibility
-            - support for @startdef
-            - bugfix
+             - PlantUML library upgrade to v1.2023.9
             """.trimIndent()
         )
     }
@@ -34,7 +32,7 @@ tasks {
 intellij {
     pluginName = properties("pluginName")
     //https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#configuration-intellij-extension
-    version = "LATEST-EAP-SNAPSHOT"
+    version = "2022.3.3"
     type = "IC"
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
@@ -53,15 +51,11 @@ java.sourceSets["main"].java {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
+// https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
+    implementation("net.sourceforge.plantuml:plantuml:1.2023.9")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-
-    implementation(
-            fileTree(
-                    "lib/plantuml/",
-            )
-    )
 }
 
 //// Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
@@ -82,9 +76,9 @@ tasks {
         gradleVersion = properties("gradleVersion").get()
     }
 
-//    buildSearchableOptions {
-//        enabled = false
-//    }
+    buildSearchableOptions {
+        enabled = false
+    }
 
 
     // Configure UI tests plugin
@@ -103,7 +97,7 @@ tasks {
     }
 
     publishPlugin {
-        dependsOn("patchChangelog")
+//        dependsOn("patchChangelog")
         token = environment("PUBLISH_TOKEN")
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
