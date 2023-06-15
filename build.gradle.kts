@@ -22,8 +22,8 @@ tasks {
         untilBuild.set("")
         changeNotes.set(
             """
-            - PlantUML library upgrade to v1.2023.9
-            - SVG rendering fixed
+            - PlantUML library upgrade to v1.2023.9<br>
+            - SVG rendering fixed<br>
             """.trimIndent()
         )
     }
