@@ -218,6 +218,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 return;
             }
             byte[] buf = null;
+            double scaledZoom = 0;
             try {
                 renderingInProgress = true;
                 long start = System.currentTimeMillis();
@@ -237,7 +238,6 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 ScaleContext scaleContext = ScaleContext.create(previewPanel);
 
                 double scale = scaleContext.getScale(ScaleType.SYS_SCALE);
-                double scaledZoom;
                 if (PlantUmlSettings.getInstance().isSvgPreviewScaling()) {
                     scaledZoom = zoom * scale;
                 } else {
@@ -254,7 +254,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 if (buf != null) {
                     source = new String(buf, StandardCharsets.UTF_8);
                 }
-                LOG.error(e.getMessage() + " - imageSource: " + source, e);
+                LOG.error(e.getMessage() + " - scaledZoom=" + scaledZoom + " imageSource: " + source, e);
                 this.holder = new Holder(null, null, -1.0, source, e);
             } finally {
                 renderingInProgress = false;
