@@ -1,33 +1,37 @@
 // Copyright 2000-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package org.plantuml.idea.preview.image.svg.batik
 
-import org.apache.batik.anim.dom.SVG12DOMImplementation
-import org.apache.batik.anim.dom.SVGDOMImplementation
-import org.apache.batik.anim.dom.SVGOMDocument
-import org.apache.batik.dom.GenericCDATASection
-import org.apache.batik.dom.GenericText
-import org.apache.batik.transcoder.TranscoderException
-import org.apache.batik.util.ParsedURL
+import com.intellij.util.xml.dom.createXmlStreamReader
+import io.sf.carte.echosvg.anim.dom.SVG12DOMImplementation
+import io.sf.carte.echosvg.anim.dom.SVGDOMImplementation
+import io.sf.carte.echosvg.anim.dom.SVGOMDocument
+import io.sf.carte.echosvg.dom.GenericCDATASection
+import io.sf.carte.echosvg.dom.GenericText
+import io.sf.carte.echosvg.transcoder.TranscoderException
+import io.sf.carte.echosvg.util.ParsedURL
+import org.codehaus.stax2.XMLStreamReader2
 import org.jetbrains.annotations.ApiStatus
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
-import java.io.Reader
+import java.io.InputStream
 import javax.xml.stream.XMLStreamConstants
 import javax.xml.stream.XMLStreamException
 import javax.xml.stream.XMLStreamReader
 
 @ApiStatus.Internal
-fun createSvgDocument(uri: String?, reader: Reader): Document {
-    val result = reader.use {
-        val xmlStreamReader = MyJDOMUtil.getXmlInputFactory().createXMLStreamReader(reader)
-        try {
-            buildDocument(xmlStreamReader)
-        } catch (e: XMLStreamException) {
-            throw TranscoderException(e)
-        } finally {
-            xmlStreamReader.close()
-        }
+fun createSvgDocument(uri: String?, reader: InputStream) = createSvgDocument(uri, createXmlStreamReader(reader))
+
+@ApiStatus.Internal
+fun createSvgDocument(uri: String?, data: ByteArray) = createSvgDocument(uri, createXmlStreamReader(data))
+
+private fun createSvgDocument(uri: String?, xmlStreamReader: XMLStreamReader2): Document {
+    val result = try {
+        buildDocument(xmlStreamReader)
+    } catch (e: XMLStreamException) {
+        throw TranscoderException(e)
+    } finally {
+        xmlStreamReader.close()
     }
 
     if (uri != null) {
@@ -36,7 +40,6 @@ fun createSvgDocument(uri: String?, reader: Reader): Document {
     }
     return result
 }
-
 private fun buildDocument(reader: XMLStreamReader): SVGOMDocument {
     var state = reader.eventType
     if (XMLStreamConstants.START_DOCUMENT != state) {

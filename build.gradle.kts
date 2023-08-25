@@ -31,29 +31,19 @@ java.sourceSets["main"].java {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
-    implementation("net.sourceforge.plantuml:plantuml:1.2023.9")
+    implementation("net.sourceforge.plantuml:plantuml:1.2023.10")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    implementation("org.jetbrains.intellij.deps.batik:batik-transcoder:1.16.0-32") {
-        exclude(group = "it.unimi.dsi", module = "fastutil")
-//        exclude(group = "xml-apis", module = "xml-apis")
+    implementation("io.sf.carte:echosvg-all:0.3.3") {
+//        exclude(group = "it.unimi.dsi", module = "fastutil")
+        exclude(group = "xml-apis", module = "xml-apis")
 //        exclude(group = "xml-apis", module = "xml-apis-ext")
         exclude(group = "commons-io", module = "commons-io")
         exclude(group = "commons-logging", module = "commons-logging")
     }
 
-//    implementation("io.sf.carte:echosvg-all:0.3")
-
-//    2.7.3 breaks org.plantuml.idea.rendering.ImageItem.parseLinks
-    implementation("xalan:xalan:2.7.0")
-
-
-// https://mvnrepository.com/artifact/xerces/xercesImpl
-    implementation("xerces:xercesImpl:2.12.2")
-// https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
-    implementation("net.sf.saxon:Saxon-HE:12.2")
 
 }
 
@@ -157,7 +147,7 @@ tasks {
     }
 
     publishPlugin {
-//        dependsOn("patchChangelog")
+        dependsOn("patchChangelog")
         token = environment("PUBLISH_TOKEN")
         // The pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:

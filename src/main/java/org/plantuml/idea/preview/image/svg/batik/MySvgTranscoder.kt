@@ -5,17 +5,22 @@ package org.plantuml.idea.preview.image.svg.batik
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.ImageLoader
-import org.apache.batik.anim.dom.SVGOMDocument
-import org.apache.batik.bridge.*
-import org.apache.batik.bridge.svg12.SVG12BridgeContext
-import org.apache.batik.ext.awt.RenderingHintsKeyExt
-import org.apache.batik.gvt.CanvasGraphicsNode
-import org.apache.batik.gvt.CompositeGraphicsNode
-import org.apache.batik.gvt.GraphicsNode
-import org.apache.batik.transcoder.TranscoderException
-import org.apache.batik.util.ParsedURL
-import org.apache.batik.util.SVGConstants
-import org.apache.batik.util.SVGFeatureStrings
+import io.sf.carte.echosvg.anim.dom.SVGOMDocument
+import io.sf.carte.echosvg.bridge.*
+import io.sf.carte.echosvg.bridge.svg12.SVG12BridgeContext
+import io.sf.carte.echosvg.ext.awt.RenderingHintsKeyExt
+import io.sf.carte.echosvg.ext.awt.image.codec.imageio.ImageIOJPEGRegistryEntry
+import io.sf.carte.echosvg.ext.awt.image.codec.imageio.ImageIOPNGRegistryEntry
+import io.sf.carte.echosvg.ext.awt.image.codec.imageio.ImageIOTIFFRegistryEntry
+import io.sf.carte.echosvg.ext.awt.image.codec.png.PNGRegistryEntry
+import io.sf.carte.echosvg.ext.awt.image.spi.ImageTagRegistry
+import io.sf.carte.echosvg.gvt.CanvasGraphicsNode
+import io.sf.carte.echosvg.gvt.CompositeGraphicsNode
+import io.sf.carte.echosvg.gvt.GraphicsNode
+import io.sf.carte.echosvg.transcoder.TranscoderException
+import io.sf.carte.echosvg.util.ParsedURL
+import io.sf.carte.echosvg.util.SVGConstants
+import io.sf.carte.echosvg.util.SVGFeatureStrings
 import org.jetbrains.annotations.ApiStatus
 import org.plantuml.idea.settings.PlantUmlSettings
 import org.w3c.dom.Document
@@ -25,10 +30,10 @@ import org.w3c.dom.svg.SVGDocument
 import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
-import java.io.StringReader
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
+
 
 private fun logger() = Logger.getInstance(MySvgTranscoder::class.java)
 
@@ -39,6 +44,12 @@ private val supportedFeatures = HashSet<String>()
 class MySvgTranscoder private constructor(private var width: Float, private var height: Float) : UserAgent {
     companion object {
         init {
+            val registry = ImageTagRegistry.getRegistry()
+            registry.register(PNGRegistryEntry())
+            registry.register(ImageIOTIFFRegistryEntry())
+            registry.register(ImageIOJPEGRegistryEntry())
+            registry.register(ImageIOPNGRegistryEntry())
+
             SVGFeatureStrings.addSupportedFeatureStrings(supportedFeatures)
         }
 
@@ -151,7 +162,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
                 "  <line x1=\"1\" y1=\"1\" x2=\"15\" y2=\"15\" stroke=\"red\" stroke-width=\"2\"/>\n" +
                 "  <line x1=\"1\" y1=\"15\" x2=\"15\" y2=\"1\" stroke=\"red\" stroke-width=\"2\"/>\n" +
                 "</svg>\n"
-        return createSvgDocument(null, StringReader(fallbackIcon)) as SVGDocument
+        return createSvgDocument(null, fallbackIcon.toByteArray()) as SVGDocument
     }
 
     override fun getTransform() = currentTransform!!
@@ -188,7 +199,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
 
     override fun getPixelUnitToMillimeter(): Float = 0.26458333333333333333333333333333f // 96dpi
 
-    override fun getPixelToMM() = pixelUnitToMillimeter
+//    override fun getPixelToMM() = pixelUnitToMillimeter
 
     override fun getDefaultFontFamily() = "Arial, Helvetica, sans-serif"
 
@@ -205,7 +216,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
 
     override fun getUserStyleSheetURI() = null
 
-    override fun getXMLParserClassName() = null
+//    override fun getXMLParserClassName() = null
 
     override fun isXMLParserValidating() = false
 

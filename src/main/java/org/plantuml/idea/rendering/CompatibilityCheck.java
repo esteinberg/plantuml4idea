@@ -11,28 +11,31 @@ import javax.xml.transform.TransformerFactory;
 import static org.plantuml.idea.util.UIUtils.notification;
 
 public class CompatibilityCheck {
-    public static boolean checkTransformer(PlantUmlSettings plantUmlSettings) {
-        if (!plantUmlSettings.isDisplaySvg()) {
-            return false;
-        }
-        if (plantUmlSettings.isRemoteRendering()) {
-            return false;
-        }
+	public static boolean checkTransformer(PlantUmlSettings plantUmlSettings) {
+		if (!plantUmlSettings.isDisplaySvg()) {
+			return false;
+		}
+		if (plantUmlSettings.isRemoteRendering()) {
+			return false;
+		}
+//		if (true) {
+//			return true;
+//		}
 
-        TransformerFactory factory = TransformerFactory.newInstance();
-        ClassLoader classLoader = factory.getClass().getClassLoader();
+		TransformerFactory factory = TransformerFactory.newInstance();
+		ClassLoader classLoader = factory.getClass().getClassLoader();
 
-        if (classLoader instanceof PluginAwareClassLoader) {
-            String clName = ((PluginAwareClassLoader) classLoader).getPluginDescriptor().getName();
+		if (classLoader instanceof PluginAwareClassLoader) {
+			String clName = ((PluginAwareClassLoader) classLoader).getPluginDescriptor().getName();
 
 
-            plantUmlSettings.setDisplaySvg(false);
+			plantUmlSettings.setDisplaySvg(false);
 
-            SwingUtilities.invokeLater(() -> {
-                Notifications.Bus.notify(notification().createNotification("Conflict detected with '" + clName + "'. Switching to PNG rendering.", NotificationType.WARNING));
-            });
-            return false;
-        }
-        return true;
-    }
+			SwingUtilities.invokeLater(() -> {
+				Notifications.Bus.notify(notification().createNotification("Conflict detected with '" + clName + "'. Switching to PNG rendering.", NotificationType.WARNING));
+			});
+			return false;
+		}
+		return true;
+	}
 }

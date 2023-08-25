@@ -39,8 +39,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -227,9 +225,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
                     throw new RuntimeException("Empty file");
                 }
 
-                ByteArrayInputStream in = new ByteArrayInputStream(buf);
-                InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8);
-                Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, reader);
+                Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, buf);
                 logDocument(svgDocument);
 
                 //it shows what is in png document - unZOOMED values, not limited by px limit
