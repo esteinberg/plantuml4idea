@@ -11,7 +11,10 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
+import org.apache.commons.lang.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +23,11 @@ import org.plantuml.idea.external.Classloaders;
 import org.plantuml.idea.plantuml.ImageFormat;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -33,6 +38,14 @@ import java.util.Objects;
 public class PlantUmlSettingsPage implements Configurable {
     private static final Logger LOG = Logger.getInstance(PlantUmlSettingsPage.class);
     public static final Icon COINS = IconLoader.getIcon("/images/coins_in_hand.png", PlantUmlSettingsPage.class);
+
+    public static final ColoredSideBorder ERROR_BORDER = new ColoredSideBorder(
+            JBColor.RED, JBColor.RED, JBColor.RED, JBColor.RED, 1);
+
+    public static final ColoredSideBorder VALID_BORDER = new ColoredSideBorder(
+            JBColor.GREEN, JBColor.GREEN, JBColor.GREEN, JBColor.GREEN, 1);
+
+    private final Border defaultBorder;
 
     private JPanel panel;
     private JTextField textFieldDotExecutable;
@@ -121,6 +134,7 @@ public class PlantUmlSettingsPage implements Configurable {
         }
 
         addListeners();
+        defaultBorder = textFieldDotExecutable.getBorder();
     }
 
     private void addListeners() {
@@ -157,6 +171,8 @@ public class PlantUmlSettingsPage implements Configurable {
         DialogUtils.enabledByAny(new JComponent[]{useProxy}, remoteRendering);
         DialogUtils.enabledByAny(new JComponent[]{svgPreviewScaling, svgPreviewLimitLabel, maxSvgSize}, displaySvg);
         DialogUtils.enabledByAny(new JComponent[]{highlightInImages, linkOpensSearchBar, showUrlLinksBorder}, displaySvg, renderLinksPng);
+        validatePath(customPlantumlJar);
+        validatePath(textFieldDotExecutable);
     }
 
     private void browseForjarOrFolder(@NotNull final JTextField target) {
@@ -358,4 +374,21 @@ public class PlantUmlSettingsPage implements Configurable {
         if (remoteRenderingSinglePage.isSelected() != data.isRemoteRenderingSinglePage()) return true;
         return false;
     }
+
+
+    private void validatePath(JTextField field) {
+        String text = field.getText();
+        if (StringUtils.isEmpty(text)) {
+            field.setBorder(defaultBorder);
+            field.setToolTipText(null);
+        } else if (new File(text).exists()) {
+            field.setBorder(VALID_BORDER);
+            field.setToolTipText("Valid path");
+        } else {
+            field.setBorder(ERROR_BORDER);
+            field.setToolTipText("Invalid path");
+        }
+    }
+
 }
+
