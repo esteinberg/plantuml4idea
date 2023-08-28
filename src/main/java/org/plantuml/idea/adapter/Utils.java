@@ -77,15 +77,12 @@ public class Utils {
     public static void applyPlantumlOptions(PlantUmlSettings plantUmlSettings) {
         boolean blank = StringUtils.isBlank(System.getProperty("GRAPHVIZ_DOT"));
         boolean blank1 = StringUtils.isBlank(System.getenv("GRAPHVIZ_DOT"));
-        boolean propertyNotSet = blank && blank1;
         boolean propertySet = !blank || !blank1;
 
-        if (propertyNotSet || (propertySet && !plantUmlSettings.isUsePreferentiallyGRAPHIZ_DOT())) {
-            if (StringUtils.isBlank(plantUmlSettings.getDotExecutable())) {
-                GraphvizUtils.setDotExecutable(null);
-            } else {
-                GraphvizUtils.setDotExecutable(plantUmlSettings.getDotExecutable());
-            }
+        if (StringUtils.isBlank(plantUmlSettings.getDotExecutable()) || (propertySet && plantUmlSettings.isUsePreferentiallyGRAPHIZ_DOT())) {
+            GraphvizUtils.setDotExecutable(null);
+        } else {
+            GraphvizUtils.setDotExecutable(plantUmlSettings.getDotExecutable());
         }
 
         if (StringUtils.isNotBlank(plantUmlSettings.getPLANTUML_LIMIT_SIZE())) {
