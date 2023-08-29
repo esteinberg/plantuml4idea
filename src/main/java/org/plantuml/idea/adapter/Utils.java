@@ -75,9 +75,9 @@ public class Utils {
     }
 
     public static void applyPlantumlOptions(PlantUmlSettings plantUmlSettings) {
-        boolean blank = StringUtils.isBlank(System.getProperty("GRAPHVIZ_DOT"));
-        boolean blank1 = StringUtils.isBlank(System.getenv("GRAPHVIZ_DOT"));
-        boolean propertySet = !blank || !blank1;
+        boolean isNotBlank = StringUtils.isNotBlank(System.getProperty("GRAPHVIZ_DOT"));
+        boolean isNotBlank1 = StringUtils.isNotBlank(System.getenv("GRAPHVIZ_DOT"));
+        boolean propertySet = isNotBlank || isNotBlank1;
 
         if (StringUtils.isBlank(plantUmlSettings.getDotExecutable()) || (propertySet && plantUmlSettings.isUsePreferentiallyGRAPHIZ_DOT())) {
             GraphvizUtils.setDotExecutable(null);
