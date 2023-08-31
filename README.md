@@ -37,7 +37,7 @@ Contributors:
 
 # Tips
 
-* PlantUML code must be inside @startuml and @enduml tags to be rendered.
+* PlantUML code must be inside `@startuml` and `@enduml` tags to be rendered.
 * To be able to generate many diagram types, you must have [Graphviz](https://www.graphviz.org/download/)
   installed on your machine (not needed for Windows, it is bundled in the PlantUML jar). 
 
