@@ -2,7 +2,6 @@ package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.vfs.ex.VirtualFileManagerEx;
 import com.intellij.util.io.URLUtil;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
@@ -26,7 +25,7 @@ public class PlantUmlExporter {
         int requestedPageNumber = renderRequest.getPage();
         DiagramFactory diagramFactory = DiagramFactory.create(renderRequest, renderRequest.getSource());
 
-        VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
+        VirtualFileManager vfm = VirtualFileManager.getInstance();
         if (requestedPageNumber >= 0) {
             try (FileOutputStream outputStream = new FileOutputStream(path)) {
                 diagramFactory.outputImage(outputStream, requestedPageNumber, new FileFormatOption(pFormat, settings.isGenerateMetadata()));
@@ -67,7 +66,7 @@ public class PlantUmlExporter {
             try (FileOutputStream outputStream = new FileOutputStream(path)) {
                 IOUtils.write(imageBytes, outputStream);
             }
-            VirtualFileManager vfm = VirtualFileManagerEx.getInstance();
+            VirtualFileManager vfm = VirtualFileManager.getInstance();
             vfm.refreshAndFindFileByUrl(VirtualFileManager.constructUrl(URLUtil.FILE_PROTOCOL, path));
         } catch (IOException e) {
             throw new RuntimeException(e);
