@@ -187,7 +187,7 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
                                                @NotNull final Project project,
                                                @NotNull final VirtualFile file) {
         if (provider instanceof AsyncFileEditorProvider asyncFileEditorProvider) {
-            return CoroutinesKt.runBlockingCancellable((coroutineScope, continuation) -> {
+            return CoroutinesKt.runBlockingMaybeCancellable((coroutineScope, continuation) -> {
                 return asyncFileEditorProvider.createEditorBuilder(project, file, continuation);
             });
         } else {
