@@ -31,7 +31,6 @@ import java.awt.*
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.lang.ref.WeakReference
-import kotlin.math.max
 import kotlin.math.min
 
 
@@ -51,31 +50,6 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
             registry.register(ImageIOPNGRegistryEntry())
 
             SVGFeatureStrings.addSupportedFeatureStrings(supportedFeatures)
-        }
-
-        @JvmStatic
-        val iconMaxSize: Float by lazy {
-            var maxSize = Integer.MAX_VALUE.toFloat()
-            if (!GraphicsEnvironment.isHeadless()) {
-                val device = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice
-                val bounds = device.defaultConfiguration.bounds
-                val tx = device.defaultConfiguration.defaultTransform
-                maxSize = max(bounds.width * tx.scaleX, bounds.height * tx.scaleY).toInt().toFloat()
-            }
-            maxSize
-        }
-
-        @JvmStatic
-        fun getDocumentSize(scale: Float, document: Document): ImageLoader.Dimension2DDouble {
-            val transcoder = MySvgTranscoder(16f, 16f)
-            val bridgeContext = if ((document as SVGOMDocument).isSVG12) {
-                SVG12BridgeContext(transcoder)
-            } else {
-                BridgeContext(transcoder)
-            }
-            GVTBuilder().build(bridgeContext, document)
-            val size = bridgeContext.documentSize
-            return ImageLoader.Dimension2DDouble(size.width * scale, size.height * scale)
         }
 
         @Throws(TranscoderException::class)
