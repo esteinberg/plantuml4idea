@@ -31,7 +31,7 @@ java.sourceSets["main"].java {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
-    implementation("net.sourceforge.plantuml:plantuml:1.2023.10")
+    implementation("net.sourceforge.plantuml:plantuml:1.2023.11")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
