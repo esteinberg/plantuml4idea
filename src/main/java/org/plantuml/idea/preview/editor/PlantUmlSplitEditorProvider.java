@@ -11,9 +11,11 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import kotlin.coroutines.Continuation;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantUmlLanguage;
 
 public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, DumbAware {
@@ -63,6 +65,7 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
             }
         });
     }
+
     protected FileEditor createSplitEditor(@NotNull final FileEditor firstEditor, @NotNull FileEditor secondEditor) {
         if (!(firstEditor instanceof TextEditor editor) || !(secondEditor instanceof PlantUmlPreviewEditor umlPreviewEditor)) {
             throw new IllegalArgumentException("Main editor should be TextEditor");
@@ -94,11 +97,26 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
         return myEditorTypeId;
     }
 
+
     @NotNull
-    @Override
+//    @Override
     public Builder createEditorAsync(@NotNull final Project project, @NotNull final VirtualFile file) {
         final Builder firstBuilder = createEditorBuilder(myFirstProvider, project, file);
         final Builder secondBuilder = createEditorBuilder(mySecondProvider, project, file);
+
+        return new Builder() {
+            @Override
+            public FileEditor build() {
+                return createSplitEditor(firstBuilder.build(), secondBuilder.build());
+            }
+        };
+    }
+
+    @Nullable
+//    @Override
+    public Object createEditorBuilder(@NotNull Project project, @NotNull VirtualFile file, @NotNull Continuation<? super Builder> $completion) {
+        final Builder firstBuilder = createEditorBuilderAsync(myFirstProvider, project, file);
+        final Builder secondBuilder = createEditorBuilderAsync(mySecondProvider, project, file);
 
         return new Builder() {
             @Override
@@ -172,6 +190,22 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
             return CoroutinesKt.runBlockingCancellable((coroutineScope, continuation) -> {
                 return asyncFileEditorProvider.createEditorBuilder(project, file, continuation);
             });
+        } else {
+            return new Builder() {
+                @Override
+                public FileEditor build() {
+                    return provider.createEditor(project, file);
+                }
+            };
+        }
+    }
+
+    @NotNull
+    private static Builder createEditorBuilderAsync(@NotNull final FileEditorProvider provider,
+                                                    @NotNull final Project project,
+                                                    @NotNull final VirtualFile file) {
+        if (provider instanceof AsyncFileEditorProvider asyncFileEditorProvider) {
+            return (Builder) asyncFileEditorProvider.createEditorBuilder(project, file, null);
         } else {
             return new Builder() {
                 @Override
