@@ -3,6 +3,7 @@ package org.plantuml.idea.preview.editor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.text.PsiAwareTextEditorProvider;
+import com.intellij.openapi.progress.CoroutinesKt;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -62,30 +63,12 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
             }
         });
     }
-
-    @NotNull
-    private static Builder getBuilderFromEditorProvider(@NotNull final FileEditorProvider provider,
-                                                        @NotNull final Project project,
-                                                        @NotNull final VirtualFile file) {
-        if (provider instanceof AsyncFileEditorProvider) {
-            return ((AsyncFileEditorProvider) provider).createEditorAsync(project, file);
-        } else {
-            return new Builder() {
-                @Override
-                public FileEditor build() {
-                    return provider.createEditor(project, file);
-                }
-            };
-        }
-    }
-
     protected FileEditor createSplitEditor(@NotNull final FileEditor firstEditor, @NotNull FileEditor secondEditor) {
-        if (!(firstEditor instanceof TextEditor) || !(secondEditor instanceof PlantUmlPreviewEditor)) {
+        if (!(firstEditor instanceof TextEditor editor) || !(secondEditor instanceof PlantUmlPreviewEditor umlPreviewEditor)) {
             throw new IllegalArgumentException("Main editor should be TextEditor");
         }
-        PlantUmlPreviewEditor asciiDocPreviewEditor = (PlantUmlPreviewEditor) secondEditor;
-        asciiDocPreviewEditor.setEditor(((TextEditor) firstEditor).getEditor());
-        return new PlantUmlSplitEditor(((TextEditor) firstEditor), ((PlantUmlPreviewEditor) secondEditor));
+        umlPreviewEditor.setEditor(editor.getEditor());
+        return new PlantUmlSplitEditor(editor, umlPreviewEditor);
     }
 
     @Override
@@ -114,8 +97,8 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
     @NotNull
     @Override
     public Builder createEditorAsync(@NotNull final Project project, @NotNull final VirtualFile file) {
-        final Builder firstBuilder = getBuilderFromEditorProvider(myFirstProvider, project, file);
-        final Builder secondBuilder = getBuilderFromEditorProvider(mySecondProvider, project, file);
+        final Builder firstBuilder = createEditorBuilder(myFirstProvider, project, file);
+        final Builder secondBuilder = createEditorBuilder(mySecondProvider, project, file);
 
         return new Builder() {
             @Override
@@ -180,4 +163,23 @@ public class PlantUmlSplitEditorProvider implements AsyncFileEditorProvider, Dum
     public FileEditorPolicy getPolicy() {
         return FileEditorPolicy.HIDE_DEFAULT_EDITOR;
     }
+
+    @NotNull
+    private static Builder createEditorBuilder(@NotNull final FileEditorProvider provider,
+                                               @NotNull final Project project,
+                                               @NotNull final VirtualFile file) {
+        if (provider instanceof AsyncFileEditorProvider asyncFileEditorProvider) {
+            return CoroutinesKt.runBlockingCancellable((coroutineScope, continuation) -> {
+                return asyncFileEditorProvider.createEditorBuilder(project, file, continuation);
+            });
+        } else {
+            return new Builder() {
+                @Override
+                public FileEditor build() {
+                    return provider.createEditor(project, file);
+                }
+            };
+        }
+    }
+
 }
