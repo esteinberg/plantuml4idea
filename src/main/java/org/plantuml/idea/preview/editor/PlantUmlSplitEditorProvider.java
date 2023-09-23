@@ -1,6 +1,9 @@
 package org.plantuml.idea.preview.editor;
 
-import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorPolicy;
+import com.intellij.openapi.fileEditor.FileEditorProvider;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -26,7 +29,7 @@ public class PlantUmlSplitEditorProvider implements FileEditorProvider, DumbAwar
     @Override
     public FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
         TextEditor editor = (TextEditor) TextEditorProvider.getInstance().createEditor(project, file);
-        PlantUmlPreviewEditor umlPreviewEditor = new PlantUmlPreviewEditor(FileDocumentManager.getInstance().getDocument(file), file, project, false);
+        PlantUmlPreviewEditor umlPreviewEditor = new PlantUmlPreviewEditor(file, project);
         umlPreviewEditor.setEditor(editor.getEditor());
         return new PlantUmlSplitEditor(editor, umlPreviewEditor);
     }
