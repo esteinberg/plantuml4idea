@@ -33,6 +33,8 @@ dependencies {
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
     implementation("net.sourceforge.plantuml:plantuml:1.2023.11")
 
+    implementation("org.apache.commons:commons-lang3:3.13.0")
+
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 

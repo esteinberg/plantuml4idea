@@ -10,9 +10,9 @@ import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayList;
 import java.util.List;

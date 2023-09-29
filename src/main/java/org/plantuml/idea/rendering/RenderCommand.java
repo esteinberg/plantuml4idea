@@ -2,8 +2,8 @@ package org.plantuml.idea.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;

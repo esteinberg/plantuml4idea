@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.syntax.SyntaxChecker;
 import net.sourceforge.plantuml.syntax.SyntaxResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.annotator.ErrorSourceAnnotation;
 import org.plantuml.idea.lang.annotator.SourceAnnotation;

@@ -3,7 +3,7 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.preproc.Defines;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.plantuml.idea.adapter.Utils;
 import org.plantuml.idea.lang.annotator.LanguageDescriptor;
 import org.plantuml.idea.rendering.RenderCacheItem;

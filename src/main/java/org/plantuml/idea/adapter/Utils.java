@@ -13,7 +13,7 @@ import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.dot.GraphvizUtils;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.rendering.RenderingCancelledException;

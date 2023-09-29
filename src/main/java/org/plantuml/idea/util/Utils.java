@@ -8,8 +8,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantIUmlFileType;
@@ -82,7 +81,7 @@ public class Utils {
         return false;
     }
 
-    public static List<IntRange> rangesInside(String str, String open, String close) {
+    public static List<kotlin.ranges.IntRange> rangesInside(String str, String open, String close) {
         if (str != null && !StringUtils.isEmpty(open) && !StringUtils.isEmpty(close)) {
             int strLen = str.length();
             if (strLen == 0) {
@@ -90,7 +89,7 @@ public class Utils {
             } else {
                 int closeLen = close.length();
                 int openLen = open.length();
-                List<IntRange> ranges = null;
+                List<kotlin.ranges.IntRange> ranges = null;
 
                 int end;
                 for (int pos = 0; pos < strLen - closeLen; pos = end + closeLen) {
@@ -107,7 +106,7 @@ public class Utils {
                     if (ranges == null) {
                         ranges = new ArrayList<>();
                     }
-                    ranges.add(new IntRange(start, end));
+                    ranges.add(new kotlin.ranges.IntRange(start, end));
                 }
 
                 return ranges;
@@ -117,7 +116,7 @@ public class Utils {
         }
     }
 
-    public static List<IntRange> join(List<IntRange> r1, List<IntRange> r2) {
+    public static List<kotlin.ranges.IntRange> join(List<kotlin.ranges.IntRange> r1, List<kotlin.ranges.IntRange> r2) {
         if (r1 == null && r2 == null) {
             return null;
         } else if (r1 == null) {

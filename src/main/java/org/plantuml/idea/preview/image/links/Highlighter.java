@@ -11,7 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtilCore;
 import com.intellij.util.Alarm;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;

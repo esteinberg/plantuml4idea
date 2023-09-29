@@ -2,7 +2,7 @@ package org.plantuml.idea.intentions;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class ArrowUtils {
 
