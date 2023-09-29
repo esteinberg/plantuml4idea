@@ -4,7 +4,7 @@ import com.intellij.lang.refactoring.NamesValidator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-import static org.apache.commons.lang.StringUtils.containsNone;
+import static org.apache.commons.lang3.StringUtils.containsNone;
 
 public class PumlNamesValidator implements NamesValidator {
     @Override

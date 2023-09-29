@@ -14,7 +14,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdesktop.swingx.combobox.ListComboBoxModel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;

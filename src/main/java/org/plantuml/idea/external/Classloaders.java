@@ -2,7 +2,7 @@ package org.plantuml.idea.external;
 
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.Utils;

@@ -1,7 +1,7 @@
 package org.plantuml.idea.preview.image.svg.batik;
 
 import com.intellij.openapi.diagnostic.Logger;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

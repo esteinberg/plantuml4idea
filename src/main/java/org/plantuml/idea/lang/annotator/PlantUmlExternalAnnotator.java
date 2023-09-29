@@ -11,8 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.external.PlantUmlFacade;
@@ -174,7 +173,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 			line = line.substring(0, i);
 		}
 		//not reliable when mixed braces ([)...(]), but it don't need to be
-		List<IntRange> excludedRanges = join(rangesInside(line, "[", "]"), rangesInside(line, "(", ")"));
+        List<kotlin.ranges.IntRange> excludedRanges = join(rangesInside(line, "[", "]"), rangesInside(line, "(", ")"));
 		excludedRanges = join(excludedRanges, rangesInside(line, "\"", "\""));
 
 		annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, keywords);
@@ -182,7 +181,7 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 		annotate(result, line, offset, excludedRanges, DefaultLanguageHighlighterColors.KEYWORD, types);
 	}
 
-	private void annotate(SourceAnnotationResult result, String line, int offset, List<IntRange> excludedRanges, TextAttributesKey textAttributesKey, Matcher matcher) {
+    private void annotate(SourceAnnotationResult result, String line, int offset, List<kotlin.ranges.IntRange> excludedRanges, TextAttributesKey textAttributesKey, Matcher matcher) {
 		matcher.reset(line);
 
 		while (matcher.find()) {
@@ -194,10 +193,10 @@ public class PlantUmlExternalAnnotator extends ExternalAnnotator<PlantUmlExterna
 		}
 	}
 
-	private boolean isExcluded(List<IntRange> excludedRanges, int start) {
+    private boolean isExcluded(List<kotlin.ranges.IntRange> excludedRanges, int start) {
 		if (excludedRanges != null) {
-			for (IntRange excludedRange : excludedRanges) {
-				if (excludedRange.containsInteger(start)) {
+            for (kotlin.ranges.IntRange excludedRange : excludedRanges) {
+                if (excludedRange.contains(start)) {
 					return true;
 				}
 			}
