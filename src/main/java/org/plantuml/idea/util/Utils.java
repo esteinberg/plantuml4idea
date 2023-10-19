@@ -171,13 +171,11 @@ public class Utils {
         return ApplicationManager.getApplication() == null || ApplicationManager.getApplication().isUnitTestMode();
     }
 
-
     public static boolean isPng(byte[] bytes) {
         boolean isPng = false;
-        if (bytes.length > 4) {
-            isPng = "‰PNG".equals(new String(bytes, 0, 4));
+        if (bytes.length >= 1) {
+            isPng = bytes[0] == (byte) 0x89;
         }
         return isPng;
     }
-
 }

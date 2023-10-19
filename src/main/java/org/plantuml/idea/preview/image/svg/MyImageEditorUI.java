@@ -615,7 +615,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
                 MyImageEditorImpl.Holder holder = imageProvider.getHolder();
                 Throwable exception = holder.getException();
                 if (exception != null) {
-                    errorLabel.setText(holder.getSource() + "\n\n" + Utils.stacktraceToString(exception));
+                    errorLabel.setText("Source:\n" + holder.getSource() + "\n\n" + Utils.stacktraceToString(exception));
                 } else {
                     errorLabel.setText("Plugin error");
                 }

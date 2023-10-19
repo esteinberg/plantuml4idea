@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 
@@ -297,7 +298,8 @@ public class ImageItem {
             LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
         } catch (Throwable e) {
-            logger.warn(e);
+            String s = "SVG source:" + new String(svgData, StandardCharsets.UTF_8);
+            logger.warn(s, e);
             return Collections.emptyList();
         }
     }
