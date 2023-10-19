@@ -1,5 +1,6 @@
 package org.plantuml.idea.rendering;
 
+import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 
@@ -297,7 +299,8 @@ public class ImageItem {
             LOG.debug("parseLinks done in ", System.currentTimeMillis() - start, "ms");
             return linkData;
         } catch (Throwable e) {
-            logger.error(e);
+            Attachment svgSource = new Attachment("SVG source", svgData, new String(svgData, StandardCharsets.UTF_8));
+            logger.error(e.getMessage(), e, svgSource);
             return Collections.emptyList();
         }
     }
