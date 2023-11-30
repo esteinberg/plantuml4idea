@@ -37,7 +37,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private static final int CACHE_SIZE_DEFAULT_VALUE = 5;
     private static final int RENDER_DELAY_DEFAULT_VALUE = 100;
     private static final int SVG_SIZE = 16384;
-    public static final String DEFAULT_SERVER = "http://www.plantuml.com/plantuml";
+    public static final String DEFAULT_SERVER = "https://www.plantuml.com/plantuml";
 
     private String dotExecutable = "";
     private boolean errorAnnotationEnabled = true;

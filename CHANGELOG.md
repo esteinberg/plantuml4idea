@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Default PlantUML Server URL changed to HTTPS
+
 ## [7.3.0-IJ2023.2] - 2023-10-19
 
 - fixed Ditaa rendering
