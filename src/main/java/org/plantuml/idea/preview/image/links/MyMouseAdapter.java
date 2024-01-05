@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.grammar.navigation.PumlItemReference;
 import org.plantuml.idea.rendering.ImageItem;
@@ -64,12 +63,10 @@ public class MyMouseAdapter extends MouseAdapter {
         Project project = renderRequest.getProject();
         File baseDir = renderRequest.getBaseDir();
 
-        String[] split = StringUtils.substringBefore(text, " ").split("#");
-        text = split[0];
-        String element = split.length >= 2 ? split[1] : null;
+        LinkNavigator.Coordinates coordinates = LinkNavigator.getCoordinates(text);
 
-        if (navigator.openFile(new File(baseDir, text), element)) return true;
-        if (navigator.openFile(new File(text), element)) return true;
+        if (navigator.openFile(new File(baseDir, coordinates.file()), coordinates)) return true;
+        if (navigator.openFile(new File(coordinates.file()), coordinates)) return true;
 
         VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(sourceFilePath);
         if (sourceFile != null) {
@@ -77,7 +74,8 @@ public class MyMouseAdapter extends MouseAdapter {
             if (module != null) {
                 VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
                 for (VirtualFile contentRoot : contentRoots) {
-                    if (navigator.openFile(new File(contentRoot.getPath(), text), element)) return true;
+                    if (navigator.openFile(new File(contentRoot.getPath(), coordinates.file()), coordinates))
+                        return true;
                 }
             }
         }

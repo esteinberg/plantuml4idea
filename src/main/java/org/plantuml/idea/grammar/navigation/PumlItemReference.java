@@ -8,6 +8,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
@@ -25,6 +26,7 @@ import org.plantuml.idea.grammar.PumlPsiUtil;
 import org.plantuml.idea.grammar.psi.PumlItem;
 import org.plantuml.idea.grammar.psi.PumlTypes;
 import org.plantuml.idea.lang.PlantUmlFileType;
+import org.plantuml.idea.preview.image.links.LinkNavigator;
 import org.plantuml.idea.preview.image.links.MyMouseAdapter;
 import org.plantuml.idea.util.PsiUtil;
 
@@ -73,20 +75,24 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
     /**
      * just like {@link MyMouseAdapter#openFile(String)}
      */
-    private PsiElement resolveFile() {
+    private @Nullable PsiElement resolveFile() {
         PsiElement target = null;
         if (key.startsWith("[[") && key.endsWith("]")) {
-            String targetFilePath = key.substring(2);
+            String targetFilePath = key;
+            if (targetFilePath.startsWith("[[[")) {
+                targetFilePath = targetFilePath.substring(3);
+            } else if (targetFilePath.startsWith("[[")) {
+                targetFilePath = targetFilePath.substring(2);
+            }
             if (targetFilePath.endsWith("]")) {
                 targetFilePath = targetFilePath.substring(0, targetFilePath.length() - 1);
             }
+
             if (StringUtils.isEmpty(targetFilePath)) {
                 return null;
             }
-            targetFilePath = StringUtils.substringBefore(targetFilePath, " ");
-            String[] split = targetFilePath.split("#");
-            targetFilePath = split[0];
-            String element = split.length >= 2 ? split[1] : null;
+
+            LinkNavigator.Coordinates coordinates = LinkNavigator.getCoordinates(targetFilePath);
 
             Project project = PsiUtil.getProjectInReadAction(myElement);
             PsiFile containingFile = myElement.getContainingFile();
@@ -98,11 +104,11 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
             if (sourceFile != null) {
                 VirtualFile parent = sourceFile.getParent();
                 if (parent != null) {
-                    target = resolveFile(new File(parent.getPath(), targetFilePath), localFileSystem, psiManager);
+                    target = resolveFile(new File(parent.getPath(), coordinates.file()), localFileSystem, psiManager);
                 }
             }
             if (target == null) {
-                target = resolveFile(new File(targetFilePath), localFileSystem, psiManager);
+                target = resolveFile(new File(coordinates.file()), localFileSystem, psiManager);
             }
 
             if (target == null) {
@@ -110,17 +116,34 @@ public class PumlItemReference extends PsiReferenceBase<PumlItem> {
                 if (module != null) {
                     VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
                     for (VirtualFile contentRoot : contentRoots) {
-                        target = resolveFile(new File(contentRoot.getPath(), targetFilePath), localFileSystem, psiManager);
+                        target = resolveFile(new File(contentRoot.getPath(), coordinates.file()), localFileSystem, psiManager);
                         if (target != null) {
                             break;
                         }
                     }
                 }
             }
-            if (target != null && element != null) {
-                PsiElement psiElement = PsiUtil.findPsiElement(target, element);
-                if (psiElement != null) {
-                    target = psiElement;
+            if (coordinates.element() != null) {
+                if (target != null) {
+                    PsiElement psiElement = PsiUtil.findPsiElement(target, coordinates.element());
+                    if (psiElement != null) {
+                        target = psiElement;
+                    }
+                }
+            } else if (coordinates.line() != null) {
+                if (sourceFile != null) {
+                    if (target != null) {
+                        PsiFile targetFile = target.getContainingFile();
+                        Document document = FileDocumentManager.getInstance().getDocument(targetFile.getVirtualFile());
+                        if (document != null) {
+                            int lineStartOffset = document.getLineStartOffset(coordinates.line());
+                            int lineEndOffset = document.getLineEndOffset(coordinates.line());
+                            PsiElement psiElement = targetFile.findElementAt(lineStartOffset);//todo not accurate
+                            if (psiElement != null) {
+                                target = psiElement;
+                            }
+                        }
+                    }
                 }
             }
         }

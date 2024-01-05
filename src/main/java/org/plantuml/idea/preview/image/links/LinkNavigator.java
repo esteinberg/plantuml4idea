@@ -5,6 +5,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -14,9 +15,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.rendering.RenderRequest;
 import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.settings.PlantUmlSettings;
@@ -41,6 +45,32 @@ public class LinkNavigator {
         this.renderResult = renderResult;
         localFileSystem = LocalFileSystem.getInstance();
         fileEditorManager = FileEditorManager.getInstance(project);
+    }
+
+    @NotNull
+    public static LinkNavigator.Coordinates getCoordinates(String file) {
+        String s = StringUtils.substringBefore(file, " ");
+        String fileResult;
+        String element = null;
+        Integer line = null;
+        if (s.contains(":")) {
+            String[] split = s.split(":");
+            fileResult = split[0];
+            line = split.length >= 2 ? tryGetLine(split) : null;
+        } else {
+            String[] split = s.split("#");
+            fileResult = split[0];
+            element = split.length >= 2 ? split[1] : null;
+        }
+        return new Coordinates(fileResult, element, line);
+    }
+
+    private static Integer tryGetLine(String[] split) {
+        try {
+            return Integer.parseInt(split[1]) - 1;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public void findNextSourceAndNavigate(String text) {
@@ -161,7 +191,7 @@ public class LinkNavigator {
         return true;
     }
 
-    public boolean openFile(File file, String element) {
+    boolean openFile(File file, Coordinates coordinates) {
         if (file.exists()) {
             VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
             if (virtualFile == null) {
@@ -171,26 +201,42 @@ public class LinkNavigator {
 
             boolean b = fileEditors.length > 0;
             if (b) {
-                navigateToElement(element, fileEditors);
+                navigateToCoordinates(coordinates, fileEditors);
             }
             return b;
         }
         return false;
     }
 
-    private static void navigateToElement(String element, FileEditor[] fileEditors) {
+    private static void navigateToCoordinates(Coordinates coordinates, FileEditor[] fileEditors) {
+        String element = coordinates.element();
+        Integer line = coordinates.line();
         FileEditor fileEditor = fileEditors[0];
         if (fileEditor instanceof TextEditor) {
             Editor editor = ((TextEditor) fileEditor).getEditor();
-            Project project = editor.getProject();
-            PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
-            if (psiFile != null && element != null) {
-                PsiElement target = PsiUtil.findPsiElement(psiFile, element);
-                if (target != null) {
-                    int textOffset = target.getTextOffset();
-                    editor.getCaretModel().moveToOffset(textOffset);
-                    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+            if (element != null) {
+                Project project = editor.getProject();
+                if (project != null) {
+                    PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+                    if (psiFile != null) {
+                        PsiElement target = PsiUtil.findPsiElement(psiFile, element);
+                        if (target != null) {
+                            int textOffset = target.getTextOffset();
+                            editor.getCaretModel().removeSecondaryCarets();
+                            editor.getCaretModel().moveToOffset(textOffset);
+                            editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                            editor.getSelectionModel().removeSelection();
+                            IdeFocusManager.getGlobalInstance().requestFocus(editor.getContentComponent(), true);
+                        }
+                    }
                 }
+            } else if (line != null) {
+                LogicalPosition position = new LogicalPosition(line, 0);
+                editor.getCaretModel().removeSecondaryCarets();
+                editor.getCaretModel().moveToLogicalPosition(position);
+                editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
+                editor.getSelectionModel().removeSelection();
+                IdeFocusManager.getGlobalInstance().requestFocus(editor.getContentComponent(), true);
             }
         }
     }
@@ -202,5 +248,9 @@ public class LinkNavigator {
                 ", lastFile=" + lastFile +
                 ", lastIndex=" + lastIndex +
                 '}';
+    }
+
+
+    public record Coordinates(String file, String element, Integer line) {
     }
 }

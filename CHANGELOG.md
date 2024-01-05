@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Default PlantUML Server URL changed to HTTPS
+- Navigation to a line from an image
 
 ## [7.3.0-IJ2023.2] - 2023-10-19
 
