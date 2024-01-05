@@ -496,6 +496,10 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     public interface SettingsChangedListener {
         Topic<SettingsChangedListener> TOPIC = Topic.create("PlantUmlApplicationSettingsChanged", SettingsChangedListener.class);
 
+        static void settingsChanged() {
+            ApplicationManager.getApplication().getMessageBus().syncPublisher(TOPIC).onSettingsChange(getInstance());
+        }
+
         void onSettingsChange(@NotNull PlantUmlSettings settings);
     }
 }

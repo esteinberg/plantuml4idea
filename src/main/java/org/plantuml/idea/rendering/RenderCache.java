@@ -28,6 +28,7 @@ public class RenderCache {
                 .subscribe(PlantUmlSettings.SettingsChangedListener.TOPIC, new PlantUmlSettings.SettingsChangedListener() {
                     @Override
                     public void onSettingsChange(@NotNull PlantUmlSettings settings) {
+                        clear();
                         setMaxCacheSize(settings.getCacheSizeAsInt());
                     }
                 });

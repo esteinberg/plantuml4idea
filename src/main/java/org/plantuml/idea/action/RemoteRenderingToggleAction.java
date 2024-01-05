@@ -18,6 +18,8 @@ public class RemoteRenderingToggleAction extends ToggleAction implements DumbAwa
     @Override
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setRemoteRendering(b);
+        PlantUmlSettings.SettingsChangedListener.settingsChanged();
         UIUtils.renderToolWindowAndEditorPreview(anActionEvent, LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
     }
+
 }

@@ -18,6 +18,7 @@ public class DisplaySvgToggleAction extends ToggleAction implements DumbAware {
     @Override
     public void setSelected(AnActionEvent anActionEvent, boolean b) {
         PlantUmlSettings.getInstance().setDisplaySvg(b);
+        PlantUmlSettings.SettingsChangedListener.settingsChanged();
         UIUtils.renderToolWindowAndEditorPreview(anActionEvent, LazyApplicationPoolExecutor.Delay.NOW, RenderCommand.Reason.REFRESH);
     }
 }
