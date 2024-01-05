@@ -1,6 +1,7 @@
 package org.plantuml.idea.preview.image.links;
 
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -70,7 +71,8 @@ public class MyMouseAdapter extends MouseAdapter {
 
         VirtualFile sourceFile = LocalFileSystem.getInstance().findFileByPath(sourceFilePath);
         if (sourceFile != null) {
-            Module module = ModuleUtilCore.findModuleForFile(sourceFile, project);
+            Module module = ActionUtil.underModalProgress(renderRequest.getProject(), "PlantUML link navigation", () -> ModuleUtilCore.findModuleForFile(sourceFile, project));
+
             if (module != null) {
                 VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
                 for (VirtualFile contentRoot : contentRoots) {
