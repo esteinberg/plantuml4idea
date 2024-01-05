@@ -1,6 +1,6 @@
 @file:Suppress("HardCodedStringLiteral")
-import org.jetbrains.changelog.Changelog
 
+import org.jetbrains.changelog.Changelog
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -31,7 +31,7 @@ java.sourceSets["main"].java {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
-    implementation("net.sourceforge.plantuml:plantuml:1.2023.11")
+    implementation("net.sourceforge.plantuml:plantuml:1.2023.13")
 
     implementation("org.apache.commons:commons-lang3:3.13.0")
 

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- PlantUML library upgrade to v1.2023.13
 - Default PlantUML Server URL changed to HTTPS
 - Navigation to a line from an image
 
