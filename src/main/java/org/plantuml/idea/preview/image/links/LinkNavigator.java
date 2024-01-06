@@ -54,11 +54,11 @@ public class LinkNavigator {
         String element = null;
         Integer line = null;
 
-        if (s.contains(":")) {
-            String[] split = s.split(":");
-            line = split.length >= 2 ? tryGetLine(split) : null;
+        int i = s.lastIndexOf(":");
+        if (i > 0) {
+            line = tryGetLine(s.substring(i + 1));
             if (line != null) {
-                fileResult = split[0];
+                fileResult = s.substring(0, i);
             }
         }
 
@@ -70,9 +70,9 @@ public class LinkNavigator {
         return new Coordinates(fileResult, element, line);
     }
 
-    private static Integer tryGetLine(String[] split) {
+    private static Integer tryGetLine(String s) {
         try {
-            return Integer.parseInt(split[1]) - 1;
+            return Integer.parseInt(s) - 1;
         } catch (Exception e) {
             return null;
         }
