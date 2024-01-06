@@ -50,14 +50,19 @@ public class LinkNavigator {
     @NotNull
     public static LinkNavigator.Coordinates getCoordinates(String file) {
         String s = StringUtils.substringBefore(file, " ");
-        String fileResult;
+        String fileResult = s;
         String element = null;
         Integer line = null;
+
         if (s.contains(":")) {
             String[] split = s.split(":");
-            fileResult = split[0];
             line = split.length >= 2 ? tryGetLine(split) : null;
-        } else {
+            if (line != null) {
+                fileResult = split[0];
+            }
+        }
+
+        if (line == null) {
             String[] split = s.split("#");
             fileResult = split[0];
             element = split.length >= 2 ? split[1] : null;
