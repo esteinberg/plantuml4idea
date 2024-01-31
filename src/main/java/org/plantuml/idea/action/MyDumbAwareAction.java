@@ -29,9 +29,6 @@ public abstract class MyDumbAwareAction extends DumbAwareAction {
         super(text, description, icon);
     }
 
-    public MyDumbAwareAction(@NotNull Supplier<@NlsActions.ActionText String> text, @Nullable Supplier<@NlsActions.ActionDescription String> description, @Nullable Supplier<? extends @Nullable Icon> iconSupplier) {
-        super(text, description, iconSupplier);
-    }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
