@@ -2,7 +2,7 @@ package org.plantuml.idea.preview.image;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
+import org.plantuml.idea.action.MyDumbAwareAction;
 
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -11,7 +11,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class CopySvgToClipboard extends DumbAwareAction {
+public class CopySvgToClipboard extends MyDumbAwareAction {
     public CopySvgToClipboard() {
         super("Copy SVG Source to Clipboard", null, null);
 

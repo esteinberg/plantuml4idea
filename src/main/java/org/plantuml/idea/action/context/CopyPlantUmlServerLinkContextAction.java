@@ -3,9 +3,9 @@ package org.plantuml.idea.action.context;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.rendering.ImageItem;
@@ -15,7 +15,7 @@ import org.plantuml.idea.settings.PlantUmlSettings;
 
 import javax.swing.*;
 
-public class CopyPlantUmlServerLinkContextAction extends DumbAwareAction {
+public class CopyPlantUmlServerLinkContextAction extends MyDumbAwareAction {
 
     public CopyPlantUmlServerLinkContextAction() {
         super("Copy as PlantUML Server link", "Generate PlantUML Server link to clipboard", AllIcons.Ide.Link);

@@ -3,12 +3,12 @@ package org.plantuml.idea.action.context;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.util.ui.TextTransferable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.image.ImageContainer;
@@ -20,7 +20,7 @@ import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.io.UnsupportedEncodingException;
 
-public class CopyDiagramAsTxtToClipboardContextAction extends DumbAwareAction {
+public class CopyDiagramAsTxtToClipboardContextAction extends MyDumbAwareAction {
 
     private static final DataFlavor FLAVOR = DataFlavor.stringFlavor;
 

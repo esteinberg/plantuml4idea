@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## [7.5.0-IJ2023.2] - 2024-01-31
+- IntelliJ 2024.1 compatibility
+
 ## [7.4.2-IJ2023.2] - 2024-01-06
 - PlantUML library upgrade to v1.2023.13
 - Default PlantUML Server URL changed to HTTPS
@@ -21,8 +24,9 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.4.2-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.5.0-IJ2023.2...HEAD
 
+[7.5.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.4.2-IJ2023.2...v7.5.0-IJ2023.2
 [7.4.2-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.3.0-IJ2023.2...v7.4.2-IJ2023.2
 [7.3.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.2.0-IJ2023.2...v7.3.0-IJ2023.2
 [7.2.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.1.1-IJ2023.3...v7.2.0-IJ2023.2

@@ -1,8 +1,8 @@
 package org.plantuml.idea.action.test;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.plantuml.SourceExtractor;
@@ -12,7 +12,7 @@ import org.plantuml.idea.settings.PlantUmlSettings;
 import java.io.File;
 import java.util.Locale;
 
-public class SaveTestAction extends DumbAwareAction {
+public class SaveTestAction extends MyDumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {

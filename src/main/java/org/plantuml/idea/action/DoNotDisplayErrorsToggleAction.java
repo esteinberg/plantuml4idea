@@ -1,11 +1,9 @@
 package org.plantuml.idea.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ToggleAction;
-import com.intellij.openapi.project.DumbAware;
 import org.plantuml.idea.settings.PlantUmlSettings;
 
-public class DoNotDisplayErrorsToggleAction extends ToggleAction implements DumbAware {
+public class DoNotDisplayErrorsToggleAction extends MyToggleAction {
 
     @Override
     public boolean isSelected(AnActionEvent anActionEvent) {

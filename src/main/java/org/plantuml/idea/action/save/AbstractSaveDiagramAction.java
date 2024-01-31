@@ -8,7 +8,6 @@ import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.ui.MessageType;
@@ -23,6 +22,7 @@ import com.intellij.util.ArrayUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
@@ -42,7 +42,7 @@ import static org.plantuml.idea.util.UIUtils.*;
 /**
  * @author Eugene Steinberg
  */
-public abstract class AbstractSaveDiagramAction extends DumbAwareAction {
+public abstract class AbstractSaveDiagramAction extends MyDumbAwareAction {
 
     public static VirtualFile homeDir = null;
     public static final String FILENAME = "diagram";

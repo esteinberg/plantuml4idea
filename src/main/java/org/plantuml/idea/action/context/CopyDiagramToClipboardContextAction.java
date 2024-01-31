@@ -4,11 +4,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.WindowManager;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.preview.image.ImageContainer;
 
 import java.awt.*;
@@ -22,7 +22,7 @@ import static org.plantuml.idea.util.UIUtils.notification;
 /**
  * @author Eugene Steinberg
  */
-public class CopyDiagramToClipboardContextAction extends DumbAwareAction {
+public class CopyDiagramToClipboardContextAction extends MyDumbAwareAction {
 
     public CopyDiagramToClipboardContextAction() {
         super("Copy Diagram to Clipboard", null, AllIcons.Actions.Copy);

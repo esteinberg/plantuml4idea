@@ -143,7 +143,7 @@ public class AboutDialog extends JDialog {
         usage = new Usage();
     }
 
-    private class BrowseHyperlinkListener implements HyperlinkListener {
+    private static class BrowseHyperlinkListener implements HyperlinkListener {
         @Override
         public void hyperlinkUpdate(HyperlinkEvent e) {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {

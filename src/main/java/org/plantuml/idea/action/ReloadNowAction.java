@@ -2,7 +2,6 @@ package org.plantuml.idea.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import org.plantuml.idea.PlantUmlApplicationComponent;
@@ -14,7 +13,7 @@ import org.plantuml.idea.util.UIUtils;
 
 import javax.swing.*;
 
-public class ReloadNowAction extends DumbAwareAction {
+public class ReloadNowAction extends MyDumbAwareAction {
     public static final Icon refreshAutoDisabled = IconLoader.getIcon("/images/forceRefresh.png", PlantUmlApplicationComponent.class);
 
     private PlantUmlSettings settings;

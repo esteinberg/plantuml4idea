@@ -2,10 +2,10 @@ package org.plantuml.idea.action.context;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.image.ImageContainer;
@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * @author Henady Zakalusky
  */
-public abstract class ExternalOpenDiagramAction extends DumbAwareAction {
+public abstract class ExternalOpenDiagramAction extends MyDumbAwareAction {
 
     protected static final Logger logger = Logger.getInstance(ExternalOpenDiagramAction.class);
 

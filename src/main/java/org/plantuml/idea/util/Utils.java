@@ -1,10 +1,9 @@
 package org.plantuml.idea.util;
 
-import com.intellij.ide.scratch.ScratchUtil;
-import com.intellij.lang.LanguageUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.lang.PlantIUmlFileType;
 import org.plantuml.idea.lang.PlantUmlFileType;
-import org.plantuml.idea.lang.PlantUmlLanguage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -54,9 +52,7 @@ public class Utils {
         if (project != null && project.isDisposed()) {
             return false;
         }
-        FileType fileType = file.getFileType();
-        return fileType == PlantUmlFileType.INSTANCE ||
-                (ScratchUtil.isScratch(file) && project != null && LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE);
+        return FileTypeRegistry.getInstance().isFileOfType(file, PlantUmlFileType.INSTANCE);
     }
 
     public static boolean isPlantUmlOrIUmlFileType(Project project, VirtualFile file) {
@@ -67,9 +63,8 @@ public class Utils {
         if (project != null && project.isDisposed()) {
             return false;
         }
-        FileType fileType = file.getFileType();
-        return fileType == PlantUmlFileType.INSTANCE || fileType == PlantIUmlFileType.INSTANCE ||
-                (ScratchUtil.isScratch(file) && project != null && (LanguageUtil.getLanguageForPsi(project, file) == PlantUmlLanguage.INSTANCE));
+        return FileTypeRegistry.getInstance().isFileOfType(file, PlantUmlFileType.INSTANCE)
+                || FileTypeRegistry.getInstance().isFileOfType(file, PlantIUmlFileType.INSTANCE);
     }
 
     public static boolean containsLettersOrNumbers(CharSequence s) {

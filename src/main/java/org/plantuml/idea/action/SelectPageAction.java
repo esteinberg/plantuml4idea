@@ -1,10 +1,10 @@
 package org.plantuml.idea.action;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.ComboBoxAction;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.rendering.RenderCacheItem;
@@ -50,7 +50,7 @@ public class SelectPageAction extends ComboBoxAction implements DumbAware {
     }
 
 
-    private class SetPageAction extends DumbAwareAction {
+    private class SetPageAction extends MyDumbAwareAction {
         private int page = 0;
 
         private SetPageAction(int page) {
@@ -73,5 +73,10 @@ public class SelectPageAction extends ComboBoxAction implements DumbAware {
         }
         e.getPresentation().setText(getDisplayPage(previewPanel.getSelectedPage()));
         e.getPresentation().setEnabled(numPages > 1);
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

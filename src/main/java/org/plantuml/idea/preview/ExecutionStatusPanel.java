@@ -3,10 +3,10 @@ package org.plantuml.idea.preview;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.JBColor;
 import com.intellij.util.Alarm;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.MyDumbAwareAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 
-public class ExecutionStatusPanel extends DumbAwareAction implements CustomComponentAction {
+public class ExecutionStatusPanel extends MyDumbAwareAction implements CustomComponentAction {
     private JLabel label;
     private volatile int version;
     private volatile State state;

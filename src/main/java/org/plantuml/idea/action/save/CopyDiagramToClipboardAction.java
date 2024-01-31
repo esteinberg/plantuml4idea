@@ -3,10 +3,10 @@ package org.plantuml.idea.action.save;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.preview.image.ImageContainer;
 import org.plantuml.idea.util.UIUtils;
@@ -23,7 +23,7 @@ import static org.plantuml.idea.util.UIUtils.notification;
 /**
  * @author Eugene Steinberg
  */
-public class CopyDiagramToClipboardAction extends DumbAwareAction {
+public class CopyDiagramToClipboardAction extends MyDumbAwareAction {
 
 
     @Override

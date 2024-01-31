@@ -6,12 +6,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.SourceExtractor;
 
@@ -23,7 +23,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.Map;
 
-public class ExtractEmbeddedSourcesAction extends DumbAwareAction {
+public class ExtractEmbeddedSourcesAction extends MyDumbAwareAction {
 
     @Override
     public void actionPerformed(AnActionEvent e) {

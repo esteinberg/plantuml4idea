@@ -1,16 +1,15 @@
 package org.plantuml.idea.preview.editor.editorLayout;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Toggleable;
-import com.intellij.openapi.project.DumbAware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.action.MyDumbAwareAction;
 import org.plantuml.idea.preview.editor.SplitFileEditor;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.UIUtils;
 
-abstract class BaseChangeSplitLayoutAction extends AnAction implements DumbAware, Toggleable {
+abstract class BaseChangeSplitLayoutAction extends MyDumbAwareAction implements Toggleable {
   @Nullable
   private final SplitFileEditor.SplitEditorLayout myLayoutToSet;
 
