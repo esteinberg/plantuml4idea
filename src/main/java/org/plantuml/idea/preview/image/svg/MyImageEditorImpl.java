@@ -17,6 +17,7 @@ package org.plantuml.idea.preview.image.svg;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
@@ -54,7 +55,6 @@ public final class MyImageEditorImpl implements MyImageEditor {
     private final Project project;
     private final VirtualFile file;
     private final MyImageEditorUI editorUI;
-    private boolean disposed;
 
 //  public MyImageEditorImpl(@NotNull Project project, @NotNull VirtualFile file) {
 //    this(project, file, false);
@@ -181,6 +181,10 @@ public final class MyImageEditorImpl implements MyImageEditor {
         return editorUI.getZoomModel();
     }
 
+    public void dispose() {
+        Disposer.dispose(editorUI);
+    }
+
 
     public class MyScaledImageProvider implements ImageDocument.ScaledImageProvider {
 
@@ -277,6 +281,10 @@ public final class MyImageEditorImpl implements MyImageEditor {
                     LOG.error(ex);
                 }
             }
+        }
+
+        public void dispose() {
+            holder = new Holder();
         }
     }
 

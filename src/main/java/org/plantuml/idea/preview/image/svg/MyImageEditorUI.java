@@ -235,8 +235,8 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     public void dispose() {
 //        imageComponent.removeMouseWheelListener(wheelAdapter);
 //        imageComponent.getDocument().removeChangeListener(changeListener);
-
         removeAll();
+        imageProvider.dispose();
     }
 
     @Override

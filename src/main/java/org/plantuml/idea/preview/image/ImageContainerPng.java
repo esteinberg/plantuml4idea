@@ -42,14 +42,15 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
             Separator.getInstance(),
             new CopyPlantUmlServerLinkContextAction()
     };
-    private static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerPng", new ActionGroup() {
+
+    public static final ActionGroup ACTION_GROUP = new ActionGroup() {
 
         @NotNull
         @Override
         public AnAction[] getChildren(@Nullable AnActionEvent e) {
             return AN_ACTIONS;
         }
-    });
+    };
 
     private static Logger LOG = Logger.getInstance(ImageContainerPng.class);
     private Project project;
@@ -120,7 +121,7 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
                 @Override
                 public void invokePopup(Component comp, int x, int y) {
-                    ACTION_POPUP_MENU.getComponent().show(comp, x, y);
+                    ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerPng", ACTION_GROUP).getComponent().show(comp, x, y);
                 }
             });
 
@@ -202,6 +203,6 @@ public class ImageContainerPng extends JLabel implements ImageContainer {
 
     @Override
     public void dispose() {
-
+        originalImage = null;
     }
 }

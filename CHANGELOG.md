@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Memory leak fix
+
 ## [7.5.0-IJ2023.2] - 2024-01-31
 - IntelliJ 2024.1 compatibility
 

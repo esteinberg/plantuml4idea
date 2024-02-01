@@ -30,4 +30,11 @@ public class ImageItemComponent {
     boolean isNull() {
         return editor == null && image == null;
     }
+
+    public void dispose() {
+        image = null;
+        if (editor != null) {
+            editor.dispose();
+        }
+    }
 }

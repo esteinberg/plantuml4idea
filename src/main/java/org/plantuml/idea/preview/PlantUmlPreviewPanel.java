@@ -76,7 +76,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private final PlantUmlSettings settings;
     private RenderCacheItem displayedItem;
 
-    public PlantUmlPreviewPanel(@NotNull Project project, PlantUmlPreviewEditor fileEditor, @Nullable JComponent parent) {
+    public PlantUmlPreviewPanel(@NotNull Project project, @Nullable PlantUmlPreviewEditor fileEditor, @Nullable JComponent parent) {
         super(new BorderLayout());
         this.project = project;
         this.fileEditor = fileEditor;
@@ -213,6 +213,9 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     public void dispose() {
         logger.debug("dispose");
         removeAllImages();
+        if (displayedItem != null) {
+            displayedItem.dispose(this);
+        }
     }
 
     private Alarm myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD);
@@ -443,26 +446,29 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         }
     }
 
-    private boolean displayImages(RenderCacheItem cacheItem, boolean force) {
-        if (!force && renderCache.isOlderRequest(cacheItem, displayedItem)) { //ctrl+z with cached image vs older request in progress
-            logger.debug("skipping displaying older result", cacheItem);
+    private boolean displayImages(RenderCacheItem newItem, boolean force) {
+        if (!force && renderCache.isOlderRequest(newItem, displayedItem)) { //ctrl+z with cached image vs older request in progress
+            logger.debug("skipping displaying older result", newItem);
             return false;
         }
         long start = System.currentTimeMillis();
 
         //maybe track position per file?
         RenderCacheItem displayedItem = this.displayedItem;
-        boolean restoreScrollPosition = displayedItem != null && displayedItem.getRenderResult().hasError() && renderCache.isSameFile(cacheItem, displayedItem);
+        boolean restoreScrollPosition = displayedItem != null && displayedItem.getRenderResult().hasError() && renderCache.isSameFile(newItem, displayedItem);
         //must be before revalidate
         int lastValidVerticalScrollValue = this.lastValidVerticalScrollValue;
         int lastValidHorizontalScrollValue = this.lastValidHorizontalScrollValue;
 
+        if (displayedItem != null) {
+            displayedItem.dispose(this);
+        }
 
-        this.displayedItem = cacheItem;
+        this.displayedItem = newItem;
 
-        ImageItem[] imageItems = cacheItem.getImageItems();
-        RenderResult renderResult = cacheItem.getRenderResult();
-        int requestedPage = cacheItem.getRequestedPage();
+        ImageItem[] imageItems = newItem.getImageItems();
+        RenderResult renderResult = newItem.getRenderResult();
+        int requestedPage = newItem.getRequestedPage();
 
         if (requestedPage >= renderResult.getPages()) {
             logger.debug("requestedPage >= renderResult.getPages()", requestedPage, ">=", renderResult.getPages());
@@ -474,7 +480,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         }
 
         if (requestedPage == -1) {
-            boolean incrementalDisplay = cacheItem.getRenderRequest().getReason() != RenderCommand.Reason.REFRESH && renderCache.isSameFile(cacheItem, displayedItem);
+            boolean incrementalDisplay = newItem.getRenderRequest().getReason() != RenderCommand.Reason.REFRESH && renderCache.isSameFile(newItem, displayedItem);
             logger.debug("displaying images ", requestedPage, ", incrementalDisplay=", incrementalDisplay);
 
             Component[] children = imagesPanel.getComponents();
@@ -493,19 +499,19 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     } else {
                         imagesPanel.remove(i * 2);
                     }
-                    JComponent component = createImageContainer(cacheItem, i, imageItem);
+                    JComponent component = createImageContainer(newItem, i, imageItem);
                     imagesPanel.add(component, i * 2);
                 }
             } else {
                 removeAllImages();
                 for (int i = 0; i < imageItems.length; i++) {
-                    displayImage(cacheItem, i, imageItems[i]);
+                    displayImage(newItem, i, imageItems[i]);
                 }
             }
         } else {
             logger.debug("displaying image ", requestedPage);
             removeAllImages();
-            displayImage(cacheItem, requestedPage, imageItems[requestedPage]);
+            displayImage(newItem, requestedPage, imageItems[requestedPage]);
         }
 
         if (settings.isHighlightInImages()) {

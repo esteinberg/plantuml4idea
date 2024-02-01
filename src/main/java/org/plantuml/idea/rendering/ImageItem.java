@@ -234,11 +234,12 @@ public class ImageItem {
     /**
      * items are shared between RenderCacheItem
      */
-    @Deprecated
-    public void dispose() {
-//        if (editor != null) {
-//            Disposer.dispose(editor);
-//        }
+    public void dispose(PlantUmlPreviewPanel plantUmlPreviewPanel) {
+        ImageItemComponent remove = componentMap.remove(plantUmlPreviewPanel);
+        if (remove != null) {
+            remove.dispose(); //todo not necessary?
+        }
+        bufferedImage = null;
     }
 
     public class LinkData {

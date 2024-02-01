@@ -56,14 +56,14 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
             Separator.getInstance(),
             new CopyPlantUmlServerLinkContextAction(),
     };
-    public static final ActionPopupMenu ACTION_POPUP_MENU = ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerSvg", new ActionGroup() {
+    public static final ActionGroup ACTION_GROUP = new ActionGroup() {
 
         @NotNull
         @Override
         public AnAction[] getChildren(@Nullable AnActionEvent e) {
             return AN_ACTIONS;
         }
-    });
+    };
 
     private static Logger LOG = Logger.getInstance(ImageContainerSvg.class);
     private final Alarm zoomAlarm;
@@ -175,7 +175,7 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
         contentComponent.addMouseListener(new PopupHandler() {
             @Override
             public void invokePopup(Component comp, int x, int y) {
-                ACTION_POPUP_MENU.getComponent().show(comp, x, y);
+                ActionManager.getInstance().createActionPopupMenu("plantuml4idea-ImageContainerSvg", ACTION_GROUP).getComponent().show(comp, x, y);
             }
         });
 
@@ -293,6 +293,8 @@ public class ImageContainerSvg extends JPanel implements ImageContainer {
 
     @Override
     public void dispose() {
-
+        if (editor != null) {
+            editor.dispose();
+        }
     }
 }

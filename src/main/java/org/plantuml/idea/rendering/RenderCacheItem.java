@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.preview.Zoom;
 
 import java.io.File;
@@ -235,5 +236,11 @@ public class RenderCacheItem {
             }
         }
         return false;
+    }
+
+    public void dispose(PlantUmlPreviewPanel plantUmlPreviewPanel) {
+        for (ImageItem imageItem : imageItems) {
+            imageItem.dispose(plantUmlPreviewPanel);
+        }
     }
 }
