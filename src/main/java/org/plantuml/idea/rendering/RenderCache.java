@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 @Service
-public class RenderCache {
+public final class RenderCache {
     public static final Logger logger = Logger.getInstance(RenderCache.class);
 
     private ArrayDeque<RenderCacheItem> cacheItems;
@@ -114,7 +114,6 @@ public class RenderCache {
 
 
     public void removeFromCache(RenderCacheItem cachedItem) {
-        logger.debug("force removing from cache ", cachedItem);
         cacheItems.remove(cachedItem);
 //        cachedItem.dispose();
     }
