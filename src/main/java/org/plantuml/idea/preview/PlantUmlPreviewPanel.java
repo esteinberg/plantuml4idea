@@ -55,8 +55,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
     private Zoom zoom;
     private int selectedPage = -1;
 
-    private RenderCache renderCache;
-
     private final LazyApplicationPoolExecutor lazyExecutor;
 
     private Project project;
@@ -83,8 +81,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         settings = PlantUmlSettings.getInstance();
         zoom = new Zoom(parent, 100, settings);
 
-        // Make sure settings are loaded and applied before we start rendering.
-        renderCache = RenderCache.getInstance();
         selectedPagePersistentStateComponent = SelectedPagePersistentStateComponent.getInstance();
         fileEditorManager = FileEditorManager.getInstance(project);
         fileDocumentManager = FileDocumentManager.getInstance();
@@ -99,7 +95,6 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         LowMemoryWatcher.register(new Runnable() {
             @Override
             public void run() {
-                renderCache.clear();
                 if (displayedItem != null && !PlantUmlPreviewPanel.this.isPreviewVisible()) {
                     displayedItem = null;
                     imagesPanel.removeAll();
@@ -264,12 +259,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                     return;
                 }
 
-                RenderCacheItem betterItem = renderCache.getCachedItem(sourceFilePath, source, selectedPage, zoom, fileDocumentManager, fileManager, displayedItem);
-                logger.debug("cacheItem ", betterItem);
-                if (betterItem != null) {
-                    cachedItem = betterItem;
-                }
-
+                //todo can be simplified, because of removing of renderCache
                 if (cachedItem == null) {
                     logger.debug("no cached item");
                     lazyExecutor.submit(getCommand(reason, sourceFilePath, source, selectedPage, zoom, null, delay));
@@ -379,7 +369,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             } else {
                 boolean updateStatus = displayImages(newItem, false);
                 if (updateStatus) {
-                    executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, new SwitchBetweenCurrentErrorAndOldImage(newItem), resultMessage);
+                    executionStatusPanel.updateNow(newItem.getVersion(), ExecutionStatusPanel.State.DONE, null, resultMessage);
                 }
             }
         } catch (Throwable e) {
@@ -395,32 +385,32 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
                 && settings.isDoNotDisplayErrors();
     }
 
-    private class SwitchBetweenCurrentErrorAndOldImage implements Runnable {
-
-        private RenderCacheItem oldDiagram;
-        private boolean hasError;
-
-        public SwitchBetweenCurrentErrorAndOldImage(RenderCacheItem newItem) {
-            hasError = newItem.getRenderResult().hasError();
-        }
-
-        @Override
-        public void run() {
-            if (hasError) {
-                final RenderCacheItem displayedItem = PlantUmlPreviewPanel.this.displayedItem;
-                if (oldDiagram != null && displayedItem != oldDiagram) {
-                    displayImages(oldDiagram, true);
-                    SwingUtilities.invokeLater(() -> oldDiagram = null);
-                } else {
-                    RenderCacheItem renderCacheItem = renderCache.getLast();
-                    if (renderCacheItem != null && displayedItem != renderCacheItem) {
-                        displayImages(renderCacheItem, true);
-                        SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
-                    }
-                }
-            }
-        }
-    }
+//    private class SwitchBetweenCurrentErrorAndOldImage implements Runnable {
+//
+//        private RenderCacheItem oldDiagram;
+//        private boolean hasError;
+//
+//        public SwitchBetweenCurrentErrorAndOldImage(RenderCacheItem newItem) {
+//            hasError = newItem.getRenderResult().hasError();
+//        }
+//
+//        @Override
+//        public void run() {
+//            if (hasError) {
+//                final RenderCacheItem displayedItem = PlantUmlPreviewPanel.this.displayedItem;
+//                if (oldDiagram != null && displayedItem != oldDiagram) {
+//                    displayImages(oldDiagram, true);
+//                    SwingUtilities.invokeLater(() -> oldDiagram = null);
+//                } else {
+//                    RenderCacheItem renderCacheItem = renderCache.getLast();
+//                    if (renderCacheItem != null && displayedItem != renderCacheItem) {
+//                        displayImages(renderCacheItem, true);
+//                        SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private class SwitchBetweenOldImageAndSilentError implements Runnable {
 
@@ -441,21 +431,23 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
             } else if (displayedItem != newItem) {
                 displayImages(newItem, true);
                 SwingUtilities.invokeLater(() -> oldDiagram = displayedItem);
-
             }
         }
     }
 
-    private boolean displayImages(RenderCacheItem newItem, boolean force) {
-        if (!force && renderCache.isOlderRequest(newItem, displayedItem)) { //ctrl+z with cached image vs older request in progress
-            logger.debug("skipping displaying older result", newItem);
-            return false;
+    public boolean isSameFile(RenderCacheItem cachedItem, RenderCacheItem displayedItem) {
+        if (displayedItem != null && cachedItem != null) {
+            return displayedItem.getSourceFilePath().equals(cachedItem.getSourceFilePath());
         }
+        return false;
+    }
+
+    private boolean displayImages(RenderCacheItem newItem, boolean force) {
         long start = System.currentTimeMillis();
 
         //maybe track position per file?
         RenderCacheItem displayedItem = this.displayedItem;
-        boolean restoreScrollPosition = displayedItem != null && displayedItem.getRenderResult().hasError() && renderCache.isSameFile(newItem, displayedItem);
+        boolean restoreScrollPosition = displayedItem != null && displayedItem.getRenderResult().hasError() && isSameFile(newItem, displayedItem);
         //must be before revalidate
         int lastValidVerticalScrollValue = this.lastValidVerticalScrollValue;
         int lastValidHorizontalScrollValue = this.lastValidHorizontalScrollValue;
@@ -480,7 +472,7 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
         }
 
         if (requestedPage == -1) {
-            boolean incrementalDisplay = newItem.getRenderRequest().getReason() != RenderCommand.Reason.REFRESH && renderCache.isSameFile(newItem, displayedItem);
+            boolean incrementalDisplay = newItem.getRenderRequest().getReason() != RenderCommand.Reason.REFRESH && isSameFile(newItem, displayedItem);
             logger.debug("displaying images ", requestedPage, ", incrementalDisplay=", incrementalDisplay);
 
             Component[] children = imagesPanel.getComponents();

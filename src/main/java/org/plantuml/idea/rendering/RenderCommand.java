@@ -183,7 +183,6 @@ public class RenderCommand {
                 SwingUtilities.invokeLater(logDuration("EDT displayResult", () -> {
                     String resultMessage = getResultMessage(totalTime);
                     target.displayResult(newRenderCacheItem, resultMessage);
-                    updateCache(newRenderCacheItem);
                 }));
             });
 
@@ -198,23 +197,6 @@ public class RenderCommand {
         return result.resultMessage(totalTime, version);
     }
 
-    protected void updateCache(RenderCacheItem newItem) {
-        if (newItem == cachedItem) {
-            return;
-        }
-
-        if (newItem.hasImagesOrStacktrace()) {
-            RenderCache renderCache = RenderCache.getInstance();
-            if (reason == RenderCommand.Reason.REFRESH) {
-                if (cachedItem != null) {
-                    renderCache.removeFromCache(cachedItem);
-                }
-            }
-            if (!newItem.getRenderResult().hasError()) {
-                renderCache.addToCache(newItem);
-            }
-        }
-    }
 
     private void updateState(PlantUmlPreviewPanel target, ExecutionStatusPanel.State state) {
         currentState = state;

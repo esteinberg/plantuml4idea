@@ -52,7 +52,6 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox syntaxCheck;
     private JButton textFieldDotExecutableBrowse;
     private JTextField renderDelay;
-    private JTextField cacheSize;
     private JCheckBox renderLinksPng;
     private JCheckBox usePreferentiallyGRAPHIZ_DOT;
     private JTextField encoding;
@@ -272,7 +271,6 @@ public class PlantUmlSettingsPage implements Configurable {
         switchToBundledAfterUpdate.setSelected(data.isSwitchToBundledAfterUpdate());
         customPlantumlJar.setText(data.getCustomPlantumlJarPath());
         renderDelay.setText(data.getRenderDelay());
-        cacheSize.setText(data.getCacheSize());
         PLANTUML_LIMIT_SIZE.setText(data.getPLANTUML_LIMIT_SIZE());
         maxSvgSize.setText(data.getMaxSvgSize());
         encoding.setText(data.getEncoding());
@@ -305,7 +303,6 @@ public class PlantUmlSettingsPage implements Configurable {
         data.setSwitchToBundledAfterUpdate(switchToBundledAfterUpdate.isSelected());
         data.setCustomPlantumlJarPath(customPlantumlJar.getText());
         data.setRenderDelay(renderDelay.getText());
-        data.setCacheSize(cacheSize.getText());
         data.setPLANTUML_LIMIT_SIZE(PLANTUML_LIMIT_SIZE.getText());
         data.setMaxSvgSize(maxSvgSize.getText());
         data.setEncoding(encoding.getText());
@@ -342,8 +339,6 @@ public class PlantUmlSettingsPage implements Configurable {
         if (customPlantumlJar.getText() != null ? !customPlantumlJar.getText().equals(data.getCustomPlantumlJarPath()) : data.getCustomPlantumlJarPath() != null)
             return true;
         if (renderDelay.getText() != null ? !renderDelay.getText().equals(data.getRenderDelay()) : data.getRenderDelay() != null)
-            return true;
-        if (cacheSize.getText() != null ? !cacheSize.getText().equals(data.getCacheSize()) : data.getCacheSize() != null)
             return true;
         if (PLANTUML_LIMIT_SIZE.getText() != null ? !PLANTUML_LIMIT_SIZE.getText().equals(data.getPLANTUML_LIMIT_SIZE()) : data.getPLANTUML_LIMIT_SIZE() != null)
             return true;

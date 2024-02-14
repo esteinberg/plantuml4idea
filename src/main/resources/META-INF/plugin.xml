@@ -175,7 +175,6 @@
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
         <applicationConfigurable instance="org.plantuml.idea.settings.PlantUmlSettingsPage" groupId="language"/>
         <applicationService serviceImplementation="org.plantuml.idea.settings.PlantUmlSettings"/>
-        <applicationService serviceImplementation="org.plantuml.idea.rendering.RenderCache"/>
         <applicationService serviceImplementation="org.plantuml.idea.rendering.LazyApplicationPoolExecutor"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
                            language="PUML"/>

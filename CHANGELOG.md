@@ -2,10 +2,10 @@
 
 ## [Unreleased]
 
-## [7.6.1-IJ2023.2] - 2024-02-14
+## [7.6.2-IJ2023.2] - 2024-02-14
 - PlantUML library upgrade to v1.2024.1
 - Memory leak fix
-- Default cache size changed to 0
+- Removed image cache
 
 ## [7.5.0-IJ2023.2] - 2024-01-31
 - IntelliJ 2024.1 compatibility
@@ -29,8 +29,8 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.6.1-IJ2023.2...HEAD
-
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.6.2-IJ2023.2...HEAD
+[7.6.2-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.5.0-IJ2023.2...v7.6.2-IJ2023.2
 [7.6.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.5.0-IJ2023.2...v7.6.1-IJ2023.2
 [7.5.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.4.2-IJ2023.2...v7.5.0-IJ2023.2
 [7.4.2-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.3.0-IJ2023.2...v7.4.2-IJ2023.2
