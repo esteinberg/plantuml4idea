@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [7.7.0-IJ2023.2] - 2024-02-21
+- PlantUML library upgrade to v1.2024.3
+- Fixed syntax check
+
 ## [7.6.2-IJ2023.2] - 2024-02-14
 - PlantUML library upgrade to v1.2024.1
 - Memory leak fix
@@ -29,7 +33,9 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.6.2-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.7.0-IJ2023.2...HEAD
+
+[7.7.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.6.2-IJ2023.2...v7.7.0-IJ2023.2
 [7.6.2-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.5.0-IJ2023.2...v7.6.2-IJ2023.2
 [7.6.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.5.0-IJ2023.2...v7.6.1-IJ2023.2
 [7.5.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.4.2-IJ2023.2...v7.5.0-IJ2023.2
