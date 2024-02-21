@@ -22,7 +22,7 @@ public class RenderRequest {
     private final Integer version;
     private boolean renderUrlLinks;
     private RenderCommand.Reason reason;
-    protected boolean useSettings = true;
+    protected boolean testRequest = false;
     private boolean disableSvgZoom;
     private Project project;
 
@@ -54,7 +54,7 @@ public class RenderRequest {
         this.format = format;
         this.page = renderRequest.page;
         this.zoom = renderRequest.zoom;
-        this.useSettings = renderRequest.useSettings;
+        this.testRequest = renderRequest.testRequest;
         this.version = null;
     }
 
@@ -105,12 +105,12 @@ public class RenderRequest {
         return reason;
     }
 
-    public boolean isUseSettings() {
-        return useSettings;
+    public boolean isTestRequest() {
+        return testRequest;
     }
 
-    public void setUseSettings(boolean useSettings) {
-        this.useSettings = useSettings;
+    public void setTestRequest(boolean testRequest) {
+        this.testRequest = testRequest;
     }
 
     public boolean requestedRefreshOrIncludesChanged() {
@@ -131,7 +131,7 @@ public class RenderRequest {
                 .append("renderUrlLinks", renderUrlLinks)
                 .append("reason", reason)
                 .append("version", version)
-                .append("useSettings", useSettings)
+                .append("useSettings", testRequest)
                 .append("disableSvgZoom", disableSvgZoom)
                 .toString();
     }

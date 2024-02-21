@@ -62,17 +62,16 @@ public class PlantUmlRendererUtil {
         long start = System.currentTimeMillis();
         List<String> configAsList;
         String encoding;
-        if (renderRequest.isUseSettings()) {
+        if (renderRequest.isTestRequest()) {
+            encoding = "UTF-8";
+            configAsList = new ArrayList<>();
+        } else {
             PlantUmlSettings settings = PlantUmlSettings.getInstance();
             encoding = settings.getEncoding();
             if (StringUtils.isBlank(encoding)) {
                 encoding = null;
             }
             configAsList = settings.getConfigAsList();
-        } else {
-            encoding = "UTF-8";
-            configAsList = new ArrayList<>();
-
         }
 
         Defines defines;
