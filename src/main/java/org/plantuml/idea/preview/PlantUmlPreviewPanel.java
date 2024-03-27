@@ -226,11 +226,10 @@ public class PlantUmlPreviewPanel extends JPanel implements Disposable {
 
                 String source = getSelectedSourceWithCaret();
                 String sourceFilePath = null;
-                RenderCacheItem cachedItem = null;
+                RenderCacheItem cachedItem = displayedItem;
 
                 if ("".equals(source)) { //is included file or some crap?
                     logger.debug("empty source");
-                    cachedItem = displayedItem;
                     if (cachedItem == null) {
                         logger.debug("no DisplayedItem, empty source, reason=", reason);
                         return;
