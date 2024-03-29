@@ -4,7 +4,6 @@
 package org.plantuml.idea.preview.image.svg.batik
 
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.util.ImageLoader
 import io.sf.carte.echosvg.anim.dom.SVGOMDocument
 import io.sf.carte.echosvg.bridge.*
 import io.sf.carte.echosvg.bridge.svg12.SVG12BridgeContext
@@ -57,7 +56,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
         @JvmOverloads
         fun createImage(scale: Float,
                         document: Document,
-                        outDimensions: ImageLoader.Dimension2DDouble? /*OUT*/,
+                        outDimensions: Dimension2DDouble? /*OUT*/,
                         overriddenWidth: Float = -1f,
                         overriddenHeight: Float = -1f): BufferedImage {
             val transcoder = MySvgTranscoder(if (overriddenWidth == -1f) 16f else overriddenWidth,

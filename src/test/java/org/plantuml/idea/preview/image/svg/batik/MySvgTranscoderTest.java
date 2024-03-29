@@ -1,6 +1,5 @@
 package org.plantuml.idea.preview.image.svg.batik;
 
-import com.intellij.util.ImageLoader;
 import io.sf.carte.echosvg.transcoder.TranscoderException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class MySvgTranscoderTest {
 	private static void renderSvg(String pathname) throws IOException, TranscoderException {
 		Document svgDocument = MySvgDocumentFactoryKt.createSvgDocument(null, FileUtils.readFileToByteArray(new File(pathname)));
 		//it shows what is in png document - unZOOMED values, not limited by px limit
-		ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
+		Dimension2DDouble outSize = new Dimension2DDouble(0.0D, 0.0D);
 		BufferedImage image = MySvgTranscoder.createImage((float) 1.1, svgDocument, outSize);
 	}
 }

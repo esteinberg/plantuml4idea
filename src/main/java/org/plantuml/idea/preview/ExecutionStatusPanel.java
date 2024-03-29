@@ -47,7 +47,7 @@ public class ExecutionStatusPanel extends MyDumbAwareAction implements CustomCom
     }
 
     @Override
-    public JComponent createCustomComponent(Presentation presentation) {
+    public @NotNull JComponent createCustomComponent(Presentation presentation, String place) {
         final JPanel panel = new JPanel();
         this.label = createLabel();
         panel.setToolTipText(DESCRIPTION);

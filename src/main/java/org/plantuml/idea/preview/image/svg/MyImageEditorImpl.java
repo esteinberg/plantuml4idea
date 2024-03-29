@@ -21,13 +21,13 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.scale.ScaleContext;
 import com.intellij.ui.scale.ScaleType;
-import com.intellij.util.ImageLoader;
 import org.intellij.images.editor.ImageDocument;
 import org.intellij.images.editor.ImageZoomModel;
 import org.intellij.images.thumbnail.actionSystem.ThumbnailViewActions;
 import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.preview.image.svg.batik.Dimension2DDouble;
 import org.plantuml.idea.preview.image.svg.batik.MySvgDocumentFactoryKt;
 import org.plantuml.idea.preview.image.svg.batik.MySvgTranscoder;
 import org.plantuml.idea.settings.PlantUmlSettings;
@@ -233,7 +233,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
                 logDocument(svgDocument);
 
                 //it shows what is in png document - unZOOMED values, not limited by px limit
-                ImageLoader.Dimension2DDouble outSize = new ImageLoader.Dimension2DDouble(0.0D, 0.0D);
+                Dimension2DDouble outSize = new Dimension2DDouble(0.0D, 0.0D);
 
                 ScaleContext scaleContext = ScaleContext.create(previewPanel);
 
@@ -289,13 +289,13 @@ public final class MyImageEditorImpl implements MyImageEditor {
     }
 
     static class Holder {
-        private final ImageLoader.Dimension2DDouble outSize;
+        private final Dimension2DDouble outSize;
         private final double zoom;
         private final BufferedImage image;
         private String source;
         private Throwable exception;
 
-        public Holder(BufferedImage image, ImageLoader.Dimension2DDouble outSize, double zoom, String source, Throwable exception) {
+        public Holder(BufferedImage image, Dimension2DDouble outSize, double zoom, String source, Throwable exception) {
             this.outSize = outSize;
             this.zoom = zoom;
             this.image = image;
@@ -311,7 +311,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
             return image == null || this.zoom != zoom;
         }
 
-        public ImageLoader.Dimension2DDouble getOutSize() {
+        public Dimension2DDouble getOutSize() {
             return outSize;
         }
 

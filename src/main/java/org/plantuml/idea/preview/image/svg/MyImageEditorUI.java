@@ -30,7 +30,6 @@ import com.intellij.ui.PopupHandler;
 import com.intellij.ui.components.JBLayeredPane;
 import com.intellij.ui.components.Magnificator;
 import com.intellij.util.Alarm;
-import com.intellij.util.ImageLoader;
 import com.intellij.util.ui.JBUI;
 import org.intellij.images.ImagesBundle;
 import org.intellij.images.editor.ImageDocument;
@@ -49,6 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.preview.PlantUmlPreviewPanel;
 import org.plantuml.idea.preview.Zoom;
+import org.plantuml.idea.preview.image.svg.batik.Dimension2DDouble;
 import org.plantuml.idea.preview.image.svg.batik.MyBufferedImage;
 import org.plantuml.idea.util.Utils;
 
@@ -159,7 +159,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
             // Make sure toolbar is 'ready' before it's added to component hierarchy
             // to prevent ActionToolbarImpl.updateActionsImpl(boolean, boolean) from increasing popup size unnecessarily
-            actionToolbar.updateActionsImmediately();
+            actionToolbar.updateActionsAsync();
 
             actionToolbar.setTargetComponent(this);
 
@@ -587,7 +587,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
             if (holder.getImage() != null) {
                 image = holder.getImage();
                 double zoom = holder.getZoom();
-                ImageLoader.Dimension2DDouble outSize = holder.getOutSize();
+                Dimension2DDouble outSize = holder.getOutSize();
 
                 int w = (int) Math.floor(outSize.getWidth() * zoom);
                 int h = (int) Math.floor(outSize.getHeight() * zoom);
