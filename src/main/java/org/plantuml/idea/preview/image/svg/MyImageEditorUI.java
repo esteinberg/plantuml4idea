@@ -159,7 +159,8 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
 
             // Make sure toolbar is 'ready' before it's added to component hierarchy
             // to prevent ActionToolbarImpl.updateActionsImpl(boolean, boolean) from increasing popup size unnecessarily
-            actionToolbar.updateActionsAsync();
+            actionToolbar.updateActionsImmediately();
+
 
             actionToolbar.setTargetComponent(this);
 
