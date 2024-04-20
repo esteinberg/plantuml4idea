@@ -3,6 +3,9 @@ package org.plantuml.idea.external;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.ui.MessageType;
+import org.plantuml.idea.settings.PlantUmlSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -22,6 +25,7 @@ import static org.plantuml.idea.util.UIUtils.notification;
 public class ParentLastURLClassLoader extends ClassLoader {
 
     final static Set<String> neverLoadFromParentWithPrefix = new HashSet<String>();
+    private static final Logger log = LoggerFactory.getLogger(ParentLastURLClassLoader.class);
 
     {
         {
@@ -86,6 +90,13 @@ public class ParentLastURLClassLoader extends ClassLoader {
                     if (name.startsWith(forbiddenParentPrefixes)) {
                         if (!closed && !shownIncompatibleNotification) {
                             shownIncompatibleNotification = true;
+
+                            PlantUmlSettings settings = PlantUmlSettings.getInstance();
+                            boolean useBundled = settings.isUseBundled();
+                            String customPlantumlJarPath = settings.getCustomPlantumlJarPath();
+                            String lastBundledVersion = settings.getLastBundledVersion();
+                            log.warn(customPlantumlJarPath + " " + useBundled + " " + lastBundledVersion, e);
+
                             SwingUtilities.invokeLater(() -> {
                                 Notifications.Bus.notify(notification().createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
                             });
