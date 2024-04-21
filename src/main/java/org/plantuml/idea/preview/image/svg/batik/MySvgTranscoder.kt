@@ -86,7 +86,14 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
                 val style = document.rootElement?.attributes?.getNamedItem("style")?.textContent
                 image.setStyle(style)
 
-                outDimensions?.setSize(image.width.toDouble(), image.height.toDouble())
+                if (image.width.toDouble() < docWidth.toDouble()) {
+                    // when the limit hits, eg. when using skinparam dpi 300000
+                    outDimensions?.setSize(image.width.toDouble(), image.height.toDouble())
+                } else {
+                    // sometimes docWidth is smaller and produces better image
+                    outDimensions?.setSize(docWidth.toDouble(), docHeight.toDouble())
+                }
+
                 return image
             } catch (e: TranscoderException) {
                 throw e
