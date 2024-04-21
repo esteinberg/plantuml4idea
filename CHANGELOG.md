@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [7.10.0-IJ2023.2] - 2024-04-21
+
+- Fixed: error with `Incompatible PlantUML Version`
+- Fixed: SVG size limit - should now limit image size by zooming out
+
 ## [7.9.0-IJ2023.2] - 2024-04-20
 - PlantUML library upgrade to v1.2024.4
 - New diagrams support
@@ -44,8 +49,9 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.9.0-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.0-IJ2023.2...HEAD
 
+[7.10.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.9.0-IJ2023.2...v7.10.0-IJ2023.2
 [7.9.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.8.1-IJ2023.2...v7.9.0-IJ2023.2
 [7.8.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.7.1-IJ2023.2...v7.8.1-IJ2023.2
 [7.8.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.7.1-IJ2023.2...v7.8.0-IJ2023.2
