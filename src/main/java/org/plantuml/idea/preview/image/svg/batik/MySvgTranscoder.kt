@@ -86,7 +86,7 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
                 val style = document.rootElement?.attributes?.getNamedItem("style")?.textContent
                 image.setStyle(style)
 
-                outDimensions?.setSize(docWidth.toDouble(), docHeight.toDouble())
+                outDimensions?.setSize(image.width.toDouble(), image.height.toDouble())
                 return image
             } catch (e: TranscoderException) {
                 throw e
