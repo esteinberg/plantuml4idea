@@ -1,6 +1,6 @@
 package org.plantuml.idea.external;
 
-public class IncompatiblePlantUmlVersionException extends RuntimeException {
+public class IncompatiblePlantUmlVersionException extends ClassNotFoundException {
     public IncompatiblePlantUmlVersionException() {
     }
 
@@ -12,11 +12,4 @@ public class IncompatiblePlantUmlVersionException extends RuntimeException {
         super(message, cause);
     }
 
-    public IncompatiblePlantUmlVersionException(Throwable cause) {
-        super(cause);
-    }
-
-    public IncompatiblePlantUmlVersionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

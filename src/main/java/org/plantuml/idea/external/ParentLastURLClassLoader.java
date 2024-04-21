@@ -86,6 +86,11 @@ public class ParentLastURLClassLoader extends ClassLoader {
                 // first try to use the URLClassLoader findClass
                 return super.findClass(name);
             } catch (ClassNotFoundException e) {
+                if (name.equals("net.sourceforge.plantuml.flashcode.FlashCodeUtilsZxing")) {
+                    //ignore, see net.sourceforge.plantuml.flashcode.FlashCodeFactory
+                    throw e;
+                }
+
                 for (String forbiddenParentPrefixes : neverLoadFromParentWithPrefix) {
                     if (name.startsWith(forbiddenParentPrefixes)) {
                         if (!closed && !shownIncompatibleNotification) {
@@ -98,7 +103,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                             log.warn(customPlantumlJarPath + " " + useBundled + " " + lastBundledVersion, e);
 
                             SwingUtilities.invokeLater(() -> {
-                                Notifications.Bus.notify(notification().createNotification("Incompatible PlantUML Version!", MessageType.ERROR));
+                                Notifications.Bus.notify(notification().createNotification("Incompatible PlantUML Version!\nNot found: " + e.getMessage(), MessageType.ERROR));
                             });
                         }
                         if (closed) {
