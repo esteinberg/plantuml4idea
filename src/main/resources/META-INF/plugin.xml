@@ -51,11 +51,11 @@
         </group>
 
         <group id="PlantUML.Toolbar" description="PlantUML toolwindow toolbar">
-            <action id="PlantUML.Update" description="Update PlantUml Diagrams"
-                    class="org.plantuml.idea.action.UpdateDiagramsAction"
-                    icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">
-                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift F"/>
-            </action>
+            <!--            <action id="PlantUML.Update" description="Update PlantUml Diagrams"-->
+            <!--                    class="org.plantuml.idea.action.UpdateDiagramsAction"-->
+            <!--                    icon="AllIcons.Javaee.UpdateRunningApplication" text="Update PlantUml Diagrams - changes only">-->
+            <!--                <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt shift F"/>-->
+            <!--            </action>-->
             <action id="PlantUML.Reload" description="Reload PlantUml Diagrams"
                     class="org.plantuml.idea.action.ReloadNowAction"
                     icon="AllIcons.Actions.Refresh" text="Reload PlantUml Diagrams">

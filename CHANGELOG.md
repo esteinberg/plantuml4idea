@@ -4,6 +4,8 @@
 
 - PlantUML library upgrade to v1.2024.7
 - Fixed save dialog for Mac OS
+- Changed status text to indicate that Remote Renderer is used
+- removed Update button
 
 ## [7.10.1-IJ2023.2] - 2024-04-21
 - Fixed: error with `Incompatible PlantUML Version`

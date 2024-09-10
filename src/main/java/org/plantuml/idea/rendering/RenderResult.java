@@ -5,6 +5,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
+import org.plantuml.idea.settings.PlantUmlSettings;
 
 import java.io.File;
 import java.util.*;
@@ -154,6 +155,9 @@ public class RenderResult {
                     + updatedTitles + ","
                     + cached + "]";
             message += "-id:" + version;
+        }
+        if (PlantUmlSettings.getInstance().isRemoteRendering()) {
+            message = "Remote Rendering - " + message;
         }
         return message;
     }
