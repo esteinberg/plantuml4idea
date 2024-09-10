@@ -3,12 +3,12 @@ package org.plantuml.idea.lang.annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiFile;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtureTestCase {
+public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixture4TestCase {
 
     private PlantUmlExternalAnnotator plantUmlExternalAnnotator = new PlantUmlExternalAnnotator();
 
