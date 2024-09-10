@@ -14,7 +14,6 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
@@ -284,7 +283,10 @@ public abstract class AbstractSaveDiagramAction extends MyDumbAwareAction {
         }
 
         String defaultExtension = plantUmlSettings.getDefaultExportFileFormatEnum().name().toLowerCase();
-        if (SystemInfo.isMac && Registry.is("ide.mac.native.save.dialog") && !filename.endsWith("." + defaultExtension)) {
+
+        // Append extension manually to file name on MacOS because FileSaverDialog does not do it
+        // automatically.
+        if (SystemInfo.isMac && !filename.endsWith("." + defaultExtension)) {
             filename += "." + defaultExtension;
         }
         return filename;
