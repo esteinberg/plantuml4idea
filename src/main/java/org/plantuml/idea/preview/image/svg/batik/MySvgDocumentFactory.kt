@@ -1,7 +1,6 @@
 // Copyright 2000-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package org.plantuml.idea.preview.image.svg.batik
 
-import com.intellij.util.xml.dom.createXmlStreamReader
 import io.sf.carte.echosvg.anim.dom.SVG12DOMImplementation
 import io.sf.carte.echosvg.anim.dom.SVGDOMImplementation
 import io.sf.carte.echosvg.anim.dom.SVGOMDocument
@@ -40,6 +39,7 @@ private fun createSvgDocument(uri: String?, xmlStreamReader: XMLStreamReader2): 
     }
     return result
 }
+
 private fun buildDocument(reader: XMLStreamReader): SVGOMDocument {
     var state = reader.eventType
     if (XMLStreamConstants.START_DOCUMENT != state) {
@@ -53,8 +53,10 @@ private fun buildDocument(reader: XMLStreamReader): SVGOMDocument {
             XMLStreamConstants.START_DOCUMENT -> {
                 assert(document == null)
             }
+
             XMLStreamConstants.DTD, XMLStreamConstants.COMMENT, XMLStreamConstants.PROCESSING_INSTRUCTION, XMLStreamConstants.SPACE -> {
             }
+
             XMLStreamConstants.START_ELEMENT -> {
                 var version: String? = null
                 for (i in 0 until reader.attributeCount) {
@@ -82,12 +84,14 @@ private fun buildDocument(reader: XMLStreamReader): SVGOMDocument {
                 }
                 processElementFragment(reader, document, implementation, element)
             }
+
             XMLStreamConstants.CHARACTERS -> {
                 val badContent = reader.text
                 if (!isAllXMLWhitespace(badContent)) {
                     throw TranscoderException("Unexpected XMLStream event at Document level: CHARACTERS ($badContent)")
                 }
             }
+
             else -> throw TranscoderException("Unexpected XMLStream event at Document level:$state")
         }
         state = if (reader.hasNext()) {
@@ -111,18 +115,22 @@ private fun processElementFragment(reader: XMLStreamReader, document: SVGOMDocum
                 current = element
                 depth++
             }
+
             XMLStreamConstants.END_ELEMENT -> {
                 current = current.parentNode
                 depth--
             }
+
             XMLStreamConstants.CDATA -> current.appendChild(GenericCDATASection(reader.text, document))
             XMLStreamConstants.SPACE, XMLStreamConstants.CHARACTERS -> {
                 if (!reader.isWhiteSpace) {
                     current.appendChild(GenericText(reader.text, document))
                 }
             }
+
             XMLStreamConstants.ENTITY_REFERENCE, XMLStreamConstants.COMMENT, XMLStreamConstants.PROCESSING_INSTRUCTION -> {
             }
+
             else -> throw TranscoderException("Unexpected XMLStream event: ${reader.eventType}")
         }
     }
