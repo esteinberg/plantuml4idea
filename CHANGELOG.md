@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- PlantUML library upgrade to v1.2024.7
+- Fixed save dialog for Mac OS
+
 ## [7.10.1-IJ2023.2] - 2024-04-21
 - Fixed: error with `Incompatible PlantUML Version`
 - Fixed: SVG size limit - should now limit image size by zooming out
