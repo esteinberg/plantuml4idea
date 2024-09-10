@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+## [7.11.1-IJ2023.2] - 2024-09-10
 - PlantUML library upgrade to v1.2024.7
 - Fixed save dialog for Mac OS
 - Changed status text to indicate that Remote Renderer is used
@@ -57,7 +58,8 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.1-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.11.1-IJ2023.2...HEAD
+[7.11.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.1-IJ2023.2...v7.11.1-IJ2023.2
 [7.10.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.0-IJ2023.2...v7.10.1-IJ2023.2
 [7.10.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.9.0-IJ2023.2...v7.10.0-IJ2023.2
 [7.9.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.8.1-IJ2023.2...v7.9.0-IJ2023.2
