@@ -167,7 +167,7 @@
             <category>plantuml4idea plugin</category>
         </intentionAction>
 
-        <toolWindow id="PlantUML" icon="/images/uml.png" anchor="right"
+        <toolWindow id="PlantUML" icon="/images/uml.svg" anchor="right"
                     factoryClass="org.plantuml.idea.preview.toolwindow.PlantUmlToolWindowFactory"/>
         <fileTypeFactory implementation="org.plantuml.idea.lang.PlantUmlTypeFactory"/>
         <lang.parserDefinition language="PUML"
