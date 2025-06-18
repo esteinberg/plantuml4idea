@@ -15,7 +15,7 @@ public class PlantUmlFileType extends LanguageFileType {
     public static final String PLANTUML_EXT = "puml";
     public static final String PLANTUML_EXT_2 = "plantuml";
 
-    public static final Icon PLANTUML_ICON = IconLoader.getIcon("/images/uml.png", PlantUmlApplicationComponent.class);
+    public static final Icon PLANTUML_ICON = IconLoader.getIcon("/images/uml.svg", PlantUmlApplicationComponent.class);
 
     private PlantUmlFileType() {
         super(PlantUmlLanguage.INSTANCE);
