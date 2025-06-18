@@ -84,7 +84,7 @@ public class Classloaders {
         if (!Utils.isUnitTest() && jars.length < 2) {
             throw new RuntimeException("Invalid installation. Should find at least 2 jars, but found: " + Arrays.toString(jars));
         }
-        List<File> plantumls = Arrays.stream(jars).filter(file -> file.getName().startsWith("plantuml")).collect(Collectors.toList());
+        List<File> plantumls = Arrays.stream(jars).filter(file -> file.getName().startsWith("plantuml") && !file.getName().startsWith("plantuml4idea")).collect(Collectors.toList());
         if (plantumls.size() != 1) {
             LOG.error("Invalid installation. Should find only one plantuml jar, but found: " + plantumls);
         }

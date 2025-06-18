@@ -6,6 +6,7 @@ import net.sourceforge.plantuml.*;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.error.PSystemError;
 import net.sourceforge.plantuml.error.PSystemErrorV2;
+import net.sourceforge.plantuml.preproc.PreprocessingArtifact;
 import net.sourceforge.plantuml.text.StringLocated;
 import net.sourceforge.plantuml.utils.LineLocationImpl;
 import org.jetbrains.annotations.NotNull;
@@ -123,8 +124,8 @@ public class PlantUmlPartialRenderer extends PlantUmlNormalRenderer {
             List<StringLocated> data = Collections.singletonList(o);
             UmlSource source = UmlSource.create(data, false);
 
-            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), 1, lineLocation);
-            PSystemError pSystemError = new PSystemErrorV2(source, data, singleError);
+            ErrorUml singleError = new ErrorUml(ErrorUmlType.EXECUTION_ERROR, e.getMessage(), 1, lineLocation, null);
+            PSystemError pSystemError = new PSystemErrorV2(source, data, singleError, new PreprocessingArtifact());
             pSystemError.exportDiagram(os, 0, new FileFormatOption(fileFormat));
         } catch (IOException e1) {
             logger.warn(e1);

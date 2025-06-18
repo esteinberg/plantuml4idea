@@ -33,7 +33,7 @@ public class Utils {
         int i = defaultValue;
         //noinspection EmptyCatchBlock
         try {
-            i = Integer.parseInt(renderDelay);
+            i = Integer.parseInt(renderDelay.trim());
         } catch (NumberFormatException e) {
         }
         return i;

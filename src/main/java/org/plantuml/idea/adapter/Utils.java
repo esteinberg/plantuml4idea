@@ -10,7 +10,7 @@ import net.sourceforge.plantuml.FileSystem;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
-import net.sourceforge.plantuml.dot.GraphvizUtils;
+import net.sourceforge.plantuml.dot.GraphvizRuntimeEnvironment;
 import net.sourceforge.plantuml.security.SFile;
 import net.sourceforge.plantuml.version.Version;
 import org.apache.commons.lang3.StringUtils;
@@ -80,14 +80,14 @@ public class Utils {
         boolean propertySet = isNotBlank || isNotBlank1;
 
         if (StringUtils.isBlank(plantUmlSettings.getDotExecutable()) || (propertySet && plantUmlSettings.isUsePreferentiallyGRAPHIZ_DOT())) {
-            GraphvizUtils.setDotExecutable(null);
+            GraphvizRuntimeEnvironment.getInstance().setDotExecutable(null);
         } else {
-            GraphvizUtils.setDotExecutable(plantUmlSettings.getDotExecutable());
+            GraphvizRuntimeEnvironment.getInstance().setDotExecutable(plantUmlSettings.getDotExecutable());
         }
 
         if (StringUtils.isNotBlank(plantUmlSettings.getPLANTUML_LIMIT_SIZE())) {
             try {
-                Integer.parseInt(plantUmlSettings.getPLANTUML_LIMIT_SIZE());
+                Integer.parseInt(plantUmlSettings.getPLANTUML_LIMIT_SIZE().trim());
                 System.setProperty("PLANTUML_LIMIT_SIZE", plantUmlSettings.getPLANTUML_LIMIT_SIZE());
             } catch (NumberFormatException e) {
                 LOG.error("invalid PLANTUML_LIMIT_SIZE", e);
