@@ -20,7 +20,7 @@ public class PlantUmlSplitEditorProvider implements FileEditorProvider, DumbAwar
         return Utils.isPlantUmlFileType(project, file);
     }
 
-    @Override
+    //    @Override
     public boolean acceptRequiresReadAction() {
         return false;
     }

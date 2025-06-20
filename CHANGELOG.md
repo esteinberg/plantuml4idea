@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [7.12.1-IJ2023.2] - 2025-06-20
+
+- PlantUML library upgrade to v1.2025.3
+- New toolwindow icon
+- build fix using JRE 17
+
 ## [7.12.0-IJ2023.2] - 2025-06-18
 
 - PlantUML library upgrade to v1.2025.3
@@ -77,7 +83,9 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.12.0-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.12.1-IJ2023.2...HEAD
+
+[7.12.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.12.0-IJ2023.2...v7.12.1-IJ2023.2
 [7.12.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.11.2-IJ2023.2...v7.12.0-IJ2023.2
 [7.11.2-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.1-IJ2023.2...v7.11.2-IJ2023.2
 [7.11.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.10.1-IJ2023.2...v7.11.1-IJ2023.2
