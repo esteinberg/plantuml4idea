@@ -63,8 +63,10 @@ public class CopyDiagramToClipboardContextAction extends MyDumbAwareAction {
                 return image;
             }
         });
-        WindowManager.getInstance().getStatusBar(e.getProject()).setInfo("Image copied to clipboard");
-
+        Project project = e.getProject();
+        if (project != null) {
+            WindowManager.getInstance().getStatusBar(project).setInfo("Image copied to clipboard");
+        }
     }
 
     @Override
