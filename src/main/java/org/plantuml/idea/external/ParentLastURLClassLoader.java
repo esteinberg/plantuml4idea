@@ -3,6 +3,7 @@ package org.plantuml.idea.external;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.ui.MessageType;
+import org.jetbrains.annotations.NotNull;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,6 @@ public class ParentLastURLClassLoader extends ClassLoader {
 
         public ChildURLClassLoader(URL[] urls, FindClassClassLoader realParent) {
             super(urls, null);
-
             this.realParent = realParent;
         }
 
@@ -77,8 +77,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                 if (name.startsWith("org.plantuml.idea") && !name.startsWith("org.plantuml.idea.adapter")) {
                     return realParent.loadClass(name);
                 }
-
-                //calling twic #findClass with the same classname, you will get a LinkageError, this fixes it
+                //calling twice #findClass with the same classname, you will get a LinkageError, this fixes it
                 Class<?> loaded = super.findLoadedClass(name);
                 if (loaded != null)
                     return loaded;
@@ -110,7 +109,7 @@ public class ParentLastURLClassLoader extends ClassLoader {
                             throw new ProcessCanceledException();
                         } else {
                             throw new IncompatiblePlantUmlVersionException(
-                                    name + " not found in child classloader, and prohibited from loading from parent", e);
+                                    name + " not found in child classloader, and prohibited from loading from parent. " + debugMessage(getURLs()), e);
                         }
                     }
                 }
@@ -118,6 +117,28 @@ public class ParentLastURLClassLoader extends ClassLoader {
                 return realParent.loadClass(name);
             }
         }
+    }
+
+    @NotNull
+    private static String debugMessage(URL[] urLs) {
+        PlantUmlSettings settings = PlantUmlSettings.getInstance();
+        String log = "";
+        if (settings.isRemoteRendering()) {
+            log += "Remote rendering. ";
+        }
+        if (settings.isUseBundled()) {
+            log += "Using bundled PlantUML";
+        } else {
+            log += "Using custom jars at: " + settings.getCustomPlantumlJarPath();
+            log += " [";
+            for (URL urL : urLs) {
+                log += urL;
+                log += ",";
+
+            }
+            log += "]";
+        }
+        return log;
     }
 
 
