@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- PlantUML library upgrade to v1.2026.2
+
 ## [7.13.0-IJ2023.2] - 2025-07-02
 
 - PlantUML library upgrade to v1.2025.4

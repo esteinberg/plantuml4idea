@@ -71,7 +71,7 @@ dependencies {
     }
 
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
-    implementation("net.sourceforge.plantuml:plantuml-mit:1.2025.4")
+    implementation("net.sourceforge.plantuml:plantuml-mit:1.2026.2")
 
     implementation("org.apache.commons:commons-lang3:3.13.0")
 

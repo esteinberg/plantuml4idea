@@ -5,7 +5,6 @@ import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.DiagramDescription;
-import net.sourceforge.plantuml.preproc.FileWithSuffix;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +20,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -225,15 +223,11 @@ public class DiagramFactory {
         long start = System.currentTimeMillis();
         LinkedHashMap<File, Long> includedFiles = new LinkedHashMap<>();
         for (MyBlock block : myBlocks) {
-            try {
-                Set<File> convert = FileWithSuffix.convert(block.getBlockUml().getIncluded());
-                ArrayList<File> files = new ArrayList<>(convert);
-                files.sort(File::compareTo);
-                for (File file : files) {
-                    includedFiles.put(file, file.lastModified());
-                }
-            } catch (FileNotFoundException e) {
-                LOG.warn(e);
+            Set<File> convert = block.getBlockUml().getIncluded();
+            ArrayList<File> files = new ArrayList<>(convert);
+            files.sort(File::compareTo);
+            for (File file : files) {
+                includedFiles.put(file, file.lastModified());
             }
         }
         LOG.debug("getIncludedFiles ", (System.currentTimeMillis() - start), "ms");
