@@ -16,7 +16,7 @@ public enum LanguageDescriptor {
     public static final String IDEA_PARTIAL_RENDER = "idea.partialRender";
     public static final String IDEA_DISABLE_SYNTAX_CHECK = "idea.disableSyntaxCheck";
 
-    public static final String TAGS = "wire|bpm|uml|dot|jcckit|ditaa|project|salt|flow|creole|tree|cute|math|latex|def|gantt|nwdiag|mindmap|wbs|json|git|board|yaml|hcl|ebnf|regex|files|chronology|chen";
+    public static final String TAGS = "wire|bpm|uml|dot|jcckit|ditaa|project|salt|flow|creole|tree|cute|math|latex|def|gantt|nwdiag|mindmap|wbs|json|git|board|yaml|hcl|ebnf|regex|files|chronology|chen|chart|packetdiag";
 
     public final List<String> types = Collections.unmodifiableList(Arrays.asList(
             "actor",
@@ -52,6 +52,8 @@ public enum LanguageDescriptor {
     ));
 
     public final List<String> tags = Collections.unmodifiableList(Arrays.asList(
+            "@startchart",
+            "@endchart",
             "@startwire",
             "@startbpm",
             "@startuml",
