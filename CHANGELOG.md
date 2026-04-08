@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [7.14.0-IJ2023.2] - 2026-04-08
+
 - PlantUML library upgrade to v1.2026.2
 
 ## [7.13.0-IJ2023.2] - 2025-07-02
@@ -89,7 +91,9 @@
 - SVG rendering migrated to EchoSVG from Batik
 - PlantUML library upgrade to v1.2023.10
 
-[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.13.0-IJ2023.2...HEAD
+[Unreleased]: https://github.com/esteinberg/plantuml4idea/compare/v7.14.0-IJ2023.2...HEAD
+
+[7.14.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.13.0-IJ2023.2...v7.14.0-IJ2023.2
 [7.13.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.12.1-IJ2023.2...v7.13.0-IJ2023.2
 [7.12.1-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.12.0-IJ2023.2...v7.12.1-IJ2023.2
 [7.12.0-IJ2023.2]: https://github.com/esteinberg/plantuml4idea/compare/v7.11.2-IJ2023.2...v7.12.0-IJ2023.2
