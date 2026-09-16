@@ -3,6 +3,7 @@ package org.plantuml.idea.preview.image.links;
 import com.intellij.find.EditorSearchSession;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -145,9 +146,16 @@ public class LinkNavigator {
     }
 
     private boolean navigateToEditor(String text, File file) {
-        VirtualFile virtualFile = localFileSystem.findFileByPath(file.getAbsolutePath());
+        VirtualFile virtualFile = ReadAction.compute(() -> localFileSystem.findFileByPath(file.getAbsolutePath()));
         if (virtualFile != null) {
-            Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
+            Document document = ReadAction.compute(() -> {
+               if (virtualFile.isValid()) {
+                    return FileDocumentManager.getInstance().getDocument(virtualFile);
+               } else {
+                    return null;
+               }
+            });
+
             if (document != null) {
                 String documentText = document.getText();
                 int i = documentText.indexOf(text, lastIndex);
