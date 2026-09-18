@@ -2,6 +2,7 @@ package org.plantuml.idea.adapter.rendering;
 
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.*;
+import net.sourceforge.plantuml.core.AbstractDiagram;
 import net.sourceforge.plantuml.klimt.creole.Display;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -87,8 +88,8 @@ public class MyBlock {
         if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
             for (net.sourceforge.plantuml.core.Diagram page : newpagedDiagram.getDiagrams()) {
-                if (page instanceof AbstractPSystem) {
-                    AbstractPSystem descriptionDiagram = (AbstractPSystem) page;
+                if (page instanceof AbstractDiagram) {
+                    AbstractDiagram descriptionDiagram = (AbstractDiagram) page;
                     Scale scale = descriptionDiagram.getScale();
 
                     if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {
@@ -96,8 +97,8 @@ public class MyBlock {
                     }
                 }
             }
-        } else if (diagram instanceof AbstractPSystem) { //gantt, salt wireframe - but has no effect
-            AbstractPSystem d = (AbstractPSystem) diagram;
+        } else if (diagram instanceof AbstractDiagram) { //gantt, salt wireframe - but has no effect
+            AbstractDiagram d = (AbstractDiagram) diagram;
             Scale scale = d.getScale();
 
             if (scale == null || scale instanceof ScaleSimple || osScaledZoom != 100) {

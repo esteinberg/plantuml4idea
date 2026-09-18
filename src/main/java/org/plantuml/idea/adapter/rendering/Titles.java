@@ -3,10 +3,8 @@ package org.plantuml.idea.adapter.rendering;
 import com.intellij.openapi.diagnostic.Logger;
 import net.sourceforge.plantuml.NewpagedDiagram;
 import net.sourceforge.plantuml.TitledDiagram;
-import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.abel.DisplayPositioned;
 import net.sourceforge.plantuml.error.PSystemError;
-import net.sourceforge.plantuml.klimt.creole.Display;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.Newpage;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
@@ -32,24 +30,24 @@ public class Titles {
             SequenceDiagram sequenceDiagram = (SequenceDiagram) diagram;
             MyBlock.addTitle(titles, sequenceDiagram.getTitle().getDisplay());
             List<Event> events = sequenceDiagram.events();
+            // Newpage no longer carries its own title
+            // SequenceDiagram keeps them in an indexed list, 0 is the main title
+            int page = 1;
             for (Event event : events) {
                 if (event instanceof Newpage) {
-                    Display title = ((Newpage) event).getTitle();
-                    MyBlock.addTitle(titles, title);
+                    DisplayPositioned title = sequenceDiagram.getTitle(page++);
+                    MyBlock.addTitle(titles, title.getDisplay());
                 }
             }
         } else if (diagram instanceof NewpagedDiagram) {
             NewpagedDiagram newpagedDiagram = (NewpagedDiagram) diagram;
-            List<net.sourceforge.plantuml.core.Diagram> diagrams = newpagedDiagram.getDiagrams();
+            List<net.sourceforge.plantuml.UgDiagram> diagrams = newpagedDiagram.getDiagrams();
             for (net.sourceforge.plantuml.core.Diagram diagram1 : diagrams) {
-                if (diagram1 instanceof UmlDiagram) {
-                    DisplayPositioned title = (DisplayPositioned) ((UmlDiagram) diagram1).getTitle();
+                if (diagram1 instanceof TitledDiagram) {
+                    DisplayPositioned title = ((TitledDiagram) diagram1).getTitle();
                     MyBlock.addTitle(titles, title.getDisplay());
                 }
             }
-        } else if (diagram instanceof UmlDiagram) {
-            DisplayPositioned title = (DisplayPositioned) ((UmlDiagram) diagram).getTitle();
-            MyBlock.addTitle(titles, title.getDisplay());
         } else if (diagram instanceof PSystemError) {
             DisplayPositioned title = (DisplayPositioned) ((PSystemError) diagram).getTitle();
             if (title == null) {
