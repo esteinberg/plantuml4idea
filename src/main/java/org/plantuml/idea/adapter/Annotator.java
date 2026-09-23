@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import net.sourceforge.plantuml.BlockUml;
 import net.sourceforge.plantuml.ErrorUml;
 import net.sourceforge.plantuml.SourceStringReader;
-import net.sourceforge.plantuml.UmlDiagram;
+import net.sourceforge.plantuml.TitledDiagram;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.error.PSystemError;
 import net.sourceforge.plantuml.preproc.Defines;
@@ -89,8 +89,8 @@ public class Annotator {
 
         final Diagram system = blocks.get(0).getDiagram();
         result.setCmapData(system.hasUrl());
-        if (system instanceof UmlDiagram) {
-            result.setUmlDiagramType(((UmlDiagram) system).getUmlDiagramType());
+        if (system instanceof TitledDiagram) {
+            result.setDiagramType(((TitledDiagram) system).getDiagramType());
             result.setDescription(system.getDescription().getDescription());
         } else if (system instanceof PSystemError) {
             result.setError(true);
