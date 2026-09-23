@@ -51,6 +51,10 @@ Contributors:
 ### master
 
 * Current production branch
+  
+### 2026
+
+* Gradle build for IntelliJ 2026
 
 ### grammar
 
