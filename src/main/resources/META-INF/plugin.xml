@@ -173,7 +173,7 @@
         <lang.parserDefinition language="PUML"
                                implementationClass="org.plantuml.idea.lang.PlantUmlParserDefinition"/>
         <lang.commenter language="PUML" implementationClass="org.plantuml.idea.lang.PlantUmlCommenter"/>
-        <applicationConfigurable instance="org.plantuml.idea.settings.PlantUmlSettingsPage" groupId="language"/>
+        <applicationConfigurable instance="org.plantuml.idea.settings.PlantUmlSettingsPage" groupId="language" displayName="PlantUML"/>
         <applicationService serviceImplementation="org.plantuml.idea.settings.PlantUmlSettings"/>
         <applicationService serviceImplementation="org.plantuml.idea.rendering.LazyApplicationPoolExecutor"/>
         <externalAnnotator implementationClass="org.plantuml.idea.lang.annotator.PlantUmlExternalAnnotator"
@@ -211,7 +211,7 @@
         <indexPatternBuilder implementation="org.plantuml.idea.grammar.PumlIndexPatternBuilder"/>
 
         <fileEditorProvider implementation="org.plantuml.idea.preview.editor.PlantUmlSplitEditorProvider"/>
-        <liveTemplateContext implementation="org.plantuml.idea.template.PumlTemplateContextType"/>
+        <liveTemplateContext implementation="org.plantuml.idea.template.PumlTemplateContextType" contextId="PUML"/>
         <defaultLiveTemplates file="/liveTemplates/PlantUml.xml"/>
     </extensions>
 
