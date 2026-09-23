@@ -74,6 +74,8 @@ import java.beans.PropertyChangeListener;
 public final class MyImageEditorUI extends JPanel implements DataProvider, CopyProvider, ImageComponentDecorator, Disposable {
     private static final Logger LOG = Logger.getInstance(MyImageEditorUI.class);
 
+    @NonNls public static String ACTION_PLACE = "Images.Thumbnails";
+
     @NonNls
     private static final String IMAGE_PANEL = "image";
     @NonNls
@@ -254,7 +256,7 @@ public final class MyImageEditorUI extends JPanel implements DataProvider, CopyP
     @Override
     public boolean isEnabledForActionPlace(String place) {
         // Disable for thumbnails action
-        return !ThumbnailViewActions.ACTION_PLACE.equals(place);
+        return !ACTION_PLACE.equals(place);
     }
 
 

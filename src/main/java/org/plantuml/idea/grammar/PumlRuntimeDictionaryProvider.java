@@ -41,7 +41,7 @@ public class PumlRuntimeDictionaryProvider implements RuntimeDictionaryProvider 
                 return name;
             }
 
-            @Override
+//            @Override
             public Boolean contains(@NotNull String s) {
                 return set.contains(s);
             }

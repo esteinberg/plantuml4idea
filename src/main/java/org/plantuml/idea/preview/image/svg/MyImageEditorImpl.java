@@ -151,7 +151,7 @@ public final class MyImageEditorImpl implements MyImageEditor {
     @Override
     public boolean isEnabledForActionPlace(String place) {
         // Disable for thumbnails action
-        return !ThumbnailViewActions.ACTION_PLACE.equals(place);
+        return !MyImageEditorUI.ACTION_PLACE.equals(place);
     }
 
     @Override
