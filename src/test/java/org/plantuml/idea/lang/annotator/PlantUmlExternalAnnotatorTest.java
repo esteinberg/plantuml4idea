@@ -4,6 +4,7 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixture4TestCase;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +13,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
 
     private PlantUmlExternalAnnotator plantUmlExternalAnnotator = new PlantUmlExternalAnnotator();
 
+    @Test
     public void testLineCommentHighlight() {
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n'Line Comment\nactor User/'Block Comment'/\n@enduml");
@@ -29,6 +31,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         assertEquals(23, lineCommentAnnotation.endSourceOffset);
     }
 
+    @Test
     public void testLineCommentHighlight_withWhitespacesBefore() {
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n\t 'Line Comment\nactor User/'Block Comment'/\n@enduml");
@@ -46,7 +49,7 @@ public class PlantUmlExternalAnnotatorTest extends LightPlatformCodeInsightFixtu
         assertEquals(25, lineCommentAnnotation.endSourceOffset);
     }
 
-
+    @Test
     public void testBlockCommentHighlight() {
         PsiFile psiFile = createForPUMLFile(
                 "@startuml\n/'Block Comment'/\nactor User/'Second Block Comment'/\n@enduml");
