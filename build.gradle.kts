@@ -5,9 +5,9 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     id("java") // Java support
-    id("org.jetbrains.kotlin.jvm")
-    id("org.jetbrains.intellij.platform")
-    id("org.jetbrains.changelog")
+    alias(libs.plugins.kotlin) // Kotlin support
+    alias(libs.plugins.intellij.platform) // IntelliJ Platform Gradle Plugin
+    alias(libs.plugins.changelog) // Gradle Changelog Plugin
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -54,6 +54,8 @@ java.sourceSets["main"].java {
     srcDir("gen")
 }
 
+fun ModuleDependency.exclude(dep: Provider<MinimalExternalModuleDependency>) = exclude(dep.get().group, module = dep.get().module.toString() )
+
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
     testImplementation(libs.junit)
@@ -64,7 +66,7 @@ dependencies {
 
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
-        intellijIdea("2026.2.3")
+        intellijIdea(libs.versions.intelliJPlatform)
 
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
@@ -76,17 +78,15 @@ dependencies {
     }
 
 // https://mvnrepository.com/artifact/net.sourceforge.plantuml/plantuml
-    implementation("net.sourceforge.plantuml:plantuml-mit:1.2026.8")
+    implementation(libs.plantuml)
 
-    implementation("org.apache.commons:commons-lang3:3.18.0")
+    implementation(libs.commons.lang)
 
 
-    implementation("io.sf.carte:echosvg-all:0.3.3") {
-//        exclude(group = "it.unimi.dsi", module = "fastutil")
-        exclude(group = "xml-apis", module = "xml-apis")
-//        exclude(group = "xml-apis", module = "xml-apis-ext")
-        exclude(group = "commons-io", module = "commons-io")
-        exclude(group = "commons-logging", module = "commons-logging")
+    implementation(libs.echosvg) {
+        exclude(libs.xml.apis)
+        exclude(libs.commons.io)
+        exclude(libs.commons.logging)
     }
 
 
@@ -104,7 +104,6 @@ repositories {
         }
     }
 }
-
 
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
