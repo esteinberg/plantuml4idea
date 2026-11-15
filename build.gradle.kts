@@ -83,11 +83,12 @@ dependencies {
     implementation(libs.commons.lang)
 
 
-    implementation(libs.echosvg) {
+    implementation(libs.echosvg.all) {
         exclude(libs.xml.apis)
         exclude(libs.commons.io)
         exclude(libs.commons.logging)
     }
+    implementation(libs.echosvg.codec)
 
 
 }
@@ -101,6 +102,7 @@ repositories {
             includeGroup("com.github.css4j")
             includeGroup("io.sf.carte")
             includeGroup("io.sf.jclf")
+            includeGroup("io.sf.w3")
         }
     }
 }
