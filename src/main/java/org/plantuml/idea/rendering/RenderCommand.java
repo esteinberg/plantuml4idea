@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.plantuml.idea.external.PlantUmlFacade;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.preview.ExecutionStatusPanel;
@@ -13,6 +14,7 @@ import org.plantuml.idea.preview.Zoom;
 import org.plantuml.idea.settings.PlantUmlSettings;
 
 import javax.swing.*;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -133,8 +135,6 @@ public class RenderCommand {
 
             PlantUmlSettings plantUmlSettings = PlantUmlSettings.getInstance();
 
-            CompatibilityCheck.checkTransformer(plantUmlSettings);
-
             ImageFormat imageFormat = plantUmlSettings.isDisplaySvg() ? ImageFormat.SVG : ImageFormat.PNG;
 
             renderRequest = new RenderRequest(sourceFilePath, source, imageFormat, page, zoom, version, plantUmlSettings.isRenderLinks(), reason, project);
@@ -217,19 +217,17 @@ public class RenderCommand {
                 .toString();
     }
 
-    public boolean isSame(RenderCommand o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        RenderCommand that = (RenderCommand) o;
+    public boolean isSame(RenderCommand that) {
+        if (this == that) return true;
+        if (that == null || getClass() != that.getClass()) return false;
 
         if (page != that.page) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) return false;
+        if (!Objects.equals(project, that.project)) return false;
         if (reason != that.reason) return false;
-        if (sourceFilePath != null ? !sourceFilePath.equals(that.sourceFilePath) : that.sourceFilePath != null)
+        if (!Objects.equals(sourceFilePath, that.sourceFilePath))
             return false;
-        if (source != null ? !source.equals(that.source) : that.source != null) return false;
-        if (zoom != null ? !zoom.equals(that.zoom) : that.zoom != null) return false;
+        if (!Objects.equals(source, that.source)) return false;
+        if (!Objects.equals(zoom, that.zoom)) return false;
         return true;
     }
 
@@ -251,7 +249,7 @@ public class RenderCommand {
         }
 
         @Override
-        protected String getResultMessage(long totalTime) {
+        protected @NonNull String getResultMessage(long totalTime) {
             String message = "cached";
             if (logger.isDebugEnabled()) {
                 message += totalTime + "ms";
