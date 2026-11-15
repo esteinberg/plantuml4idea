@@ -64,7 +64,7 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
     private boolean switchToBundledAfterUpdate = true;
     private boolean useBundled = true;
     private String lastBundledVersion;
-    private String defaultExportFileFormat = "PNG";
+    public ImageFormat defaultExportFileFormat = ImageFormat.PNG;
     private boolean usePageTitles = true;
     private boolean useGrammar = true;
     private boolean keywordHighlighting = true;
@@ -92,25 +92,6 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
             return new PlantUmlSettings();
         }
         return ApplicationManager.getApplication().getService(PlantUmlSettings.class);
-    }
-
-    /**
-     * @see #getDefaultExportFileFormatEnum
-     */
-    @Deprecated
-    public String getDefaultExportFileFormat() {
-        if (this.defaultExportFileFormat == null) {
-            return ImageFormat.PNG.name();
-        }
-        return this.defaultExportFileFormat;
-    }
-
-    public ImageFormat getDefaultExportFileFormatEnum() {
-        return ImageFormat.from(defaultExportFileFormat);
-    }
-
-    public void setDefaultExportFileFormat(String defaultExportFileFormat) {
-        this.defaultExportFileFormat = defaultExportFileFormat;
     }
 
     public boolean isShowChessboard() {
@@ -490,6 +471,14 @@ public class PlantUmlSettings implements PersistentStateComponent<PlantUmlSettin
 
     public void setRemoteRenderingSinglePage(final boolean remoteRenderingSinglePage) {
         this.remoteRenderingSinglePage = remoteRenderingSinglePage;
+    }
+
+    public ImageFormat getDefaultExportFileFormat() {
+        return this.defaultExportFileFormat;
+    }
+
+    public void setDefaultExportFileFormat(ImageFormat selectedItem) {
+        this.defaultExportFileFormat = selectedItem;
     }
 
 

@@ -27,7 +27,6 @@ import org.plantuml.idea.rendering.RenderResult;
 import org.plantuml.idea.settings.PlantUmlSettings;
 import org.plantuml.idea.util.PsiUtil;
 
-import java.awt.event.InputEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
@@ -192,7 +191,7 @@ public class LinkNavigator {
                             presentation.copyFrom(templatePresentation);
 
                             DataContext dataContext = DataManager.getInstance().getDataContext(editor.getComponent());
-                            AnActionEvent anActionEvent = new AnActionEvent(null, dataContext, "plantuml image", presentation, ActionManager.getInstance(), 0);
+                            AnActionEvent anActionEvent = new AnActionEvent(dataContext, presentation, "plantuml image", ActionUiKind.NONE, null, 0, ActionManager.getInstance());
                             find.actionPerformed(anActionEvent);
                         }
                     }

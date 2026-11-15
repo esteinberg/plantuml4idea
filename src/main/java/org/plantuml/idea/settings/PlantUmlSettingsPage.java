@@ -15,7 +15,7 @@ import com.intellij.ui.ColoredSideBorder;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import org.apache.commons.lang3.StringUtils;
-import org.jdesktop.swingx.combobox.ListComboBoxModel;
+import com.intellij.ui.CollectionComboBoxModel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,8 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 /**
  * @author Max Gorbunov
@@ -78,7 +77,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox svgPreviewScaling;
     private JButton donate;
     private JLabel svgPreviewLimitLabel;
-    private JComboBox<String> defaultFileExtension;
+    private JComboBox<ImageFormat> defaultFileExtension;
     private JTextField serverUrl;
     private JCheckBox remoteRendering;
     private JCheckBox useProxy;
@@ -98,12 +97,7 @@ public class PlantUmlSettingsPage implements Configurable {
     private JCheckBox remoteRenderingSinglePage;
 
     public PlantUmlSettingsPage() {
-        ArrayList<String> list = new ArrayList<String>();
-        ImageFormat[] values = ImageFormat.values();
-        for (ImageFormat value : values) {
-            list.add(value.name());
-        }
-        defaultFileExtension.setModel(new ListComboBoxModel<>(list));
+        defaultFileExtension.setModel(new CollectionComboBoxModel<ImageFormat>(List.of(ImageFormat.values())));
 
         donate.setIcon(COINS);
         donate.addActionListener(e -> {
@@ -226,7 +220,7 @@ public class PlantUmlSettingsPage implements Configurable {
         if (bundledPlantUMLRadioButton.isSelected() != settings.isUseBundled()) {
             return true;
         }
-        if (!Objects.equals(settings.getDefaultExportFileFormat(), defaultFileExtension.getSelectedItem())) {
+        if (settings.getDefaultExportFileFormat() != defaultFileExtension.getSelectedItem()) {
             return true;
         }
 
@@ -239,7 +233,7 @@ public class PlantUmlSettingsPage implements Configurable {
         getData(settings);
 
         settings.setUseBundled(bundledPlantUMLRadioButton.isSelected());
-        settings.setDefaultExportFileFormat((String) defaultFileExtension.getSelectedItem());
+        settings.setDefaultExportFileFormat((ImageFormat) defaultFileExtension.getSelectedItem());
         ApplicationManager.getApplication().getMessageBus().syncPublisher(PlantUmlSettings.SettingsChangedListener.TOPIC).onSettingsChange(settings);
     }
 

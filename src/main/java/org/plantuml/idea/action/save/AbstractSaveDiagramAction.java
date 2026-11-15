@@ -91,7 +91,7 @@ public abstract class AbstractSaveDiagramAction extends MyDumbAwareAction {
             sourceFile = new File(file.getPath());
             selectedSource = getSelectedSourceWithCaret(FileEditorManager.getInstance(project), fileEditor.getEditor());
             remote = plantUmlSettings.isRemoteRendering();
-            format = plantUmlSettings.getDefaultExportFileFormatEnum();
+            format = plantUmlSettings.getDefaultExportFileFormat();
             zoom = new Zoom(100, plantUmlSettings);
             String filename = PlantUmlFacade.get().getFilename(project, selectedSource, file);
             defaultFileName = getDefaultFileName(e, project, null, editor, filename);
@@ -102,7 +102,7 @@ public abstract class AbstractSaveDiagramAction extends MyDumbAwareAction {
             selectedSource = displayedItem.getSource();
             sourceFile = new File(displayedItem.getSourceFilePath());
             remote = renderResult.getStrategy() == RenderingType.REMOTE;
-            format = remote ? displayedItem.getRenderResult().getImageItem(0).getFormat() : plantUmlSettings.getDefaultExportFileFormatEnum();
+            format = remote ? displayedItem.getRenderResult().getImageItem(0).getFormat() : plantUmlSettings.getDefaultExportFileFormat();
             zoom = getEditorOrToolWindowPreview(e).getZoom();
             defaultFileName = getDefaultFileName(e, project, previewPanel, null, null);
         }
@@ -282,7 +282,7 @@ public abstract class AbstractSaveDiagramAction extends MyDumbAwareAction {
             filename = FILENAME;
         }
 
-        String defaultExtension = plantUmlSettings.getDefaultExportFileFormatEnum().name().toLowerCase();
+        String defaultExtension = plantUmlSettings.getDefaultExportFileFormat().name().toLowerCase();
 
         // Append extension manually to file name on MacOS because FileSaverDialog does not do it
         // automatically.

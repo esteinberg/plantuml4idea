@@ -63,18 +63,6 @@ public class Classloaders {
                 validate(jars);
                 jarFiles.addAll(Arrays.asList(jars));
             }
-            if (Utils.isUnitTest()) {
-                File file = new File("lib/plantuml");
-                if (!file.exists()) {
-                    throw new RuntimeException(file.getAbsolutePath());
-                }
-                File[] files = file.listFiles();
-                if (files != null) {
-                    jarFiles.addAll(Arrays.asList(files));
-                }
-            }
-
-
             bundled = classLoader(jarFiles);
         }
         return bundled;
@@ -149,9 +137,6 @@ public class Classloaders {
 
     @NotNull
     private static File getPluginHome() {
-        if (Utils.isUnitTest()) {
-            return new File("lib/");
-        } else {
             File pluginHome = new File(PathManager.getPluginsPath(), "plantuml4idea/lib/");
             if (pluginHome.exists()) {
                 return pluginHome;
@@ -163,8 +148,7 @@ public class Classloaders {
                 return pluginHome;
             }
             LOG.warn(pluginHome.getAbsolutePath() + " does not exist!");
-        }
-        throw new RuntimeException("Plugin home not found! Did you install the whole zip file?! (PathManager.getPluginsPath()=" + PathManager.getPluginsPath() + ")");
+            throw new RuntimeException("Plugin home not found! Did you install the whole zip file?! (PathManager.getPluginsPath()=" + PathManager.getPluginsPath() + ")");
     }
 
     /**

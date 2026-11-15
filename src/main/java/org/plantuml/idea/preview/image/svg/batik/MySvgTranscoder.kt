@@ -177,14 +177,14 @@ class MySvgTranscoder private constructor(private var width: Float, private var 
 
     override fun showConfirm(message: String?) = false
 
-    override fun getPixelUnitToMillimeter(): Float = 0.26458333333333333333333333333333f // 96dpi
+    override fun getResolution(): Float = 96f
 
 //    override fun getPixelToMM() = pixelUnitToMillimeter
 
     override fun getDefaultFontFamily() = "Arial, Helvetica, sans-serif"
 
     // 9pt (72pt = 1in)
-    override fun getMediumFontSize(): Float = 9f * 25.4f / (72f * pixelUnitToMillimeter)
+    override fun getMediumFontSize(): Float = 9f * 25.4f / (72f * getResolution())
 
     override fun getLighterFontWeight(f: Float) = getStandardLighterFontWeight(f)
 

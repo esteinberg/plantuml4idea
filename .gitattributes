@@ -1,0 +1,3 @@
+# gradlew is unix line endings
+gradlew text eol=lf
+*.sh	text eol=lf

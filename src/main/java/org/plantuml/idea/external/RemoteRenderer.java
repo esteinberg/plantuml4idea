@@ -2,8 +2,8 @@ package org.plantuml.idea.external;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.ConcurrencyUtil;
-import com.intellij.util.net.HttpConfigurable;
-import com.intellij.util.net.IdeaWideProxySelector;
+import com.intellij.util.net.IdeProxySelector;
+import com.intellij.util.net.ProxySettings;
 import org.jetbrains.annotations.Nullable;
 import org.plantuml.idea.plantuml.ImageFormat;
 import org.plantuml.idea.rendering.ImageItem;
@@ -177,7 +177,7 @@ public class RemoteRenderer {
                 .followRedirects(HttpClient.Redirect.NEVER); //it is slow, better if user fixes the url
 
         if (plantUmlSettings.isUseProxy()) {
-            builder.proxy(new IdeaWideProxySelector(HttpConfigurable.getInstance()));
+            builder.proxy(new IdeProxySelector(() -> ProxySettings.getInstance().getProxyConfiguration()));
         } else {
             builder.proxy(HttpClient.Builder.NO_PROXY);
         }

@@ -26,7 +26,7 @@ public class PumlRuntimeDictionaryProvider implements RuntimeDictionaryProvider 
     }
 
     private Dictionary dictionary(List<String> keys, final String name) {
-        HashSet<String> set = new HashSet<>(keys.size());
+        HashSet<String> set = HashSet.newHashSet(keys.size());
         for (String type : keys) {
             if (type.startsWith("@") || type.startsWith("!")) {
                 set.add(type.substring(1));
@@ -41,9 +41,9 @@ public class PumlRuntimeDictionaryProvider implements RuntimeDictionaryProvider 
                 return name;
             }
 
-//            @Override
-            public Boolean contains(@NotNull String s) {
-                return set.contains(s);
+            @Override
+            public @NotNull LookupStatus lookup(@NotNull String word) {
+                return set.contains(word) ? LookupStatus.Present : LookupStatus.Absent;
             }
 
             @Override
